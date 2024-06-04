@@ -35,6 +35,7 @@ import net.minidev.json.JSONArray;
 
 @Component
 @Slf4j
+
 public class MDMSApplicationRunnerImpl {
 
     @Autowired
