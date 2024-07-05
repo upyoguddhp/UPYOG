@@ -116,12 +116,19 @@ public class SsoService {
 		List<Role> rolesList = Arrays.asList(Role.builder().name(null).code(constants.CITIZEN_ROLE).tenantId(constants.getStateLevelTenantId()).build());
 		Set<Role> rolesSet = rolesList.stream().collect(Collectors.toSet());
 
+		String guardian = null;
+		if (hpSsoValidateTokenResponse.getCo() != null) {
+		    String[] coParts = hpSsoValidateTokenResponse.getCo().split(":");
+		    if (coParts.length > 1) {
+		        guardian = coParts[1];
+		    }
+		}
+		
 		User user = User.builder().username(hpSsoValidateTokenResponse.getUsername())
 				.name(hpSsoValidateTokenResponse.getName()).mobileNumber(hpSsoValidateTokenResponse.getMobile())
 				.emailId(hpSsoValidateTokenResponse.getEmail())
 				.gender(Gender.valueOf(hpSsoValidateTokenResponse.getGender().toUpperCase())).dob(dob)
-				.guardian(null != hpSsoValidateTokenResponse.getCo() ? hpSsoValidateTokenResponse.getCo().split(":")[1]
-						: null)
+				.guardian(guardian)
 				.active(true).type(UserType.valueOf(constants.CITIZEN_ROLE)).password(constants.CITIZEN_PASSWORD).tenantId(constants.getStateLevelTenantId()).roles(rolesSet)
 				.build();
 		return user;
