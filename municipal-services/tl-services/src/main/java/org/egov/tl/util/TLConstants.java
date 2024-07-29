@@ -12,6 +12,8 @@ public class TLConstants {
 
 
     public static  final String businessService_TL = "TL";
+    
+    public static  final String businessService_NewTL = "NewTL";
 
     public static  final String businessService_DIRECT_RENEWAL = "DIRECTRENEWAL";
     
@@ -188,6 +190,7 @@ public class TLConstants {
     public static final String TRADE_TYPE = "TradeType";
 
     public static final String ACCESSORIES_CATEGORY = "AccessoriesCategory";
+    public static final String ACCESSORIES_CATEGORY_PART_2 = "AccessoriesCategoryPart2";
 
     public static final String STRUCTURE_TYPE = "StructureType";
 
@@ -272,9 +275,24 @@ public class TLConstants {
     
     public static final String ACTION_MANUALLYEXPIRE = "MANUALEXPIRE";
 
+    public static final String ACTION_CREATE  = "CREATE";
+
+    public static final String ACTION_VERIFY  = "VERIFY";
+
+    public static final String ACTION_FORWARD_TO_VERIFIER  = "FORWARD_TO_VERIFIER";
+
+    public static final String ACTION_FORWARD_TO_APPROVER  = "FORWARD_TO_APPROVER";
+
+    public static final String ACTION_RETURN_TO_INITIATOR  = "RETURN_TO_INITIATOR";
+
+    public static final String ACTION_RETURN_TO_VERIFIER  = "RETURN_TO_VERIFIER";
+
+
     public static final String STATUS_INITIATED = "INITIATED";
 
     public static final String STATUS_APPLIED  = "APPLIED";
+
+    public static final String STATUS_VERIFIED  = "VERIFIED";
 
     public static final String STATUS_APPROVED  = "APPROVED";
 
@@ -291,6 +309,15 @@ public class TLConstants {
     public static final String STATUS_MANUALLYEXPIRED = "MANUALEXPIRED";
 
     public static final String BILL_AMOUNT_JSONPATH = "$.Bill[0].totalAmount";
+    
+    public static final String STATUS_PENDINGFORMODIFICATION = "PENDINGFORMODIFICATION";
+    
+    public static final String STATUS_PENDINGFORVERIFICATION = "PENDINGFORVERIFICATION";
+    
+    public static final String STATUS_PENDINGFORAPPROVAL = "PENDINGFORAPPROVAL";
+    
+    public static final String STATUS_PENDINGFORPAYMENT = "PENDINGFORPAYMENT";
+	
 
 
     // ACTION_STATUS combinations for notification
@@ -430,5 +457,11 @@ public class TLConstants {
     public TLConstants() {}
 
     public static final String TENANTS_JSONPATH = "$.MdmsRes.tenant.tenants";
+    
+    public static String ROLE_CODE_EMPLOYEE = "EMPLOYEE";
+
+    public static String ROLE_CODE_TL_VERIFIER = "TL_VERIFIER";
+
+    public static String ROLE_CODE_TL_APPROVER = "TL_APPROVER";
 
 }

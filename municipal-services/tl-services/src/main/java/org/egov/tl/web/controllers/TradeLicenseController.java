@@ -1,32 +1,49 @@
 package org.egov.tl.web.controllers;
 
 
-import org.egov.tl.service.PaymentUpdateService;
+import static org.egov.tl.util.TLConstants.businessService_TL;
+
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.egov.tl.service.TradeLicenseService;
 import org.egov.tl.service.notification.PaymentNotificationService;
 import org.egov.tl.service.notification.TLNotificationService;
 import org.egov.tl.util.ResponseInfoFactory;
 import org.egov.tl.util.TLConstants;
-import org.egov.tl.web.models.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.*;
+import org.egov.tl.web.models.ApplicationStatusChangeRequest;
+import org.egov.tl.web.models.RequestInfoWrapper;
+import org.egov.tl.web.models.TradeLicense;
+import org.egov.tl.web.models.TradeLicenseActionRequest;
+import org.egov.tl.web.models.TradeLicenseActionResponse;
+import org.egov.tl.web.models.TradeLicenseRequest;
+import org.egov.tl.web.models.TradeLicenseResponse;
+import org.egov.tl.web.models.TradeLicenseSearchCriteria;
+import org.egov.tl.web.models.UpdateTLStatusCriteriaRequest;
+import org.egov.tl.web.models.contract.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-
-import static org.egov.tl.util.TLConstants.businessService_TL;
-
-@RestController
+@RestController	
+@CrossOrigin(origins="*")
     @RequestMapping("/v1")
     public class TradeLicenseController {
 
@@ -56,6 +73,7 @@ import static org.egov.tl.util.TLConstants.businessService_TL;
 
 
 
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
     @PostMapping({"/{servicename}/_create", "/_create"})
     public ResponseEntity<TradeLicenseResponse> create(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
                                                        @PathVariable(required = false) String servicename) {
@@ -66,6 +84,7 @@ import static org.egov.tl.util.TLConstants.businessService_TL;
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
     @RequestMapping(value = {"/{servicename}/_search", "/_search"}, method = RequestMethod.POST)
     public ResponseEntity<TradeLicenseResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                        @Valid @ModelAttribute TradeLicenseSearchCriteria criteria,
@@ -82,12 +101,15 @@ import static org.egov.tl.util.TLConstants.businessService_TL;
         TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).count(count).applicationsIssued(applicationsIssued)
         		.applicationsRenewed(applicationsRenewed).validity(validity).build();
+        tradeLicenseService.processResponse(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
     @RequestMapping(value = {"/{servicename}/_update", "/_update"}, method = RequestMethod.POST)
-    public ResponseEntity<TradeLicenseResponse> update(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
+    public ResponseEntity<TradeLicenseResponse> update(@RequestBody TradeLicenseRequest tradeLicenseRequest,
                                                        @PathVariable(required = false) String servicename) {
+    	
         List<TradeLicense> licenses = tradeLicenseService.update(tradeLicenseRequest, servicename);
 
         TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
@@ -96,7 +118,7 @@ import static org.egov.tl.util.TLConstants.businessService_TL;
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = {"/{servicename}/{jobname}/_batch", "/_batch"}, method = RequestMethod.POST)
+	@RequestMapping(value = {"/{servicename}/{jobname}/_batch", "/_batch"}, method = RequestMethod.POST)
     public ResponseEntity sendReminderSMS(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                           @PathVariable(required = false) String servicename,
                                           @PathVariable(required = true) String jobname) {
@@ -129,6 +151,38 @@ import static org.egov.tl.util.TLConstants.businessService_TL;
         tlNotificationService.process(tradeLicenseRequest);
         return new ResponseEntity(HttpStatus.OK);
     }
+    
+    
+    @PostMapping("/update/state")
+    public ResponseEntity<ProcessInstanceResponse> updateStateWf(@RequestBody UpdateTLStatusCriteriaRequest updateTLStatusCriteriaRequest){
+    	ProcessInstanceResponse processInstanceResponse = tradeLicenseService.updateState(updateTLStatusCriteriaRequest);
+        return new ResponseEntity(processInstanceResponse , HttpStatus.OK);
+    }
+    
+    @PostMapping("/updateApplicationAppliedStatus")
+    public ResponseEntity<?> updateStateOfApplication(@RequestBody ApplicationStatusChangeRequest applicationStatusChangeRequest){
+    	ApplicationStatusChangeRequest applicationStatusChangeRequest2 = tradeLicenseService.updateStateOfApplication(applicationStatusChangeRequest);
+        return new ResponseEntity(applicationStatusChangeRequest2 , HttpStatus.OK);
+    }
 
+    @PostMapping("/testPdfCreateAndUpload")
+    public ResponseEntity<Resource> testPdfCreateAndUpload(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest){
+    	Resource object = tradeLicenseService.createNoSavePDF(tradeLicenseRequest.getLicenses().get(0)
+    														, tradeLicenseRequest.getRequestInfo());
+    	
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "generated.pdf");
+
+        return new ResponseEntity(object, headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/_actions")
+    public ResponseEntity<?> getActions(@RequestBody TradeLicenseActionRequest tradeLicenseActionRequest){
+    	
+    	TradeLicenseActionResponse response = tradeLicenseService.getActionsOnApplication(tradeLicenseActionRequest);
+    	
+    	return new ResponseEntity(response, HttpStatus.OK);
+    }
 }

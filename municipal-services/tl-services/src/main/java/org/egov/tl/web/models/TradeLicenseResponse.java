@@ -3,6 +3,8 @@ package org.egov.tl.web.models;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TradeLicenseResponse   {
         @JsonProperty("ResponseInfo")
         private ResponseInfo responseInfo = null;
@@ -49,6 +52,21 @@ public class TradeLicenseResponse   {
         
         @JsonProperty("applicationValidity")
         private int validity;
+        
+        @JsonProperty("applicationInitiated")
+        private int applicationInitiated;
+        
+        @JsonProperty("applicationApplied")
+        private int applicationApplied;
+        
+        @JsonProperty("applicationPendingForPayment")
+        private int applicationPendingForPayment;
+        
+        @JsonProperty("applicationRejected")
+        private int applicationRejected;
+        
+        @JsonProperty("applicationApproved")
+        private int applicationApproved;
 
 
         public TradeLicenseResponse addLicensesItem(TradeLicense licensesItem) {

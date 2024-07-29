@@ -46,6 +46,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -83,9 +86,9 @@ public class Employee {
 
     private Long dateOfAppointment;
 
-    @Valid
-    @NotEmpty
-    @Size(min = 1,max = 50)
+//    @Valid
+//    @NotEmpty
+//    @Size(min = 1,max = 50)
     private List<Jurisdiction> jurisdictions = new ArrayList<>();
 
 
@@ -130,6 +133,10 @@ public class Employee {
     @Valid
     @NotNull
     private User user;
+
+    @JsonProperty("additionalDetail")
+    private JsonNode additionalDetail = null;
+
 
 
 }

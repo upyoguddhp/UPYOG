@@ -18,6 +18,7 @@ import net.minidev.json.JSONArray;
 
 @RestController
 @Slf4j
+@CrossOrigin(origins="*")
 @RequestMapping(value = "/v1")
 public class MDMSController {
 
@@ -26,6 +27,7 @@ public class MDMSController {
 
     @PostMapping("_search")
     @ResponseBody
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
     private ResponseEntity<?> search(@RequestBody @Valid MdmsCriteriaReq mdmsCriteriaReq) {
 
         Map<String, Map<String, JSONArray>> response = mdmsService.searchMaster(mdmsCriteriaReq);

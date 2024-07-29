@@ -106,12 +106,15 @@ public class TLValidator {
             Map<String, String> errorMap = new HashMap<>();
             if (license.getFinancialYear() == null)
                 errorMap.put("NULL_FINANCIALYEAR", " Financial Year cannot be null");
-            if (license.getTradeLicenseDetail().getStructureType() == null)
-                errorMap.put("NULL_STRUCTURETYPE", " Structure Type cannot be null");
-            if (license.getTradeLicenseDetail().getSubOwnerShipCategory() == null)
-                errorMap.put("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
-            if ((license.getTradeLicenseDetail().getAddress().getLocality() == null)||(license.getTradeLicenseDetail().getAddress().getLocality().getCode() == null))
-                errorMap.put("NULL_LOCALITY", " Locality cannot be null");
+            if (!StringUtils.equals(businessService_TL, license.getBusinessService())) {
+            	if (license.getTradeLicenseDetail().getStructureType() == null)
+                    errorMap.put("NULL_STRUCTURETYPE", " Structure Type cannot be null");
+                if (license.getTradeLicenseDetail().getSubOwnerShipCategory() == null)
+                    errorMap.put("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
+            }
+         // if need to implement Locality/Ward/Zone/ULB validations
+//            if ((license.getTradeLicenseDetail().getAddress().getLocality() == null)||(license.getTradeLicenseDetail().getAddress().getLocality().getCode() == null))
+//                errorMap.put("NULL_LOCALITY", " Locality cannot be null");
 
             if (!errorMap.isEmpty())
                 throw new CustomException(errorMap);
@@ -323,7 +326,7 @@ public class TLValidator {
         switch (businessService) {
             case businessService_TL:
                 valideDates(request, mdmsData);
-                propertyValidator.validateProperty(request);
+//                propertyValidator.validateProperty(request);
                 validateTLSpecificNotNullFields(request);
                 break;
 
@@ -570,8 +573,8 @@ public class TLValidator {
         if(!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& criteria.isEmpty())
             throw new CustomException("INVALID SEARCH","Search without any paramters is not allowed");
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE" )&& criteria.tenantIdOnly())
-            throw new CustomException("INVALID SEARCH","Search based only on tenantId is not allowed");
+//        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE" )&& criteria.tenantIdOnly())
+//            throw new CustomException("INVALID SEARCH","Search based only on tenantId is not allowed");
 
         /*if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& criteria.tenantIdOnly())
             throw new CustomException("INVALID SEARCH","Search only on tenantId is not allowed");*/
