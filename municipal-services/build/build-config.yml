@@ -7,6 +7,7 @@
 #       image-name: < Docker image name  >
 # -
 # -
+#
 config:
   - name: "builds/municipal-services/egov-user-event"
     build:
