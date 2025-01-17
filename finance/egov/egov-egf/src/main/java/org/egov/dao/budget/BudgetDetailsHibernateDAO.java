@@ -994,7 +994,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 			if (paramMap.get(Constants.SCHEMEID) != null)
 				schemeid = (Integer) paramMap.get(Constants.SCHEMEID);
 			if (paramMap.get(Constants.FUNDID) != null)
-				fundid = (Integer) paramMap.get(Constants.FUNDID);
+				fundid = ((Long)paramMap.get(Constants.FUNDID)).intValue();
 			if (paramMap.get(Constants.SUBSCHEMEID) != null)
 				subschemeid = (Integer) paramMap.get(Constants.SUBSCHEMEID);
 			if (paramMap.get(Constants.BOUNDARYID) != null)
@@ -1020,18 +1020,46 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 			fromdate = finyear.getStartingDate();
 
 			final Map<String, Object> params = new HashMap<>();
-			query.append(" and gl.functionId=:functionid and vmis.departmentcode=:deptCode")
-					.append(" and vmis.functionary=:functionaryid and vmis.schemeid=:schemeid")
-					.append(" and vmis.subschemeid=:subschemeid and vh.fundId=:fundid")
-					.append(" and vmis.divisionid=:boundaryid");
+			
+			query.append("and vmis.departmentcode=:deptCode");
+			if(null!=functionid) {
+				query.append(" and gl.functionId=:functionid ");
+			}
+			if(null!=functionaryid) {
+				query.append(" and vmis.functionary=:functionaryid ");
+			}
+			if(null!=schemeid) {
+				query.append( "and vmis.schemeid=:schemeid");
+			}
+			if(null!=subschemeid) {
+				query.append(" and vmis.subschemeid=:subschemeid ");
+			}
+			if(null!=fundid) {
+				query.append( "and vh.fundId=:fundid");
+			}
+			if(null!=boundaryid) {
+				query.append(" and vmis.divisionid=:boundaryid");
+			}
 
-			params.put("functionid", functionid);
 			params.put("deptCode", deptCode);
-			params.put("functionaryid", functionaryid);
-			params.put("schemeid", schemeid);
-			params.put("subschemeid", subschemeid);
-			params.put("fundid", fundid);
-			params.put("boundaryid", boundaryid);
+			if(null!=functionid) {
+				params.put("functionid", functionid);
+			}
+			if(null!=functionaryid) {
+				params.put("functionaryid", functionaryid);
+			}
+			if(null!=schemeid) {
+				params.put("schemeid", schemeid);
+			}
+			if(null!=subschemeid) {
+				params.put("subschemeid", subschemeid);
+			}
+			if(null!=fundid) {
+				params.put("fundid", fundid);
+			}
+			if(null!=boundaryid) {
+				params.put("boundaryid", boundaryid);
+			}
 
 			if (budgetheadid == null || budgetheadid.equals(EMPTY_STRING))
 				throw new ValidationException(EMPTY_STRING, "Budget head id is null or empty");
@@ -1047,7 +1075,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 			final int majorcodelength = Integer.valueOf(appList.get(0).getValue());
 
 			if (budgetgroup.getMinCode() != null) {
-				query.append(" and substr(gl.glcode,1,:minCodeLength<=:minGlcode ");
+				query.append(" and substr(gl.glcode,1,:minCodeLength)<=:minGlcode ");
 				params.put("minCodeLength", budgetgroup.getMinCode().getGlcode().length());
 				params.put("minGlcode", budgetgroup.getMinCode().getGlcode());
 				if (budgetgroup.getMaxCode() == null)
