@@ -67,6 +67,7 @@ public class RequestSearchCriteria {
 
     @JsonProperty("offset")
     private Integer offset;
+    
 
     @JsonIgnore
     private Set<String> userIds;

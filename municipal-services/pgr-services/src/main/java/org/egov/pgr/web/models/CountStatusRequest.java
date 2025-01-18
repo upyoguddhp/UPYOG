@@ -22,6 +22,6 @@ public class CountStatusRequest {
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo;
 	
-	private List<CountStatusUpdate> countStatusUpdate;
+	//private List<CountStatusUpdate> countStatusUpdate;
 
 }

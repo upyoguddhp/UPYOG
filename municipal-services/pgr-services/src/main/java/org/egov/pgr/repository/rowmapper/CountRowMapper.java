@@ -3,11 +3,8 @@ package org.egov.pgr.repository.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.egov.pgr.web.models.CountStatusRequest;
 import org.egov.pgr.web.models.CountStatusUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -35,11 +32,9 @@ public class CountRowMapper implements ResultSetExtractor<List<CountStatusUpdate
 			 update = CountStatusUpdate.builder().closedAfterRejection(rs.getInt("closedAfterRejection"))
 					.closedAfterResolution(rs.getInt("closedAfterResolution"))
 					.pendingAtLME(rs.getInt("pendingAtLME"))
-					.pendingForAssignment(rs.getInt("pendingForAssignment"))
-					.pendingForReAssignment(rs.getInt("pendingForReAssignment"))
-					.rejected(rs.getInt("rejected"))
 					.resolved(rs.getInt("resolved"))
-					.dateRange(rs.getString("period"))
+					.closedAfterRejection(rs.getInt("closedAfterRejection"))
+					.pendingAtLMHE(rs.getInt("pendingAtLMHE"))
 						/*
 						 * .additionalDetails(getAdditionalDetails(rs,"additionaldetails"))
 						 * .tenantId(rs.getString("tenantid")) .serviceCode(rs.getString("servicecode"))

@@ -99,11 +99,25 @@ public class RequestsApiController{
     }
     
     @RequestMapping(value="/request/_countStatus", method = RequestMethod.POST)
-    public ResponseEntity<CountStatusResponse> requestCountStatuspost(@Valid @RequestBody CountStatusRequest request) throws IOException{
-    	request = pgrService.getStatusCount(request);
+    public ResponseEntity<CountStatusResponse> requestCountStatuspost(@Valid @RequestBody CountStatusRequest request ,
+    		@Valid @ModelAttribute RequestSearchCriteria criteria) throws IOException{
+    	CountStatusResponse response = new CountStatusResponse();
+    	response = pgrService.getStatusCount(request,criteria);
     	 ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(),true);
-    	 CountStatusResponse response = CountStatusResponse.builder().responseInfo(responseInfo).countStatusUpdate(request.getCountStatusUpdate()).build();
+    	 response = CountStatusResponse.builder().responseInfo(responseInfo).countStatusUpdate(response.getCountStatusUpdate()).build();
     	return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @PostMapping(value = "/request/_updateStatus")
+	public ResponseEntity<ServiceResponse> updateStatus(@Valid @RequestBody ServiceStatusUpdateRequest request)
+			throws IOException {
+ 
+		ServiceRequest enrichedReq = pgrService.updateStatus(request);
+		ServiceWrapper serviceWrapper = ServiceWrapper.builder().service(enrichedReq.getService())
+				.workflow(enrichedReq.getWorkflow()).build();
+		ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(),
+				true);
+		ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo)
+				.serviceWrappers(Collections.singletonList(serviceWrapper)).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

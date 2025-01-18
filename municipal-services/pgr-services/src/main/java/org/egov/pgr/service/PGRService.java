@@ -22,6 +22,7 @@ import org.egov.pgr.web.models.CountStatusUpdate;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
+import org.egov.pgr.web.models.ServiceStatusUpdateRequest;
 import org.egov.pgr.web.models.ServiceWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -207,18 +208,36 @@ public class PGRService {
 	}
 
 
-	public @Valid CountStatusRequest getStatusCount(@Valid CountStatusRequest request) {
+	public @Valid CountStatusResponse getStatusCount(@Valid CountStatusRequest request, @Valid RequestSearchCriteria criteria) {
 	
-		List<CountStatusUpdate> count = null;
-		CountStatusResponse response = null;
+		CountStatusUpdate count = null;
+		CountStatusResponse response = new CountStatusResponse();
 		try {
 			
-			 count = repository.countSearch(request);
+			 count = repository.countSearch(criteria);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
-		request.setCountStatusUpdate(count);
-		return request;
+		response.setCountStatusUpdate(count);
+		return response;
+	}
+	
+	public ServiceRequest updateStatus(ServiceStatusUpdateRequest request) {
+		 
+		RequestSearchCriteria requestSearchCriteria = RequestSearchCriteria.builder()
+				.serviceRequestId(request.getServiceRequestId()).tenantId(request.getTenantId()).build();
+ 
+		List<ServiceWrapper> serviceWrappers = search(request.getRequestInfo(), requestSearchCriteria);
+ 
+		Service service = serviceWrappers.get(0).getService();
+ 
+		service.setApplicationStatus(request.getApplicationStatus());
+ 
+		ServiceRequest serviceRequest = ServiceRequest.builder().service(service).requestInfo(request.getRequestInfo())
+				.workflow(request.getWorkflow()).build();
+ 
+		return update(serviceRequest);
+ 
 	}
 }

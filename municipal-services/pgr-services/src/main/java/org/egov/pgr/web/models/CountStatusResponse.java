@@ -1,7 +1,5 @@
 package org.egov.pgr.web.models;
 
-import java.util.List;
-
 import org.egov.common.contract.response.ResponseInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,6 +21,6 @@ public class CountStatusResponse {
 	private ResponseInfo responseInfo;
 	
 	@JsonProperty("countStatusUpdate")
-	private List<CountStatusUpdate> countStatusUpdate;
+	private CountStatusUpdate countStatusUpdate;
 
 }

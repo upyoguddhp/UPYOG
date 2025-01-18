@@ -15,17 +15,9 @@ import lombok.Setter;
 @Builder
 public class CountStatusUpdate {
 
-	private int pendingForAssignment;
-	private int pendingForReAssignment;
 	private int pendingAtLME;
-	private int rejected;
+	private int pendingAtLMHE;
 	private int resolved;
 	private int closedAfterRejection;
 	private int closedAfterResolution;
-	private String tenantId;
-	private String serviceCode;
-	private Object additionalDetails;
-	private String dateRange;
-	private Long fromDate;
-	private Long endDate;
 }

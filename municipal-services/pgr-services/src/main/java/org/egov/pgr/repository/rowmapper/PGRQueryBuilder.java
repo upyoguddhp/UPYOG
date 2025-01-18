@@ -55,85 +55,78 @@ public class PGRQueryBuilder {
             "SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END) AS closedAfterResolution " +
             "FROM eg_pgr_service_v2 as pt " ;
 	
-	public static final String COUNT_APPLCATIONSTATUS_SUMMARY  = "CREATE OR REPLACE VIEW application_status_summary AS " +
-            "SELECT * " +
-            "FROM ( " +
-            "    SELECT " +
-            "        'Last_10_days' AS period, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution, " +
-            "        pt.tenantid AS tenantId, " +
-            "        pt.servicecode as servicecode, " +
-            "        pt.additionaldetails as additionaldetails " +
-            "    FROM eg_pgr_service_v2 AS pt " +
-            "    WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 10 " +
-            "    GROUP BY tenantId, servicecode, additionaldetails " +
-            "    UNION ALL " +
-            "    SELECT " +
-            "        '11_to_30_days' AS period, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution, " +
-            "        pt.tenantid AS tenantId, " +
-            "        pt.servicecode as servicecode, " +
-            "        pt.additionaldetails as additionaldetails " +
-            "    FROM eg_pgr_service_v2 AS pt " +
-            "    WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 10 " +
-            "      AND EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 30 " +
-            "    GROUP BY tenantId, servicecode, additionaldetails " +
-            "    UNION ALL " +
-            "    SELECT " +
-            "        '31_to_60_days' AS period, " +
-			 "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution, " +
-            "        pt.tenantid AS tenantId, " +
-            "        pt.servicecode as servicecode, " +
-            "        pt.additionaldetails as additionaldetails " +
-            "    FROM eg_pgr_service_v2 AS pt " +
-            "    WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 30 " +
-            "      AND EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 60 " +
-            "    GROUP BY tenantId, servicecode, additionaldetails " +
-			"    UNION ALL " +
-            "    SELECT " +
-            "        '60_days' AS period, " +
-			 "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
-            "        COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution, " +
-            "        pt.tenantid AS tenantId, " +
-            "        pt.servicecode as servicecode, " +
-            "        pt.additionaldetails as additionaldetails " +
-            "    FROM eg_pgr_service_v2 AS pt " +
-            "    WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 60 " +
-            "    GROUP BY tenantId, servicecode, additionaldetails " +
-            "    ) AS combined_results " +
-            "ORDER BY " +
-            "  CASE combined_results.period  " +
-            "    WHEN 'Last_10_days' THEN 1 " +
-            "    WHEN '11_to_30_days' THEN 2 " +
-            "    WHEN '31_to_60_days' THEN 3 " +
-            "    ELSE 4 ";
+	public static final String COUNT_APPLCATIONSTATUS_SUMMARY = "DROP VIEW IF EXISTS application_status_summary; " +
+	        "CREATE VIEW application_status_summary AS " +
+	        "SELECT 'Last_10_days' AS period, " +
+	        "pt.tenantid, " +
+	        "pt.servicecode, " +
+	        "pt.additionaldetails, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution " +
+	        "FROM eg_pgr_service_v2 AS pt " +
+	        "WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 10 " +
+	        "GROUP BY pt.tenantid, pt.servicecode, pt.additionaldetails " +
+	        "UNION ALL " +
+	        "SELECT '11_to_30_days' AS period, " +
+	        "pt.tenantid, " +
+	        "pt.servicecode, " +
+	        "pt.additionaldetails, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution " +
+	        "FROM eg_pgr_service_v2 AS pt " +
+	        "WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 10 " +
+	        "AND EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 30 " +
+	        "GROUP BY pt.tenantid, pt.servicecode, pt.additionaldetails " +
+	        "UNION ALL " +
+	        "SELECT '31_to_60_days' AS period, " +
+	        "pt.tenantid, " +
+	        "pt.servicecode, " +
+	        "pt.additionaldetails, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution " +
+	        "FROM eg_pgr_service_v2 AS pt " +
+	        "WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 30 " +
+	        "AND EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) <= 60 " +
+	        "GROUP BY pt.tenantid, pt.servicecode, pt.additionaldetails " +
+	        "UNION ALL " +
+	        "SELECT 'More_than_60_days' AS period, " +
+	        "pt.tenantid, " +
+	        "pt.servicecode, " +
+	        "pt.additionaldetails, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END), 0) AS pendingForReAssignment, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END), 0) AS rejected, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution " +
+	        "FROM eg_pgr_service_v2 AS pt " +
+	        "WHERE EXTRACT(DAY FROM (current_timestamp - TO_TIMESTAMP(lastmodifiedtime / 1000.0))) > 60 " +
+	        " GROUP BY pt.tenantid, pt.servicecode, pt.additionaldetails";
+	
+	public final String COUNT_STATUS_FOR_PGR =  "SELECT "+
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END), 0) AS pendingAtLME, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLMHE' THEN 1 ELSE 0 END), 0) AS pendingAtLMHE, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolved, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END), 0) AS closedAfterRejection, " +
+	        "COALESCE(SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END), 0) AS closedAfterResolution " +
+	        "FROM eg_pgr_service_v2 AS pt " ;
 
-           /* "WHERE created_date BETWEEN CURRENT_DATE - INTERVAL '60 days' AND CURRENT_DATE " +
-            "GROUP BY date_range " +
-            "ORDER BY date_range";*/
 	public String getPGRSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
