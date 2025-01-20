@@ -78,7 +78,6 @@ public class LocalDiskFileStoreServiceTest {
 
     @AfterClass
     public static void afterTest() throws IOException {
-        //Files.deleteIfExists(tempFilePath);
         Path storePath = Paths.get(System.getProperty("user.home") + File.separator + "testfilestore");
         try {
             Files.walkFileTree(storePath, new SimpleFileVisitor<Path>() {
@@ -168,7 +167,6 @@ public class LocalDiskFileStoreServiceTest {
             FileInputStream fin = new FileInputStream(newFile);
             files.add(fin);
         }
-        //FileUtils.deleteDirectory(tempFilePath.toFile());
     }
 
     @Test
