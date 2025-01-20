@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: pet-registration
    description: Persists Pet Registration Application
-   fromTopic: save-ptr-application
+   fromTopic: hp-save-ptr-application
    isTransaction: true
    queryMaps:
     - query: INSERT INTO eg_ptr_registration (id, tenantid, applicationnumber, applicantname,fathername, mobilenumber, emailid, aadharnumber,createdby, lastmodifiedby, createdtime, lastmodifiedtime, additionaldetail, status, is_banned_pet) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -168,7 +168,7 @@ serviceMaps:
  - version: 1.0
    name: pet-registration
    description: Update Pet Registration Application
-   fromTopic: update-ptr-application
+   fromTopic: hp-update-ptr-application
    isTransaction: true
    queryMaps:
     - query: UPDATE eg_ptr_registration SET tenantid = ?, applicationnumber = ?, applicantname = ?, fathername = ?, mobilenumber = ?, emailid = ?, aadharnumber = ?, createdby = ?, lastmodifiedby = ?, createdtime = ?, lastmodifiedtime = ?, additionaldetail = ?, status = ?, is_banned_pet = ? WHERE id = ?;

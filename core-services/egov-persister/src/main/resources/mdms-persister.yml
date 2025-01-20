@@ -3,7 +3,7 @@ serviceMaps:
   mappings:
     - version: 1.0
       description: Persists the schema definition
-      fromTopic: save-mdms-schema-definition
+      fromTopic: hp-save-mdms-schema-definition
       isTransaction: true
       queryMaps:
         - query: INSERT INTO eg_mdms_schema_definition (id ,tenantid, code, description, definition, isactive, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -34,7 +34,7 @@ serviceMaps:
 
     - version: 1.0
       description: Persists the mdms data
-      fromTopic: save-mdms-data
+      fromTopic: hp-save-mdms-data
       isTransaction: true
       queryMaps:
         - query: INSERT INTO eg_mdms_data (id, tenantid, uniqueidentifier, schemacode, data, isactive, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

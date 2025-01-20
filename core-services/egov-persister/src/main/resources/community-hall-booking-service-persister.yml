@@ -3,7 +3,7 @@ serviceMaps:
  mappings:
  - version: 1.0
    description: Persists incomplete community hall booking details in community_hall_booking_init  table
-   fromTopic: save-community-hall-booking-init
+   fromTopic: hp-save-community-hall-booking-init
    isTransaction: true
    queryMaps:
 
@@ -34,7 +34,7 @@ serviceMaps:
 
  - version: 1.0
    description: Persists community hall booking details after application is completed community_hall_booking  table
-   fromTopic: save-community-hall-booking
+   fromTopic: hp-save-community-hall-booking
    isTransaction: true
    queryMaps:
 
@@ -182,7 +182,7 @@ serviceMaps:
           
  - version: 1.0
    description: Update community hall booking details after application is changed
-   fromTopic: update-community-hall-booking
+   fromTopic: hp-update-community-hall-booking
    isTransaction: true
    queryMaps:
        - query: UPDATE public.eg_chb_booking_detail SET booking_status= ?, payment_date = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE booking_id = ?;

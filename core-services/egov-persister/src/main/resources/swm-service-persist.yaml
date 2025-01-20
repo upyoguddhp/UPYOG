@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: vehicleFuellingDetails create
    description: create vehicleFuellingDetails in egswm_vehiclefuellingdetails
-   fromTopic: swm-vehiclefuellingdetails-save-topic
+   fromTopic: hp-swm-vehiclefuellingdetails-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehiclefuellingdetails( tenantid, transactionno, transactiondate, vehicle, vehiclereadingduringfuelling, refuellingstation, fuelfilled, totalcostincurred, receiptno, receiptdate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicleFuellingDetails.*
@@ -48,7 +48,7 @@ serviceMaps:
  - version: 1.0
    name: vehicleFuellingDetails update
    description: update vehicleFuellingDetails in egswm_vehiclefuellingdetails
-   fromTopic: swm-vehiclefuellingdetails-update-topic
+   fromTopic: hp-swm-vehiclefuellingdetails-update-topic
    queryMaps: 
 
     - query: UPDATE egswm_vehiclefuellingdetails SET transactiondate=?,vehicle=?,vehiclereadingduringfuelling=?, refuellingstation=?,fuelfilled=?,totalcostincurred=?,receiptno=?,receiptdate=?,lastmodifiedby=?,lastmodifiedtime=? WHERE transactionno=? AND tenantid=?;
@@ -89,7 +89,7 @@ serviceMaps:
  - version: 1.0
    name: vehicle create
    description: create vehicle in egswm_vehicle
-   fromTopic: swm-vehicle-save-topic
+   fromTopic: hp-swm-vehicle-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehicle(tenantid, vehicletype, fueltype, regnumber, enginesrnumber, chassissrnumber, vehiclecapacity, operatorsReq, model, driver, vendor, purchasedate, price, sourceofpurchase, remarks, insurancenumber, insurancevaliditydate, kilometers, endOfWarranty, isvehicleunderwarranty, isulbowned, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicles.*
@@ -182,7 +182,7 @@ serviceMaps:
  - version: 1.0
    name: vehicle update
    description: update vehicle in egswm_vehicle
-   fromTopic: swm-vehicle-update-topic
+   fromTopic: hp-swm-vehicle-update-topic
    queryMaps: 
 
     - query: UPDATE egswm_vehicle SET vehicletype=?, fueltype=?, enginesrnumber=?, chassissrnumber=?, vehiclecapacity=?, operatorsReq=?, model=?, driver=?, vendor=?, purchasedate=?, price=?, sourceofpurchase=?, remarks=?, insurancenumber=?, insurancevaliditydate=?, kilometers=?, endOfWarranty=?, isvehicleunderwarranty=?, isulbowned=?, lastmodifiedby=?, lastmodifiedtime=? WHERE regnumber=? AND tenantid=?;
@@ -274,7 +274,7 @@ serviceMaps:
  - version: 1.0
    name: collectionpoint create
    description: create collectionpoint in egswm_collectionpoint
-   fromTopic: swm-collectionpoint-save-topic
+   fromTopic: hp-swm-collectionpoint-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_collectionpoint(code, tenantid, name, location, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.collectionPoints.*
@@ -331,7 +331,7 @@ serviceMaps:
  - version: 1.0
    name: collectionpoint update
    description: update collectionpoint in egswm_vehicle
-   fromTopic: swm-collectionpoint-update-topic
+   fromTopic: hp-swm-collectionpoint-update-topic
    queryMaps: 
 
     - query: UPDATE egswm_collectionpoint SET name=?, location=?, lastmodifiedby=?, lastmodifiedtime=? WHERE code=? AND tenantid=?;
@@ -385,7 +385,7 @@ serviceMaps:
  - version: 1.0
    name: route create
    description: create route in egswm_route
-   fromTopic: swm-route-save-topic
+   fromTopic: hp-swm-route-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_route(code, tenantid, name, collectionType, totalDistance, totalGarbageEstimate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.routes.*
@@ -444,7 +444,7 @@ serviceMaps:
  - version: 1.0
    name: route update
    description: update route in egswm_route
-   fromTopic: swm-route-update-topic
+   fromTopic: hp-swm-route-update-topic
    queryMaps: 
 
     - query: UPDATE egswm_route SET name=?, collectionType=?, totalDistance=?, totalGarbageEstimate=?, lastmodifiedby=?, lastmodifiedtime=? WHERE code=? AND tenantid=?;
@@ -499,7 +499,7 @@ serviceMaps:
  - version: 1.0
    name: vendor create
    description: create vendor in egswm_vendor
-   fromTopic: swm-vendor-save-topic
+   fromTopic: hp-swm-vendor-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vendor(vendorNo, tenantid, name,registrationNo, supplier, details, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vendors.*
@@ -616,7 +616,7 @@ serviceMaps:
  - version: 1.0
    name: vendor update
    description: update vendor in egswm_vendor
-   fromTopic: swm-vendor-update-topic
+   fromTopic: hp-swm-vendor-update-topic
    queryMaps: 
     - query: update egswm_vendor set name=?, registrationNo=?, details=?, lastmodifiedby=?, lastmodifiedtime=? where vendorNo=? and tenantId = ?;
       basePath: $.vendors.*
@@ -721,7 +721,7 @@ serviceMaps:
  - version: 1.0
    name: vendorcontract create
    description: create vendorcontract in egswm_vendorcontract
-   fromTopic: swm-vendorcontract-save-topic
+   fromTopic: hp-swm-vendorcontract-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vendorcontract(tenantid, vendor, contractNo, contractDate, contractPeriodFrom, contractPeriodTo, securityDeposit, paymentAmount, paymentTerms, remarks, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vendorContracts.*
@@ -775,7 +775,7 @@ serviceMaps:
  - version: 1.0
    name: vendorcontract update
    description: update vendorcontract in egswm_vendorcontract
-   fromTopic: swm-vendorcontract-update-topic
+   fromTopic: hp-swm-vendorcontract-update-topic
    queryMaps: 
     - query: update egswm_vendorcontract set vendor=?, contractDate=?, contractPeriodFrom=?, contractPeriodTo=?, securityDeposit=?, paymentAmount=?, paymentTerms=?, remarks=?, lastmodifiedby=?, lastmodifiedtime=? where contractNo=? and tenantId=?;
       basePath: $.vendorContracts.*
@@ -824,7 +824,7 @@ serviceMaps:
  - version: 1.0
    name: vehiclemaintenance create
    description: create vehiclemaintenance in egswm_vehiclemaintenance
-   fromTopic: swm-vehiclemaintenance-save-topic
+   fromTopic: hp-swm-vehiclemaintenance-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehiclemaintenance(code, tenantid, vehicle, maintenanceUom, maintenanceAfter, downtimeforMaintenanceUom, downtimeforMaintenance, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicleMaintenances.*
@@ -859,7 +859,7 @@ serviceMaps:
  - version: 1.0
    name: vehiclemaintenance update
    description: update vehiclemaintenance in egswm_vehiclemaintenance
-   fromTopic: swm-vehiclemaintenance-update-topic
+   fromTopic: hp-swm-vehiclemaintenance-update-topic
    queryMaps: 
     - query: update egswm_vehiclemaintenance set vehicle=?, maintenanceUom=?, maintenanceAfter=?, downtimeforMaintenanceUom=?, downtimeforMaintenance=?, lastmodifiedby=?, lastmodifiedtime=? where code=? and tenantId=?;
       basePath: $.vehicleMaintenances.*
@@ -889,7 +889,7 @@ serviceMaps:
  - version: 1.0
    name: sanitationstafftarget create
    description: create sanitationstafftarget in egswm_sanitationstafftarget
-   fromTopic: swm-sanitationstafftarget-save-topic
+   fromTopic: hp-swm-sanitationstafftarget-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_sanitationstafftarget(targetNo, tenantid, swmProcess, route, employee, targetFrom, targetTo, targetedGarbage, wetWaste, dryWaste, dumpingGround, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.sanitationStaffTargets.*
@@ -945,7 +945,7 @@ serviceMaps:
  - version: 1.0
    name: sanitationstafftarget update
    description: update sanitationstafftarget in egswm_sanitationstafftarget
-   fromTopic: swm-sanitationstafftarget-update-topic
+   fromTopic: hp-swm-sanitationstafftarget-update-topic
    queryMaps: 
     - query: update egswm_sanitationstafftarget set swmProcess=?, route=?, employee=?, targetFrom=?, targetTo=?, targetedGarbage=?, wetWaste=?, dryWaste=?, dumpingGround=?, lastmodifiedby=?, lastmodifiedtime=? where targetNo=? and tenantId=?;
       basePath: $.sanitationStaffTargets.*
@@ -997,7 +997,7 @@ serviceMaps:
  - version: 1.0
    name: refillingpumpstation create
    description: create refillingpumpstation in egswm_refillingpumpstation
-   fromTopic: swm-refillingpumpstation-save-topic
+   fromTopic: hp-swm-refillingpumpstation-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_refillingpumpstation(code, tenantid, location, name, typeofpump, remarks, quantity, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.refillingPumpStations.*
@@ -1040,7 +1040,7 @@ serviceMaps:
  - version: 1.0
    name: refillingpumpstation update
    description: update refillingpumpstation in egswm_refillingpumpstation
-   fromTopic: swm-refillingpumpstation-update-topic
+   fromTopic: hp-swm-refillingpumpstation-update-topic
    queryMaps:
     - query: UPDATE egswm_refillingpumpstation SET code = ?, tenantid = ?, location = ?, name = ?, typeofpump = ?, remarks = ?, quantity = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE tenantid = ? and code = ?;
       basePath: $.refillingPumpStations.*
@@ -1086,7 +1086,7 @@ serviceMaps:
  - version: 1.0
    name: vehicleschedule create
    description: create vehicleschedule in egswm_vehicleschedule
-   fromTopic: swm-vehicleschedule-save-topic
+   fromTopic: hp-swm-vehicleschedule-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehicleschedule(transactionNo, tenantid, scheduledFrom, scheduledTo, route, vehicle, targetedGarbage, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicleSchedules.*
@@ -1122,7 +1122,7 @@ serviceMaps:
  - version: 1.0
    name: vehicleschedule update
    description: update vehicleschedule in egswm_vehicleschedule
-   fromTopic: swm-vehicleschedule-update-topic
+   fromTopic: hp-swm-vehicleschedule-update-topic
    queryMaps:
     - query: UPDATE egswm_vehicleschedule SET scheduledFrom = ?, scheduledTo = ?, route = ?, vehicle = ?, targetedGarbage = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE transactionNo = ? and tenantid = ?;
       basePath: $.vehicleSchedules.*
@@ -1153,7 +1153,7 @@ serviceMaps:
  - version: 1.0
    name: vehiclemaintenancedetails create
    description: create vehiclemaintenancedetails in egswm_vehiclemaintenancedetails
-   fromTopic: swm-vehiclemaintenancedetail-save-topic
+   fromTopic: hp-swm-vehiclemaintenancedetail-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehiclemaintenancedetails (transactionno, tenantid, isscheduled, maintenancetype, vehicle, actualmaintenancedate, vehiclescheduledmaintenancedate, vehicledowntimeactual, vehicledowntimeactualuom, vehiclereadingduringmaintenance, remarks, costincurred, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicleMaintenanceDetails.*
@@ -1202,7 +1202,7 @@ serviceMaps:
  - version: 1.0
    name: vehiclemaintenancedetails update
    description: update vehiclemaintenancedetails in egswm_vehiclemaintenancedetails
-   fromTopic: swm-vehiclemaintenancedetail-update-topic
+   fromTopic: hp-swm-vehiclemaintenancedetail-update-topic
    queryMaps: 
     - query: UPDATE egswm_vehiclemaintenancedetails SET transactionno = ?, tenantid = ?, isscheduled = ?, maintenancetype = ?, vehicle = ?, actualmaintenancedate = ?, vehiclescheduledmaintenancedate = ?, vehicledowntimeactual = ?, vehicledowntimeactualuom = ?, vehiclereadingduringmaintenance = ?, remarks = ?, costincurred = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE tenantid = ? and transactionno = ?;
       basePath: $.vehicleMaintenanceDetails.*
@@ -1249,7 +1249,7 @@ serviceMaps:
  - version: 1.0
    name: vehicletripsheetdetails create
    description: create vehicletripsheetdetails in egswm_vehicletripsheetdetails
-   fromTopic: swm-vehicletripsheetdetails-save-topic
+   fromTopic: hp-swm-vehicletripsheetdetails-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vehicletripsheetdetails(tripNo, tenantid, vehicle, route, tripStartDate, tripEndDate, inTime, outTime, entryWeight, exitWeight, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vehicleTripSheetDetails.*
@@ -1295,7 +1295,7 @@ serviceMaps:
  - version: 1.0
    name: vehicletripsheetdetails update
    description: update vehicletripsheetdetails in egswm_vehicletripsheetdetails
-   fromTopic: swm-vehicletripsheetdetails-update-topic
+   fromTopic: hp-swm-vehicletripsheetdetails-update-topic
    queryMaps: 
     - query: update egswm_vehicletripsheetdetails set vehicle=?, route=?, tripStartDate=?, tripEndDate=?, inTime=?, outTime=?, entryWeight=?, exitWeight=?, lastmodifiedby=?, lastmodifiedtime=? where tripNo=? and tenantId=?;
       basePath: $.vehicleTripSheetDetails.*
@@ -1337,7 +1337,7 @@ serviceMaps:
  - version: 1.0
    name: sourcesegregation create
    description: create sourcesegregation in egswm_sourcesegregation
-   fromTopic: swm-sourcesegregation-save-topic
+   fromTopic: hp-swm-sourcesegregation-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_sourcesegregation(code, tenantid, dumpingGround, ulb, sourceSegregationDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.sourceSegregations.*
@@ -1386,7 +1386,7 @@ serviceMaps:
  - version: 1.0
    name: sourcesegregation update
    description: update sourcesegregation in egswm_sourcesegregation
-   fromTopic: swm-sourcesegregation-update-topic
+   fromTopic: hp-swm-sourcesegregation-update-topic
    queryMaps: 
     - query: update egswm_sourcesegregation set ulb=?, dumpingGround=?, sourceSegregationDate=?, lastmodifiedby=?, lastmodifiedtime=? where code=? and tenantId=?;
       basePath: $.sourceSegregations.*
@@ -1430,7 +1430,7 @@ serviceMaps:
  - version: 1.0
    name: vendorpaymentdetails create
    description: create vehiclemaintenancedetails in egswm_vendorpaymentdetails
-   fromTopic: swm-vendorpaymentdetails-save-topic
+   fromTopic: hp-swm-vendorpaymentdetails-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_vendorpaymentdetails (paymentno, tenantid, vendorcontract, invoiceno, invoicedate, fromdate, todate, vendorinvoiceamount, employee,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.vendorPaymentDetails.*
@@ -1496,7 +1496,7 @@ serviceMaps:
  - version: 1.0
    name: vendorpaymentdetails update
    description: update vehiclemaintenancedetails in egswm_vendorpaymentdetails
-   fromTopic: swm-vendorpaymentdetails-update-topic
+   fromTopic: hp-swm-vendorpaymentdetails-update-topic
    queryMaps: 
     - query: update egswm_vendorpaymentdetails set vendorcontract=?, invoiceno=?, invoicedate=?, fromdate=?, todate=?, vendorinvoiceamount=?, employee=?, lastmodifiedby=?, lastmodifiedtime=? where paymentNo=? and tenantId=?;
       basePath: $.vendorPaymentDetails.*
@@ -1558,7 +1558,7 @@ serviceMaps:
  - version: 1.0
    name: sanitationstaffschedule create
    description: create sanitationstaffschedule in egswm_sanitationstaffschedule
-   fromTopic: swm-sanitationstaffschedule-save-topic
+   fromTopic: hp-swm-sanitationstaffschedule-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_sanitationstaffschedule (transactionNo, tenantid, sanitationStaffTarget, shift, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.sanitationStaffSchedules.*
@@ -1586,7 +1586,7 @@ serviceMaps:
  - version: 1.0
    name: sanitationstaffschedule update
    description: update sanitationstaffschedule in egswm_sanitationstaffschedule
-   fromTopic: swm-sanitationstaffschedule-update-topic
+   fromTopic: hp-swm-sanitationstaffschedule-update-topic
    queryMaps: 
     - query: update egswm_sanitationstaffschedule set sanitationStaffTarget=?, shift=?, lastmodifiedby=?, lastmodifiedtime=? where transactionNo=? and tenantid=?;
       basePath: $.sanitationStaffSchedules.*
@@ -1608,7 +1608,7 @@ serviceMaps:
  - version: 1.0
    name: paymentdetails create
    description: create paymentdetails in egswm_paymentdetails
-   fromTopic: swm-paymentdetails-save-topic
+   fromTopic: hp-swm-paymentdetails-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_paymentdetails (code, paymentNo, tenantId, voucherNumber, voucherDate, instrumentType, instrumentNumber, instrumentDate, amount, bankName, branchName, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.paymentDetails.*
@@ -1653,7 +1653,7 @@ serviceMaps:
  - version: 1.0
    name: paymentdetails update
    description: update paymentdetails in egswm_paymentdetails
-   fromTopic: swm-paymentdetails-update-topic
+   fromTopic: hp-swm-paymentdetails-update-topic
    queryMaps: 
     - query: update egswm_paymentdetails set amount=?, paymentNo=?, voucherNumber=?, voucherDate=?, instrumentType=?, instrumentNumber=?, instrumentDate=?, bankName=?, branchName=?, lastmodifiedby=?, lastmodifiedtime=? where code=? and tenantId=?;
       basePath: $.paymentDetails.*
@@ -1692,7 +1692,7 @@ serviceMaps:
  - version: 1.0
    name: shift create
    description: create shift in egswm_shift
-   fromTopic: swm-shift-save-topic
+   fromTopic: hp-swm-shift-save-topic
    queryMaps: 
     - query: INSERT INTO egswm_shift (code, tenantId, shiftType, department, designation, shiftStartTime, shiftEndTime, lunchStartTime, lunchEndTime, graceTimeFrom, graceTimeTo, remarks, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.shifts.*
@@ -1742,7 +1742,7 @@ serviceMaps:
  - version: 1.0
    name: shift update
    description: update shift in egswm_shift
-   fromTopic: swm-shift-update-topic
+   fromTopic: hp-swm-shift-update-topic
    queryMaps: 
     - query: update egswm_shift set shiftType=?, department=?, designation=?, shiftStartTime=?, shiftEndTime=?, lunchStartTime=?, lunchEndTime=?, graceTimeFrom=?, graceTimeTo=?, remarks=?, lastmodifiedby=?, lastmodifiedtime=? where code=? and tenantId=?;
       basePath: $.shifts.*

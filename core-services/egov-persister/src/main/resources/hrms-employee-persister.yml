@@ -4,7 +4,7 @@ serviceMaps:
   - version: 1.0
     name: hrms
     description: Persists employee details in the table
-    fromTopic: save-hrms-employee
+    fromTopic: hp-save-hrms-employee
     isTransaction: true
     queryMaps:
     - query: INSERT INTO eg_hrms_employee(tenantid, id, uuid, code, dateOfAppointment, employeestatus, employeetype, active, createdby, createddate, lastmodifiedby, lastModifiedDate, additionalDetail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -233,7 +233,7 @@ serviceMaps:
   - version: 1.0
     name: hrms
     description: Persists employee details in the table
-    fromTopic: update-hrms-employee
+    fromTopic: hp-update-hrms-employee
     isTransaction: true
     queryMaps:
     - query: DELETE from eg_hrms_employee WHERE uuid=?

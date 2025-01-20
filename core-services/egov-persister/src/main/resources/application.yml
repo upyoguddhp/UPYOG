@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: User
    description: Persists User details in eg_user and eg_user_address table
-   fromTopic: egov.persist
+   fromTopic: hp-egov.persist
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO eg_user(title, salutation, dob, locale, username, password, pwdexpirydate, mobilenumber, altcontactnumber, emailid, createddate, lastmodifieddate, createdby, lastmodifiedby, active, name, gender, pan, aadhaarnumber, type, version, guardian, guardianrelation, signature, accountlocked, bloodgroup, photo, identificationmark, tenantid, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -146,7 +146,7 @@ serviceMaps:
  - version: 1.0
    name: citizen_service_create
    description: Persists citizen service details egov_citizen_service_req table
-   fromTopic: save-service-db
+   fromTopic: hp-save-service-db
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egov_citizen_service_req(id, tenantid, userid, servicecode, consumercode, email, mobilenumber, assignedto, createddate, lastmodifiedddate, createdby, lastmodifiedby, jsonvalue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -196,7 +196,7 @@ serviceMaps:
  - version: 1.0
    name: citizen_service_update
    description: Updates citizen service details egov_citizen_service_req table for specified id and tenantId
-   fromTopic: update-service-db
+   fromTopic: hp-update-service-db
    isTransaction: true
    queryMaps: 
     - query: UPDATE egov_citizen_service_req SET  userid=?, servicecode=?, consumercode=?, email=?, mobilenumber=?, assignedto=?,  lastmodifiedddate=?, lastmodifiedby=?, jsonvalue=? WHERE id=? and tenantid=?;
@@ -240,7 +240,7 @@ serviceMaps:
  - version: 1.0
    name: marriage_regn_create
    description: Persists Marriage registration details in db with witnesses, bride and bridegrrom details in in following tables 1.Marriage registration details in egmr_marriage_regn table 2.witnesses details in egmr_marriageregn_witness table 3.bride and bridegrrom details in egmr_marrying_person tables
-   fromTopic: egov.marriageregn.create
+   fromTopic: hp-egov.marriageregn.create
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egmr_marriage_regn(id, regnunitid,marriagedate, venue, street, placeofmarriage,locality,   city, marriagephoto, bridegroomid, brideid, priestname,priestreligion, priestaddress, priestaadhaar, priestmobileno, priestemail, serialno, volumeno, applicationnumber, regnnumber, regndate, status, source, stateid, isactive, tenantid, feeid, demandid, approvaldepartment, approvaldesignation, approvalassignee, approvalaction, approvalstatus, approvalcomments, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -543,7 +543,7 @@ serviceMaps:
  - version: 1.0
    name: marriage_regn_update
    description: Updates Marriage registration details in db with witnesses, bride and bridegrrom details in in following tables 1.Marriage registration details in egmr_marriage_regn table 2.witnesses details in egmr_marriageregn_witness table 3.bride and bridegrrom details in egmr_marrying_person tables
-   fromTopic: egov.marriageregn.update
+   fromTopic: hp-egov.marriageregn.update
    isTransaction: true
    queryMaps: 
     - query: UPDATE egmr_marriage_regn SET  regnunitid=?, marriagedate=?, venue=?, street=?, placeofmarriage=?, locality=?, city=?, marriagephoto=?, bridegroomid=?, brideid=?, priestname=?, priestreligion=?, priestaddress=?, priestaadhaar=?, priestmobileno=?, priestemail=?, serialno=?, volumeno=?, regnnumber=?, regndate=?, status=?, source=?, stateid=?, isactive=?, feeid=?, demandid=?, approvaldepartment=?, approvaldesignation=?, approvalassignee=?, approvalaction=?, approvalstatus=?, approvalcomments=?, lastmodifiedby=?, lastmodifiedtime=? WHERE tenantid=? AND applicationnumber=? ;
@@ -841,7 +841,7 @@ serviceMaps:
  - version: 1.0
    name: registration_unit_create
    description: Persists units details where all user can register Marriage in egmr_registration_unit table
-   fromTopic: egov.regnunit.create
+   fromTopic: hp-egov.regnunit.create
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egmr_registration_unit(id, name, isactive, tenantid, locality, zone, revenueward, block, street, electionward, doorno, pincode, ismainregistrationunit, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -904,7 +904,7 @@ serviceMaps:
  - version: 1.0
    name: registration_unit_update
    description: Updates units details where all user can register Marriage in egmr_registration_unit table
-   fromTopic: egov.regnunit.update
+   fromTopic: hp-egov.regnunit.update
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_registration_unit SET  name=?, isactive=?, locality=?, zone=?, revenueward=?, block=?, street=?, electionward=?, doorno=?, pincode=?, ismainregistrationunit=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=? AND tenantid=?;
@@ -960,7 +960,7 @@ serviceMaps:
  - version: 1.0
    name: marriage_document_type_create
    description: persists types of Document related to marriage in  egmr_marriage_document_type
-   fromTopic: mr.marriagedocumenttype.create
+   fromTopic: hp-mr.marriagedocumenttype.create
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_marriage_document_type(id,name,code,isactive,isindividual,isrequired,proof,appltype,tenantid,createdby,lastmodifiedby,createdtime,lastmodifiedtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?);
@@ -1011,7 +1011,7 @@ serviceMaps:
  - version: 1.0
    name: marriage_document_type_update
    description: persists types of Document related to marriage in  egmr_marriage_document_type
-   fromTopic: mr.marriagedocumenttype.update
+   fromTopic: hp-mr.marriagedocumenttype.update
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_marriage_document_type SET name=?, isactive=?, isindividual=?, isrequired=?, proof=?, appltype=? ,lastmodifiedby=?, lastmodifiedtime=? WHERE id=? AND code=? AND tenantid=?;
@@ -1054,7 +1054,7 @@ serviceMaps:
  - version: 1.0
    name: fee_create
    description: persists fees details corresponding to criteria for marriage registration in  egmr_marriage_document_type
-   fromTopic: egov-fee-create
+   fromTopic: hp-egov-fee-create
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_fee(createddate,tenantid, feecriteria, fee, fromdate, todate, lastmodifieddate, createdby, lastmodifiedby, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -1094,7 +1094,7 @@ serviceMaps:
  - version: 1.0
    name: fee_update
    description: updates fees details corresponding to criteria for marriage registration in  egmr_marriage_document_type
-   fromTopic: egov-fee-update
+   fromTopic: hp-egov-fee-update
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_fee SET  feecriteria=?, fee=?, fromdate=?, todate=?, lastmodifieddate=?, lastmodifiedby=? WHERE id=? AND tenantid=? ;
@@ -1128,7 +1128,7 @@ serviceMaps:
  - version: 1.0
    name: Reissue_Application
    description: Persists Marriage reissue application details in db in egmr_reissuecertificate table
-   fromTopic: egov-reissue-create
+   fromTopic: hp-egov-reissue-create
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_reissuecertificate(id, regnno, applicantname, applicantaddress, applicantmobileno,applicantfee, applicantaadhaar, applicationnumber, reissueapplstatus, stateid, approvaldepartment, approvaldesignation, approvalassignee, approvalaction, approvalstatus, approvalcomments, demands,rejectionreason, remarks, isactive, createdby, createdtime, lastmodifiedby, lastmodifiedtime, tenantid, applsubmisiondate, regnunit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -1221,7 +1221,7 @@ serviceMaps:
  - version: 1.0
    name: demand create
    description: create demand in  egbs_demand
-   fromTopic: save-demand
+   fromTopic: hp-save-demand
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egbs_demand (id,consumerCode,consumerType,businessService,owner,taxPeriodFrom,taxPeriodTo,minimumAmountPayable,createdby,lastModifiedby,createdtime,lastModifiedtime,tenantid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
@@ -1303,7 +1303,7 @@ serviceMaps:
  - version: 1.0
    name: bill create
    description: create bill in egbs_bill
-   fromTopic: save-bill-db
+   fromTopic: hp-save-bill-db
    isTransaction: true
    queryMaps: 
     - query: INSERT into egbs_bill (id, tenantid, payeename, payeeaddress, payeeemail, isactive, iscancelled, createdby, createddate, lastmodifiedby, lastmodifieddate) values(?,?,?,?,?,?,?,?,?,?,?)
@@ -1456,7 +1456,7 @@ serviceMaps:
  - version: 1.0
    name: property tax create
    description: create property tax in egbs_bill
-   fromTopic: property-create-validatedf
+   fromTopic: hp-property-create-validatedf
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egpt_property (id,tenantId, upicNumber, oldUpicNumber, vltUpicNumber,creationReason, assessmentDate,occupancyDate, gisRefNo,isAuthorised, isUnderWorkflow, channel, createdBy,lastModifiedBy, createdTime,lastModifiedTime,sequenceNo)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);

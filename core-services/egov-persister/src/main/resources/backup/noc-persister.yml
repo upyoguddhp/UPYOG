@@ -3,7 +3,7 @@ serviceMaps:
  mappings:
  - version: 1.0
    description: Persists noc details in EG_NOC  table
-   fromTopic: save-noc-application
+   fromTopic: hp-save-noc-application
    isTransaction: true
    queryMaps:
 
@@ -96,7 +96,7 @@ serviceMaps:
           
  - version: 1.0
    description: update noc details in EG_NOC  table
-   fromTopic: update-noc-application
+   fromTopic: hp-update-noc-application
    isTransaction: true
    queryMaps:
    
@@ -164,7 +164,7 @@ serviceMaps:
           
  - version: 1.0
    description: update noc workflow details in EG_NOC  table
-   fromTopic: update-noc-workflow
+   fromTopic: hp-update-noc-workflow
    isTransaction: true
    queryMaps:
    

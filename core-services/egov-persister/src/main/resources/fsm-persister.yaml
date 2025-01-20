@@ -3,7 +3,7 @@ serviceMaps:
  mappings:
  - version: 1.0
    description: Persists FSM Application details in eg_fsm_application  table
-   fromTopic: save-fsm-application
+   fromTopic: hp-save-fsm-application
    isTransaction: true
    queryMaps:
 
@@ -157,7 +157,7 @@ serviceMaps:
           
  - version: 1.0
    description: Persists FSM Application details in eg_fsm_application  table
-   fromTopic: update-fsm-application
+   fromTopic: hp-update-fsm-application
    isTransaction: true
    queryMaps: 
    
@@ -320,7 +320,7 @@ serviceMaps:
 
  - version: 1.0
    description: Persists FSM Application details in eg_fsm_application  table
-   fromTopic: update-fsm-workflow-application
+   fromTopic: hp-update-fsm-workflow-application
    isTransaction: true
    queryMaps: 
    

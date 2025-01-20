@@ -37,7 +37,7 @@ Persister uses configuration file to persist data. The key variables are describ
 - serviceName: Name of the service to which this configuration belongs.
 - description: Description of the service.
 - version: the version of the configuration.
-- fromTopic: The kafka topic from which data is fetched
+- fromTopic: hp-The kafka topic from which data is fetched
 - queryMaps: Contains the list of queries to be executed for the given data.
 - query: The query to be executed in form of prepared statement:
     - basePath: base of json object from which data is extrated
@@ -51,7 +51,7 @@ serviceMaps:
  mappings:
  - version: 1.0
    description: Persists student details in studentinfo table
-   fromTopic: save-student-info
+   fromTopic: hp-save-student-info
    isTransaction: true
    queryMaps:
        - query: INSERT INTO studentinfo( id, name, age, marks) VALUES (?, ?, ?, ?);

@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: asset-service
    description: Save Asset Details
-   fromTopic: save-asset-assetdetails
+   fromTopic: hp-save-asset-assetdetails
    isTransaction: true
    queryMaps:
      - query: INSERT INTO eg_asset_assetdetails (id, bookrefno, name, description, classification, parentcategory, category, subcategory, department, applicationno, approvalno, tenantid, status, action, businessservice, additionaldetails, assetDetails, createdtime, lastmodifiedtime, approvaldate, applicationdate, accountid, createdby, lastmodifiedby, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -181,7 +181,7 @@ serviceMaps:
 
  - version: 1.0
    description: Update Asset Details
-   fromTopic: update-asset-assetdetails
+   fromTopic: hp-update-asset-assetdetails
    isTransaction: true
    queryMaps:
 

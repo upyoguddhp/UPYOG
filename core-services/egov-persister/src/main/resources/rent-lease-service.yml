@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: asset-service
    description: Save Rent Lease Details
-   fromTopic: create-rent-lease
+   fromTopic: hp-create-rent-lease
    isTransaction: true
    queryMaps:
      - query: INSERT INTO eg_rent_lease_application(uuid, tenantid, mobile_no, start_date, end_date, month, assetid, applicant_detail, status, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate,applicationno) VALUES(?, ?, ?, ?, ?, ?, ?, ?::JSONB , ?, ?, ?, ?, ?, ?, ?);
@@ -45,7 +45,7 @@ serviceMaps:
  - version: 1.0
    name: asset-service
    description: Update Rent Lease Details
-   fromTopic: update-rent-lease-booking
+   fromTopic: hp-update-rent-lease-booking
    isTransaction: true
    queryMaps:
      - query: UPDATE eg_rent_lease_application SET start_date = ?, end_date = ?, month = ?, applicant_detail = ?::JSONB , status = ?, is_active = ? WHERE uuid =?;

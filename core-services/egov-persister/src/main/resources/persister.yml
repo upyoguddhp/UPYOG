@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: Indexer
    description: Persists index jobs to table
-   fromTopic: save-index-jobs
+   fromTopic: hp-save-index-jobs
    isTransaction: true
    queryMaps:
     - query: INSERT INTO eg_indexer_job(tenantid, jobid, requesterid, typeofjob, oldindex, newindex, jobstatus, totaltimetakeninms, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -41,7 +41,7 @@ serviceMaps:
  - version: 1.0
    name: Indexer
    description: Updates index jobs in the table
-   fromTopic: update-index-jobs
+   fromTopic: hp-update-index-jobs
    isTransaction: true
    queryMaps:
     - query: UPDATE eg_indexer_job SET jobStatus = ?, totalTimeTakenInMS = ?, lastmodifiedby =?, lastmodifiedtime = ? WHERE jobid = ?

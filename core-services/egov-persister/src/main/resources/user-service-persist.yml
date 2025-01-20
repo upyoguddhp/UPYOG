@@ -4,7 +4,7 @@ serviceMaps:
  - version: 1.0
    name: User
    description: create UserCompleteDetails in eg_user, eg_user_details and eg_userrole
-   fromTopic: user-save-topic
+   fromTopic: hp-user-save-topic
    isTransaction : true
    queryMaps: 
     - query: INSERT INTO eg_user(id, salutation, locale, username, pwdexpirytime, mobilenumber,emailid, name, gender, aadhaarnumber, type, active, accountlocked,tenantid,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?,?,?,?,?,?);
@@ -106,7 +106,7 @@ serviceMaps:
  - version: 1.0
    name: User
    description: update UserCompleteDetails in eg_user, eg_user_details and eg_userrole
-   fromTopic: user-update-topic
+   fromTopic: hp-user-update-topic
    isTransaction : true
    queryMaps: 
     - query: UPDATE eg_user SET salutation=?, locale=?,name=?, gender=?, aadhaarnumber=?,type=?, active=?, accountlocked=?,lastmodifiedtime=?, lastmodifiedby=? WHERE username=? and tenantid=?;
@@ -211,7 +211,7 @@ serviceMaps:
  - version: 1.0
    name: User
    description: create user otp
-   fromTopic: userotp-save-topic
+   fromTopic: hp-userotp-save-topic
    isTransaction : true
    queryMaps: 
     - query: INSERT INTO eg_user_otp(userid, tenantid, otpnumber, otpidentity, validated, createdtime,lastmodifiedtime, createdby, lastmodifiedby) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?); 
@@ -239,7 +239,7 @@ serviceMaps:
  - version: 1.0
    name: User
    description: update user otp as password 
-   fromTopic: userpassword-update-topic
+   fromTopic: hp-userpassword-update-topic
    isTransaction : true
    queryMaps: 
     - query: update eg_user set password=?,lastmodifiedby=?,lastmodifiedtime=? where tenantid=? and username=? 

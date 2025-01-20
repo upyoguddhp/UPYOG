@@ -3,7 +3,7 @@ serviceMaps:
  mappings:
  - version: 1.0
    description: Persists property details in EG_PT_PROPERTY  table
-   fromTopic: save-pt-property
+   fromTopic: hp-save-pt-property
    isTransaction: true
    queryMaps:
 
@@ -291,7 +291,7 @@ serviceMaps:
 
  - version: 1.0
    description: Update property details in EG_PT_PROPERTY  table
-   fromTopic: update-pt-property
+   fromTopic: hp-update-pt-property
    isTransaction: true
    queryMaps:
 
