@@ -306,6 +306,11 @@ public class VoucherSearchAction extends BaseFormAction {
 							.getDepartmentByCode(voucherheader.getVouchermis().getDepartmentcode());
 					voucherMap.put("deptName", depList.getName());
 				}
+				if(null!=voucherheader.getState()) {
+					voucherMap.put("pendingWith", microserviceUtils.getEmployeeByPositionId(voucherheader.getState().getOwnerPosition()).getUser().getName());	
+				} else {
+					voucherMap.put("pendingWith", microserviceUtils.getEmployeeByPositionId(voucherSearchUtil.voucherSearchQuery(voucherheader.getId()).get(0).getState().getOwnerPosition()).getUser().getName());
+				}
 				voucherMap.put("voucherdate", voucherheader.getVoucherDate());
 				voucherMap.put("fundname", voucherheader.getFundId().getName());
 				if (voucherheader.getModuleId() == null)

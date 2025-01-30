@@ -247,8 +247,9 @@ public class CreateExpenseBillController extends BaseBillController {
 
 			final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
 					savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition, approverName);
-			return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
-					+ savedEgBillregister.getBillnumber();
+			return "redirect:/expensebill/success?approverDetails=" + approverDetails 
+					+ "&approverDesignation=" + approvalDesignation
+					+ "&billNumber=" + savedEgBillregister.getBillnumber();
 		}
 	}
 
@@ -281,6 +282,7 @@ public class CreateExpenseBillController extends BaseBillController {
 				approverName = keyNameArray[1];
 			}
 		}
+		nextDesign = request.getParameter("approverDesignation");
 		if (id != null)
 			model.addAttribute("approverName", approverName);
 

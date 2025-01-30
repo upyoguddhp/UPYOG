@@ -75,12 +75,12 @@ public class User implements Serializable {
     private List<Role> roles;
     private boolean active;
     private String tenantId;
-
+    private String username;
     public User() {
     }
 
     public User(Long id, String uuid, String userName, String name, String mobileNumber, String emailId, String locale,
-            String type, List<Role> roles, boolean active, String tenantId) {
+            String type, List<Role> roles, boolean active, String tenantId,String username) {
         this.id = id;
         this.uuid = uuid;
         this.userName = userName;
@@ -92,6 +92,7 @@ public class User implements Serializable {
         this.roles = roles;
         this.active = active;
         this.tenantId = tenantId;
+        this.username = username;
     }
 
     public Long getId() {
@@ -190,11 +191,20 @@ public class User implements Serializable {
         this.userType = userType;
     }
 
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", uuid=" + uuid + ", userName=" + userName + ", name=" + name + ", mobileNumber="
-                + mobileNumber + ", emailId=" + emailId + ", locale=" + locale + ", type=" + type + ", roles=" + roles
-                + ", active=" + active + ", tenantId=" + tenantId + "]";
-    }
+    public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", uuid=" + uuid + ", userName=" + userName + ", userType=" + userType + ", name="
+				+ name + ", mobileNumber=" + mobileNumber + ", emailId=" + emailId + ", locale=" + locale + ", type="
+				+ type + ", roles=" + roles + ", active=" + active + ", tenantId=" + tenantId + ", username=" + username
+				+ "]";
+	}
 
 }

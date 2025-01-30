@@ -63,6 +63,7 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.payment.Paymentheader;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.Query;
@@ -409,7 +410,12 @@ public class VoucherSearchUtil {
             return financialYearDAO.isClosedPeriod(fromDate, toDate);
     }
 	
-	
+	public List<Paymentheader> voucherSearchQuery(Long voucherHeaderId) {
+		final String sqlQuery = new StringBuilder("from Paymentheader p where p.voucherheader.id = :voucherHeaderId ").toString();
+		final Query query = persistenceService.getSession().createQuery(sqlQuery);
+		query.setParameter("voucherHeaderId", voucherHeaderId);
+		return query.list();
+	}	
 
 	public void setFinancialYearDAO(final FinancialYearDAO financialYearDAO) {
 		this.financialYearDAO = financialYearDAO;

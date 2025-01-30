@@ -192,6 +192,10 @@
 							<display:column title="Total Amount" style="text-align:right;">
 								<s:property value="%{#attr.currentRowObject.amount}" />
 							</display:column>
+							<display:column title="Pending With"
+								style="text-align:center;">
+								<s:property value="%{#attr.currentRowObject.pendingWith}" />
+							</display:column>
 							<display:column title="Status" style="text-align:center;">
 								<s:property value="%{#attr.currentRowObject.status}" />
 							</display:column>

@@ -61,6 +61,7 @@ import org.egov.commons.CVoucherHeader;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.VoucherReport;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.reporting.util.ReportUtil;
@@ -77,6 +78,7 @@ import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -371,14 +373,16 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getCreditAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                    //voucherReport.setDepartment(voucher.getVouchermis().getDepartmentid());
+                    final List<Department> result = persistenceService.findAllBy("from Department where code=?",voucher.getVouchermis().getDepartmentcode());
+                    voucherReport.setDepartment(result.get(0));
                     voucherReportList.add(voucherReport);
                 }
             for (final CGeneralLedger vd : voucher.getGeneralledger())
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getDebitAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                   // voucherReport.setDepartment(voucher.getVouchermis().getDepartmentid());
+                    final List<Department> result = persistenceService.findAllBy("from Department where code=?",voucher.getVouchermis().getDepartmentcode());
+                    voucherReport.setDepartment(result.get(0));
                     voucherReportList.add(voucherReport);
                 }
         }

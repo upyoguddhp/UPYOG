@@ -154,7 +154,7 @@ function openVoucher(vid)
 																	<td width="17%" class="bluebox"><strong><s:text
 																				name="voucher.fundsource" /></strong></td>
 																	<td width="33%" class="bluebox"><s:property
-																			value="%{paymentheader.voucherheader.fundsourceId.name}" /></td>
+																			value="%{paymentheader.voucherheader.vouchermis.fundsource.name}" /></td>
 																</s:if>
 															</tr>
 															<tr>
