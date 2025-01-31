@@ -15,7 +15,7 @@ import org.egov.garbageservice.model.Email;
 import org.egov.garbageservice.model.EmailRequest;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgAddress;
-import org.egov.garbageservice.model.SMSRequest;
+import org.egov.garbageservice.model.SMSSentRequest;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.GrbgUtils;
 import org.egov.garbageservice.util.RequestInfoWrapper;
@@ -52,6 +52,9 @@ public class NotificationService {
 			+ "/" + YEAR_PLACEHOLDER + " with " + GARBAGE_NO_PLACEHOLDER;
 
 	@Autowired
+	private EncryptionService encryptionService;
+
+	@Autowired
 	private GrbgConstants grbgConfig;
 
 	@Autowired
@@ -68,8 +71,8 @@ public class NotificationService {
 
 	public void sendSms(String message, String mobileNumber) {
 
-		SMSRequest smsRequest = SMSRequest.builder().message(message).mobileNumber(mobileNumber)
-				.category(SMSCategory.NOTIFICATION).build();
+		SMSSentRequest smsRequest = SMSSentRequest.builder().message(message).mobileNumber(mobileNumber)
+				.category(SMSCategory.NOTIFICATION).templateName("OTP").build(); // TODO
 
 		kafkaTemplate.send(smsTopic, smsRequest);
 	}
@@ -134,8 +137,9 @@ public class NotificationService {
 		body = body.replace(AMOUNT_PLACEHOLDER, String.valueOf(bill.getTotalAmount()));
 		body = body.replace(DUE_DATE_PLACEHOLDER, "");
 		body = body.replace(GARBAGE_NO_PLACEHOLDER, garbageAccount.getGrbgApplicationNumber());
-		body = body.replace(GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER, grbgConfig.getGrbgServiceHostUrl() + ""
-				+ grbgConfig.getGrbgPayNowBillEndpoint() + "" + garbageAccount.getCreated_by());
+		body = body.replace(GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER,
+				grbgConfig.getGrbgServiceHostUrl() + "" + grbgConfig.getGrbgPayNowBillEndpoint() + ""
+						+ encryptionService.encryptString(garbageAccount.getCreated_by()));
 
 		return body;
 	}
@@ -150,8 +154,9 @@ public class NotificationService {
 					.append(", ").append(!StringUtils.isEmpty(grbgAddress.getUlbName()) ? grbgAddress.getUlbName() : "")
 					.append("(").append(!StringUtils.isEmpty(grbgAddress.getUlbType()) ? grbgAddress.getUlbType() : "")
 					.append("), ")
-					.append(null != grbgAddress.getAdditionalDetail() ? GrbgUtils.removeFirstAndLastChar(
-							String.valueOf(grbgAddress.getAdditionalDetail().get("district"))) : "")
+					.append(null != grbgAddress.getAdditionalDetail()
+							? String.valueOf(grbgAddress.getAdditionalDetail().get("district").asText())
+							: "")
 					.append(", ").append(!StringUtils.isEmpty(grbgAddress.getPincode()) ? grbgAddress.getPincode() : "")
 					.append(".");
 		}

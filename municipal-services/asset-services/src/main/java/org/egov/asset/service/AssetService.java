@@ -19,6 +19,7 @@ import javax.validation.Valid;
 
 import org.egov.asset.config.AssetConfiguration;
 import org.egov.asset.dto.AssetAssignmentDTO;
+import org.egov.asset.dto.AssetAddressDTO;
 import org.egov.asset.dto.AssetDTO;
 import org.egov.asset.dto.AssetSearchDTO;
 import org.egov.asset.repository.AssetRepository;
@@ -127,28 +128,34 @@ public class AssetService {
 
 	public List<AssetDTO> search(AssetSearchCriteria criteria, RequestInfo requestInfo) {
 		List<Asset> assets = new LinkedList<>();
-		assetValidator.validateSearch(requestInfo, criteria);
+		//assetValidator.validateSearch(requestInfo, criteria);
 		List<String> roles = new ArrayList<>();
 		for (Role role : requestInfo.getUserInfo().getRoles()) {
 			roles.add(role.getCode());
 		}
-		List<String> listOfStatus = getAccountStatusListByRoles(criteria.getTenantId(),
-				requestInfo.getUserInfo().getRoles());
-		if (CollectionUtils.isEmpty(listOfStatus)) {
-			throw new CustomException("SEARCH_ACCOUNT_BY_ROLES",
-					"Search can't be performed by this Employee due to lack of roles.");
-		}
+		
 		// if ((criteria.tenantIdOnly() || criteria.isEmpty()) &&
 		// roles.contains(AssetConstants.ASSET_INITIATOR)) {
-		criteria.setListOfstatus(listOfStatus);
-
-		if ((/* criteria.tenantIdOnly() || */ criteria.isEmpty())) {
-			log.debug("loading data of created and by me");
-			assets = this.getAssetCreatedForByMe(criteria, requestInfo);
-			log.debug("no of assets retuning by the search query" + assets.size());
-		} else if (roles.contains(AssetConstants.EMPLOYEE)) {
-
-			criteria.setCreatedBy(null);
+		
+//		if ((criteria.tenantIdOnly() ||  criteria.isEmpty())) {
+//			log.debug("loading data of created and by me");
+//			assets = this.getAssetCreatedForByMe(criteria, requestInfo);
+//			log.debug("no of assets retuning by the search query" + assets.size());
+//		} else 
+		if (roles.contains(AssetConstants.EMPLOYEE)) {
+			List<String> listOfStatus = getAccountStatusListByRoles(criteria.getTenantId(),
+					requestInfo.getUserInfo().getRoles());
+			 if (CollectionUtils.isEmpty(listOfStatus)) {
+			 	throw new CustomException("SEARCH_ACCOUNT_BY_ROLES",
+			 			"Search can't be performed by this Employee due to lack of roles.");
+			 }
+			 criteria.setListOfstatus(listOfStatus);
+			 criteria.setCreatedBy(null);
+			 assets = getAssetsFromCriteria(criteria);
+		} else if (roles.contains(AssetConstants.CITIZEN)) {
+			criteria.setStatus("APPROVED");
+//			criteria.setBookingStatus("AVAILABLE");
+			
 			assets = getAssetsFromCriteria(criteria);
 		} else {
 			assets = getAssetsFromCriteria(criteria);
@@ -167,13 +174,15 @@ public class AssetService {
 		try {
 			if (!CollectionUtils.isEmpty(rolesWithinTenant)) {
 				for (String r : rolesWithinTenant) {
-					if (r.equalsIgnoreCase(AssetConstants.ASSET_WF_APPROVER)) {
+					if (r.equalsIgnoreCase(AssetConstants.ASSET_APPROVER)) {
 						statusWithRoles.add(AssetConstants.STATUS_PENDINGFORAPPROVAL);
 						statusWithRoles.add(AssetConstants.STATUS_APPROVED);
 						statusWithRoles.add(AssetConstants.STATUS_REJECTED);
 					}
-					if (r.equalsIgnoreCase(AssetConstants.ASSET_WF_CREATOR)) {
+					if (r.equalsIgnoreCase(AssetConstants.ASSET_CREATOR)) {
 						statusWithRoles.add(AssetConstants.STATUS_PENDINGFORMODIFICATION);
+						statusWithRoles.add(AssetConstants.STATUS_PENDINGFORAPPROVAL);
+						statusWithRoles.add(AssetConstants.STATUS_APPROVED);
 						statusWithRoles.add(AssetConstants.STATUS_INITIATE);
 					}
 				}
@@ -197,6 +206,8 @@ public class AssetService {
 		if (asset.getAssetAssignment() != null) {
 			assetSearchDTO.setAssetAssignment(modelMapper.map(asset.getAssetAssignment(), AssetAssignmentDTO.class));
 		}
+		assetSearchDTO.setAddressDetails(modelMapper.map(asset.getAddressDetails(), AssetAddressDTO.class));
+
 		return assetSearchDTO;
 	}
 
@@ -397,14 +408,24 @@ public class AssetService {
 			if (StringUtils.equalsIgnoreCase(assetBusinessService, AssetConstants.ASSET_BusinessService)) {
 				for (Role role : roles) {
 					if (StringUtils.equalsIgnoreCase(role.getCode(), AssetConstants.ASSET_CREATOR)) {
-						roleCodes.add(AssetConstants.ASSET_CREATOR);
+						roleCodes.add(AssetConstants.ASSET_WF_CREATOR);
 					}
 					if (StringUtils.equalsIgnoreCase(role.getCode(), AssetConstants.ASSET_APPROVER)) {
-						roleCodes.add(AssetConstants.ASSET_APPROVER);
+						roleCodes.add(AssetConstants.ASSET_WF_APPROVER);
 					}
 				}
 			}
 
+			if (StringUtils.equalsIgnoreCase(assetBusinessService, AssetConstants.ASSET_BusinessService)) {
+				for (Role role : roles) {
+					if (StringUtils.equalsIgnoreCase(role.getCode(), AssetConstants.ASSET_WF_CREATOR)) {
+						roleCodes.add(AssetConstants.ASSET_WF_CREATOR);
+					}
+					if (StringUtils.equalsIgnoreCase(role.getCode(), AssetConstants.ASSET_WF_APPROVER)) {
+						roleCodes.add(AssetConstants.ASSET_WF_APPROVER);
+					}
+				}
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Roles does not exists!!!");
 		}
@@ -422,31 +443,6 @@ public class AssetService {
 
 		return roleCodes;
 	}
-	
-	public AssetActionResponse getAllcounts() {
-		AssetActionResponse response = new AssetActionResponse();
-        List<Map<String, Object>> statusList = null;
-        statusList = assetRepository.getAllCounts();
-        
-        if (!CollectionUtils.isEmpty(statusList)) {
-        	response.setCountsData(
-		                statusList.stream()
-		                        .filter(Objects::nonNull) // Ensure no null entries
-		                        .filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
-		                        .collect(Collectors.toList())); // Collect the filtered list
-			  
-			  if (statusList.get(0).containsKey("total_applications")) {
-		            Object totalApplicationsObj = statusList.get(0).get("total_applications");
-		            if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
-		            	response.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());
-		            } else {
-		                throw new IllegalArgumentException("total_applications is not a valid number");
-		            }
-		        }
-		}
-        return response;
-	}	
-	
 
 	/*
 	 * public AssetActionResponse getAllcounts() { AssetActionResponse response =
@@ -496,10 +492,13 @@ public class AssetService {
 			validateAssetUpdateRequest(assetRequest);
 			appNoToSiteBookingMap = searchAssetFromRequest(assetRequest);
 			assetRequest = validateAndEnrichUpdateAsset(assetRequest, appNoToSiteBookingMap);
+			if (!AssetConstants.BOOKING_BOOKED_STATUS.equals(assetRequest.getAssetUpdate().get(0).getBookingStatus())) {
+				workflowService.updateWorkflowForAssetUpdate(assetRequest, CreationReason.UPDATE);
+			}
 			assetRepository.updateAsset(assetRequest);
 
 		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+			throw new RuntimeException(e);
 		}
 		return assetRequest.getAssetUpdate();
 	}

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.egov.asset.web.models.Asset;
 import org.egov.asset.web.models.AssetAssignment;
+import org.egov.asset.web.models.Address;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,7 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
                 	    .assetName(rs.getString("name"))
                 	    .department(rs.getString("department"))
                 	    .status(rs.getString("status"))
+                	    .bookingStatus(rs.getString("bookingStatus"))
                 	    .build();
 
                 assetMap.put(id, currentAsset);
@@ -65,5 +67,11 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
 	    	assetAssignment.setReturnDate(rs.getLong("returnDate"));
 	    	assetAssignment.setIsAssigned(rs.getBoolean("isAssigned"));
 	    	asset.setAssetAssignment(assetAssignment);
+	    	
+	    	 // Mapping AddressDetails
+	        Address addressDetails = new Address();
+		        addressDetails.setStreet(rs.getString("street"));
+		        asset.setAddressDetails(addressDetails);
+
     }
 }
