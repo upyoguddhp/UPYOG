@@ -85,6 +85,7 @@ import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -123,6 +124,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	@Autowired
 	private VoucherTypeForULB voucherTypeForULB;
 	protected String reversalVoucherNumber;
+	public Department approverDepartment;
 	protected String reversalVoucherDate;
 	private Integer voucherNumberPrefixLength;
 	public static final String ZERO = "0";
@@ -193,8 +195,17 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh where vh.status!=4 order by vh.type"));
 		addDropdownData("typeList", VoucherHelper.VOUCHER_TYPES);
-		 addDropdownData("approverDepartmentList",
-				 masterDataCache.get("egi-department"));
+		
+		List<Department> approverDepartmentList =  masterDataCache.get("egi-department");
+		List<Department> accountsDepartmentList =  new ArrayList<>();
+		for(Department department:approverDepartmentList) {
+			if("Accounts Branch".equalsIgnoreCase(department.getName())) {
+				accountsDepartmentList.add(department);
+			}
+		}
+		addDropdownData("approverDepartmentList",accountsDepartmentList);
+		 //addDropdownData("approverDepartmentList",
+				 //masterDataCache.get("egi-department"));
 //		 voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
 		
 		if (LOGGER.isDebugEnabled())
