@@ -11,7 +11,6 @@ import org.egov.garbageservice.contract.bill.GenerateBillCriteria;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
-import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ public class GarbageAccountSchedulerService {
 	@Autowired
 	private NotificationService notificationService;
 
-	public Object generateBill(RequestInfoWrapper requestInfoWrapper) {
+	public void generateBill(RequestInfoWrapper requestInfoWrapper) {
 
 		SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest = SearchCriteriaGarbageAccountRequest
 				.builder().requestInfo(requestInfoWrapper.getRequestInfo())
@@ -62,7 +61,7 @@ public class GarbageAccountSchedulerService {
 				List<Demand> savedDemands = new ArrayList<>();
 				// generate demand
 				savedDemands = demandService.generateDemand(requestInfoWrapper.getRequestInfo(), garbageAccount,
-						GrbgConstants.BUSINESS_SERVICE, taxAmount);
+						garbageAccount.getBusinessService(), taxAmount);
 
 				if (CollectionUtils.isEmpty(savedDemands)) {
 					throw new CustomException("INVALID_CONSUMERCODE",
@@ -71,7 +70,7 @@ public class GarbageAccountSchedulerService {
 
 				// fetch/create bill
 				GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
-						.tenantId(garbageAccount.getTenantId()).businessService(GrbgConstants.BUSINESS_SERVICE)
+						.tenantId(garbageAccount.getTenantId()).businessService(garbageAccount.getBusinessService())
 						.consumerCode(garbageAccount.getGrbgApplicationNumber()).build();
 				BillResponse billResponse = billService.generateBill(requestInfoWrapper.getRequestInfo(), billCriteria);
 
@@ -82,7 +81,6 @@ public class GarbageAccountSchedulerService {
 			});
 		}
 
-		return garbageAccountResponse;
 	}
 
 }

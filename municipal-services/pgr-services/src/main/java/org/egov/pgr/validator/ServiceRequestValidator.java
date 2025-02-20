@@ -207,13 +207,14 @@ public class ServiceRequestValidator {
         /*
         * Checks if tenatId is provided with the search params
         * */
-        if( (criteria.getMobileNumber()!=null 
-                || criteria.getServiceRequestId()!=null || criteria.getIds()!=null
-                || criteria.getServiceCode()!=null )
-                && criteria.getTenantId()==null)
-            throw new CustomException("INVALID_SEARCH","TenantId is mandatory search param");
+    		if( (criteria.getMobileNumber()!=null 
+                    || criteria.getServiceRequestId()!=null || criteria.getIds()!=null
+                    || criteria.getServiceCode()!=null )
+                    && criteria.getTenantId()==null)
+                throw new CustomException("INVALID_SEARCH","TenantId is mandatory search param");	
+            validateSearchParam(requestInfo, criteria);
+        
 
-        validateSearchParam(requestInfo, criteria);
 
     }
 
@@ -228,9 +229,12 @@ public class ServiceRequestValidator {
         if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE" ) && criteria.isEmpty())
             throw new CustomException("INVALID_SEARCH","Search without params is not allowed");
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE") && criteria.getTenantId().split("\\.").length == 1){
-            throw new CustomException("INVALID_SEARCH", "Employees cannot perform state level searches.");
-        }
+		/*
+		 * if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE") &&
+		 * criteria.getTenantId().split("\\.").length == 1){ throw new
+		 * CustomException("INVALID_SEARCH",
+		 * "Employees cannot perform state level searches."); }
+		 */
 
         String allowedParamStr = null;
 

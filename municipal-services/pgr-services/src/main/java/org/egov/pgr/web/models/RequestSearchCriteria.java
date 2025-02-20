@@ -37,6 +37,7 @@ public class RequestSearchCriteria {
     @SafeHtml
     @JsonProperty("serviceRequestId")
     private String serviceRequestId;
+    
 
     @JsonProperty("sortBy")
     private SortBy sortBy;
@@ -73,7 +74,8 @@ public class RequestSearchCriteria {
 
     @JsonIgnore
     private Boolean isPlainSearch;
-
+//    @Builder.Default
+//    private Boolean isAllRecord = false;
 
     public enum SortOrder {
         ASC,

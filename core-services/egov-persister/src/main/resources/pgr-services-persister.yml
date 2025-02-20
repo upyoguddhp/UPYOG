@@ -122,44 +122,59 @@ serviceMaps:
       - jsonPath: $.service.id
 
 
-    - query: UPDATE eg_pgr_address_v2 SET doorno=?, plotno=?, buildingname=?, street=?, landmark=?, city=?, pincode=?, locality=?, district=?, region=?, state=?, country=?, latitude=?, longitude=?,additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
-      basePath: service.address
+  - version: 1.0
+    description: Persists pgr service request in tables
+    name : pgr-services
+    fromTopic: save-pgr-notification-request
+    isTransaction: true
+    queryMaps:
+
+    - query: INSERT INTO eg_pgr_notification(uuid, servicerequestid, tenantid, applicationstatus, recipientname, emailid, mobilenumber, isemailsent, issmssent, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: pgrNotification
       jsonMaps:
+      - jsonPath: $.pgrNotification.uuid
 
-      - jsonPath: $.service.address.doorNo
+      - jsonPath: $.pgrNotification.serviceRequestId
 
-      - jsonPath: $.service.address.plotNo
+      - jsonPath: $.pgrNotification.tenantId
 
-      - jsonPath: $.service.address.buildingName
+      - jsonPath: $.pgrNotification.applicationStatus
 
-      - jsonPath: $.service.address.street
+      - jsonPath: $.pgrNotification.recipientName
 
-      - jsonPath: $.service.address.landmark
+      - jsonPath: $.pgrNotification.emailId
 
-      - jsonPath: $.service.address.city
+      - jsonPath: $.pgrNotification.mobileNumber
 
-      - jsonPath: $.service.address.pincode
+      - jsonPath: $.pgrNotification.isEmailSent
 
-      - jsonPath: $.service.address.locality.code
+      - jsonPath: $.pgrNotification.isSmsSent
 
-      - jsonPath: $.service.address.district
+      - jsonPath: $.pgrNotification.auditDetails.createdBy
 
-      - jsonPath: $.service.address.region
+      - jsonPath: $.pgrNotification.auditDetails.createdTime
 
-      - jsonPath: $.service.address.state
+      - jsonPath: $.pgrNotification.auditDetails.lastModifiedBy
 
-      - jsonPath: $.service.address.country
+      - jsonPath: $.pgrNotification.auditDetails.lastModifiedTime
 
-      - jsonPath: $.service.address.geoLocation.latitude
 
-      - jsonPath: $.service.address.geoLocation.longitude
+  - version: 1.0
+    description: Updates pgr service request in tables
+    fromTopic: update-pgr-notification-request
+    isTransaction: true
+    queryMaps:
+    - query: UPDATE eg_pgr_notification SET isemailsent=?, issmssent = ?, lastmodifiedby=?, lastmodifiedtime=? WHERE uuid=?;
+      basePath: pgrNotification
+      jsonMaps:
+      - jsonPath: $.pgrNotification.isEmailSent
 
-      - jsonPath: $.service.address.additionDetails
-        type: JSON
-        dbType: JSONB
+      - jsonPath: $.pgrNotification.isSmsSent
 
-      - jsonPath: $.service.auditDetails.lastModifiedBy
+      - jsonPath: $.pgrNotification.auditDetails.lastModifiedBy
 
-      - jsonPath: $.service.auditDetails.lastModifiedTime
+      - jsonPath: $.pgrNotification.auditDetails.lastModifiedTime
 
-      - jsonPath: $.service.address.id
+      - jsonPath: $.pgrNotification.uuid	  
+
+
