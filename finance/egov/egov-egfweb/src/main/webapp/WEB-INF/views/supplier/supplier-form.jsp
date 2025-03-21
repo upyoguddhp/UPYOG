@@ -48,12 +48,6 @@
 
 
 <div class="form-group">
-	<label class="col-sm-2 control-label text-right" for="code"> <spring:message code="supplier.code" /><span class="mandatory"></span> 
-	</label>
-	<div class="col-sm-3 add-margin">
-		<form:input path="code" maxlength="50" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
-		<form:errors path="code" cssClass="add-margin error-msg" />
-	</div>
 	<label class="col-sm-2 control-label text-right" for="name"> <spring:message code="supplier.name" /><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
@@ -123,28 +117,28 @@
 </div>
 
 <div class="form-group">
-	<label class="col-sm-2 control-label text-right" for="bank"> <spring:message code="supplier.bank" text="Bank"/>
+	<label class="col-sm-2 control-label text-right" for="bank"> <spring:message code="supplier.bank" text="Bank"/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:select path="bank" data-first-option="false" id="bank" class="form-control"  >
+		<form:select path="bank" data-first-option="false" id="bank" class="form-control"  required="required">
 			<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
 			<form:options items="${banks}" itemValue="id" itemLabel="name" />
 		</form:select>
 		<form:errors path="bank" cssClass="add-margin error-msg" />
 	</div>
-	<label class="col-sm-2 control-label text-right" for="ifscCode"> <spring:message code="supplier.ifscCode" text="IFSC Code"/>
+	<label class="col-sm-2 control-label text-right" for="ifscCode"> <spring:message code="supplier.ifscCode" text="IFSC Code"/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="ifscCode" id="ifscCode" minlength="11" maxlength="11" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
+		<form:input path="ifscCode" id="ifscCode" minlength="11" maxlength="11" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
 		<form:errors path="ifscCode" cssClass="add-margin error-msg" />
 	</div>
 </div>
 
 <div class="form-group">
-	<label class="col-sm-2 control-label text-right" for="bankAccount"> <spring:message code="supplier.bankAccount" text="Bank Account Number"/>
+	<label class="col-sm-2 control-label text-right" for="bankAccount"> <spring:message code="supplier.bankAccount" text="Bank Account Number"/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="bankAccount" id="bankAccount" maxlength="22" size="24" cssClass="form-control" />
+		<form:input path="bankAccount" id="bankAccount" maxlength="22" size="24" cssClass="form-control" required="required"/>
 		<form:errors path="bankAccount" cssClass="add-margin error-msg" />
 	</div>
 	</div>
@@ -168,10 +162,10 @@
 	<form:errors path="supplierType" cssClass="error-msg" />
 </div>
 	<div class="form-group" id="registerationNo" style="display: none">
-	<label class="col-sm-2 control-label text-right" for="registrationNumber"> <spring:message code="supplier.registrationNo" text="Registration No"/>
+	<label class="col-sm-2 control-label text-right" for="registrationNumber"> <spring:message code="supplier.registrationNo" text="Registration No"/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="registrationNumber" id="registrationNumber" maxlength="21" required="required" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace"/>
+		<form:input path="registrationNumber" id="registrationNumber" maxlength="21" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
 		<form:errors path="registrationNumber" cssClass="add-margin error-msg" />
 	</div>
 </div>
@@ -186,10 +180,10 @@
 		</form:select>
 		<form:errors path="status" cssClass="add-margin error-msg" />
 	</div>
-	<label class="col-sm-2 control-label text-right" for="panNumber"> <spring:message code="supplier.panNo" text="PAN No"/>
+	<label class="col-sm-2 control-label text-right" for="panNumber"> <spring:message code="supplier.panNo" text="PAN No"/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="panNumber" id="panNumber" maxlength="10" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace"/>
+		<form:input path="panNumber" id="panNumber" maxlength="10" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
 		<form:errors path="panNumber" cssClass="add-margin error-msg" />
 	</div>
 </div>

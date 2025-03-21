@@ -79,6 +79,7 @@ public class ApplicationTenantResolverFilter implements Filter {
         String domainURL = extractRequestDomainURL((HttpServletRequest) request, false);
         String domainName = extractRequestedDomainName(domainURL);
         ApplicationThreadLocals.setTenantID(environmentSettings.schemaName(domainName));
+        //ApplicationThreadLocals.setTenantID("hp.Shimla");
         LOGGER.info(" *** Schema name  :"+environmentSettings.schemaName(domainName) );
         LOGGER.info(" *** domainName  :"+domainName);
         LOGGER.info(" *** domainURL  :"+domainURL);

@@ -52,6 +52,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.commons.bank.service.CreateBankService;
 import org.egov.egf.masters.services.ContractorService;
@@ -133,10 +134,14 @@ public class CreateContractorController {
 			prepareNewForm(model);
 			return NEW;
 		}
-		String gstState = contractor.getGstRegisteredState().toUpperCase();
-		contractor.setGstRegisteredState(gstState);
-		String gst = contractor.getTinNumber().toUpperCase();
-		contractor.setTinNumber(gst);
+		if(StringUtils.isNotBlank(contractor.getGstRegisteredState())) {
+			String gstState = contractor.getGstRegisteredState().toUpperCase();
+			contractor.setGstRegisteredState(gstState);
+		}
+		if(StringUtils.isNotBlank(contractor.getTinNumber())) {
+			String gst = contractor.getTinNumber().toUpperCase();
+			contractor.setTinNumber(gst);
+		}
 		contractorService.create(contractor);
 
 		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.contractor.success", null, null));

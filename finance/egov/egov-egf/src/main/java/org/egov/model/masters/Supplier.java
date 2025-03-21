@@ -90,7 +90,6 @@ public class Supplier extends AbstractAuditable implements EntityType {
     @Length(max = 50, message = "Maximum of 50 Characters allowed for Code")
     @OptionalPattern(regex = FinancialConstants.alphaNumericwithspecialchar, message = "Special Characters are not allowed in Code")
     @SafeHtml
-    @NotNull
     @Column(updatable = false)
     private String code;
 
@@ -128,6 +127,7 @@ public class Supplier extends AbstractAuditable implements EntityType {
     @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
     private String narration;
 
+    @NotNull
     @SafeHtml
     @Length(max = 10, message = "PAN No Field length should be 10 and it should be in the format XXXXX1234X")
     @OptionalPattern(regex = Constants.PANNUMBER, message = "Enter the PAN No in correct format - XXXXX1234X")
@@ -140,15 +140,18 @@ public class Supplier extends AbstractAuditable implements EntityType {
     @Column(updatable = false)
     private String tinNumber;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "bank")
     private Bank bank;
 
+    @NotNull
     @SafeHtml
     @Length(min = 11, max = 11, message = "Maximum of 11 Characters allowed for IFSC Code")
     @OptionalPattern(regex = Constants.ALPHANUMERIC, message = "Special Characters are not allowed in IFSC Code")
     private String ifscCode;
 
+    @NotNull
     @SafeHtml
     @Length(max = 22, message = "Maximum of 22 Characters allowed for Bank Account")
     @OptionalPattern(regex = FinancialConstants.numericwithoutspecialchar, message = "Only allowed numeric in account No")

@@ -47,10 +47,14 @@
  */
 package org.egov.egf.masters.services;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -68,6 +72,7 @@ import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.EntityTypeService;
 import org.egov.egf.masters.repository.SupplierRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.masters.Supplier;
 import org.egov.model.masters.SupplierSearchRequest;
@@ -95,6 +100,9 @@ public class SupplierService implements EntityTypeService {
 
 	@Autowired
 	private AccountdetailtypeService accountdetailtypeService;
+	
+	@Autowired
+    private GenericSequenceNumberGenerator genericSequenceNumberGenerator;
 
 	public Session getCurrentSession() {
 		return entityManager.unwrap(Session.class);
@@ -107,9 +115,24 @@ public class SupplierService implements EntityTypeService {
 	@Transactional
 	public Supplier create(Supplier supplier) {
 		setAuditDetails(supplier);
+		supplier.setCode(getSupplierNumber());
 		supplier = supplierRepository.save(supplier);
 		saveAccountDetailKey(supplier);
 		return supplier;
+	}
+	
+	private String getSupplierNumber() {
+    	String supplierCode = "";
+
+        String sequenceName = "";
+        
+		LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy");
+        String year = date.format(formatter1);
+		sequenceName = "seq_egf_supplier_code_" + year;
+        Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
+        supplierCode = String.format("%s/%s/%s/%04d", ApplicationThreadLocals.getUserTenantId().toUpperCase(), "SUPL", year, nextSequence);
+        return supplierCode;
 	}
 
 	@Transactional

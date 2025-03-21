@@ -1394,22 +1394,26 @@ public class MicroserviceUtils {
     }
 
     public String getHeaderNameForTenant() {
-        String ulbGrade = "";
-        List<ModuleDetail> moduleDetailList = new ArrayList<>();
-        String tenentId = getTenentId();
-        try {
-            this.prepareModuleDetails(moduleDetailList, "tenant", "tenants", "code", tenentId, String.class);
-            Map postForObject = mapper.convertValue(this.getMdmsData(moduleDetailList, true, null, null), Map.class);
-            if (postForObject != null) {
-                ulbGrade = mapper.convertValue(
-                        JsonPath.read(postForObject, "$.MdmsRes.tenant.tenants[0].city.ulbGrade"), String.class);
-            }
-            if (ulbGrade != null && !ulbGrade.isEmpty())
-                ulbGrade = environment.getProperty(ulbGrade, ulbGrade);
-        } catch (RestClientException e) {
-            LOGGER.error("ERROR occurred while fetching header name of tenant in getHeaderNameForTenant : ", e);
-        }
-        return tenentId.split(Pattern.quote("."))[1] + " " + (ulbGrade != null ? ulbGrade : "");
+    	String ulbGrade = "";
+    	List<ModuleDetail> moduleDetailList = new ArrayList<>();
+    	String tenentId = getTenentId();
+    	try {
+    		this.prepareModuleDetails(moduleDetailList, "tenant", "tenants", "code", tenentId, String.class);
+    		Map postForObject = mapper.convertValue(this.getMdmsData(moduleDetailList, true, null, null), Map.class);
+    		if (postForObject != null) {
+    			ulbGrade = mapper.convertValue(
+    					JsonPath.read(postForObject, "$.MdmsRes.tenant.tenants[0].city.ulbGrade"), String.class);
+    		}
+    		if (ulbGrade != null && !ulbGrade.isEmpty())
+    			ulbGrade = environment.getProperty(ulbGrade, ulbGrade);
+    	} catch (RestClientException e) {
+    		LOGGER.error("ERROR occurred while fetching header name of tenant in getHeaderNameForTenant : ", e);
+    	}
+    	if(tenentId.contains(".")) {
+    		return tenentId.split(Pattern.quote("."))[1] + " " + (ulbGrade != null ? ulbGrade : "");
+    	} else {
+    		return tenentId + " " + (ulbGrade != null ? ulbGrade : "");
+    	}
     }
 
     private void prepareModuleDetails(List<ModuleDetail> moduleDetailsList, String moduleNme, String masterName,

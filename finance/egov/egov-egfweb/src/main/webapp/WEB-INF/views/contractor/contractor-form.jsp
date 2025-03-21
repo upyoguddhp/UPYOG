@@ -48,15 +48,7 @@
 
 
 <div class="form-group">
-	<label class="col-sm-2 control-label text-right" for="code"> <spring:message
-			code="contractor.code" text='Code' /><span class="mandatory"></span>
-	</label>
-	<div class="col-sm-3 add-margin">
-		<form:input path="code" maxlength="50"
-			cssClass="form-control patternvalidation"
-			data-pattern="alphanumericwithspace" required="required" />
-		<form:errors path="code" cssClass="add-margin error-msg" />
-	</div>
+	
 	<label class="col-sm-2 control-label text-right" for="name"> <spring:message
 			code="contractor.name" text='Name' /><span class="mandatory"></span>
 	</label>
@@ -140,35 +132,34 @@
 
 <div class="form-group">
 	<label class="col-sm-2 control-label text-right" for="tinNumber">
-		<spring:message code="contractor.tinNo" text='GST/TIN No' /><span
-		class="mandatory"></span>
+		<spring:message code="contractor.tinNo" text='GST/TIN No' />
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="tinNumber" id="tinNumber" minlength="15"
 			maxlength="15" cssClass="form-control patternvalidation"
-			data-pattern="alphanumericwithspace" required="required" />
+			data-pattern="alphanumericwithspace" />
 		<form:errors path="tinNumber" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right"
 		for="gstRegisteredState"> <spring:message
-			code="contractor.gst.registered.state" text='GST registered State/UT' /><span
-		class="mandatory"></span>
+			code="contractor.gst.registered.state" text='GST registered State/UT' />
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="gstRegisteredState" maxlength="250"
 			id="gstRegisteredState" cssClass="form-control patternvalidation"
-			data-pattern="alphanumericwithspace" required="required" />
+			data-pattern="alphanumericwithspace" />
 		<form:errors path="gstRegisteredState" cssClass="add-margin error-msg" />
 	</div>
 </div>
 
 <div class="form-group">
 	<label class="col-sm-2 control-label text-right" for="bank"> <spring:message
-			code="contractor.bank" text='Bank' />
+			code="contractor.bank" text='Bank' /><span
+		class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:select path="bank" data-first-option="false" id="bank"
-			class="form-control">
+			class="form-control" required="required">
 			<form:option value="">
 				<spring:message code="lbl.select" text='Select' />
 			</form:option>
@@ -177,12 +168,13 @@
 		<form:errors path="bank" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="ifscCode">
-		<spring:message code="contractor.ifscCode" text='IFSC Code' />
+		<spring:message code="contractor.ifscCode" text='IFSC Code' /><span
+		class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="ifscCode" id="ifscCode" minlength="11"
 			maxlength="11" cssClass="form-control patternvalidation"
-			data-pattern="alphanumericwithspace" />
+			data-pattern="alphanumericwithspace" required="required"/>
 		<form:errors path="ifscCode" cssClass="add-margin error-msg" />
 	</div>
 </div>
@@ -190,12 +182,13 @@
 <div class="form-group">
 	<label class="col-sm-2 control-label text-right" for="bankAccount">
 		<spring:message code="contractor.bankAccount"
-			text='Bank Account Number' />
+			text='Bank Account Number' /><span
+		class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="bankAccount" id="bankAccount" maxlength="22"
-			size="24" cssClass="form-control" />
-		<form:errors path="bankAccount" cssClass="add-margin error-msg" />
+			size="24" cssClass="form-control" required="required"/>
+		<form:errors path="bankAccount" cssClass="add-margin error-msg"/>
 	</div>
 </div>
 <div class="form-group">
@@ -221,12 +214,13 @@
 	<div class="form-group" id="registerationNo" style="display: none">
 		<label class="col-sm-2 control-label text-right"
 			for="registrationNumber"> <spring:message
-				code="contractor.registrationNo" text='Registration No' />
+				code="contractor.registrationNo" text='Registration No' /><span
+		class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input path="registrationNumber" id="registrationNumber"
 				maxlength="21" cssClass="form-control patternvalidation"
-				required="required" data-pattern="alphanumericwithspace" />
+				data-pattern="alphanumericwithspace" required="required"/>
 			<form:errors path="registrationNumber"
 				cssClass="add-margin error-msg" />
 		</div>
@@ -249,13 +243,14 @@
 			<form:errors path="status" cssClass="add-margin error-msg" />
 		</div>
 		<label class="col-sm-2 control-label text-right" for="panNumber">
-			<spring:message code="contractor.panNo" text='PAN No' />
+			<spring:message code="contractor.panNo" text='PAN No' /><span
+		class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input path="panNumber" id="panNumber" maxlength="10"
 				cssClass="form-control patternvalidation"
-				data-pattern="alphanumericwithspace" />
-			<form:errors path="panNumber" cssClass="add-margin error-msg" />
+				data-pattern="alphanumericwithspace" required="required"/>
+			<form:errors path="panNumber" cssClass="add-margin error-msg" required="required"/>
 		</div>
 	</div>
 	<div class="form-group">

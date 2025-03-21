@@ -349,7 +349,7 @@ function validate(){
 	
 	$("#passedamount").val(debitamount);
 	
-	if(debitamount != Number(Number(creditamount) + Number(netpayableamount)).toFixed(2)){
+	if(debitamount != Number(creditamount)){
 		bootbox.alert($.i18n.prop('msg.debit.and.credit.amount.is.not.matching'));
 		return false;
 	}
@@ -443,6 +443,7 @@ function calcualteNetpaybleAmount(){
 
 	var debitamt = 0;
 	var creditamt = 0;
+	var tds = 0;
 	for (var count = 0; count <=debitAmountrowcount; ++count) {
 
 		if (null != document.getElementById("debitDetails[" + count
@@ -465,12 +466,13 @@ function calcualteNetpaybleAmount(){
 					+ "].creditamount").value;
 			if (val != "" && !isNaN(val)) {
 //				creditamt = creditamt + parseFloat(val);
-				creditamt = parseFloat(Number(creditamt) + Number(val)).toFixed(2);
+				tds = parseFloat(Number(tds) + Number(val)).toFixed(2);
 				document.getElementById("creditDetails[" + count + "].creditamount").value = Number(val).toFixed(2);
 			}
 		}
 	}
-	netPayableAmount=amountConverter(debitamt-creditamt);
+	netPayableAmount=amountConverter(debitamt-tds);
+	creditamt = parseFloat(Number(tds) + Number(netPayableAmount)).toFixed(2);
 	$("#contractor-netPayableAmount").val(netPayableAmount);
 	$("#contractorNetPayableAmount").html(netPayableAmount);
 	$("#contractorBillTotalDebitAmount").html(debitamt);

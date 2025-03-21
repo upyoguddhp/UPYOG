@@ -185,6 +185,7 @@ public class ApplicationCoreFilter implements Filter {
         ApplicationThreadLocals.setUserId((Long) session.getAttribute(USERID_KEY));
         ApplicationThreadLocals.setIPAddress((String) session.getAttribute(IP_ADDRESS));
         ApplicationThreadLocals.setUserTenantId((String) session.getAttribute(MS_TENANTID_KEY));
+        //ApplicationThreadLocals.setUserTenantId("hp.Shimla");
         ApplicationThreadLocals.setUserToken((String)session.getAttribute(MS_USER_TOKEN));
     }
 

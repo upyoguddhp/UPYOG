@@ -82,8 +82,9 @@ $(document).ready(function(){
 	if($("#mode").val() == 'edit'){
 		netpayableamount = $("#netPayableAmount").val();
 		billamount = $("#billamount").val();
-		creditamount = Number($("#billamount").val()) - Number(netpayableamount);
+		//creditamount = Number($("#billamount").val()) + Number(netpayableamount);
 		debitamount = $("#billamount").val();
+		creditamount = Number(debitamount) + Number(netpayableamount);
 		
 		$("#expenseNetPayableAmount").html(netpayableamount);
 		$("#expenseBillTotalDebitAmount").html(debitamount);
@@ -848,7 +849,7 @@ function validate(){
 		return false;
 	}
 	
-	if(debitamount != Number(Number(creditamount) + Number(netpayableamount))){
+	if(debitamount != Number(creditamount)){
 		bootbox.alert($.i18n.prop('msg.debit.and.credit.amount.is.not.matching'));
 		return false;
 	}
@@ -946,7 +947,7 @@ function calculateBillAmount(){
 		debitamount = parseFloat(Number(debitamount) + Number($(this).find(".accountDetailsDebitAmount").html())).toFixed(2);
 		creditamount = parseFloat(Number(creditamount) + Number($(this).find(".accountDetailsCreditAmount").html())).toFixed(2);
 	});
-	creditamount = amountConverter(creditamount - netpayableamount);
+	creditamount = amountConverter(creditamount + netpayableamount);
 	$("#expenseNetPayableAmount").html(netpayableamount);
 	$("#expenseBillTotalDebitAmount").html(debitamount);
 	$("#expenseBillTotalCreditAmount").html(creditamount);
@@ -1016,6 +1017,7 @@ function calcualteNetpaybleAmount(){
 
 	var debitamt = 0;
 	var creditamt = 0;
+	var tds = 0;
 	// var debitAmountrowcount=0;
 	// var creditAmoutrowcount=0;
 	for (var count = 0; count <=debitAmountrowcount; ++count) {
@@ -1037,11 +1039,13 @@ function calcualteNetpaybleAmount(){
 			var val = document.getElementById("tempCreditDetails[" + count
 					+ "].creditamount").value;
 			if (val != "" && !isNaN(val)) {
-				creditamt = parseFloat(Number(creditamt) + Number(val)).toFixed(2);
+				tds = parseFloat(Number(tds) + Number(val)).toFixed(2);
 			}
 		}
 	}
-	netPayableAmount=amountConverter(debitamt-creditamt);
+	
+	netPayableAmount=amountConverter(debitamt-tds);
+	creditamt = parseFloat(Number(tds) + Number(netPayableAmount)).toFixed(2);
 	$("#expense-netPayableAmount").val(netPayableAmount);
 	$("#expenseNetPayableAmount").html(netPayableAmount);
 	$("#expenseBillTotalDebitAmount").html(debitamt);

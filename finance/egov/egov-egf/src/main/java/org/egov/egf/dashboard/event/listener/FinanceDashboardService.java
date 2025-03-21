@@ -533,7 +533,11 @@ public class FinanceDashboardService {
 	}
     
     private void prepareThreadLocal(String tenant, String domainName) {
-        ApplicationThreadLocals.setTenantID(tenant.split(Pattern.quote("."))[1]);
+    	if(tenant.contains(".")) {
+    		ApplicationThreadLocals.setTenantID(tenant.split(Pattern.quote("."))[1]);
+    	} else {
+    		 ApplicationThreadLocals.setTenantID(tenant);
+    	}
         ApplicationThreadLocals.setDomainName(domainName);
     }
     

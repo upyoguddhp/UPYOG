@@ -50,9 +50,9 @@
 
 .page-container .main-content table th.bluebgheadtd
 {
-	border-right-color: #CCCCCC;
-    border-bottom-color: #CCCCCC;
-    background-color: #f2851f;
+	border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #49627e;
 }
 
 div.topbar {
@@ -61,7 +61,7 @@ div.topbar {
 	width: 100%;
 	border-bottom-width: 3px;
 	border-bottom-style: double;
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ffffff;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 24px;
 	font-weight: normal;
@@ -109,7 +109,7 @@ td.bluebox {
 	background-color: #FFFFFF;
 	border-bottom: 1px solid white;
 	border-top: 1px solid white;
-	font-size: 12px;
+	font-size: 16px;
 	padding-top: 3px;
 	padding-bottom: 3px;
 	padding-right: 5px;
@@ -207,9 +207,9 @@ th.bluebgheadtd {
 	padding-right: 5px;
 	padding-left: 5px;
 	text-align: center;
-	border-right-color: #CCCCCC;
-    border-bottom-color: #CCCCCC;
-    background-color: #f2851f;
+	border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #49627e;
 	}
 td.bluebgheadtd {
 	height: 32px;
@@ -225,9 +225,9 @@ td.bluebgheadtd {
 	padding-left: 5px;
 	background-color: #999999;
 	text-align: center;
-	border-right-color: #CCCCCC;
-    border-bottom-color: #CCCCCC;
-    background-color: #f2851f;
+	border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #49627e;
 	}
 	
 td.totalbg {
@@ -286,9 +286,9 @@ td.totalbg {
 	border-top-style: solid;
 	border-right-style: solid;
 	border-left-style: solid;
-	border-top-color: #CCCCCC;
-	border-right-color: #CCCCCC;
-	border-left-color: #CCCCCC;
+	border-top-color: #ffffff;
+	border-right-color: #ffffff;
+	border-left-color: #ffffff;
 	}
 	
 #tab2 a.active {
@@ -296,16 +296,16 @@ td.totalbg {
 	text-decoration: none;
 	border-top-width: 1px;
 	border-top-style: solid;
-	border-top-color: #CCCCCC;
+	border-top-color: #ffffff;
 	border-right-width: 1px;
 	border-bottom-width: 0px;
 	border-left-width: 1px;
 	border-right-style: solid;
 	border-bottom-style: solid;
 	border-left-style: solid;
-	border-right-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
-	border-left-color: #CCCCCC;
+	border-right-color: #ffffff;
+	border-bottom-color: #ffffff;
+	border-left-color: #ffffff;
 	color: #FFFFFF;
 	}
 
@@ -325,16 +325,16 @@ td.totalbg {
 	text-decoration: none;
 	border-top-width: 1px;
 	border-top-style: solid;
-	border-top-color: #CCCCCC;
+	border-top-color: #ffffff;
 	border-right-width: 1px;
 	border-bottom-width: 0px;
 	border-left-width: 1px;
 	border-right-style: solid;
 	border-bottom-style: solid;
 	border-left-style: solid;
-	border-right-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
-	border-left-color: #CCCCCC;
+	border-right-color: #ffffff;
+	border-bottom-color: #ffffff;
+	border-left-color: #ffffff;
 	background-color: #5A9BE2;
 	}
 	
@@ -471,9 +471,9 @@ td.totalbg {
 	border-top-style: solid;
 	border-right-style: solid;
 	border-left-style: solid;
-	border-top-color: #CCCCCC;
-	border-right-color: #CCCCCC;
-	border-left-color: #CCCCCC;
+	border-top-color: #ffffff;
+	border-right-color: #ffffff;
+	border-left-color: #ffffff;
 	padding-top: 2px;
 	background-color: #F6DC63;
 	}
@@ -484,8 +484,8 @@ td.totalbg {
 	color: #fff;
 	text-align: center;
 	padding: 10px 15px;
-	background-color: #F2851F;
-	border-color: #F2851F;
+	background-color: #49627e;
+	border-color: #49627e;
 	}
 div.subheadsmallnew {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -499,7 +499,7 @@ div.subheadsmallnew {
 	padding-left: 3px;
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ffffff;
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #FFFFFF;
@@ -549,7 +549,7 @@ td.bluebox2 {
 	text-align: center;
 	padding-right: 8px;
 	padding-left: 8px;
-	border: 1px solid #CCCCCC;
+	border: 1px solid #ffffff;
 	padding-top: -2px;
 	padding-bottom: -2px;
 }
@@ -618,9 +618,9 @@ th.bluebgheadtdnew {
 	padding-right: 2px;
 	padding-left: 2px;
 	text-align: center;
-	border-right-color: #CCCCCC;
-    border-bottom-color: #CCCCCC;
-    background-color: #f2851f;
+	border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #49627e;
 
 	}
 
@@ -654,7 +654,7 @@ td.blueborderfortdnew {
 	padding-left: 5px;
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ffffff;
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #FFFFFF;
@@ -674,7 +674,7 @@ div.excelpdf {
 	padding-left: 3px;
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ffffff;
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #FFFFFF;

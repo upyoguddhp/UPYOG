@@ -47,10 +47,14 @@
  */
 package org.egov.egf.masters.services;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -68,6 +72,7 @@ import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.EntityTypeService;
 import org.egov.egf.masters.repository.ContractorRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.masters.Contractor;
 import org.egov.model.masters.ContractorSearchRequest;
@@ -96,6 +101,9 @@ public class ContractorService implements EntityTypeService {
     @Autowired
     private AccountdetailtypeService accountdetailtypeService;
 
+    @Autowired
+    private GenericSequenceNumberGenerator genericSequenceNumberGenerator;
+
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
     }
@@ -108,10 +116,25 @@ public class ContractorService implements EntityTypeService {
     public Contractor create(Contractor contractor) {
 
         setAuditDetails(contractor);
+        contractor.setCode(getContractorNumber());
         contractor = contractorRepository.save(contractor);
         saveAccountDetailKey(contractor);
         return contractor;
     }
+
+    private String getContractorNumber() {
+    	String contractorCode = "";
+
+        String sequenceName = "";
+        
+		LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy");
+        String year = date.format(formatter1);
+		sequenceName = "seq_egf_contractor_code_" + year;
+        Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
+        contractorCode = String.format("%s/%s/%s/%04d", ApplicationThreadLocals.getUserTenantId().toUpperCase(), "CONT", year, nextSequence);
+        return contractorCode;
+	}
 
     @Transactional
     public void saveAccountDetailKey(Contractor contractor) {
