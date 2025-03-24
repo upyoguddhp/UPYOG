@@ -252,6 +252,12 @@ public class CreateContractorBillController extends BaseBillController {
 		removeEmptyRows(egBillregister);
 		validateLedgerAndSubledger(egBillregister, resultBinder);
 		validateCuttofDate(egBillregister, resultBinder);
+		
+		WorkOrder wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+    	
+    	if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
+    		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);
+    	}
 
 		if (resultBinder.hasErrors()) {
 			return populateDataOnErrors(egBillregister, model, request);

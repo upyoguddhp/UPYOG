@@ -251,6 +251,10 @@ public class CreateSupplierBillController extends BaseBillController {
 		removeEmptyRows(egBillregister);
 		validateLedgerAndSubledger(egBillregister, resultBinder);
 		validateCuttofDate(egBillregister, resultBinder);
+		PurchaseOrder po = purchaseOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+		if(egBillregister.getBillamount().compareTo(po.getOrderValue())==1) {
+    		resultBinder.reject("msg.supplierbill.amount", new String[] {}, null);
+    	}
 		if (resultBinder.hasErrors()) {
 			return populateDataOnErrors(egBillregister, model, request);
 		} else {

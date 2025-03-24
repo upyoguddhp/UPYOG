@@ -82,9 +82,8 @@ $(document).ready(function(){
 	if($("#mode").val() == 'edit'){
 		netpayableamount = $("#netPayableAmount").val();
 		billamount = $("#billamount").val();
-		//creditamount = Number($("#billamount").val()) + Number(netpayableamount);
+		creditamount = Number($("#billamount").val()) + Number(netpayableamount);
 		debitamount = $("#billamount").val();
-		creditamount = Number(debitamount) + Number(netpayableamount);
 		
 		$("#expenseNetPayableAmount").html(netpayableamount);
 		$("#expenseBillTotalDebitAmount").html(debitamount);
@@ -947,7 +946,7 @@ function calculateBillAmount(){
 		debitamount = parseFloat(Number(debitamount) + Number($(this).find(".accountDetailsDebitAmount").html())).toFixed(2);
 		creditamount = parseFloat(Number(creditamount) + Number($(this).find(".accountDetailsCreditAmount").html())).toFixed(2);
 	});
-	creditamount = amountConverter(creditamount + netpayableamount);
+	//creditamount = amountConverter(creditamount + netpayableamount);
 	$("#expenseNetPayableAmount").html(netpayableamount);
 	$("#expenseBillTotalDebitAmount").html(debitamount);
 	$("#expenseBillTotalCreditAmount").html(creditamount);

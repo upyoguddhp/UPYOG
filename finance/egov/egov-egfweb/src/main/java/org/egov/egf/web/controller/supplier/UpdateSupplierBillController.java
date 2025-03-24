@@ -85,6 +85,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.masters.PurchaseOrder;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,6 +399,10 @@ public class UpdateSupplierBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
+        PurchaseOrder po = purchaseOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+		if(egBillregister.getBillamount().compareTo(po.getOrderValue())==1) {
+    		resultBinder.reject("msg.supplierbill.amount", new String[] {}, null);
+    	}
         model.addAttribute(SUPPLIER_ID,
                 purchaseOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getSupplier().getId());
 

@@ -85,6 +85,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.masters.WorkOrder;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -399,6 +400,10 @@ public class UpdateContractorBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
+        WorkOrder wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+        if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
+    		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);
+    	}
         model.addAttribute(CONTRACTOR_ID,
                 workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
 

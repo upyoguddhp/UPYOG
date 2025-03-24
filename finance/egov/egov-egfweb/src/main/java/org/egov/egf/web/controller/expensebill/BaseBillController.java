@@ -72,6 +72,7 @@ import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBillSubType;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.masters.WorkOrder;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.SQLQuery;
@@ -173,6 +174,8 @@ public abstract class BaseBillController extends BaseVoucherController {
                 resultBinder.reject("msg.expense.bill.accdetail.amount",
                         new String[] { details.getChartOfAccounts().getGlcode() }, null);
         }
+        if(totalDrAmt.compareTo(egBillregister.getBillamount())==1)
+        	resultBinder.reject("msg.billamount", new String[] {}, null);
         if (totalDrAmt.compareTo(totalCrAmt) != 0)
             resultBinder.reject("msg.expense.bill.accdetail.drcrmatch", new String[] {}, null);
         validateSubledgerDetails(egBillregister, resultBinder);
