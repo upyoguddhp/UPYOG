@@ -47,6 +47,7 @@
  */
 package org.egov.eis.web.controller.workflow;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,8 +84,13 @@ public abstract class GenericWorkFlowController {
     @ModelAttribute(value = "approvalDepartmentList")
     public List<Department> addAllDepartments() {
         List<Department> deptlist = getDepartmentsFromMs();
-
-        return deptlist;
+        List<Department> approvaldeptlist = new ArrayList<>();
+        for(Department department:deptlist) {
+        	if("Accounts".equalsIgnoreCase(department.getName())) {
+        		approvaldeptlist.add(department);
+        	}
+        }
+        return approvaldeptlist;
     }
 
     @ModelAttribute("workflowcontainer")

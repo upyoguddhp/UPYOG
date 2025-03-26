@@ -236,7 +236,7 @@ public class DishonorChequeWorkflowAction extends BaseFormAction {
     }
 
     public void populateWorkflowEntities() {
-        approverDepartmentList = persistenceService.findAllBy("from Department order by deptName");
+        approverDepartmentList = persistenceService.findAllBy("from Department where name = 'Accounts' order by deptName");
         eisCommonService.getEmployeeByUserId(ApplicationThreadLocals.getUserId());
         desgnationList = persistenceService.findAllBy("from Designation where name=?", "ACCOUNTS OFFICER");
         addDropdownData("approverDepartmentList", approverDepartmentList);
