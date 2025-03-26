@@ -296,8 +296,8 @@ public class CreateSupplierBillController extends BaseBillController {
 			final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
 					savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition, approverName);
 
-			return "redirect:/supplierbill/success?approverDetails=" + approverDetails + "&billNumber="
-					+ savedEgBillregister.getBillnumber();
+			return "redirect:/supplierbill/success?approverDetails=" + approverDetails + "&approverDesignation=" + approvalDesignation
+					+ "&billNumber=" + savedEgBillregister.getBillnumber();
 
 		}
 	}
@@ -443,6 +443,7 @@ public class CreateSupplierBillController extends BaseBillController {
 				approverName = keyNameArray[1];
 			}
 		}
+		nextDesign = request.getParameter("approverDesignation");
 		if (id != null)
 			model.addAttribute(APPROVER_NAME, approverName);
 
@@ -457,8 +458,7 @@ public class CreateSupplierBillController extends BaseBillController {
 
 	private String getMessageByStatus(final EgBillregister supplierBill, final String approverName,
 			final String nextDesign) {
-		String message = "";
-
+		String message = "";		
 		if (FinancialConstants.SUPPLIERBILL_CREATED_STATUS.equals(supplierBill.getStatus().getCode())) {
 			if (org.apache.commons.lang.StringUtils
 					.isNotBlank(supplierBill.getEgBillregistermis().getBudgetaryAppnumber())
