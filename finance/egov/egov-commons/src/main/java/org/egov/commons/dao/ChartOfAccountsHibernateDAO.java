@@ -530,13 +530,13 @@ public class ChartOfAccountsHibernateDAO implements ChartOfAccountsDAO {
         final Query query = persistenceService
                 .getSession()
                 .createQuery(
-                        "from CChartOfAccounts where id not in (select glCodeId.id from CChartOfAccountDetail) and type = 'L' and classification=4 and isActiveForPosting = true and id not in (select chartofaccounts.id from Recovery)");
+                        "from CChartOfAccounts where id not in (select glCodeId.id from CChartOfAccountDetail) and type = 'L' and classification=4 and isActiveForPosting = true and id not in (select chartofaccounts.id from Recovery) order by glcode");
         return query.list();
     }
 
     public List<CChartOfAccounts> getForRecovery() {
         final Query query = persistenceService.getSession().createQuery(
-                "from CChartOfAccounts where id in  (select chartofaccounts.id from Recovery)");
+                "from CChartOfAccounts where id in  (select chartofaccounts.id from Recovery) order by glcode");
         return query.list();
     }
 
