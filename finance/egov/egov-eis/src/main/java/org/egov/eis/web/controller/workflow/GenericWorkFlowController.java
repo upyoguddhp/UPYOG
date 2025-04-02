@@ -86,7 +86,7 @@ public abstract class GenericWorkFlowController {
         List<Department> deptlist = getDepartmentsFromMs();
         List<Department> approvaldeptlist = new ArrayList<>();
         for(Department department:deptlist) {
-        	if("Accounts".equalsIgnoreCase(department.getName())) {
+        	if("Accounts Branch".equalsIgnoreCase(department.getName())) {
         		approvaldeptlist.add(department);
         	}
         }
