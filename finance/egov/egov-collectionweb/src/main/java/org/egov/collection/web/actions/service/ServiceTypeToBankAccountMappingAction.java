@@ -48,10 +48,8 @@
 
 package org.egov.collection.web.actions.service;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +57,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -71,7 +68,6 @@ import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.commons.dao.BankaccountHibernateDAO;
 import org.egov.commons.entity.BankAccountServiceMap;
 import org.egov.infra.microservice.models.BankAccountServiceMapping;
-import org.egov.infra.microservice.models.BusinessDetails;
 import org.egov.infra.microservice.models.BusinessService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPageExt;
@@ -216,9 +212,11 @@ public class ServiceTypeToBankAccountMappingAction extends BaseFormAction {
             businessDetails.append(".").append(bankAccountServiceMap.getServiceDetails().getCode());
         }
         
-        mappings = microserviceUtils
-                .getBankAcntServiceMappingsByBankAcc(bankAccountServiceMap.getBankAccountId().getAccountnumber(),
-                        businessDetails.toString());
+        //mappings = microserviceUtils
+                //.getBankAcntServiceMappingsByBankAcc(bankAccountServiceMap.getBankAccountId().getAccountnumber(),
+                       // businessDetails.toString());
+        mappings = microserviceUtils.searchBankAcntServiceMappings(bankAccountServiceMap.getBankAccountId().getAccountnumber(),
+                businessDetails.toString());
         populateNames(mappings);
         target = "searchresult";
         return INDEX;

@@ -54,6 +54,7 @@ import static org.egov.infra.utils.DateUtils.toDefaultDateTimeFormat;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -64,7 +65,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -110,6 +110,7 @@ import org.egov.infra.microservice.models.BankAccount;
 import org.egov.infra.microservice.models.BankAccountServiceMapping;
 import org.egov.infra.microservice.models.BankAccountServiceMappingReq;
 import org.egov.infra.microservice.models.BankAccountServiceMappingResponse;
+import org.egov.infra.microservice.models.BankAccountServiceMappingSearchReq;
 import org.egov.infra.microservice.models.BusinessService;
 import org.egov.infra.microservice.models.BusinessServiceCriteria;
 import org.egov.infra.microservice.models.BusinessServiceMapping;
@@ -178,6 +179,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -906,6 +908,37 @@ public class MicroserviceUtils {
             return response.getBankAccountServiceMapping();
         else
             return null;
+    }
+    
+    public List<BankAccountServiceMapping> searchBankAcntServiceMappings(String accountnumber, String businessdetails) {
+
+    	final RestTemplate restTemplate = createRestTemplate();
+    	final String url = appConfigManager.getEgovCollSerHost() + bankAccountServiceMappingSearchUrl;
+
+    	RequestInfo requestInfo = new RequestInfo();
+
+    	requestInfo.setAuthToken(getUserToken());
+    	requestInfo.setUserInfo(getUserInfo());
+
+    	UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url).queryParam("tenantId", getTenentId());
+
+    	if (StringUtils.isNotBlank(accountnumber) && !"-1".equalsIgnoreCase(accountnumber)) {
+    		uriBuilder.queryParam("bankAccount", accountnumber);
+    	}
+    	if (StringUtils.isNotBlank(businessdetails) && !"-1".equalsIgnoreCase(businessdetails)) {
+    		uriBuilder.queryParam("businessDetails", String.join(",",businessdetails));
+    	}
+
+    	URI uri = uriBuilder.build().toUri();
+
+    	// Send the POST request with the entity as the body
+    	BankAccountServiceMappingResponse response = restTemplate.postForObject(uri, requestInfo,
+    			BankAccountServiceMappingResponse.class);
+
+    	if (response != null && response.getBankAccountServiceMapping() != null)
+    		return response.getBankAccountServiceMapping();
+    	else
+    		return null;
     }
 
     public FinancialStatus getInstrumentStatusByCode(String code) {
