@@ -174,7 +174,7 @@ public abstract class BaseBillController extends BaseVoucherController {
                 resultBinder.reject("msg.expense.bill.accdetail.amount",
                         new String[] { details.getChartOfAccounts().getGlcode() }, null);
         }
-        if(totalDrAmt.compareTo(egBillregister.getBillamount())==1)
+        if(totalDrAmt.compareTo(egBillregister.getBillamount())!=1)
         	resultBinder.reject("msg.billamount", new String[] {}, null);
         if (totalDrAmt.compareTo(totalCrAmt) != 0)
             resultBinder.reject("msg.expense.bill.accdetail.drcrmatch", new String[] {}, null);
