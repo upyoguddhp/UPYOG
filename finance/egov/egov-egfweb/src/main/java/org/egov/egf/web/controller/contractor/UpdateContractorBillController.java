@@ -60,12 +60,14 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.commons.CommonsUtil;
+import org.egov.egf.contractorbill.repository.ContractorBillRepository;
 import org.egov.egf.contractorbill.service.ContractorBillService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.services.ContractorService;
@@ -92,6 +94,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -150,6 +153,12 @@ public class UpdateContractorBillController extends BaseBillController {
     private static final String CONTRACTORBILL_VIEW = "contractorbill-view";
 
     private static final String NET_PAYABLE_ID = "netPayableId";
+    
+    private static final String FIRST_AND_FINAL = "First & Final Bill";
+	
+	private static final String FINAL_BILL = "Final Bill";
+	
+	private static final String FIRST_BILL = "First Bill";
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
     @Autowired
@@ -173,6 +182,8 @@ public class UpdateContractorBillController extends BaseBillController {
     private SecurityUtils securityUtils;
     @Autowired
     private CommonsUtil commonsUtil;
+    @Autowired
+	private ContractorBillRepository contractorBillRepository;
 
     public UpdateContractorBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -403,6 +414,45 @@ public class UpdateContractorBillController extends BaseBillController {
         WorkOrder wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
         if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
     		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);
+    	}
+        List<EgBillregister> savedEgBillregisters = contractorBillRepository.getByWorkOrder(wo.getOrderNumber());
+    	
+        if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
+        	BigDecimal totalBillAmt = new BigDecimal(0);
+        	if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+        		resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
+        	}
+        	if ((FINAL_BILL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+        		resultBinder.reject("msg.final.bill.err", new String[] {}, null);
+        	}
+        	if (StringUtils.isNotBlank(egBillregister.getBilltype())
+        			&& (FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+        		resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
+        	}
+        	for(EgBillregister egBill:savedEgBillregisters) {
+        		totalBillAmt = totalBillAmt.add(egBill.getBillamount());
+        	}
+        	if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())==1) {
+        		resultBinder.reject("msg.contractorbill.totalamount", new String[] {}, null);
+        	}
+        	if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+        		if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())!=0) {
+        			resultBinder.reject("msg.contractorbill.finalamount", new String[] {}, null);
+        		}
+        	}
+        	if((FIRST_BILL).equalsIgnoreCase(egBillregister.getBilltype())
+        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
+        		resultBinder.reject("msg.first.bill.err", new String[] {}, null);
+        	}
+        } else {
+    		if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    			resultBinder.reject("msg.no.prv.bill.err", new String[] {}, null);
+    		}
+    	}
+    	if ((FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    		if(egBillregister.getBillamount().compareTo(wo.getOrderValue())!=0) {
+	    		resultBinder.reject("msg.contractorbill.finalamount", new String[] {}, null);
+	    	}
     	}
         model.addAttribute(CONTRACTOR_ID,
                 workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());

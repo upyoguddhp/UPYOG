@@ -79,6 +79,7 @@ import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.commons.CommonsUtil;
+import org.egov.egf.contractorbill.repository.ContractorBillRepository;
 import org.egov.egf.contractorbill.service.ContractorBillService;
 import org.egov.egf.masters.services.ContractorService;
 import org.egov.egf.masters.services.WorkOrderService;
@@ -102,6 +103,7 @@ import org.owasp.esapi.HTTPUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -156,6 +158,12 @@ public class CreateContractorBillController extends BaseBillController {
 	private static final String BILL_TYPES = "billTypes";
 
 	private static final String INVALID_APPROVER = "invalid.approver";
+	
+	private static final String FIRST_AND_FINAL = "First & Final Bill";
+	
+	private static final String FINAL_BILL = "Final Bill";
+	
+	private static final String FIRST_BILL = "First Bill";
 
 	@Autowired
 	private ContractorBillService contractorBillService;
@@ -183,6 +191,9 @@ public class CreateContractorBillController extends BaseBillController {
 
 	@Autowired
 	private CommonsUtil commonsUtil;
+	
+	@Autowired
+	private ContractorBillRepository contractorBillRepository;	
 
 	public CreateContractorBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -258,7 +269,46 @@ public class CreateContractorBillController extends BaseBillController {
     	if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
     		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);
     	}
-
+    	
+    	List<EgBillregister> savedEgBillregisters = contractorBillRepository.getByWorkOrder(wo.getOrderNumber());
+    	
+    	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
+    		BigDecimal totalBillAmt = new BigDecimal(0);
+			if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+				resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
+			}
+			if ((FINAL_BILL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+				resultBinder.reject("msg.final.bill.err", new String[] {}, null);
+			}
+			if (StringUtils.isNotBlank(egBillregister.getBilltype())
+					&& (FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
+			}
+			for(EgBillregister egBill:savedEgBillregisters) {
+				totalBillAmt = totalBillAmt.add(egBill.getBillamount());
+    		}
+			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())==1) {
+	    		resultBinder.reject("msg.contractorbill.totalamount", new String[] {}, null);
+	    	}
+			if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+				if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())!=0) {
+		    		resultBinder.reject("msg.contractorbill.finalamount", new String[] {}, null);
+		    	}
+    		}
+			if((FIRST_BILL).equalsIgnoreCase(egBillregister.getBilltype())
+        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
+				resultBinder.reject("msg.first.bill.err", new String[] {}, null);
+			}
+    	} else {
+    		if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    			resultBinder.reject("msg.no.prv.bill.err", new String[] {}, null);
+    		}
+    	}
+    	if ((FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    		if(egBillregister.getBillamount().compareTo(wo.getOrderValue())!=0) {
+	    		resultBinder.reject("msg.contractorbill.finalamount", new String[] {}, null);
+	    	}
+    	}
 		if (resultBinder.hasErrors()) {
 			return populateDataOnErrors(egBillregister, model, request);
 		} else {

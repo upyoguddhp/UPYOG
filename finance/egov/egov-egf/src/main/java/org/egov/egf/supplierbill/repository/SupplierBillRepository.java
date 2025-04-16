@@ -51,6 +51,7 @@ import java.util.List;
 
 import org.egov.model.bills.EgBillregister;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -64,5 +65,8 @@ public interface SupplierBillRepository extends JpaRepository<EgBillregister, Lo
     EgBillregister findByBillnumber(final String billNumber);
 
     List<EgBillregister> findByBillnumberContainingIgnoreCase(final String billNumber);
+
+    @Query(value="from EgBillregister e where e.workordernumber=?1 order by id desc")
+	List<EgBillregister> getByPurchaseOrder(String orderNumber);
 
 }

@@ -81,6 +81,7 @@ import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.commons.CommonsUtil;
 import org.egov.egf.masters.services.PurchaseOrderService;
 import org.egov.egf.masters.services.SupplierService;
+import org.egov.egf.supplierbill.repository.SupplierBillRepository;
 import org.egov.egf.supplierbill.service.SupplierBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
@@ -102,6 +103,7 @@ import org.owasp.esapi.HTTPUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -156,6 +158,12 @@ public class CreateSupplierBillController extends BaseBillController {
 	private static final String APPROVAL_DESIGNATION = "approvalDesignation";
 
 	private static final int BUFFER_SIZE = 4096;
+	
+	private static final String FIRST_AND_FINAL = "First & Final Bill";
+	
+	private static final String FINAL_BILL = "Final Bill";
+	
+	private static final String FIRST_BILL = "First Bill";
 
 	@Autowired
 	private SupplierBillService supplierBillService;
@@ -183,6 +191,9 @@ public class CreateSupplierBillController extends BaseBillController {
 
 	@Autowired
 	private CommonsUtil commonsUtil;
+	
+	@Autowired
+    private SupplierBillRepository supplierBillRepository;
 
 	public CreateSupplierBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -254,6 +265,45 @@ public class CreateSupplierBillController extends BaseBillController {
 		PurchaseOrder po = purchaseOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
 		if(egBillregister.getBillamount().compareTo(po.getOrderValue())==1) {
     		resultBinder.reject("msg.supplierbill.amount", new String[] {}, null);
+    	}
+		List<EgBillregister> savedEgBillregisters = supplierBillRepository.getByPurchaseOrder(po.getOrderNumber());
+    	
+    	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
+    		BigDecimal totalBillAmt = new BigDecimal(0);
+			if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+				resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
+			}
+			if ((FINAL_BILL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+				resultBinder.reject("msg.final.bill.err", new String[] {}, null);
+			}
+			if (StringUtils.isNotBlank(egBillregister.getBilltype())
+					&& (FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
+			}
+			for(EgBillregister egBill:savedEgBillregisters) {
+				totalBillAmt = totalBillAmt.add(egBill.getBillamount());
+    		}
+			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())==1) {
+	    		resultBinder.reject("msg.supplierbill.totalamount", new String[] {}, null);
+	    	}
+			if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+				if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())!=0) {
+		    		resultBinder.reject("msg.supplierbill.finalamount", new String[] {}, null);
+		    	}
+    		}
+			if((FIRST_BILL).equalsIgnoreCase(egBillregister.getBilltype())
+        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
+				resultBinder.reject("msg.first.bill.err", new String[] {}, null);
+			}
+    	} else {
+    		if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    			resultBinder.reject("msg.no.prv.bill.err", new String[] {}, null);
+    		}
+    	}
+    	if ((FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    		if(egBillregister.getBillamount().compareTo(po.getOrderValue())!=0) {
+	    		resultBinder.reject("msg.supplierbill.finalamount", new String[] {}, null);
+	    	}
     	}
 		if (resultBinder.hasErrors()) {
 			return populateDataOnErrors(egBillregister, model, request);
