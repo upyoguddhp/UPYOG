@@ -273,7 +273,7 @@ public class CreateSupplierBillController extends BaseBillController {
     	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
     		if(egBillregister.getId()!=savedEgBillregisters.get(0).getId()){
     			if(null==savedEgBillregisters.get(0).getStatus().getId()
-    					|| 67!=savedEgBillregisters.get(0).getStatus().getId()) {
+    					|| 77!=savedEgBillregisters.get(0).getStatus().getId()) {
     				resultBinder.reject("msg.last.bill.not.approved", new String[] {}, null);
     			}
     			BigDecimal totalBillAmt = new BigDecimal(0);
