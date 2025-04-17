@@ -269,34 +269,33 @@ public class CreateSupplierBillController extends BaseBillController {
 		List<EgBillregister> savedEgBillregisters = supplierBillRepository.getByPurchaseOrder(po.getOrderNumber());
     	
     	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
-    		BigDecimal totalBillAmt = new BigDecimal(0);
-			if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
-				resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
-			}
-			if ((FINAL_BILL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
-				resultBinder.reject("msg.final.bill.err", new String[] {}, null);
-			}
-			if (StringUtils.isNotBlank(egBillregister.getBilltype())
-					&& (FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
-				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
-			}
-			for(EgBillregister egBill:savedEgBillregisters) {
-				totalBillAmt = totalBillAmt.add(egBill.getBillamount());
+    		if(egBillregister.getId()!=savedEgBillregisters.get(0).getId()){
+    			BigDecimal totalBillAmt = new BigDecimal(0);
+    			if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+    				resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
+    			}
+    			if ((FINAL_BILL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
+    				resultBinder.reject("msg.final.bill.err", new String[] {}, null);
+    			}
+    			if (StringUtils.isNotBlank(egBillregister.getBilltype())
+    					&& (FIRST_AND_FINAL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
+    			}
+    			for(EgBillregister egBill:savedEgBillregisters) {
+    				totalBillAmt = totalBillAmt.add(egBill.getBillamount());
+    			}
+    			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())==1) {
+    				resultBinder.reject("msg.supplierbill.totalamount", new String[] {}, null);
+    			}
+    			if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    				if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())!=0) {
+    					resultBinder.reject("msg.supplierbill.finalamount", new String[] {}, null);
+    				}
+    			}
+    			if((FIRST_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    				resultBinder.reject("msg.first.bill.err", new String[] {}, null);
+    			}
     		}
-			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())==1
-        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
-	    		resultBinder.reject("msg.supplierbill.totalamount", new String[] {}, null);
-	    	}
-			if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())
-        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
-				if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())!=0) {
-		    		resultBinder.reject("msg.supplierbill.finalamount", new String[] {}, null);
-		    	}
-    		}
-			if((FIRST_BILL).equalsIgnoreCase(egBillregister.getBilltype())
-        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
-				resultBinder.reject("msg.first.bill.err", new String[] {}, null);
-			}
     	} else {
     		if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
     			resultBinder.reject("msg.no.prv.bill.err", new String[] {}, null);
