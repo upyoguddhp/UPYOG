@@ -432,10 +432,12 @@ public class UpdateContractorBillController extends BaseBillController {
         	for(EgBillregister egBill:savedEgBillregisters) {
         		totalBillAmt = totalBillAmt.add(egBill.getBillamount());
         	}
-        	if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())==1) {
+        	if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())==1
+        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
         		resultBinder.reject("msg.contractorbill.totalamount", new String[] {}, null);
         	}
-        	if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+        	if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())
+        			&& egBillregister.getId()!=savedEgBillregisters.get(0).getId()) {
         		if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())!=0) {
         			resultBinder.reject("msg.contractorbill.finalamount", new String[] {}, null);
         		}
