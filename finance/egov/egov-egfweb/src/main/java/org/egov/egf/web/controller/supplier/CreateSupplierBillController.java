@@ -164,6 +164,8 @@ public class CreateSupplierBillController extends BaseBillController {
 	private static final String FINAL_BILL = "Final Bill";
 	
 	private static final String FIRST_BILL = "First Bill";
+	
+	private static final String RUNNING_BILL = "Running Bill";
 
 	@Autowired
 	private SupplierBillService supplierBillService;
@@ -270,6 +272,10 @@ public class CreateSupplierBillController extends BaseBillController {
     	
     	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
     		if(egBillregister.getId()!=savedEgBillregisters.get(0).getId()){
+    			if(null==savedEgBillregisters.get(0).getStatus().getId()
+    					|| 67!=savedEgBillregisters.get(0).getStatus().getId()) {
+    				resultBinder.reject("msg.last.bill.not.approved", new String[] {}, null);
+    			}
     			BigDecimal totalBillAmt = new BigDecimal(0);
     			if ((FIRST_AND_FINAL).equalsIgnoreCase(savedEgBillregisters.get(0).getBilltype())) {
     				resultBinder.reject("msg.first.final.bill.err", new String[] {}, null);
@@ -297,7 +303,8 @@ public class CreateSupplierBillController extends BaseBillController {
     			}
     		}
     	} else {
-    		if ((FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
+    		if ((RUNNING_BILL).equalsIgnoreCase(egBillregister.getBilltype())
+    				|| (FINAL_BILL).equalsIgnoreCase(egBillregister.getBilltype())) {
     			resultBinder.reject("msg.no.prv.bill.err", new String[] {}, null);
     		}
     	}
