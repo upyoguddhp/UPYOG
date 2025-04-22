@@ -66,7 +66,7 @@ public interface SupplierBillRepository extends JpaRepository<EgBillregister, Lo
 
     List<EgBillregister> findByBillnumberContainingIgnoreCase(final String billNumber);
 
-    @Query(value="from EgBillregister e where e.workordernumber=?1 order by id desc")
+    @Query(value="from EgBillregister e where e.workordernumber=?1 and e.status.id <> 73 order by id desc")
 	List<EgBillregister> getByPurchaseOrder(String orderNumber);
 
 }
