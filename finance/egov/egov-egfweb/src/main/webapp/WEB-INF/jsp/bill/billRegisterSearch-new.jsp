@@ -130,7 +130,8 @@
 						<th class="bluebgheadtd"><s:text name="lbl.bill.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.passed.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.bill.status"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.owner.name"/></th>
+						<!--  <th class="bluebgheadtd"><s:text name="lbl.owner.name"/></th>-->
+						<th class="bluebgheadtd"><s:text name="lbl.pending.with"/>
 					</tr>
 
 					<s:iterator var="p" value="billList" status="s">

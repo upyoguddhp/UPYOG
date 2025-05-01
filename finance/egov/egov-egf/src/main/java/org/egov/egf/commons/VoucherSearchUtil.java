@@ -112,8 +112,9 @@ public class VoucherSearchUtil {
 			 * has active payments 5.Get all vouchers which has active remittance payments
 			 * 6. Add 4 and 5 ==>B 7. Remove All Bs from A
 			 */
-			final String jvModifyCondition = " and vh.status in (:vhStatus) and vh.moduleId is null ";
-			jvmModifyParams.put("vhStatus", FinancialConstants.CREATEDVOUCHERSTATUS);
+			//final String jvModifyCondition = " and vh.status in (:vhStatus) and vh.moduleId is null ";
+			//jvmModifyParams.put("vhStatus", FinancialConstants.CREATEDVOUCHERSTATUS);
+			final String jvModifyCondition = " and vh.moduleId is null ";
 			// editModeQuery1 :Get all vouchers created from JV screen and
 			// payments are not done
 			editModeQuery1 = " from CVoucherHeader vh where vh not in ( select billVoucherHeader from Miscbilldetail) "
@@ -156,12 +157,13 @@ public class VoucherSearchUtil {
 			final StringBuilder editModeQuery3 = new StringBuilder(
 					" select misc.billVoucherHeader.id from CVoucherHeader ph, Miscbilldetail misc,CVoucherHeader vh")
 							.append("  where misc.payVoucherHeader=ph and misc.billVoucherHeader is not null")
-							.append(" and misc.billVoucherHeader=vh and ph.status  in (:phStatus) ")
+							//.append(" and misc.billVoucherHeader=vh and ph.status  in (:phStatus) ")
+							.append(" and misc.billVoucherHeader=vh ")
 							.append(jvModifyCondition).append(sql);
 
 			final Query queryThree = persistenceService.getSession().createQuery(editModeQuery3.toString());
-			queryThree.setParameter("phStatus", Arrays.asList(FinancialConstants.CREATEDVOUCHERSTATUS,
-					FinancialConstants.PREAPPROVEDVOUCHERSTATUS));
+			//queryThree.setParameter("phStatus", Arrays.asList(FinancialConstants.CREATEDVOUCHERSTATUS,
+					//FinancialConstants.PREAPPROVEDVOUCHERSTATUS));
 			sqlParams.entrySet().forEach(entry -> queryThree.setParameter(entry.getKey(), entry.getValue()));
 			jvmModifyParams.entrySet().forEach(entry -> queryThree.setParameter(entry.getKey(), entry.getValue()));
 			final List<Long> vouchersHavingActivePayments = queryThree.list();
@@ -174,10 +176,11 @@ public class VoucherSearchUtil {
 							.append(" WHERE r.egRemittanceGldtl=rgd AND rgd.generalledgerdetail=gld")
 							.append(" AND gld.generalledger=gl AND r.egRemittance=rd AND rd.voucherheader=remittedvh")
 							.append(" AND gl.voucherHeaderId =vh")
-							.append(" AND remittedvh =billmis.voucherheaderid and remittedvh.status!=:remittedvhStatus");
+							//.append(" AND remittedvh =billmis.voucherheaderid and remittedvh.status!=:remittedvhStatus");
+							.append(" AND remittedvh =billmis.voucherheaderid ");
 			final Query ucrQuery = persistenceService.getSession()
 					.createQuery(uncancelledRemittances.append(sql).toString());
-			ucrQuery.setParameter("remittedvhStatus", FinancialConstants.CANCELLEDVOUCHERSTATUS);
+			//ucrQuery.setParameter("remittedvhStatus", FinancialConstants.CANCELLEDVOUCHERSTATUS);
 			sqlParams.entrySet().forEach(entry -> ucrQuery.setParameter(entry.getKey(), entry.getValue()));
 			final List<Long> remittanceBillVhIdList = ucrQuery.list();
 			if (LOGGER.isDebugEnabled()) {
@@ -200,9 +203,10 @@ public class VoucherSearchUtil {
 			return voucherList;
 		} else {
 			final Query query = persistenceService.getSession()
-					.createQuery(new StringBuilder(" from CVoucherHeader vh where vh.status not in (:statusExclude)")
+					//.createQuery(new StringBuilder(" from CVoucherHeader vh where vh.status not in (:statusExclude)")
+					.createQuery(new StringBuilder(" from CVoucherHeader vh where vh.id is not null")
 							.append(sql).append(" order by vh.voucherNumber ").toString());
-			query.setParameter("statusExclude", statusExclude);
+			//query.setParameter("statusExclude", statusExclude);
 			sqlParams.entrySet().forEach(entry -> query.setParameter(entry.getKey(), entry.getValue()));
 			voucherList = query.list();
 		}
@@ -290,8 +294,10 @@ public class VoucherSearchUtil {
 		statusExclude = statusExclude + "," + FinancialConstants.REVERSEDVOUCHERSTATUS.toString() + ","
 				+ FinancialConstants.REVERSALVOUCHERSTATUS;
 
-		final String finalQuery = " from CVoucherHeader vh where vh.status not in (:statusExclude) " + sql1 + "  ";
-		params.put("statusExclude", Arrays.asList(StringUtils.split(statusExclude, ",")));
+		//final String finalQuery = " from CVoucherHeader vh where vh.status not in (:statusExclude) " + sql1 + "  ";
+		//params.put("statusExclude", Arrays.asList(StringUtils.split(statusExclude, ",")));
+		
+		final String finalQuery = " from CVoucherHeader vh where vh.id is not null " + sql1 + "  ";
 
 		final Query query = persistenceService.getSession().createQuery(finalQuery);
 		params.entrySet().forEach(entry -> query.setParameter(entry.getKey(), entry.getValue()));
@@ -388,16 +394,20 @@ public class VoucherSearchUtil {
 		}
 		final Map<String, Object> params = new HashMap<>();
 		final String sql = voucherFilterQuery(voucherHeader, fromDate, toDate, mode, params);
-		final String sqlQuery = new StringBuilder("from CVoucherHeader vh where vh.status not in (:statusExclude) ")
+		//final String sqlQuery = new StringBuilder("from CVoucherHeader vh where vh.status not in (:statusExclude) ")
+				//.append(sql).append(" order by vh.voucherNumber ,vh.voucherDate,vh.name ").toString();
+		final String sqlQuery = new StringBuilder("from CVoucherHeader vh where vh.id is not null ")
 				.append(sql).append(" order by vh.voucherNumber ,vh.voucherDate,vh.name ").toString();
 		final Query query1 = persistenceService.getSession().createQuery(sqlQuery);
 		params.entrySet().forEach(entry -> query1.setParameter(entry.getKey(), entry.getValue()));
-		query1.setParameterList("statusExclude", list);
+		//query1.setParameterList("statusExclude", list);
 		queryList.add(query1);
+		//final Query query2 = persistenceService.getSession().createQuery(
+				//"select count(*) from CVoucherHeader vh where vh.status not in (:statusExclude) " + sql);
 		final Query query2 = persistenceService.getSession().createQuery(
-				"select count(*) from CVoucherHeader vh where vh.status not in (:statusExclude) " + sql);
+				"select count(*) from CVoucherHeader vh where vh.id is not null " + sql);
 		params.entrySet().forEach(entry -> query2.setParameter(entry.getKey(), entry.getValue()));
-		query2.setParameterList("statusExclude", list);
+		//query2.setParameterList("statusExclude", list);
 		queryList.add(query2);
 		return queryList;
 	}

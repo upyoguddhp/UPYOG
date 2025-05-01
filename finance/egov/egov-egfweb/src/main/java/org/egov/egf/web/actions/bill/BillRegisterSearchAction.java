@@ -66,6 +66,7 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
+import org.egov.infra.workflow.service.StateService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.EgBillregister;
@@ -110,6 +111,8 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private List<Map<String, Object>> billList;
     @Autowired
     private AppConfigValueService appConfigValueService;
+    @Autowired
+    private StateService stateService;
     DateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy");
    
  @Autowired
@@ -217,9 +220,16 @@ public class BillRegisterSearchAction extends BaseFormAction {
         if (stateIds != null && stateIds.size() > 0)
             oWnerNamesList = getOwnersForWorkFlowState(stateIds);
 
-        for (final Object[] owner : oWnerNamesList)
-            if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[1])))
-                stateIdAndOwnerNameMap.put(getLongValue(owner[1]), getStringValue(owner[0]));
+        /*for (final Object[] owner : oWnerNamesList)
+        if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[1])))
+            stateIdAndOwnerNameMap.put(getLongValue(owner[1]), getStringValue(owner[0]));*/
+	for (final long stateId : stateIds)
+		if (stateId != 0L)
+			if (!stateIdAndOwnerNameMap.containsKey(stateId))
+				stateIdAndOwnerNameMap.put(stateId,
+						microserviceUtils
+								.getEmployeeByPositionId(stateService.getStateById(stateId).getOwnerPosition())
+								.getUser().getName());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Total number of bills found =: " + list.size());
 

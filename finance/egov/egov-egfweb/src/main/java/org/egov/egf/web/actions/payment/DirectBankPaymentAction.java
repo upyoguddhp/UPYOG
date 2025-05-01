@@ -513,13 +513,18 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                         + entity.getName()));
                         throw new ValidationException(errors);
 
-                    } else if (type.equalsIgnoreCase("Supplier") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    } else if (type.equalsIgnoreCase("Supplier") && (/*StringUtils.isBlank(entity.getTinno())
+                            ||*/ StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
-                        LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                        /*LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                                        + entity.getName()));*/
+                        LOGGER.error("BankAccount,IFSC Code is mandatory for RTGS Payment for "
+                                + entity.getName());
+                        errors.add(new ValidationError("paymentMode",
+                                "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
                                         + entity.getName()));
                         throw new ValidationException(errors);
                     }

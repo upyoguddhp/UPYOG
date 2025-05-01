@@ -90,7 +90,7 @@
 	</div>
 </c:if>
 	
-    <div class="position_alert">
+    <!--<div class="position_alert">
         <spring:message code="lbl.netpayable.amount" text="Net Payable Amount"/>
         : &#8377 <span id="supplierNetPayableAmount"><c:out
             value="${supplierNetPayableAmount}" default="0.0"></c:out></span>
@@ -102,6 +102,17 @@
     </div>
     <div class="position_alert2">
         <spring:message code="lbl.total.deduction.amount" text="Total Deduction Amount"/>
+        : &#8377 <span id="supplierBillTotalCreditAmount"> <c:out
+            value="${supplierBillTotalCreditAmount}" default="0.0"></c:out></span>
+    </div>-->
+    
+   <div class="position_alert2">
+        <spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/>
+        : &#8377 <span id="supplierBillTotalDebitAmount"> <c:out
+            value="${supplierBillTotalDebitAmount}" default="0.0"></c:out></span>
+    </div>
+    <div class="position_alert">
+        <spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/>
         : &#8377 <span id="supplierBillTotalCreditAmount"> <c:out
             value="${supplierBillTotalCreditAmount}" default="0.0"></c:out></span>
     </div>

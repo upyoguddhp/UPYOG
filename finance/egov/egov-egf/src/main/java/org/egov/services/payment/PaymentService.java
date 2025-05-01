@@ -1255,14 +1255,19 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     }
                     entity = getEntity(Integer.valueOf(obj[0].toString()), (Serializable) obj[1]);
 
-                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    if (type.equals("Supplier") && (/*StringUtils.isBlank(entity.getTinno())
+                            ||*/ StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
-                        LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                        /*LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
-                                        + entity.getName()));
+                                        + entity.getName()));*/
+                    	 LOGGER.error("BankAccount,IFSC Code is mandatory for RTGS Payment for "
+                                 + entity.getName());
+                         errors.add(new ValidationError("paymentMode",
+                                 "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
+                                         + entity.getName()));
                         throw new ValidationException(errors);
                     } else
                         validateEntity(entity);
@@ -1303,13 +1308,18 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     }
                     entity = getEntity(Integer.valueOf(obj[0].toString()), (Serializable) obj[1]);
 
-                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    if (type.equals("Supplier") && (/*StringUtils.isBlank(entity.getTinno())
+                            ||*/ StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
-                        LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                        /*LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                                        + entity.getName()));*/
+                        LOGGER.error("BankAccount,IFSC Code is mandatory for RTGS Payment for "
+                                + entity.getName());
+                        errors.add(new ValidationError("paymentMode",
+                                "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
                                         + entity.getName()));
                         throw new ValidationException(errors);
                     } else
@@ -1481,13 +1491,18 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                                         + entity.getName()));
                         throw new ValidationException(errors);
                     }
-                    if (obj[2].equals("Purchase") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    if (obj[2].equals("Purchase") && (/*StringUtils.isBlank(entity.getTinno())
+                            ||*/ StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
-                        LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                        /*LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                                        + entity.getName()));*/
+                        LOGGER.error("BankAccount,IFSC Code is mandatory for RTGS Payment for "
+                                + entity.getName());
+                        errors.add(new ValidationError("paymentMode",
+                                "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
                                         + entity.getName()));
                         throw new ValidationException(errors);
                     }
