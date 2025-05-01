@@ -67,6 +67,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccountDetail;
@@ -362,24 +363,26 @@ public class ChartOfAccounts {
 		final ArrayList glParamList = glAcc.getGLParameters();
 		for (int i = 0; i < glParamList.size(); i++) {
 			final GLParameter glPrm = (GLParameter) glParamList.get(i);
-			final TransaxtionParameter txnPrm1 = (TransaxtionParameter) txn.transaxtionParameters.get(0);
-			if (glPrm.getDetailId() == Integer.parseInt(txnPrm1.getDetailTypeId()))
-				requiredCount++;
-			/*
-			 * if(!glPrm.getDetailKey().equalsIgnoreCase("0")&&glPrm.
-			 * getDetailKey ().length()>0){ foundCount++; continue; }
-			 */
-			for (int j = 0; j < txn.transaxtionParameters.size(); j++) {
-				final TransaxtionParameter txnPrm = (TransaxtionParameter) txn.transaxtionParameters.get(j);
-				// if(LOGGER.isInfoEnabled())
-				// LOGGER.info(glAcc.getCode()+" "+txnPrm.getDetailName()+"
-				// "+txnPrm.getDetailKey());
-				if (txnPrm.getDetailName().equalsIgnoreCase(glPrm.getDetailName())) {
-					final int id = glPrm.getDetailId();
-					if (rv.validateKey(id, txnPrm.getDetailKey()))
-						foundCount++;
-					else
-						return false;
+			if(!CollectionUtils.isEmpty(txn.getTransaxtionParam())) {
+				final TransaxtionParameter txnPrm1 = (TransaxtionParameter) txn.transaxtionParameters.get(0);
+				if (glPrm.getDetailId() == Integer.parseInt(txnPrm1.getDetailTypeId()))
+					requiredCount++;
+				/*
+				 * if(!glPrm.getDetailKey().equalsIgnoreCase("0")&&glPrm.
+				 * getDetailKey ().length()>0){ foundCount++; continue; }
+				 */
+				for (int j = 0; j < txn.transaxtionParameters.size(); j++) {
+					final TransaxtionParameter txnPrm = (TransaxtionParameter) txn.transaxtionParameters.get(j);
+					// if(LOGGER.isInfoEnabled())
+					// LOGGER.info(glAcc.getCode()+" "+txnPrm.getDetailName()+"
+					// "+txnPrm.getDetailKey());
+					if (txnPrm.getDetailName().equalsIgnoreCase(glPrm.getDetailName())) {
+						final int id = glPrm.getDetailId();
+						if (rv.validateKey(id, txnPrm.getDetailKey()))
+							foundCount++;
+						else
+							return false;
+					}
 				}
 			}
 		}
@@ -789,52 +792,54 @@ public class ChartOfAccounts {
                     final GLParameter glPrm = (GLParameter) glParamList.get(a);
 
                     { // Post the details sent apart from defaults
-                    	for (int z = 0; z < txnPrm.size(); z++) {
-                    		final TransaxtionParameter tParam = (TransaxtionParameter) txnPrm.get(z);
-                    		if (LOGGER.isInfoEnabled())
-                    			LOGGER.info("tParam.getGlcodeId():" + tParam.getGlcodeId());
-                    		if (LOGGER.isInfoEnabled())
-                    			LOGGER.info("gLedger.getglCodeId():" + gLedger.getGlcodeId());
-                    		if (tParam.getDetailName().equalsIgnoreCase(glPrm.getDetailName())
-                    				&& tParam.getGlcodeId().equals(gLedger.getGlcodeId().getId().toString())) {
-                    			gLedgerDet = new CGeneralLedgerDetail();
-                    			detKeyName = tParam.getDetailName();
-                    			detKeyId = tParam.getDetailKey();
-                    			gLedgerDet.setGeneralLedgerId(gLedger);
-                    			Accountdetailtype acctype = (Accountdetailtype) persistenceService.getSession()
-                    					.load(Accountdetailtype.class, glPrm.getDetailId());
-                    			gLedgerDet.setDetailTypeId(acctype);
-                    			gLedgerDet.setDetailKeyId(Integer.parseInt(detKeyId));
-                    			gLedgerDet.setDetailKeyName(detKeyName);
-                    			gLedgerDet.setAmount(new BigDecimal(tParam.getDetailAmt()));
-                    			generalLedgerDetPersistenceService.persist(gLedgerDet);
-                    			try {
-                    				if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
-                    						&& gLedger.getCreditAmount() > 0) {
-                    					egRemitGldtl = new EgRemittanceGldtl();
-                    					// if(LOGGER.isInfoEnabled())
-                    					// LOGGER.info("----------"+gLedger.getGlCodeId());
-                    					egRemitGldtl.setGeneralledgerdetail(gLedgerDet);
-                    					egRemitGldtl.setGldtlamt(gLedgerDet.getAmount());
-                    					Recovery tdsentry = null;
-                    					if (tParam.getTdsId() != null)
-                    						tdsentry = (Recovery) persistenceService.find(
-                    								"from Recovery where id=?", Long.parseLong(tParam.getTdsId()));
-                    					if (tdsentry != null) {
-                    						egRemitGldtl.setRecovery(tdsentry);
+                    	if (!CollectionUtils.isEmpty(txnPrm) && txnPrm.size() > 0) {
+                    		for (int z = 0; z < txnPrm.size(); z++) {
+                    			final TransaxtionParameter tParam = (TransaxtionParameter) txnPrm.get(z);
+                    			if (LOGGER.isInfoEnabled())
+                    				LOGGER.info("tParam.getGlcodeId():" + tParam.getGlcodeId());
+                    			if (LOGGER.isInfoEnabled())
+                    				LOGGER.info("gLedger.getglCodeId():" + gLedger.getGlcodeId());
+                    			if (tParam.getDetailName().equalsIgnoreCase(glPrm.getDetailName())
+                    					&& tParam.getGlcodeId().equals(gLedger.getGlcodeId().getId().toString())) {
+                    				gLedgerDet = new CGeneralLedgerDetail();
+                    				detKeyName = tParam.getDetailName();
+                    				detKeyId = tParam.getDetailKey();
+                    				gLedgerDet.setGeneralLedgerId(gLedger);
+                    				Accountdetailtype acctype = (Accountdetailtype) persistenceService.getSession()
+                    						.load(Accountdetailtype.class, glPrm.getDetailId());
+                    				gLedgerDet.setDetailTypeId(acctype);
+                    				gLedgerDet.setDetailKeyId(Integer.parseInt(detKeyId));
+                    				gLedgerDet.setDetailKeyName(detKeyName);
+                    				gLedgerDet.setAmount(new BigDecimal(tParam.getDetailAmt()));
+                    				generalLedgerDetPersistenceService.persist(gLedgerDet);
+                    				try {
+                    					if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
+                    							&& gLedger.getCreditAmount() > 0) {
+                    						egRemitGldtl = new EgRemittanceGldtl();
+                    						// if(LOGGER.isInfoEnabled())
+                    						// LOGGER.info("----------"+gLedger.getGlCodeId());
+                    						egRemitGldtl.setGeneralledgerdetail(gLedgerDet);
+                    						egRemitGldtl.setGldtlamt(gLedgerDet.getAmount());
+                    						Recovery tdsentry = null;
+                    						if (tParam.getTdsId() != null)
+                    							tdsentry = (Recovery) persistenceService.find(
+                    									"from Recovery where id=?", Long.parseLong(tParam.getTdsId()));
+                    						if (tdsentry != null) {
+                    							egRemitGldtl.setRecovery(tdsentry);
+                    						}
+                    						remitanceDetPersistenceService.persist(egRemitGldtl);
                     					}
-                    					remitanceDetPersistenceService.persist(egRemitGldtl);
+                    				} catch (final TaskFailedException e) {
+                    					LOGGER.error("Error while inserting to eg_remittance_gldtl " + e, e);
+                    					return false;
                     				}
-                    			} catch (final TaskFailedException e) {
-                    				LOGGER.error("Error while inserting to eg_remittance_gldtl " + e, e);
-                    				return false;
-                    			}
-                    			if(gLedger.getGeneralLedgerDetails() == null){
-                    			    Set<CGeneralLedgerDetail> gldSet = new HashSet<>();
-                    			    gldSet.add(gLedgerDet);
-                    			    gLedger.setGeneralLedgerDetails(gldSet);
-                    			}else{
-                    			    gLedger.getGeneralLedgerDetails().add(gLedgerDet);
+                    				if (gLedger.getGeneralLedgerDetails() == null) {
+                    					Set<CGeneralLedgerDetail> gldSet = new HashSet<>();
+                    					gldSet.add(gLedgerDet);
+                    					gLedger.setGeneralLedgerDetails(gldSet);
+                    				} else {
+                    					gLedger.getGeneralLedgerDetails().add(gLedgerDet);
+                    				}
                     			}
                     		}
                     	}
