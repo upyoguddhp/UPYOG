@@ -59,6 +59,7 @@ public class ExcelUtils {
 				}
 				// populate owner details
 				List<OwnerInfo> owners = enrichOwners(row);
+				log.info(getCellValue(row.getCell(0)));
 				// populate unit details
 				List<Unit> units = enrichUnits(row);
 				// populate address details
