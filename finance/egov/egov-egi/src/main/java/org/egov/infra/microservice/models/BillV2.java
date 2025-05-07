@@ -168,6 +168,10 @@ public class BillV2 {
     @SafeHtml
     @JsonProperty("fileStoreId")
     private String fileStoreId;
+    
+    @SafeHtml
+    @JsonProperty("userId")
+    private String userId;
 
     public enum StatusEnum {
         ACTIVE("ACTIVE"),
