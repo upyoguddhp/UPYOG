@@ -230,6 +230,8 @@ public class UserService {
 		userSearchRequest.setUserType(owner.getType());
 		userSearchRequest.setName(owner.getName());
 
+		log.info("Owner Name:" +owner.getName());
+
 		StringBuilder uri = new StringBuilder(grbgConfig.getUserServiceHostUrl())
 				.append(grbgConfig.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
