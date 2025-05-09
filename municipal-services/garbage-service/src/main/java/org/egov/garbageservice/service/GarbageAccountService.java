@@ -438,6 +438,7 @@ public class GarbageAccountService {
 				address.setGarbageId(garbageAccount.getGarbageId());
 			});
 		} else {
+			log.info("Record No" + garbageAccount.getName() + ","+ garbageAccount.getAddresses());
 			throw new CustomException("MISSING_ADDRESS", "Provide address.");
 		}
 	}
