@@ -75,7 +75,7 @@
 <div class="form-group">
 	<label class="col-sm-2 control-label text-right" for="description" > <spring:message code="purchaseorder.description" text="Description"/></label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea path="description" id="description" cols="35" cssClass="form-control textfieldsvalidate patternvalidation"  maxlength = "250" />
+		<form:textarea path="description" id="description" cols="35" cssClass="form-control textfieldsvalidate patternvalidation"  maxlength = "2000" />
 		<form:errors path="description" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="active"> <spring:message code="purchaseorder.active" text="Active Y/N"/>
