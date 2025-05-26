@@ -2225,7 +2225,7 @@ public class CreateVoucher {
 		if (null == receiptdetails.get(VoucherConstant.BANKCODE))
 			throw new ApplicationRuntimeException("Bank Code is null");
 		if (null == receiptdetails.get(VoucherConstant.BANKBRANCHCODE))
-			throw new ApplicationRuntimeException("Bank branch code  is null");
+			throw new ApplicationRuntimeException("Bank IFSC code  is null");
 		if (null == receiptdetails.get(VoucherConstant.BANKACCOUNTNUMBER))
 			throw new ApplicationRuntimeException("Bank Account number is null");
 		bankCode = receiptdetails.get(VoucherConstant.BANKCODE).toString();
