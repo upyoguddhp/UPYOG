@@ -445,7 +445,7 @@ else{
 																</tr>
 																<tr>
 																	<td class="greybox">&nbsp;</td>
-																	<td class="greybox"><s:text name="lbl.narration"/> </td>
+																	<td class="greybox"><s:text name="Narration"/> </td>
 																	<td class="greybox" colspan="4"><textarea
 																			name="description" id="narration" type="text"
 																			style="width: 580px;"></textarea></td>
