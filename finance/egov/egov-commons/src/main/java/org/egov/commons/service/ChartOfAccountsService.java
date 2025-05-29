@@ -353,7 +353,7 @@ public class ChartOfAccountsService extends PersistenceService<CChartOfAccounts,
     public List<CChartOfAccounts> getAccountTypes() {
 
         final Query accountTypesQuery = getSession()
-                .createQuery(" from CChartOfAccounts WHERE glcode LIKE '4502%' AND classification=2 ORDER BY glcode");
+                .createQuery(" from CChartOfAccounts WHERE (glcode LIKE '4502%' or glcode LIKE '4504%' or glcode LIKE '4506%') AND classification=2 ORDER BY glcode");
         return accountTypesQuery.list();
     }
 
