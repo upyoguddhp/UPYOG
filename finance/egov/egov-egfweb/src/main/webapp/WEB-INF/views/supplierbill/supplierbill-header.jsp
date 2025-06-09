@@ -96,7 +96,12 @@
 		<div class="col-sm-3 add-margin">
 			<form:select path="" data-first-option="false" id="supplier" class="form-control" required="required"  >
 				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
-				<form:options items="${suppliers}" itemValue="id" itemLabel="name" />
+				<!-- <form:options items="${suppliers}" itemValue="id" itemLabel="name" /> -->
+				<c:forEach var="supplier" items="${suppliers}">
+				<form:option  value="${supplier.id}" >
+					<c:out value="${supplier.name} - ${supplier.code}"/>
+				</form:option>
+				</c:forEach>
 			</form:select>
 		</div>
 		

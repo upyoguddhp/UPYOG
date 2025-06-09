@@ -49,7 +49,9 @@
 package org.egov.commons.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -90,7 +92,11 @@ public class FundService {
 	}
 
 	public List<Fund> getByIsActive(final Boolean isActive) {
-		return fundRepository.findByIsactive(isActive);
+		//return fundRepository.findByIsactive(isActive);
+		List<Fund> funds = fundRepository.findByIsactive(isActive);
+	    return funds.stream()
+	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
+	                .collect(Collectors.toList());
 	}
 
 	@Transactional
@@ -99,7 +105,11 @@ public class FundService {
 	}
 
 	public List<Fund> findAll() {
-		return fundRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
+		//return fundRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
+		List<Fund> funds = fundRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
+	    return funds.stream()
+	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
+	                .collect(Collectors.toList());
 	}
 
 	public Fund findByName(final String name) {
@@ -187,11 +197,18 @@ public class FundService {
 	}
 
 	public List<Fund> findByIsnotleaf() {
-		return fundRepository.findByIsnotleaf(true);
+		//return fundRepository.findByIsnotleaf(true);
+		List<Fund> funds = fundRepository.findByIsnotleaf(true);
+	    return funds.stream()
+	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
+	                .collect(Collectors.toList());
 	}
 
 	public List<Fund> findAllActiveAndIsnotleaf() {
-		return fundRepository.findByIsactiveAndIsnotleaf(true, false);
+		List<Fund> funds = fundRepository.findByIsactiveAndIsnotleaf(true, false);
+	    return funds.stream()
+	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
+	                .collect(Collectors.toList());
 	}
 
 }
