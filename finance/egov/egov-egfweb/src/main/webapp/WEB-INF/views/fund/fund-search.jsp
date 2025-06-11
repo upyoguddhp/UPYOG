@@ -88,7 +88,10 @@
                   <form:option value="">
                     <spring:message code="lbl.select" text="Select"/>
                   </form:option>
-                  <form:options items="${funds}" itemValue="id" itemLabel="name" />
+                  <!-- <form:options items="${funds}" itemValue="id" itemLabel="name" /> -->
+							<c:forEach var="fund" items="${funds}">
+       						 	<form:option value="${fund.id}">${fund.name} - ${fund.code}</form:option>
+   							</c:forEach>
                 </form:select>
                 <form:errors path="parentId" cssClass="error-msg" />
               </div>
