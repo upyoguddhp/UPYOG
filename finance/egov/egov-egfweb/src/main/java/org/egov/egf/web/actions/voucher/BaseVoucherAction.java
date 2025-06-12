@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -180,8 +181,13 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
 		if (headerFields.contains("function"))
 			addDropdownData("functionList", masterDataCache.get("egi-function"));
-		if (headerFields.contains("fund"))
-			addDropdownData("fundList", masterDataCache.get("egi-fund"));
+		if (headerFields.contains("fund")) {
+			//addDropdownData("fundList", masterDataCache.get("egi-fund"));
+			List<Fund> funds =  masterDataCache.get("egi-fund");
+			addDropdownData("fundList", funds.stream()
+	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
+	                .collect(Collectors.toList()));
+		}
 		if (headerFields.contains("fundsource"))
 			addDropdownData("fundsourceList", masterDataCache.get("egi-fundSource"));
 		if (headerFields.contains("field"))
