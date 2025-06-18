@@ -216,7 +216,19 @@ public class BalanceSheetReportAction extends BaseFormAction {
         super.prepare();
         if (!parameters.containsKey("showDropDown")) {
             addDropdownData("departmentList", masterDataCache.get("egi-department"));
-            addDropdownData("fundList", masterDataCache.get("egi-fund"));
+            //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+            List<Fund> funds =  masterDataCache.get("egi-fund");
+        	List<Fund> newFundList = new ArrayList<>();
+        	for(Fund fund:funds) {
+        		if(!fund.getName().contains("-")) {
+        			Fund newFund = fund;
+        			newFund.setName(fund.getName() + " - " + fund.getCode());
+        			newFundList.add(newFund);
+        		} else {
+        			newFundList.add(fund);
+        		}
+        	}
+        	addDropdownData("fundList", newFundList);
             addDropdownData("functionList", masterDataCache.get("egi-function"));
         //    addDropdownData("functionaryList", masterCache.get("egi-functionary"));
           //  addDropdownData("fieldList", masterCache.get("egi-ward"));

@@ -190,41 +190,7 @@
 																	<td class="greybox">
 																</s:else>
 															</tr>
-															<tr>
-																<td class="greybox">&nbsp;</td>
-																<s:if test="%{shouldShowHeaderField('function')}">
-																	<td class="greybox"><strong><s:text
-																				name="voucher.function" /></strong> <s:if
-																			test="%{isFieldMandatory('function')}">
-																			<span class="mandatory1">*</span>
-																		</s:if></td>
-																	<td class="greybox"><s:select name="function"
-																			id="function" list="dropdownData.functionList"
-																			listKey="id" listValue="name" headerKey="-1"
-																			headerValue="%{getText('lbl.choose.options')}"
-																			value="%{billregister.egBillregistermis.function.id}" />
-																		<%--  <s:property
-																		value="%{billregister.egBillregistermis.function.name}" /> --%></td>
-																</s:if>
-																<s:else>
-																	<td class="greybox">
-																	<td class="greybox">
-																</s:else>
-																<td class="greybox">&nbsp;</td>
-																<s:if test="%{shouldShowHeaderField('field')}">
-																	<td class="greybox"><strong><s:text
-																				name="voucher.field" /></strong> <s:if
-																			test="%{isFieldMandatory('field')}">
-																			<span class="mandatory1">*</span>
-																		</s:if></td>
-																	<td class="greybox" colspan="4"><s:property
-																			value="%{billregister.egBillregistermis.fieldid.name}" /></td>
-																</s:if>
-																<s:else>
-																	<td class="greybox">
-																	<td class="greybox">
-																</s:else>
-															</tr>
+															
 															<tr>
 																<td class="bluebox">&nbsp;</td>
 																<td class="bluebox"><strong><s:text

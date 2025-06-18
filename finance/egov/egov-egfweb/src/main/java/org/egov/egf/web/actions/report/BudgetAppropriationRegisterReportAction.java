@@ -187,7 +187,19 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         dropdownData.put("functionList",Collections.EMPTY_LIST);
         dropdownData.put("executingDepartmentList",Collections.EMPTY_LIST);
         dropdownData.put("budgetGroupList", Collections.EMPTY_LIST);
-        dropdownData.put("fundList", masterDataCache.get("egi-fund"));
+        //dropdownData.put("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	dropdownData.put("fundList", newFundList);
         populateSelectedData();
     }
 

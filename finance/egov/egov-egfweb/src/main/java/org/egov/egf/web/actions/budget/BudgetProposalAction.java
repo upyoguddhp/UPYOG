@@ -335,7 +335,19 @@ public class BudgetProposalAction extends GenericWorkFlowAction {
         for (final CFunction fn : fnList)
             functionMap.put(fn.getId(), fn);
 
-        final List<Fund> fundList = masterDataCache.get("egi-fund");
+        //final List<Fund> fundList = masterDataCache.get("egi-fund");
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> fundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			fundList.add(newFund);
+    		} else {
+    			fundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", fundList);
         fundMap = new HashMap<Long, Fund>();
         for (final Fund f : fundList)
             fundMap.put(f.getId(), f);

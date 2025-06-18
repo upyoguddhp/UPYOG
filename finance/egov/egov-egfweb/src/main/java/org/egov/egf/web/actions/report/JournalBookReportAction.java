@@ -58,6 +58,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.CFunction;
+import org.egov.commons.Fund;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
@@ -84,6 +85,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ParentPackage("egov")
 @Results({
@@ -120,8 +122,11 @@ public class JournalBookReportAction extends BaseFormAction {
 
     public void prepareNewForm() {
         super.prepare();
-        addDropdownData("fundList",
-                persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+        //addDropdownData("fundList",
+                //persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+        List<Fund> fundList = persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name");
+		addDropdownData("fundList", fundList.stream()
+				.peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode())).collect(Collectors.toList()));
         addDropdownData("fundsourceList",
                 persistenceService.findAllBy(" from Fundsource where isactive=true order by name"));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));

@@ -47,6 +47,7 @@
  */
 package org.egov.egf.web.controller.report;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Size;
 
+import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.egf.web.service.report.RemittanceServiceImpl;
 import org.egov.infra.microservice.models.BankAccountServiceMapping;
@@ -201,7 +203,19 @@ public class RemittanceReportController {
 
 	private void prepareModel(Model model) {
 		model.addAttribute("remittanceReportModel", new RemittanceReportModel());
-		model.addAttribute("fundList", masterDataCache.get("egi-fund"));
+		//model.addAttribute("fundList", masterDataCache.get("egi-fund"));
+		List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	model.addAttribute("fundList", newFundList);
 		model.addAttribute("bankAccServiceMapp", getBankAccountServiceMapping());
 		model.addAttribute("financialYearList", financialYearDAO.getAllActivePostingAndNotClosedFinancialYears());
 		model.addAttribute("instrumentTypes", getInstrumentMap());

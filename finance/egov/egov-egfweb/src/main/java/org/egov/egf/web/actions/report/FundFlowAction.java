@@ -133,7 +133,19 @@ public class FundFlowAction extends BaseFormAction {
 
     @Override
     public void prepare() {
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+    	List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
     }
 
     @Action(value = "/report/fundFlow-beforeSearch")

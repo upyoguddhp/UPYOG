@@ -166,7 +166,19 @@ public class ReceiptPaymentReportAction extends BaseFormAction {
     }
 
     private void loadDropDownData() {
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
         addDropdownData("financialYearList",
                 getPersistenceService().findAllBy("from CFinancialYear where isActive=true order by finYearRange desc "));
     }

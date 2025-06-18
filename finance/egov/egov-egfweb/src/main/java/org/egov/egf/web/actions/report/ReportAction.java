@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.egov.commons.CFunction;
 import org.egov.commons.Functionary;
@@ -125,9 +126,13 @@ public class ReportAction extends BaseFormAction {
 		if (headerFields.contains(Constants.FUNCTIONARY))
 			addDropdownData("functionaryList",
 					persistenceService.findAllBy(" from Functionary where isactive=true order by name"));
-		if (headerFields.contains(Constants.FUND))
-			addDropdownData("fundList",
-					persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+		if (headerFields.contains(Constants.FUND)) {
+			//addDropdownData("fundList",
+					//persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+			List<Fund> fundList = persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name");
+			addDropdownData("fundList", fundList.stream()
+					.peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode())).collect(Collectors.toList()));
+		}
 		if (headerFields.contains(Constants.FUNDSOURCE))
 			addDropdownData("fundsourceList",
 					persistenceService.findAllBy(" from Fundsource where isactive=true order by name"));

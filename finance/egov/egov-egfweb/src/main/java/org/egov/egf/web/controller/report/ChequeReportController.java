@@ -47,6 +47,7 @@
  */
 package org.egov.egf.web.controller.report;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.egov.commons.Fund;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
@@ -119,7 +121,19 @@ public class ChequeReportController {
 
 	private void prepareModel(Model model) {
 		model.addAttribute("chequeReportModel", new ChequeReportModel());
-		model.addAttribute("fundList", masterDataCache.get("egi-fund"));
+		//model.addAttribute("fundList", masterDataCache.get("egi-fund"));
+		List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	model.addAttribute("fundList", newFundList);
 		model.addAttribute("bankBranchList", getBankBranch(0));
 		model.addAttribute("surrendarReasonMap", loadReasonsForSurrendaring());
 	}

@@ -179,8 +179,11 @@ public class CancelBillAction extends BaseFormAction {
 			LOGGER.debug("Inside Prepare method");
 		List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
 		dropdownData.put("DepartmentList", departments);
-		addDropdownData("fundList",
-				persistenceService.findAllBy("from Fund where isactive=true and isnotleaf=false order by name"));
+		//addDropdownData("fundList",
+				//persistenceService.findAllBy("from Fund where isactive=true and isnotleaf=false order by name"));
+		List<Fund> fundList = persistenceService.findAllBy("from Fund where isactive=true and isnotleaf=false order by name");
+		addDropdownData("fundList", fundList.stream()
+				.peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode())).collect(Collectors.toList()));
 		// Important - Remove the like part of the query below to generalize the
 		// bill cancellation screen
 		addDropdownData("expenditureList", persistenceService.findAllBy(

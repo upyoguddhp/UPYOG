@@ -849,8 +849,21 @@ public class BillRegisterReportAction extends SearchFormAction {
             addDropdownData("departmentList", masterDataCache.get("egi-department"));
         if (headerFields.contains("functionary"))
             addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
-        if (headerFields.contains("fund"))
-            addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        if (headerFields.contains("fund")) {
+        	//addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        	List<Fund> funds =  masterDataCache.get("egi-fund");
+        	List<Fund> newFundList = new ArrayList<>();
+        	for(Fund fund:funds) {
+        		if(!fund.getName().contains("-")) {
+        			Fund newFund = fund;
+        			newFund.setName(fund.getName() + " - " + fund.getCode());
+        			newFundList.add(newFund);
+        		} else {
+        			newFundList.add(fund);
+        		}
+        	}
+        	addDropdownData("fundList", newFundList);
+        }
         if (headerFields.contains("fundsource"))
             addDropdownData("fundsourceList", masterDataCache.get("egi-fundSource"));
         if (headerFields.contains("field"))

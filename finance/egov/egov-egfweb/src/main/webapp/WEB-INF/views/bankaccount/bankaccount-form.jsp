@@ -81,10 +81,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:select path="fund" data-first-option="false" id="fund" class="form-control" required="required">
 							<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
-							<!-- <form:options items="${funds}" itemValue="id" itemLabel="name" /> -->
-							<c:forEach var="fund" items="${funds}">
-       						 	<form:option value="${fund.id}">${fund.name} - ${fund.code}</form:option>
-   							</c:forEach>
+							<form:options items="${funds}" itemValue="id" itemLabel="name" />
 						</form:select>
 						<form:errors path="fund" cssClass="error-msg" />
 					</div>

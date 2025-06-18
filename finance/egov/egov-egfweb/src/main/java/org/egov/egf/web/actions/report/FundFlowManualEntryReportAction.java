@@ -140,7 +140,19 @@ public class FundFlowManualEntryReportAction extends BaseFormAction {
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         super.prepare();
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
     }

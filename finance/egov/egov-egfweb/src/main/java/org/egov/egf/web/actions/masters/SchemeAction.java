@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -116,8 +117,19 @@ public class SchemeAction extends BaseFormAction {
 	@Override
 	public void prepare() {
 		super.prepare();
-		addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
-
+		//addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+		List<Fund> funds =  masterDataCache.get("egi-fund");
+		List<Fund> newFundList = new ArrayList<>();
+		for(Fund fund:funds) {
+			if(!fund.getName().contains("-")) {
+				Fund newFund = fund;
+				newFund.setName(fund.getName() + " - " + fund.getCode());
+				newFundList.add(newFund);
+			} else {
+				newFundList.add(fund);
+			}
+		}
+		addDropdownData("fundDropDownList", newFundList);
 	}
 
 	@SkipValidation

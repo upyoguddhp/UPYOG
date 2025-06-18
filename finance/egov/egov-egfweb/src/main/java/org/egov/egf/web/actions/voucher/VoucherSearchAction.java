@@ -59,6 +59,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 //import org.egov.commons.VoucherDetail;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -161,9 +162,15 @@ public class VoucherSearchAction extends BaseFormAction {
 		if (headerFields.contains("functionary"))
 			addDropdownData("functionaryList",
 					persistenceService.findAllBy(" from Functionary where isactive=true order by name"));
-		if (headerFields.contains("fund"))
-			addDropdownData("fundList",
-					persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+		if (headerFields.contains("fund")) {
+			// addDropdownData("fundList",
+			// persistenceService.findAllBy(" from Fund where isactive=true and
+			// isnotleaf=false order by name"));
+			List<Fund> fundList = persistenceService
+					.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name");
+			addDropdownData("fundList", fundList.stream()
+					.peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode())).collect(Collectors.toList()));
+		}
 		if (headerFields.contains("fundsource"))
 			addDropdownData("fundsourceList",
 					persistenceService.findAllBy(" from Fundsource where isactive=true order by name"));

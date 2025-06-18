@@ -54,6 +54,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.egov.commons.Fund;
 import org.egov.egf.model.BudgetReAppReportBean;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.reporting.util.ReportUtil;
@@ -142,7 +143,19 @@ public class BudgetAppropriationReportAction extends BaseFormAction {
 			addDropdownData("departmentList",
 					masterDataCache.get("egi-department"));
 			addDropdownData("functionList", masterDataCache.get("egi-function"));
-			addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+			//addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+			List<Fund> funds =  masterDataCache.get("egi-fund");
+	    	List<Fund> newFundList = new ArrayList<>();
+	    	for(Fund fund:funds) {
+	    		if(!fund.getName().contains("-")) {
+	    			Fund newFund = fund;
+	    			newFund.setName(fund.getName() + " - " + fund.getCode());
+	    			newFundList.add(newFund);
+	    		} else {
+	    			newFundList.add(fund);
+	    		}
+	    	}
+	    	addDropdownData("fundDropDownList", newFundList);
 			budgetList = persistenceService
 					.findAllBy("from Budget bud where bud.isActiveBudget=true  and bud.parent is null  order by bud.financialYear.id  desc");
 			addDropdownData("budList", budgetList);

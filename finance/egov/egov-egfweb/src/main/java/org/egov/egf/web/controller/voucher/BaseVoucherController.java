@@ -50,6 +50,7 @@ package org.egov.egf.web.controller.voucher;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.Fund;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -136,8 +137,21 @@ public abstract class BaseVoucherController extends GenericWorkFlowController {
             model.addAttribute("functionarys", masterDataCache.get("egi-functionary"));
         if (headerFields.contains("function"))
             model.addAttribute("functions", masterDataCache.get("egi-function"));
-        if (headerFields.contains("fund"))
-            model.addAttribute("funds", masterDataCache.get("egi-fund"));
+        if (headerFields.contains("fund")) {
+        	//model.addAttribute("funds", masterDataCache.get("egi-fund"));
+        	List<Fund> funds =  masterDataCache.get("egi-fund");
+        	List<Fund> newFundList = new ArrayList<>();
+        	for(Fund fund:funds) {
+        		if(!fund.getName().contains("-")) {
+        			Fund newFund = fund;
+        			newFund.setName(fund.getName() + " - " + fund.getCode());
+        			newFundList.add(newFund);
+        		} else {
+        			newFundList.add(fund);
+        		}
+        	}
+        	model.addAttribute("funds", newFundList);
+        }
         if (headerFields.contains("fundsource"))
             model.addAttribute("fundsources", masterDataCache.get("egi-fundSource"));
         if (headerFields.contains("field"))

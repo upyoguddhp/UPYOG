@@ -55,6 +55,7 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.egov.commons.Bankaccount;
+import org.egov.commons.Fund;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
@@ -139,7 +140,19 @@ public class OutstandingPaymentAction extends BaseFormAction {
         if (!parameters.containsKey("skipPrepare")) {
             addDropdownData("bankList", Collections.EMPTY_LIST);
             addDropdownData("accNumList", Collections.EMPTY_LIST);
-            addDropdownData("fundList", masterDataCache.get("egi-fund"));
+            //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+            List<Fund> funds =  masterDataCache.get("egi-fund");
+        	List<Fund> newFundList = new ArrayList<>();
+        	for(Fund fund:funds) {
+        		if(!fund.getName().contains("-")) {
+        			Fund newFund = fund;
+        			newFund.setName(fund.getName() + " - " + fund.getCode());
+        			newFundList.add(newFund);
+        		} else {
+        			newFundList.add(fund);
+        		}
+        	}
+        	addDropdownData("fundList", newFundList);
         }
     }
 

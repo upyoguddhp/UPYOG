@@ -132,7 +132,19 @@ public class DepartmentwiseExpenditureReportAction extends BaseFormAction {
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         super.prepare();
-        addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundDropDownList", newFundList);
         addDropdownData("financialYearList", getPersistenceService().findAllBy("from CFinancialYear where isActive=true " +
                 "  and startingDate >='01-Apr-2010' order by finYearRange desc  "));
     }

@@ -173,7 +173,19 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
             addDropdownData("departmentList", masterDataCache.get("egi-department"));
             addDropdownData("functionList", masterDataCache.get("egi-function"));
 //            addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
-            addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+            //addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
+            List<Fund> funds =  masterDataCache.get("egi-fund");
+        	List<Fund> newFundList = new ArrayList<>();
+        	for(Fund fund:funds) {
+        		if(!fund.getName().contains("-")) {
+        			Fund newFund = fund;
+        			newFund.setName(fund.getName() + " - " + fund.getCode());
+        			newFundList.add(newFund);
+        		} else {
+        			newFundList.add(fund);
+        		}
+        	}
+        	addDropdownData("fundDropDownList", newFundList);
 //            addDropdownData("fieldList", masterDataCache.get("egi-ward"));
             addDropdownData("financialYearList",
                     getPersistenceService().findAllBy("from CFinancialYear where isActive=true  order by finYearRange desc "));

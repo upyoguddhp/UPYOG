@@ -183,7 +183,19 @@ public class TrialBalanceAction extends BaseFormAction {
 		persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
 		super.prepare();
 
-		addDropdownData("fundList", masterDataCache.get("egi-fund"));
+		//addDropdownData("fundList", masterDataCache.get("egi-fund"));
+		List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
 		addDropdownData("departmentList", masterDataCache.get("egi-department"));
 		addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
 		addDropdownData("fieldList", masterDataCache.get("egi-ward"));
@@ -274,9 +286,21 @@ public class TrialBalanceAction extends BaseFormAction {
 			getReportForDateRange();
 			formatTBReport();
 		} else {
-			if (rb.getFundId() == null)
-				fundList = masterDataCache.get("egi-fund");
-			else {
+			if (rb.getFundId() == null) {
+				//fundList = masterDataCache.get("egi-fund");
+				List<Fund> funds =  masterDataCache.get("egi-fund");
+				List<Fund> newFundList = new ArrayList<>();
+				for(Fund fund:funds) {
+					if(!fund.getName().contains("-")) {
+						Fund newFund = fund;
+						newFund.setName(fund.getName() + " - " + fund.getCode());
+						newFundList.add(newFund);
+					} else {
+						newFundList.add(fund);
+					}
+				}
+				fundList = newFundList;
+			} else {
 				fundList = new ArrayList<Fund>();
 				fundList.add((Fund) persistenceService.find("from Fund where id=?", Long.valueOf(rb.getFundId())));
 			}

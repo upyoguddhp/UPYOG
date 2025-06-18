@@ -47,6 +47,7 @@
  */
 package org.egov.egf.web.actions.masters.loangrant;
 
+import org.egov.commons.Fund;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -54,6 +55,7 @@ import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -82,7 +84,19 @@ public class LoanGrantBaseAction extends BaseFormAction {
         final String fundId = appList.get(0).getValue();
         if (fundId != null && !fundId.isEmpty())
             defaultFundId = Long.valueOf(fundId);
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
 
     }
 

@@ -60,6 +60,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.egf.commons.EgovCommon;
@@ -137,7 +138,19 @@ public class AccountChequeAction extends BaseFormAction {
     public String newform() {
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
         return "new";
 
     }
@@ -146,7 +159,19 @@ public class AccountChequeAction extends BaseFormAction {
     public String view() {
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
-        addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        //addDropdownData("fundList", masterDataCache.get("egi-fund"));
+        List<Fund> funds =  masterDataCache.get("egi-fund");
+    	List<Fund> newFundList = new ArrayList<>();
+    	for(Fund fund:funds) {
+    		if(!fund.getName().contains("-")) {
+    			Fund newFund = fund;
+    			newFund.setName(fund.getName() + " - " + fund.getCode());
+    			newFundList.add(newFund);
+    		} else {
+    			newFundList.add(fund);
+    		}
+    	}
+    	addDropdownData("fundList", newFundList);
         return "view";
 
     }
