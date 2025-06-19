@@ -70,7 +70,7 @@
 </head>
 <body onload="treeInit()" >
 <h2>
-	<s:text name="Chart Of Account"/>
+	<s:text name="Chart Of Accounts"/>
 </h2>
  
 <div id="treeDiv1">

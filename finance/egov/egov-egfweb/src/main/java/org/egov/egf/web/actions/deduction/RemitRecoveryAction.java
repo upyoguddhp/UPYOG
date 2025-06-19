@@ -325,9 +325,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
 		if (StringUtils.isEmpty(parameters.get("voucherDate")[0])) {
 			addActionError(getText("msg.please.select.date"));
 		}
-		if (StringUtils.isEmpty(parameters.get("fundId")[0]) || parameters.get("fundId")[0] == "-1") {
+		/*if (StringUtils.isEmpty(parameters.get("fundId")[0]) || parameters.get("fundId")[0] == "-1") {
 			addActionError(getText("msg.please.select.fund"));
-		}
+		}*/
 	}
 
     public void prepareRemit() {

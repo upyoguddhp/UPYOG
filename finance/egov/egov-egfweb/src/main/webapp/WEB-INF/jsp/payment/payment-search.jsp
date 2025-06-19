@@ -158,7 +158,7 @@
 			{
 				var fund = document.getElementById('fundId').value;
 				if(fund == "-1"){
-					bootbox.alert("Please select fund");     
+					//bootbox.alert("Please select fund");     
 				}else{
 					console.log("department code new");
 					console.log(document.getElementById('departmentid').value);

@@ -377,8 +377,8 @@
 				}
 
 			if(fundId == "-1" && voucherNumber==""){
-				bootbox.alert("<s:text name='msg.please.select.fund'/>");
-				return false;
+				//bootbox.alert("<s:text name='msg.please.select.fund'/>");
+				//return false;
 				}
 			
 			if(!DateValidation(fromDate,toDate))

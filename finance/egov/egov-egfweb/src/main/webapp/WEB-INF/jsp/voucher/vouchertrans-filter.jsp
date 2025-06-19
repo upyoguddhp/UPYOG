@@ -51,11 +51,20 @@
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <tr>
 	<td style="width: 5%"></td>
-	<s:if test="%{shouldShowHeaderField('fund')}">
+	<!-- <s:if test="%{shouldShowHeaderField('fund')}">
 		<td class="greybox"><s:text name="voucher.fund" /> <s:if
 				test="%{isFieldMandatory('fund')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
+		<td class="greybox"><s:select name="fundId" id="fundId"
+				list="dropdownData.fundList" listKey="id" listValue="name"
+				headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+				onChange="populateSchemes(this);loadBank(this);"
+				value="%{fundId.id}" /></td>
+	</s:if> -->
+	<s:if test="%{shouldShowHeaderField('fund')}">
+		<td class="greybox"><s:text name="voucher.fund" /> <span
+			class="bluebox"><span class="mandatory1">*</span></span></td>
 		<td class="greybox"><s:select name="fundId" id="fundId"
 				list="dropdownData.fundList" listKey="id" listValue="name"
 				headerKey="-1" headerValue="%{getText('lbl.choose.options')}"

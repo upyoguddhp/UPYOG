@@ -293,10 +293,10 @@ public class BillRegisterSearchAction extends BaseFormAction {
         if (expType == null || expType.equals("-1")) {
             addFieldError("expType", getText("msg.please.select.expenditure.type"));
         }
-        if (billregister.getEgBillregistermis().getFund() == null
+        /*if (billregister.getEgBillregistermis().getFund() == null
                 || billregister.getEgBillregistermis().getFund().getId() == -1) {
             addFieldError("egBillregistermis.fund", getText("msg.please.select.fund"));
-        }
+        }*/
         if (billDateFrom == null || StringUtils.isEmpty(billDateFrom)) {
             addFieldError("billDateFrom", getText("msg.please.select.bill.from.date"));
         }

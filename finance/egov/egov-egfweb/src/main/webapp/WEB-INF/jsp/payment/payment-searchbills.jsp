@@ -213,8 +213,8 @@ function search()
 		document.getElementById('vouchermis.departmentid').disabled=false;
 	var fund = document.getElementById('fundId').value;
 	if(fund == "-1"){
-		bootbox.alert("Please select fund");   
-		return false;  
+		//bootbox.alert("Please select fund");   
+		//return false;  
 	}else{
 		document.getElementById("search").innerHTML="";
 		document.getElementById("search").innerHTML=document.getElementById("searchtab").innerHTML;

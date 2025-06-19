@@ -135,6 +135,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @Column(updatable = false)
     private String panNumber;
 
+    @NotNull
     @SafeHtml
     @Length(min = 15, max = 15, message = "Maximum of 15 Characters allowed for TIN/GST No")
     @OptionalPattern(regex = Constants.ALPHANUMERIC, message = "Special Characters are not allowed in TIN/GST No")

@@ -55,7 +55,7 @@
 	<td class="bluebox"><select name="vType" id="vType"
 		onchange="onChangeVSubType()">
 			<option value="-1"><s:text name="%{getText('lbl.choose.options')}"/></option>
-			<option value="JVGeneral">General</option>
+			<option value="JVGeneral">Receipt</option>
 			<option value="Works">Works</option>
 			<option value="Purchase">Purchase</option>
 			<option value="Fixed Asset">Fixed Asset</option>
