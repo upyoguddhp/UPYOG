@@ -156,7 +156,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @NotNull
     @SafeHtml
     @Length(max = 22, message = "Maximum of 22 Characters allowed for Bank Account")
-    @OptionalPattern(regex = FinancialConstants.numericwithoutspecialchar, message = "Only allowed numeric in account No")
+    //@OptionalPattern(regex = FinancialConstants.numericwithoutspecialchar, message = "Only allowed numeric in account No")
     private String bankAccount;
 
     @SafeHtml
