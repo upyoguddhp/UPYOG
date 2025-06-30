@@ -1269,8 +1269,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                                  "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
                                          + entity.getName()));
                         throw new ValidationException(errors);
-                    } else
-                        validateEntity(entity);
+                    } //else
+                        //validateEntity(entity);
                 }
             }
         if (LOGGER.isDebugEnabled())

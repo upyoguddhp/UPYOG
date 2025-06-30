@@ -63,6 +63,7 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 
 import org.egov.commons.Accountdetailkey;
+import org.egov.commons.Fund;
 import org.egov.commons.service.AccountDetailKeyService;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.EntityTypeService;
@@ -170,8 +171,20 @@ public class WorkOrderService implements EntityTypeService {
 	public WorkOrder update(WorkOrder workOrder) {
 		if (workOrder.getEditAllFields().booleanValue()) {
 			setAuditDetails(workOrder);
-			if (workOrder.getFund() != null && workOrder.getFund().getId() != null) {
+			/*if (workOrder.getFund() != null && workOrder.getFund().getId() != null) {
 				workOrder.setFund(fundService.findOne(workOrder.getFund().getId()));
+			}*/
+			if (workOrder.getFund() != null && workOrder.getFund().getId() != null) {
+			    Fund persistedFund = fundService.findOne(workOrder.getFund().getId());
+			    if (persistedFund != null) {
+			        // Defensive: only set if IDs match or entity is different
+			        if (!persistedFund.equals(workOrder.getFund())) {
+			            workOrder.setFund(persistedFund);
+			        }
+			    } else {
+			        // handle missing fund (maybe throw an error or nullify)
+			        workOrder.setFund(null);
+			    }
 			}
 			if (workOrder.getScheme() != null && workOrder.getScheme().getId() != null) {
 				workOrder.setScheme(schemeService.findById(workOrder.getScheme().getId(), false));

@@ -55,13 +55,14 @@
 	<td class="bluebox"><select name="vType" id="vType"
 		onchange="onChangeVSubType()">
 			<option value="-1"><s:text name="%{getText('lbl.choose.options')}"/></option>
-			<option value="JVGeneral">Receipt</option>
+			<option value="JVGeneral">General</option>
 			<option value="Works">Works</option>
 			<option value="Purchase">Purchase</option>
 			<option value="Fixed Asset">Fixed Asset</option>
 			<!-- <option value="Salary">Salary</option> -->
 			<option value="Expense">Expense</option>
 			<!-- <option value="Pension">Pension</option> -->
+			<option value="Receipt">Receipt</option>
 	</select></td>
 	<td class="greybox"><s:text name="jv.partyName" />
 		<div id="partyNameDivId" style="display: none">
@@ -124,6 +125,8 @@ function onChangeVSubType(){
 		vsubTypeValue = "fixedassetjv-Supplier Journal";
 	}else if(vType == 'Pension'){
 	vsubTypeValue = "pensionjv-Pension Journal";  
+	}else if(vType == 'Receipt'){
+	vsubTypeValue = "receiptjv-Receipt Journal";  
 	}
 	var array = vsubTypeValue.split("-");
 	document.getElementById('voucherTypeBean.voucherNumType').value = array[0];
