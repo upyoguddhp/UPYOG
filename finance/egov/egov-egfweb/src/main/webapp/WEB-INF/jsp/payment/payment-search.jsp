@@ -156,10 +156,10 @@
 			function loadBank(obj){}
 			function search()
 			{
-				var fund = document.getElementById('fundId').value;
-				if(fund == "-1"){
+				//var fund = document.getElementById('fundId').value;
+				//if(fund == "-1"){
 					//bootbox.alert("Please select fund");     
-				}else{
+				//}else{
 					console.log("department code new");
 					console.log(document.getElementById('departmentid').value);
 					document.forms[0].action='${pageContext.request.contextPath}/payment/payment-search.action';
@@ -171,7 +171,7 @@
 	                        })
 	                    );
 	    			document.forms[0].submit();
-				}
+				//}
 				return true;
 			}
 			<s:if test="%{disableExpenditureType == true && enablePensionType == false}">
