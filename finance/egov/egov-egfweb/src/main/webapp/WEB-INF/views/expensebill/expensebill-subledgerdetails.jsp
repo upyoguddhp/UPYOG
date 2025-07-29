@@ -57,10 +57,10 @@
 	<div  style="padding: 0 15px;">
 		<div class="form-group">
 			<label class="col-sm-3 control-label text-right">
-				<spring:message code="lbl.subledgertype" text="SubLedger Type"/>
+				<spring:message code="lbl.subledgertype" text="SubLedger Type"/> <span class="mandatory"></span>
 			</label>
 			<div class="col-sm-3 add-margin">
-				<select name="subLedgerType" data-first-option="false" id="subLedgerType" class="form-control" >
+				<select name="subLedgerType" data-first-option="false" id="subLedgerType" class="form-control" required >
 					<option value=""><spring:message code="lbl.select" text="Select"/></option>
 					<c:forEach items="${subLedgerTypes}" var="subLedgerType">
 						<option value="${subLedgerType.id }">${subLedgerType.name}</option>
@@ -69,11 +69,11 @@
 			</div>
 			<div id="subLedgerCodeSection" class="display-hide">
 				<label class="col-sm-2 control-label text-right" id="subLedgerNameLabel">
-					<spring:message code="lbl.code" text="Code" />
+					<spring:message code="lbl.code" text="Code" /> <span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
 					<input type="hidden" name="detailkeyId" id="detailkeyId">
-					<input type="text" name="subLedgerCode" id="subLedgerCode" class="form-control" placeholder="Type first 3 letters of SubLedger name"  />
+					<input type="text" name="subLedgerCode" id="subLedgerCode" class="form-control" placeholder="Type first 3 letters of SubLedger name" required />
 				</div>
 			</div>
 		</div>

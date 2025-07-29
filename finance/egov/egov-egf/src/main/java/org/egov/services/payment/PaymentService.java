@@ -1322,8 +1322,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                                 "BankName, BankAccount,IFSC Code is mandatory for RTGS Payment for "
                                         + entity.getName()));
                         throw new ValidationException(errors);
-                    } else
-                        validateEntity(entity);
+                    } //else
+                        //validateEntity(entity);
                 }
             }
         if (LOGGER.isDebugEnabled())
@@ -1477,9 +1477,10 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     throw new ValidationException(errors);
                 }
 
-                if (obj[2].equals(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT))
-                    validateCBill(bean, "Modify");
-                else {
+                //if (obj[2].equals(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
+                    //validateCBill(bean, "Modify");
+                //else {
+                if (!obj[2].equals(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
                     entity = getEntity(Integer.valueOf(obj[0].toString()), (Serializable) obj[1]);
                     if (obj[2].equals("Works") && (StringUtils.isBlank(entity.getPanno())
                             || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())

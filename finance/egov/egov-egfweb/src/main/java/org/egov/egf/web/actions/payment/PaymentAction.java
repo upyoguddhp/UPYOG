@@ -247,7 +247,7 @@ public class PaymentAction extends BasePaymentAction {
 
     @Override
     public void prepare() {
-
+    	 LOGGER.info("Entering prepare method");
         super.prepare();
         if (fromDate == null)
             fromDate = "";
@@ -308,6 +308,7 @@ public class PaymentAction extends BasePaymentAction {
                 + FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepare.");
+        LOGGER.info("Exiting prepare method");
     }
 
     private void loadbankBranch(final Fund fund) {
@@ -361,6 +362,7 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-beforeSearch")
     public String beforeSearch() {
+    	LOGGER.info("Entering beforeSearch method");
         return "search";
     }
 
@@ -432,6 +434,7 @@ public class PaymentAction extends BasePaymentAction {
     @ValidationErrorPage(value = "search")
     @Action(value = "/payment/payment-search")
     public String search() throws ParseException {
+    	LOGGER.info("Entering search method");
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         if (LOGGER.isDebugEnabled())
@@ -977,6 +980,7 @@ public class PaymentAction extends BasePaymentAction {
     @ValidationErrorPage("searchbills")
     @Action(value = "/payment/payment-save")
     public String save() throws ValidationException {
+    	LOGGER.info("Entering save method");
         final List<PaymentBean> paymentList = new ArrayList<PaymentBean>();
         final List<AppConfigValues> cutOffDateconfigValue = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "DataEntryCutOffDate");
@@ -1070,6 +1074,7 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed generatePayment.");
         if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
             addActionMessage(getText("payment.bankbalance.controltype"));
+        LOGGER.info("Exiting save method");
         return "form";
 
     }
@@ -1177,6 +1182,7 @@ public class PaymentAction extends BasePaymentAction {
     @Action(value = "/payment/payment-create")
     public String create() {
         try {
+        	LOGGER.info("Entering create method");
         	populateWorkflowBean();
             contingentList = prepareBillTypeList(contingentList,selectedContingentRows);
             contractorList = prepareBillTypeList(contractorList,selectedContractorRows);
@@ -1206,6 +1212,7 @@ public class PaymentAction extends BasePaymentAction {
                     return "form";
                 }
             }
+            LOGGER.info("validations start");
             validateBillVoucherDate(billList, paymentVoucherDate);
             paymentActionHelper.setbillRegisterFunction(billregister, cFunctionobj);
             if (LOGGER.isDebugEnabled())
@@ -1215,10 +1222,13 @@ public class PaymentAction extends BasePaymentAction {
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
+            LOGGER.info("Entering createPayment method");
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean);
+            LOGGER.info("Entering getPaymentBills method");
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
+            LOGGER.info("Cut Off date formatting");
             if (!cutOffDate.isEmpty() && cutOffDate != null)
                 try {
                     date = sdf1.parse(cutOffDate);
@@ -1226,6 +1236,7 @@ public class PaymentAction extends BasePaymentAction {
                 } catch (final ParseException e) {
                     //
                 }
+            LOGGER.info("Entering addActionMessages code block");
             if (cutOffDate1 != null && voucherDate.compareTo(cutOffDate1) <= 0
                     && FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getMessage("payment.transaction.success",
@@ -1261,6 +1272,7 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed createPayment.");
         populateDepartmentName();
         setMode("view");
+        LOGGER.info("Exiting create method");
         return VIEW;
     }
 
