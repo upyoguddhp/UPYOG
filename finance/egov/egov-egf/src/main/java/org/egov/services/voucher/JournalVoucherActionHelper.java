@@ -120,6 +120,10 @@ public class JournalVoucherActionHelper {
             voucherHeader.setName(voucherTypeBean.getVoucherName());
             voucherHeader.setType(voucherTypeBean.getVoucherType());
             voucherHeader.setVoucherSubType(voucherTypeBean.getVoucherSubType());
+            if("Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName()))
+            {
+            	voucherHeader.setType("Receipt");
+            }
             voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader);
             if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName()) && !"Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
                 if (LOGGER.isDebugEnabled())
