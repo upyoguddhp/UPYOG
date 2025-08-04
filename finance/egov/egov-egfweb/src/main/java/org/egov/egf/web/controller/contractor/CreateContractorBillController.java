@@ -266,7 +266,7 @@ public class CreateContractorBillController extends BaseBillController {
 		validateLedgerAndSubledger(egBillregister, resultBinder);
 		validateCuttofDate(egBillregister, resultBinder);
 		
-		WorkOrder wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+		WorkOrder wo = workOrderService.findByOrderNoNotCancelled(egBillregister.getWorkordernumber());
     	
     	if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
     		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);
@@ -276,20 +276,8 @@ public class CreateContractorBillController extends BaseBillController {
     	
     	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {    		
     		if(egBillregister.getId()!=savedEgBillregisters.get(0).getId()){
-    			EgBillregister lastBill = savedEgBillregisters.get(0);
-    			EgBillregister secondLastBill = savedEgBillregisters.size() > 1 ? savedEgBillregisters.get(1) : null;
-    			boolean lastBillApproved = lastBill.getStatus() != null 
-    					&& lastBill.getStatus().getId() != null 
-    					&& lastBill.getStatus().getId() == 67;
-
-    			boolean lastBillCancelled = StringUtils.isNotBlank(lastBill.getBillstatus()) 
-    					&& "Cancelled".equalsIgnoreCase(lastBill.getBillstatus());
-
-    			boolean secondLastBillApproved = secondLastBill != null 
-    					&& secondLastBill.getStatus() != null
-    					&& secondLastBill.getStatus().getId() != null 
-    					&& secondLastBill.getStatus().getId() == 67;
-    			if(!lastBillApproved || (lastBillCancelled && !secondLastBillApproved)) {
+    			if(null==savedEgBillregisters.get(0).getStatus().getId()
+    					|| 67!=savedEgBillregisters.get(0).getStatus().getId()) {
     				resultBinder.reject("msg.last.bill.not.approved", new String[] {}, null);
     			}
     			BigDecimal totalBillAmt = new BigDecimal(0);
@@ -304,10 +292,7 @@ public class CreateContractorBillController extends BaseBillController {
     				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
     			}
     			for(EgBillregister egBill:savedEgBillregisters) {
-    				if (StringUtils.isNotBlank(savedEgBillregisters.get(0).getBillstatus())
-    						&& "Cancelled".equalsIgnoreCase(savedEgBillregisters.get(0).getBillstatus())) {
     					totalBillAmt = totalBillAmt.add(egBill.getBillamount());
-    				}
     			}
     			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(wo.getOrderValue())==1) {
     				resultBinder.reject("msg.contractorbill.totalamount", new String[] {}, null);

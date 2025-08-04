@@ -70,5 +70,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByContractor_Id(Long id);
 
     public WorkOrder findByOrderNumber(String orderNumber);
-
+    
+    @Query("from WorkOrder where UPPER(billstatus)=UPPER(Cancelled)")
+    public WorkOrder findByOrderNoNotCancelled(String orderNumber);
 }

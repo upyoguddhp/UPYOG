@@ -271,22 +271,9 @@ public class CreateSupplierBillController extends BaseBillController {
 		List<EgBillregister> savedEgBillregisters = supplierBillRepository.getByPurchaseOrder(po.getOrderNumber());
     	
     	if (!CollectionUtils.isEmpty(savedEgBillregisters)) {
-    		EgBillregister lastBill = savedEgBillregisters.get(0);
-			EgBillregister secondLastBill = savedEgBillregisters.size() > 1 ? savedEgBillregisters.get(1) : null;
-			boolean lastBillApproved = lastBill.getStatus() != null 
-					&& lastBill.getStatus().getId() != null 
-					&& lastBill.getStatus().getId() == 77;
-
-			boolean lastBillCancelled = StringUtils.isNotBlank(lastBill.getBillstatus()) 
-					&& "Cancelled".equalsIgnoreCase(lastBill.getBillstatus());
-
-			boolean secondLastBillApproved = secondLastBill != null 
-					&& secondLastBill.getStatus() != null
-					&& secondLastBill.getStatus().getId() != null 
-					&& secondLastBill.getStatus().getId() == 77;
-    		
     		if(egBillregister.getId()!=savedEgBillregisters.get(0).getId()){
-    			if(!lastBillApproved || (lastBillCancelled && !secondLastBillApproved)) {
+    			if(null==savedEgBillregisters.get(0).getStatus().getId()
+    					|| 77!=savedEgBillregisters.get(0).getStatus().getId()) {
     				resultBinder.reject("msg.last.bill.not.approved", new String[] {}, null);
     			}
     			BigDecimal totalBillAmt = new BigDecimal(0);
@@ -301,10 +288,7 @@ public class CreateSupplierBillController extends BaseBillController {
     				resultBinder.reject("msg.running.final.bill.err", new String[] {}, null);
     			}
     			for(EgBillregister egBill:savedEgBillregisters) {
-					if (StringUtils.isNotBlank(savedEgBillregisters.get(0).getBillstatus())
-							&& "Cancelled".equalsIgnoreCase(savedEgBillregisters.get(0).getBillstatus())) {
-						totalBillAmt = totalBillAmt.add(egBill.getBillamount());
-					}
+    				totalBillAmt = totalBillAmt.add(egBill.getBillamount());
     			}
     			if((totalBillAmt.add(egBillregister.getBillamount())).compareTo(po.getOrderValue())==1) {
     				resultBinder.reject("msg.supplierbill.totalamount", new String[] {}, null);
