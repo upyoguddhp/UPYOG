@@ -66,7 +66,10 @@ public interface ContractorBillRepository extends JpaRepository<EgBillregister, 
 
     List<EgBillregister> findByBillnumberContainingIgnoreCase(final String billNumber);
 
-    @Query(value="from EgBillregister e where e.workordernumber=?1  and e.status.id <> 70 order by id desc")
+    @Query(value="from EgBillregister e where e.workordernumber=?1 and (e.billstatus IS NULL OR UPPER(e.billstatus) <> UPPER('Cancelled')) order by id desc")
 	List<EgBillregister> getByWorkOrder(String orderNumber);
+
+    @Query(value="from EgBillregister e where e.id>?1 and e.workordernumber=?2 order by id desc")
+	List<EgBillregister> getLatestBills(Long id, String workordernumber);
 
 }

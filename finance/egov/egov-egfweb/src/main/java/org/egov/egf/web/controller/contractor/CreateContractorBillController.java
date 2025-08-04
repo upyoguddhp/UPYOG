@@ -266,7 +266,7 @@ public class CreateContractorBillController extends BaseBillController {
 		validateLedgerAndSubledger(egBillregister, resultBinder);
 		validateCuttofDate(egBillregister, resultBinder);
 		
-		WorkOrder wo = workOrderService.findByOrderNoNotCancelled(egBillregister.getWorkordernumber());
+		WorkOrder wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
     	
     	if(egBillregister.getBillamount().compareTo(wo.getOrderValue())==1) {
     		resultBinder.reject("msg.contractorbill.amount", new String[] {}, null);

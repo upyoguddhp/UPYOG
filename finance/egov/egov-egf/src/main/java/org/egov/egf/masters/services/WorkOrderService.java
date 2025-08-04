@@ -127,10 +127,6 @@ public class WorkOrderService implements EntityTypeService {
 	public WorkOrder getByOrderNumber(final String orderNumber) {
 		return workOrderRepository.findByOrderNumber(orderNumber);
 	}
-	
-	public WorkOrder findByOrderNoNotCancelled(final String orderNumber) {
-		return workOrderRepository.findByOrderNoNotCancelled(orderNumber);
-	}
 
 	@SuppressWarnings("deprecation")
 	@Transactional
