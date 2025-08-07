@@ -175,6 +175,19 @@
             <artifactId>jsoup</artifactId>
             <version>1.10.2</version>
         </dependency>
+		
+		<!--  Start   -->
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+		</dependency>
+		<!--  End   -->
+        
     </dependencies>
     <repositories>
         <repository>
