@@ -80,6 +80,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 /**
@@ -183,6 +184,7 @@ public abstract class BaseBillController extends BaseVoucherController {
 
     protected void validateSubledgerDetails(final EgBillregister egBillregister, final BindingResult resultBinder) {
         Boolean check;
+        Boolean isMissingSubLedger;
         BigDecimal detailAmt;
         BigDecimal payeeDetailAmt;
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
@@ -193,10 +195,22 @@ public abstract class BaseBillController extends BaseVoucherController {
             if (details.getDebitamount() != null && details.getDebitamount().compareTo(BigDecimal.ZERO) == 1)
                 detailAmt = details.getDebitamount();
             else if (details.getCreditamount() != null &&
-                    details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
+                    details.getCreditamount().compareTo(BigDecimal.ZERO) == 1) {
                 detailAmt = details.getCreditamount();
+                if(CollectionUtils.isEmpty(details.getEgBillPaydetailes())){
+                	if(!egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS)
+                			&& !egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE)) {
+                		resultBinder.reject("msg.subledger.warnig.message", new String[] {details.getChartOfAccounts().getGlcode()}, null);
+                	} else {
+                		resultBinder.reject("msg.subledger.mapping.warnig", new String[] {details.getChartOfAccounts().getGlcode()}, null);
+                	}
+              }
+            }
+            
+  
 
             for (final EgBillPayeedetails payeeDetails : details.getEgBillPaydetailes()) {
+            	isMissingSubLedger = true;
                 if (payeeDetails != null) {
                     if (payeeDetails.getDebitAmount() != null && payeeDetails.getCreditAmount() != null
                             && payeeDetails.getDebitAmount().equals(BigDecimal.ZERO)
@@ -223,7 +237,6 @@ public abstract class BaseBillController extends BaseVoucherController {
                     if (!check)
                         resultBinder.reject("msg.expense.bill.subledger.mismatch",
                                 new String[] { details.getChartOfAccounts().getGlcode() }, null);
-
                 }
 
             }

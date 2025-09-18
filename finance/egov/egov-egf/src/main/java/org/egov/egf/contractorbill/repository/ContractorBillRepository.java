@@ -52,6 +52,7 @@ import java.util.List;
 import org.egov.model.bills.EgBillregister;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -69,7 +70,7 @@ public interface ContractorBillRepository extends JpaRepository<EgBillregister, 
     @Query(value="from EgBillregister e where e.workordernumber=?1 and (e.billstatus IS NULL OR UPPER(e.billstatus) <> UPPER('Cancelled')) order by id desc")
 	List<EgBillregister> getByWorkOrder(String orderNumber);
 
-    @Query(value="from EgBillregister e where e.id>?1 and e.workordernumber=?2 order by id desc")
-	List<EgBillregister> getLatestBills(Long id, String workordernumber);
+    @Query(value = "select * from EG_BILLREGISTER e where workordernumber = :workordernumber and (billstatus is null or upper(billstatus) <> upper('Cancelled')) and statusid = 67 order by id desc", nativeQuery = true)
+    List<EgBillregister> getLatestBills(@Param("workordernumber") String workordernumber);
 
 }

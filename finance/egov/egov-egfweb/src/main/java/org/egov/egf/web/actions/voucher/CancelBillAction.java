@@ -58,11 +58,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -71,8 +73,10 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
+import org.egov.egf.contractorbill.repository.ContractorBillRepository;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.supplierbill.repository.SupplierBillRepository;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -89,6 +93,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.BindingResult;
 
 import com.exilant.eGov.src.domain.BillRegisterBean;
 
@@ -124,6 +129,11 @@ public class CancelBillAction extends BaseFormAction {
 	
 	@Autowired
 	FinanceDashboardService finDashboardService;
+	
+	@Autowired
+    private SupplierBillRepository supplierBillRepository;
+	@Autowired
+	private ContractorBillRepository contractorBillRepository;	
 
 	@Override
 	public Object getModel() {
@@ -441,7 +451,55 @@ public class CancelBillAction extends BaseFormAction {
         final EgwStatus status = (EgwStatus) query.uniqueResult();
         if (idListLength != 0) {
             for (i = 0; i < idListLength; i++) {
+            	boolean canBeCancelled=true;
                 billRegister = billsService.getBillRegisterById(idList[i].intValue());
+                List<EgBillregister> latestBills = new ArrayList<>();
+                if (FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE.equalsIgnoreCase(billRegister.getExpendituretype())) {
+                	latestBills = supplierBillRepository.getLatestBills(billRegister.getWorkordernumber());
+                	if(!CollectionUtils.isEmpty(latestBills) && latestBills.get(0).getId()!=billRegister.getId()) {
+                		if(idListLength==1) {
+                			addActionError(getText("msg.purchase.latest.bill", new String[] {billRegister.getBillnumber()}));
+                			continue;
+                		} else if(idListLength>1) {
+                			Set<Long> idSet = Arrays.stream(idList).collect(Collectors.toSet());
+
+                	        canBeCancelled = latestBills.stream()
+                	                .map(EgBillregister::getId)
+                	                .allMatch(idSet::contains);
+                	        
+                	        if(canBeCancelled==false) {
+                            	addActionError(getText("msg.purchase.latest.bill", latestBills.stream()
+                                        .filter(e -> idSet.contains(e.getId()))
+                                        .map(EgBillregister::getBillnumber)
+                                        .collect(Collectors.toList())));
+                            	continue;
+                            }
+                		}
+                	}
+                } else if (FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS.equalsIgnoreCase(billRegister.getExpendituretype())) {
+                	latestBills = contractorBillRepository.getLatestBills(billRegister.getWorkordernumber());
+                	if(!CollectionUtils.isEmpty(latestBills) && latestBills.get(0).getId()!=billRegister.getId()) {
+                		if(idListLength==1) {
+                			addActionError(getText("msg.works.latest.bill", new String[] {billRegister.getBillnumber()}));
+                			continue;
+                		} else if(idListLength>1) {
+                	        Set<Long> idSet = Arrays.stream(idList).collect(Collectors.toSet());
+
+                	        canBeCancelled = latestBills.stream()
+                	                .map(EgBillregister::getId)
+                	                .allMatch(idSet::contains);
+                	        
+                	        if(canBeCancelled==false) {
+                            	addActionError(getText("msg.works.latest.bill", latestBills.stream()
+                                        .filter(e -> idSet.contains(e.getId()))
+                                        .map(EgBillregister::getBillnumber)
+                                        .collect(Collectors.toList())));
+                            	continue;
+                            }
+                		}
+                	}
+                }
+                
                 final boolean value = cancelBillAndVoucher.canCancelBill(billRegister);
                 if (!value) {
                     billNumbers.add(billRegister.getBillnumber());

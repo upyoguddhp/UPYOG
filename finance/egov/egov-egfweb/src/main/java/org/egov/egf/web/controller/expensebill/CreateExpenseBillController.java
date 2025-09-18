@@ -80,6 +80,7 @@ import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.utils.DateUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
@@ -208,6 +209,7 @@ public class CreateExpenseBillController extends BaseBillController {
 		validateBillNumber(egBillregister, resultBinder);
 		validateLedgerAndSubledger(egBillregister, resultBinder);
 		validateCuttofDate(egBillregister, resultBinder);
+		
 		if (resultBinder.hasErrors()) {
 			populateDataOnErrors(egBillregister, model, request);
 			return EXPENSEBILL_FORM;
