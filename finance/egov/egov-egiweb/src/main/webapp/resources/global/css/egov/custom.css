@@ -257,8 +257,8 @@ label.error {
 .oldbuttonsection input.button:focus,
 .oldbuttonsection input.button:active {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
   opacity: 0.8;
 }
 /*parent section inside body*/
@@ -705,7 +705,7 @@ label.error {
 .hr-menu li a .custom-badge {
   padding: 5px 10px;
   font-size: 11px;
-  background-color: #49627e;
+  background-color: #00d2e0 !important;
 }
 .hr-menu li .right-arrow.dropdown-menu:before {
   position: absolute;
@@ -1422,7 +1422,7 @@ label.error {
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #49627e none repeat scroll 0% 0%;
+  background: #00d2e0 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -1442,8 +1442,8 @@ label.error {
 .page-container .main-content div.formmainbox input.button:focus,
 .page-container .main-content div.formmainbox input.button:active {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
   opacity: 0.8;
 }
 .page-container .main-content div.subheadnew {
@@ -1452,7 +1452,7 @@ label.error {
   font-weight: bold;
   color: #ffffff;
   padding: 0px 0px;
-  background: #49627e;
+  background: linear-gradient(178deg, #7ec8f8, #0d5ed0) !important;
 }
 .page-container .main-content div.subheadsmallnew {
   background-color: #ffffff;
@@ -1496,8 +1496,8 @@ label.error {
 .page-container .main-content input.button:focus,
 .page-container .main-content input.button:active {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
   opacity: 0.8;
 }
 .page-container .main-content th.bluebgheadtd {
@@ -1511,13 +1511,13 @@ label.error {
   font-weight: bold;
   color: #ffffff;
   padding: 4px;
-  background-color: #49627e;
+  background-color: #00d2e0 !important;
   background-image: none;
   text-align: center;
 }
 .page-container .main-content .yui-skin-sam .yui-dt th {
   color: #ffffff;
-  background: #49627e;
+  background: linear-gradient(178deg, #7ec8f8, #0d5ed0) !important;
   font-size: 18px;
   text-align: center;
   font-weight: 600;
@@ -1650,8 +1650,8 @@ label.error {
 }
 .btn-custom {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
 }
 .btn-custom:hover,
 .btn-custom:focus,
@@ -1670,8 +1670,8 @@ label.error {
 }
 .btn-primary {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
 }
 .btn-primary:hover,
 .btn-primary:focus,
@@ -1704,15 +1704,15 @@ label.error {
 .btn-default.active.focus,
 .open > .dropdown-toggle.btn-default.focus {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
   outline: none;
   opacity: 0.8;
 }
 .btn-secondary {
   color: #ffffff;
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
 }
 .btn-danger {
   color: #ffffff !important;
@@ -1898,7 +1898,7 @@ label.error {
 }
 .table thead:first-child > tr:first-child th {
   border-bottom: none;
-  background: #49627e;
+  background: linear-gradient(178deg, #7ec8f8, #0d5ed0) !important;
   color: #ffffff;
   font-weight: normal;
 }
@@ -1996,8 +1996,8 @@ table.dataTable tbody.no-pointer tr:hover {
 .pagination .active > span:hover,
 .pagination .active > a:focus,
 .pagination .active > span:focus {
-  background-color: #49627e;
-  border-color: #49627e;
+  background-color: #00d2e0 !important;
+  border-color: #00d2e0 !important;
 }
 .buttons-margin {
   margin-top: 10px;

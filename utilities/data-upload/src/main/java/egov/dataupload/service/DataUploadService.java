@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.JacksonJsonValue;
 import com.github.wnameless.json.flattener.JsonFlattener;
+
+import egov.dataupload.models.BankUploadModel;
 import egov.dataupload.models.DataUploadConfig;
 import egov.dataupload.models.Mapping;
 import egov.dataupload.models.Step;
 import egov.dataupload.repository.ServiceRequestRepository;
 import egov.dataupload.service.extensions.Transformer;
+import egov.dataupload.web.models.BankUploaderResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.csv.CSVFormat;
@@ -167,5 +170,37 @@ public class DataUploadService {
         throw new CustomException("TEMPLATE_NOT_FOUND", "No template configured for given service and " +
                 "template!");
     }
+
+	public BankUploaderResponse uploadV2(MultipartFile file) {
+		BankUploaderResponse response = null;
+		List<BankUploadModel> bankExcelUploadLst = null;
+		List<BankUploadModel> bankList = null;
+		Long id = null;
+		//Bank bank = null;
+		try {
+			/*bankExcelUploadLst = Poiji.fromExcel(file.getInputStream(), PoijiExcelType.XLSX,
+					BankUploadModel.class, PoijiOptionsBuilder.settings().sheetIndex(0).build());
+
+			if (bankExcelUploadLst != null && !bankExcelUploadLst.isEmpty()) {
+				List<BankUploadModel> empList = new ArrayList<>();
+
+				for (BankUploadModel model : bankExcelUploadLst) {
+					if (model.getEmployeeId() != null) {
+						//map and upload
+						
+						bankList.add(model);
+					}
+				}
+
+				response.setBankExcelUploadLst(bankList);
+			}*/
+
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		return response;
+	
+	}
 
 }

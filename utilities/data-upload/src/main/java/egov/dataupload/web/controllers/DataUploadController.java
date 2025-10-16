@@ -3,6 +3,7 @@ package egov.dataupload.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import egov.dataupload.service.DataUploadService;
 import egov.dataupload.utils.Utils;
+import egov.dataupload.web.models.BankUploaderResponse;
 import egov.dataupload.web.models.DataUploaderResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -34,5 +35,11 @@ public class DataUploadController {
             throw new CustomException("USER_INFO_MISSING", "Failed to process data upload, missing user info!");
         String fileStoreId = dataUploadService.upload(service, mapping, reqInfo.getUserInfo().getTenantId(), file, reqInfo);
         return new ResponseEntity<>(new DataUploaderResponse(fileStoreId), HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/_uploadV2", method = RequestMethod.POST)
+    public ResponseEntity<?> uploadV2(@RequestParam("file") MultipartFile file) {
+    	BankUploaderResponse response = dataUploadService.uploadV2(file);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
