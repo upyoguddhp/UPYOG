@@ -61,8 +61,8 @@ const envVariables = {
   //------------------------------ KAFKA CONFIGURATIONS ------------------------------//
   // KAFKA SERVER CONFIGURATIONS
   KAFKA_BOOTSTRAP_SERVER:
-    process.env.KAFKA_BOOTSTRAP_SERVER || "localhost:9092",
-  KAFKA_BROKER_HOST: process.env.KAFKA_BROKER_HOST || "localhost:9092",
+    process.env.KAFKA_BOOTSTRAP_SERVER || "3.108.21.221:8092",
+  KAFKA_BROKER_HOST: process.env.KAFKA_BROKER_HOST || "3.108.21.221:8092",
 
   // KAFKA TOPIC CONFIGURATIONS
   KAFKA_TOPICS_SAVE_SERVICE:

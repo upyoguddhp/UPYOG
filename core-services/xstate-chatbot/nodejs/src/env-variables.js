@@ -35,7 +35,7 @@ const envVariables = {
     },
 
     kafka: {
-        kafkaBootstrapServer: process.env.KAFKA_BOOTSTRAP_SERVER || 'localhost:9092',
+        kafkaBootstrapServer: process.env.KAFKA_BOOTSTRAP_SERVER || '3.108.21.221:8092',
         chatbotTelemetryTopic: process.env.CHATBOT_TELEMETRY_TOPIC || 'chatbot-telemetry-v2',
 
         kafkaConsumerEnabled: process.env.KAFKA_CONSUMER_ENABLED || true,

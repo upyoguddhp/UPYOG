@@ -14,7 +14,7 @@ const envVariables = {
   SERVER_PORT: process.env.SERVER_PORT || "8080",
 
   //kafka configurations
-  KAFKA_BROKER_HOST: process.env.KAFKA_BROKER_HOST || "localhost:9092",
+  KAFKA_BROKER_HOST: process.env.KAFKA_BROKER_HOST || "3.108.21.221:8092",
   KAFKA_TOPICS_FIRENOC_CREATE:
     process.env.KAFKA_TOPICS_FIRENOC_CREATE || "save-fn-firenoc",
   KAFKA_TOPICS_FIRENOC_UPDATE:

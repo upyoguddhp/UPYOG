@@ -116,7 +116,7 @@ public class ConsumerConfigurations {
     
     public ConsumerFactory<String, IncomingData> taskConsumerFactory() {
     	Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "3.108.21.221:8092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "task-group-notify");
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(IncomingData.class));
     }
