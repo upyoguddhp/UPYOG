@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [[ -z "${JAVA_OPTS}" ]];then
-    export JAVA_OPTS="-Xmx64m -Xms64m"
+    export JAVA_OPTS="-Xmx512m -Xms256m"
 fi
 
 if [ x"${JAVA_ENABLE_DEBUG}" != x ] && [ "${JAVA_ENABLE_DEBUG}" != "false" ]; then
