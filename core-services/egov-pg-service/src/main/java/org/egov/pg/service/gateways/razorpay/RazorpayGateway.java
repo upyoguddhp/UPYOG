@@ -183,6 +183,7 @@ public class RazorpayGateway implements Gateway {
 	private Transaction validateAndEnrichPaymentStatus(Transaction currentStatus, String transactionAmount,
 			String razorpayOrderId) {
 		PaymentResponse paymentResponse = fetchPaymentsByOrderId(razorpayOrderId);
+		
 
 		if (null != paymentResponse) {
 
@@ -277,6 +278,7 @@ public class RazorpayGateway implements Gateway {
 					"Unable to transfer amount for the orderId: " + transfer.getNotes().getGatewayTxnId());
 		}
 	}
+
 
 	@Override
 	public Object getSettlementStatus(String gatewayTxnId) {

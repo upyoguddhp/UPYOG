@@ -42,6 +42,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
+import org.egov.pg.service.gateways.razorpay.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +82,11 @@ public class TransactionServiceV2 {
 
 	@Autowired
 	private PaymentsService paymentsService;
+	
+	@Autowired
+	private RazorpayGateway RazorpayGateway;
+	
+	private ObjectMapper ObjectMapper;
 
 	/**
 	 * Initiates a transaction by generating a gateway redirect URI for the request
@@ -230,10 +239,22 @@ public class TransactionServiceV2 {
 
 			} else {
 				newTxn = gatewayService.getLiveStatus(currentTxnStatus, requestParams);
+				Object razorpayRawResponse = newTxn.getResponseJson();
 
 				// Enrich the new transaction status before persisting
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
+				
+				
+				// Fetch payment response from gateway
+				if (razorpayRawResponse != null) {
+				    newTxn.setRazorpayResponse(
+				        ObjectMapper.convertValue(
+				            razorpayRawResponse,
+				            new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {}
+				        )
+				    );
+				}
 			}
 
 			// Check if transaction is successful, amount matches etc
