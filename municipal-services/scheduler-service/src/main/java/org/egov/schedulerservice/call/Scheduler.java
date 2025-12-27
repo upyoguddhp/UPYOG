@@ -21,12 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Scheduler {
 
 	@Autowired
-	private RequestInfoUtils requestInfoUtils;
-
-	@Autowired
-	private GarbageService garbageService;
-
-	@Autowired
 	private BillService billService;
 
 	@Autowired
@@ -46,6 +40,12 @@ public class Scheduler {
 	
 	@Autowired
 	private NotificationSmsService notificationSmsService;
+	
+	@Autowired
+    private GarbageService garbageService;
+
+    @Autowired
+    private RequestInfoUtils requestInfoUtils;
 
 	@Scheduled(cron = "${cron.job.default.garbage.bill.generator}", zone = "IST")
 	public void generateGarbageBills() {
@@ -167,5 +167,13 @@ public class Scheduler {
 		notificationSmsService.sendSmsNotification(requestInfo);
 		log.info("sendSmsNotification CRON JOB Ends");
 	}
+	
+	@Scheduled(cron = "${cron.job.default.garbage.tracker.penalty.amount.updater}", zone = "IST")
+    public void updateGarbagePenaltyAmount() {
+        log.info("Garbage updatePenaltyAmount CRON JOB Starts");
+        RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+        garbageService.updatePenaltyAmount(requestInfo);
+        log.info("Garbage updatePenaltyAmount CRON JOB Ends");
+    }
 
 }

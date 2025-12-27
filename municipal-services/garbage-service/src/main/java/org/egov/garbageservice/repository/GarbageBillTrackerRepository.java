@@ -69,6 +69,29 @@ public class GarbageBillTrackerRepository {
 			+ " WHERE consumer_code = :consumer_code" + "  AND from_date = :from_date" + "  AND to_date = :to_date;";
 	
 	private static final String SANATIZE_BILL_FAILURE = "DELETE FROM eg_bill_failure bf WHERE EXISTS ( SELECT 1 FROM eg_grbg_bill_tracker bt WHERE bt.grbg_application_id = bf.consumer_code and bt.month = bf.month ) AND module_name = 'GB'";
+	
+	private static final String UPDATE_BILL_TRACKER_PENALTY =
+		    "UPDATE eg_grbg_bill_tracker " +
+		    "SET penalty_amount = :penaltyAmount, " +
+		    "    grbg_bill_without_penalty = :billWithoutPenalty, " +
+		    "    grbg_bill_amount = :billAmount, " +
+		    "    last_modified_by = :lastModifiedBy, " +
+		    "    last_modified_time = :lastModifiedTime " +
+		    "WHERE uuid = :uuid";
+
+
+
+	public int updatePenalty(GrbgBillTracker tracker) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("penaltyAmount", tracker.getPenaltyAmount());
+	    params.put("billWithoutPenalty", tracker.getGrbgBillWithoutPenalty());
+	    params.put("billAmount", tracker.getGrbgBillAmount());
+	    params.put("uuid", tracker.getUuid());
+	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
+	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(UPDATE_BILL_TRACKER_PENALTY, params);
+	}
 
 
 	public GrbgBillTracker createTracker(GrbgBillTracker grbgBillTracker) {

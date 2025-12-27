@@ -25,8 +25,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 public class MdmsService {
 
 	@Autowired
@@ -37,6 +40,10 @@ public class MdmsService {
 	
 	@Autowired
 	private GrbgConstants config;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+
 
 	public Object fetchGarbageFeeFromMdms(RequestInfo requestInfo, String tenantId) {
 
@@ -123,5 +130,121 @@ public class MdmsService {
 		}
 		return taxAmount.get();
 	}
+	
+	private Object fetchMdmsData(
+	        RequestInfo requestInfo,
+	        String tenantId,
+	        String moduleName,
+	        String masterName) {
+	
+	    String url = config.getMdmsServiceHostUrl() + config.getMdmsSearchEndpoint();
+	
+	    MasterDetail masterDetail =
+	            MasterDetail.builder().name(masterName).build();
+	    
+	    List<MasterDetail> masterDetails = new ArrayList<>();
+	    masterDetails.add(masterDetail);
+
+	    ModuleDetail moduleDetail =
+	            ModuleDetail.builder()
+	                    .moduleName(moduleName)
+	                    .masterDetails(masterDetails)
+	                    .build();
+
+	    List<ModuleDetail> moduleDetails = new ArrayList<>();
+	    moduleDetails.add(moduleDetail);
+
+	    MdmsCriteria mdmsCriteria =
+	            MdmsCriteria.builder()
+	                    .tenantId(tenantId)
+	                    .moduleDetails(moduleDetails)
+	                    .build();
+	
+	    MdmsCriteriaReq request =
+	            MdmsCriteriaReq.builder()
+	                    .requestInfo(requestInfo)
+	                    .mdmsCriteria(mdmsCriteria)
+	                    .build();
+	
+	    log.info("[MDMS][Penalty] MDMS URL={}", url);
+
+	    log.info("[MDMS][Penalty] tenantId={}", tenantId);
+	    log.info("[MDMS][Penalty] moduleName={}", moduleName);
+	    log.info("[MDMS][Penalty] masterName={}", masterName);
+
+	    log.info("[MDMS][Penalty] MasterDetails={}",
+	            objectMapper.valueToTree(masterDetails).toString());
+
+	    log.info("[MDMS][Penalty] ModuleDetails={}",
+	            objectMapper.valueToTree(moduleDetails).toString());
+
+	    log.info("[MDMS][Penalty] MdmsCriteria={}",
+	            objectMapper.valueToTree(mdmsCriteria).toString());
+
+	    log.info("[MDMS][Penalty] MdmsCriteriaReq={}",
+	            objectMapper.valueToTree(request).toString());
+
+	    
+	    
+	    return restTemplate.postForObject(url, request, Object.class);
+	}
+
+
+	
+	public BigDecimal fetchGarbagePenaltyRate(RequestInfo requestInfo, String tenantId) {
+    // MDMS module and master names
+    String moduleName = "ULBS";
+    String masterName = "GarbagePenaltyRate";
+
+    // Filter for active entries
+    String filter = "$.[?(@.active==true)]"; 
+
+    // Build MasterDetail list
+    MasterDetail masterDetail = MasterDetail.builder()
+            .name(masterName)
+            .filter(filter)
+            .build();
+    List<MasterDetail> masterDetails = new ArrayList<>();
+    masterDetails.add(masterDetail);
+
+    // Build ModuleDetail list
+    ModuleDetail moduleDetail = ModuleDetail.builder()
+            .moduleName(moduleName)
+            .masterDetails(masterDetails)
+            .build();
+    List<ModuleDetail> moduleDetails = new ArrayList<>();
+    moduleDetails.add(moduleDetail);
+
+    // Build MDMS criteria request
+    MdmsCriteria mdmsCriteria = MdmsCriteria.builder()
+            .tenantId(tenantId)
+            .moduleDetails(moduleDetails)
+            .build();
+    MdmsCriteriaReq request = MdmsCriteriaReq.builder()
+            .requestInfo(requestInfo)
+            .mdmsCriteria(mdmsCriteria)
+            .build();
+
+    // Call MDMS service
+    String url = config.getMdmsServiceHostUrl() + config.getMdmsSearchEndpoint();
+    log.info("[MDMS][Penalty] Fetching GarbagePenaltyRate for tenantId={}", tenantId);
+    log.info("[MDMS][Penalty] MdmsCriteriaReq={}", objectMapper.valueToTree(request));
+
+    Object mdmsResponse = restTemplate.postForObject(url, request, Object.class);
+
+    // Parse response
+    JsonNode root = objectMapper.convertValue(mdmsResponse, JsonNode.class);
+    JsonNode rateNode = root.path("MdmsRes").path(moduleName).path(masterName);
+
+    if (!rateNode.isArray() || rateNode.isEmpty()) {
+        log.warn("[MDMS][Penalty] GarbagePenaltyRate not found for tenantId={}", tenantId);
+        return BigDecimal.ZERO;
+    }
+
+    BigDecimal rate = BigDecimal.valueOf(rateNode.get(0).path("rate").asDouble());
+    log.info("[MDMS][Penalty] Penalty rate resolved = {}", rate);
+
+    return rate;
+}
 
 }

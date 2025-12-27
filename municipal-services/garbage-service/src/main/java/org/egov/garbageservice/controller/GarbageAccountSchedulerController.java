@@ -2,18 +2,24 @@ package org.egov.garbageservice.controller;
 
 import org.egov.garbageservice.model.GenerateBillRequest;
 import org.egov.garbageservice.model.OnDemandBillRequest;
+import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.service.GarbageAccountSchedulerService;
+import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.egov.common.contract.request.RequestInfo;
 
 
 
 @RestController
+@Slf4j
 @RequestMapping("/garbage-accounts-scheduler")
 public class GarbageAccountSchedulerController {
 
@@ -32,5 +38,14 @@ public class GarbageAccountSchedulerController {
 	public ResponseEntity<?> demandGeneration(@RequestBody OnDemandBillRequest onDemandBillRequest) {
 		return ResponseEntity.ok(service.generateBillOnDemand(onDemandBillRequest));
 	}
+	
+	@PostMapping("/penalty/_update")
+    public ResponseEntity<Void> updatePenalty(
+            @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		service.processGarbagePenalty(
+            requestInfoWrapper.getRequestInfo()
+        );
+        return ResponseEntity.ok().build();
+    }
 
 }

@@ -93,6 +93,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.contract.bill.DemandDetail;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -2451,12 +2452,66 @@ public class GarbageAccountService {
 
 		return fyStartYear + "-" + (fyEndYear % 100); // e.g., "2023-24"
 	}
-
 	
 	
+	public List<GrbgBillTracker> fetchExpiredUnpaidBills() {
+
+	    GrbgBillTrackerSearchCriteria criteria =
+	        GrbgBillTrackerSearchCriteria.builder()
+	            .status(Collections.singleton("ACTIVE"))
+	            .type("MONTHLY")
+	            .build();
+
+	    List<GrbgBillTracker> trackers =
+	        garbageBillTrackerRepository.getBillTracker(criteria);
+
+	    return trackers.stream()
+	        .filter(t -> t.getPenaltyAmount() == null
+	                  || t.getPenaltyAmount().compareTo(BigDecimal.ZERO) == 0)
+	        .collect(Collectors.toList());
+	}
 
 	
+	public void applyPenalty(
+        GrbgBillTracker tracker,
+        Demand demand,
+        BigDecimal penalty,
+        RequestInfo requestInfo) {
 
+    BigDecimal existingAmount = demand.getDemandDetails().stream()
+        .map(DemandDetail::getTaxAmount)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    tracker.setGrbgBillWithoutPenalty(existingAmount);
+
+ 
+    tracker.setGrbgBillAmount(existingAmount.add(penalty));
+
+    demandService.addPenaltyTaxHead(
+        demand,
+        GrbgConstants.GARBAGE_PENALTY_TAX_HEAD,
+        penalty
+    );
+
+
+    demandService.updateDemand(
+        requestInfo,
+        Collections.singletonList(demand)
+    );
+    GenerateBillCriteria billCriteria =
+        GenerateBillCriteria.builder()
+            .tenantId(tracker.getTenantId())
+            .businessService("GB")
+            .consumerCode(tracker.getGrbgApplicationId())
+            .build();
+
+    BillResponse billResponse =
+        billService.generateBill(requestInfo, billCriteria);
+
+    tracker.setPenaltyAmount(penalty);
+    tracker.setBillId(billResponse.getBill().get(0).getId());
+    garbageBillTrackerRepository.updatePenalty(tracker);
+}
 
 
 }

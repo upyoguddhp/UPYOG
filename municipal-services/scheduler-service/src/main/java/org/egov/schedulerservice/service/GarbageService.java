@@ -41,5 +41,24 @@ public class GarbageService {
 		}
 
 	}
+	
+	 public String updatePenaltyAmount(RequestInfo requestInfo) {
+	        try {
+	            StringBuilder url = new StringBuilder(applicationConfig.getGarbageServiceHostUrl());
+	            url.append(applicationConfig.getGarbageUpdatePenaltyAmountEndpoint());
+
+	            RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder()
+	                    .requestInfo(requestInfo)
+	                    .build();
+
+	            ResponseEntity<String> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
+	                    String.class);
+	            return responseEntity.getBody();
+	        } catch (Exception e) {
+	            log.error("Error occured while updating garbage penalty amount.", e);
+	            throw new SchedulerServiceException("ERR_GARBAGE_SERVICE_ERROR",
+	                    "Error occured while updating garbage penalty amount. Message: " + e.getMessage());
+	        }
+	    }
 
 }

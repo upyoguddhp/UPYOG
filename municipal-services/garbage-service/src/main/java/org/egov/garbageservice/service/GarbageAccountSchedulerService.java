@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.math.RoundingMode;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.contract.bill.BillResponse;
@@ -45,6 +47,14 @@ import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.util.RestCallRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.egov.garbageservice.service.GarbageAccountService;
+import org.egov.garbageservice.contract.bill.DemandDetail;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+
 
 
 
@@ -94,76 +104,6 @@ public class GarbageAccountSchedulerService {
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
-
-	
-//public void processPendingBillSms(RequestInfo requestInfo) {
-//
-//    int batchSize = 1000;
-//    int offset = 0;
-//    List<GrbgBillTracker> trackers;
-//
-//    do {
-//        trackers = garbageAccountService.fetchPendingSms(batchSize, offset);
-//        log.info("Processing {} pending SMS records", trackers.size());
-//
-//        for (GrbgBillTracker tracker : trackers) {
-//            try {
-//            	SearchCriteriaGarbageAccountRequest searchRequest = SearchCriteriaGarbageAccountRequest.builder()
-//            	        .requestInfo(requestInfo)
-//            	        .searchCriteriaGarbageAccount(
-//            	                SearchCriteriaGarbageAccount.builder()
-//            	                        .applicationNumber(Collections.singletonList(tracker.getGrbgApplicationId()))
-//            	                        .tenantId(tracker.getTenantId())
-//            	                        .isMonthlyBilling(true)
-//            	                        .status(Collections.singletonList("APPROVED"))
-//            	                        .isActiveAccount(true)
-//            	                        .isActiveSubAccount(true)
-//            	                        .build()
-//            	        )
-//            	        .isSchedulerCall(true)
-//            	        .build();
-//
-//            	GarbageAccountResponse response = garbageAccountService.searchGarbageAccounts(searchRequest, false);
-//
-//            	if (CollectionUtils.isEmpty(response.getGarbageAccounts())) {
-//            	    log.error("Garbage account not found for applicationId {}", tracker.getGrbgApplicationId());
-//            	    continue;
-//            	}
-//
-//            	GarbageAccount garbageAccount = response.getGarbageAccounts().get(0);
-//
-//
-//                // Build BillSearchCriteria using tracker billId
-//                BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-//                        .tenantId(tracker.getTenantId())
-//                        .billId(Collections.singleton(tracker.getBillId()))
-//                        .build();
-//
-//                BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfo);
-//
-//                if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
-//                    log.error("Bill not found for billId {}", tracker.getBillId());
-//                    continue; 
-//                }
-//
-//                // Trigger notification
-//                notificationService.triggerNotificationsGenerateBill(
-//                        garbageAccount,
-//                        billResponse.getBill().get(0),
-//                        requestInfo,
-//                        tracker
-//                );
-//                
-//                garbageAccountService.markSmsAsSent(tracker);
-//                log.info("Marked sms_status=true for trackerId {}", tracker.getBillId());
-//
-//            } catch (Exception e) {
-//                log.error("Failed to process SMS for trackerId {}", tracker.getBillId(), e);
-//            }
-//        }
-//        offset += batchSize;
-//    } while (!CollectionUtils.isEmpty(trackers));
-//}
 
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
@@ -575,4 +515,70 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("INVALID_BILL_AMOUNT", "bill amount not valid.");
 		}
 	}
+	
+public void processGarbagePenalty(RequestInfo requestInfo) {
+
+    List<GrbgBillTracker> trackers = garbageAccountService.fetchExpiredUnpaidBills();
+
+    for (GrbgBillTracker tracker : trackers) {
+        try {
+            log.info("Processing tracker for consumerCode {}", tracker.getGrbgApplicationId());
+
+            // fetch tenantId and ULB from tracker
+            String tenantId = tracker.getTenantId();
+
+            log.info(tenantId); //hp.Shimla
+
+//            BigDecimal penaltyRate = mdmsService.fetchGarbagePenaltyRate(requestInfo, tenantId);
+            
+            final BigDecimal penaltyRate = new BigDecimal("0.02");
+            log.info("[Penalty] Penalty rate resolved = {}", penaltyRate);
+
+            if (penaltyRate.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            Demand demand = demandService.searchDemand(
+                    tracker.getTenantId(),
+                    Collections.singleton(tracker.getGrbgApplicationId()),
+                    requestInfo,
+                    "GB"
+            ).get(0);
+
+
+            BigDecimal baseAmount = demand.getDemandDetails().stream()
+                .filter(d -> GrbgConstants.BILLING_TAX_HEAD_MASTER_CODE.equals(d.getTaxHeadMasterCode()))
+                .map(DemandDetail::getTaxAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+
+            // months overdue
+            Long billExpiryTime = demand.getBillExpiryTime();
+            if (billExpiryTime == null || billExpiryTime >= System.currentTimeMillis()) {
+                continue; // demand not expired → skip penalty
+            }
+
+            LocalDate expiryDate = Instant.ofEpochMilli(billExpiryTime)
+                                          .atZone(ZoneId.systemDefault())
+                                          .toLocalDate();
+
+            long monthsOverdue = ChronoUnit.MONTHS.between(expiryDate, LocalDate.now());
+            if (monthsOverdue <= 0) monthsOverdue = 1;
+
+            BigDecimal penalty = baseAmount
+                    .multiply(penaltyRate)
+                    .divide(BigDecimal.valueOf(100))
+                    .multiply(BigDecimal.valueOf(monthsOverdue))
+                    .setScale(2, RoundingMode.HALF_UP);
+            
+            garbageAccountService.applyPenalty(tracker, demand, penalty, requestInfo);
+            log.info("Base={}, Rate={}, Months={}", baseAmount, penaltyRate, monthsOverdue);
+
+        } catch (Exception e) {
+            log.error("Penalty failed for consumerCode {}", tracker.getGrbgApplicationId(), e);
+        }
+    }
+}
+
+
 }
