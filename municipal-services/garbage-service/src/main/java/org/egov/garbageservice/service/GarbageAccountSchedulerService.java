@@ -571,6 +571,10 @@ public void processGarbagePenalty(RequestInfo requestInfo) {
                     .multiply(BigDecimal.valueOf(monthsOverdue))
                     .setScale(2, RoundingMode.HALF_UP);
             
+            if (tracker.getGrbgBillWithoutPenalty() == null) {
+                tracker.setGrbgBillWithoutPenalty(baseAmount);
+            }
+            
             garbageAccountService.applyPenalty(tracker, demand, penalty, requestInfo);
             log.info("Base={}, Rate={}, Months={}", baseAmount, penaltyRate, monthsOverdue);
 

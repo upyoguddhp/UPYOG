@@ -2450,7 +2450,7 @@ public class GarbageAccountService {
 
 		int fyEndYear = fyStartYear + 1;
 
-		return fyStartYear + "-" + (fyEndYear % 100); // e.g., "2023-24"
+		return fyStartYear + "-" + (fyEndYear % 100);
 	}
 	
 	
@@ -2478,14 +2478,10 @@ public class GarbageAccountService {
         BigDecimal penalty,
         RequestInfo requestInfo) {
 
-    BigDecimal existingAmount = demand.getDemandDetails().stream()
-        .map(DemandDetail::getTaxAmount)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-    tracker.setGrbgBillWithoutPenalty(existingAmount);
-
- 
-    tracker.setGrbgBillAmount(existingAmount.add(penalty));
+		BigDecimal newBillAmount =
+		        tracker.getGrbgBillWithoutPenalty().add(penalty);
+		
+    tracker.setGrbgBillAmount(newBillAmount);
 
     demandService.addPenaltyTaxHead(
         demand,
