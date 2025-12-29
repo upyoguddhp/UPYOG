@@ -529,9 +529,8 @@ public void processGarbagePenalty(RequestInfo requestInfo) {
 
             log.info(tenantId); //hp.Shimla
 
-//            BigDecimal penaltyRate = mdmsService.fetchGarbagePenaltyRate(requestInfo, tenantId);
+            BigDecimal penaltyRate = mdmsService.fetchGarbagePenaltyRate(requestInfo, tenantId);
             
-            final BigDecimal penaltyRate = new BigDecimal("0.02");
             log.info("[Penalty] Penalty rate resolved = {}", penaltyRate);
 
             if (penaltyRate.compareTo(BigDecimal.ZERO) <= 0) {

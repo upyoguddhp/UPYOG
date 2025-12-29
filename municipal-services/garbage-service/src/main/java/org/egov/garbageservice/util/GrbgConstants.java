@@ -170,6 +170,11 @@ public class GrbgConstants {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsSearchEndpoint;
 	
+	@Value("${mdms.v2.host}")
+	private String mdmsV2Host;
+
+	@Value("${mdms.v2.searchEndpoint}")
+	private String mdmsV2SearchEndpoint;
 
 	@Value("${garbage.service.host}")
 	private String grbgServiceHostUrl;

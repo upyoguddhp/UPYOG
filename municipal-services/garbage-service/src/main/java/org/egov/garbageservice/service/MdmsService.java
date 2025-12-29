@@ -226,7 +226,7 @@ public class MdmsService {
             .build();
 
     // Call MDMS service
-    String url = config.getMdmsServiceHostUrl() + config.getMdmsSearchEndpoint();
+    String url = config.getMdmsV2Host() + config.getMdmsV2SearchEndpoint();
     log.info("[MDMS][Penalty] Fetching GarbagePenaltyRate for tenantId={}", tenantId);
     log.info("[MDMS][Penalty] MdmsCriteriaReq={}", objectMapper.valueToTree(request));
 
