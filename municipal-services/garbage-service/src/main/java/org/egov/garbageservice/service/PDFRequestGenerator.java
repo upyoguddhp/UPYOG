@@ -42,6 +42,14 @@ public class PDFRequestGenerator {
 		
 		grbg.put("ulbName", grbgAccount.getAddresses().get(0).getUlbName());
 		grbg.put("ulbType", grbgAccount.getAddresses().get(0).getUlbType());
+		grbg.put(
+			    "oldGarbageId",
+			    grbgAccount.getGrbgOldDetails() != null &&
+			    grbgAccount.getGrbgOldDetails().getOldGarbageId() != null
+			        ? grbgAccount.getGrbgOldDetails().getOldGarbageId()
+			        : "NA"
+			);
+
 
 		Map<String, BigDecimal> grbgTaxMap = new HashMap<>();
 		for (GrbgBillTracker grbgBillTrackerObj : grbgBillTracker) {
@@ -85,6 +93,7 @@ public class PDFRequestGenerator {
 				int lastIndex = bill.get(i).getBillDetails().size() - 1;
 
 				grbg.put("billNo", bill.get(i).getBillNumber());
+				grbg.put("mobileNo", grbgAccount.getMobileNumber());
 				grbg.put("billDueDate", Instant.ofEpochMilli(bill.get(i).getBillDetails().get(lastIndex).getExpiryDate())
 						.atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 			}
