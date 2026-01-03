@@ -657,15 +657,11 @@ public class NotificationService {
 	            monthFormat.format(tracker.getFromDate()) + " / "
 	                    + monthFormat.format(tracker.getToDate())
 	    );
-	    
-	    String ownerName = bill.getAdditionalDetails()
-                .path("ownerName")
-                .asText("");
-	    
-	    body = body.replace(
-	            RECIPINTS_NAME_PLACEHOLDER,
-	            ownerName
-	    );
+
+	    String ownerName = bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText();
+	     
+	     body = body.replace(
+	             RECIPINTS_NAME_PLACEHOLDER,ownerName);
 
 	    body = body.replace(
 	            PROPERTY_ID_PLACEHOLDER,
