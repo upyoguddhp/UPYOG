@@ -658,10 +658,10 @@ public class NotificationService {
 	                    + monthFormat.format(tracker.getToDate())
 	    );
 
-	    body = body.replace(
-	            RECIPINTS_NAME_PLACEHOLDER,
-	            property.getOwners().get(0).getName()
-	    );
+	    String ownerName = bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText();
+	     
+	     body = body.replace(
+	             RECIPINTS_NAME_PLACEHOLDER,ownerName);
 
 	    body = body.replace(
 	            PROPERTY_ID_PLACEHOLDER,
