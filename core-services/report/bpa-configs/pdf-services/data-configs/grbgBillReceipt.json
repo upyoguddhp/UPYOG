@@ -119,6 +119,18 @@
 						"value": {
 							"path": "$.qrCodeText"
 						}
+					},
+					{
+						"variable": "mobileNo",
+						"value": {
+							"path": "$.mobileNo"
+						}
+					},
+					{
+						"variable": "oldGarbageId",
+						"value": {
+							"path": "$.oldGarbageId"
+						}
 					}
 				]
 			}

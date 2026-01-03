@@ -662,7 +662,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
@@ -798,7 +798,7 @@ public class GarbageAccountService {
 		// Build the search criteria request
 		SearchCriteriaGarbageAccountRequest searchCriteria = SearchCriteriaGarbageAccountRequest.builder()
 				.requestInfo(updateGarbageRequest.getRequestInfo()).searchCriteriaGarbageAccount(
-						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts()))
+						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts(),true))
 				.build();
 
 		// Get the response from the database
@@ -1384,11 +1384,14 @@ public class GarbageAccountService {
 		return existingGarbageAccountsMap;
 	}
 
-	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts) {
+	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts,Boolean searchActiveAccount) {
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = SearchCriteriaGarbageAccount.builder().build();
-		searchCriteriaGarbageAccount.setIsActiveAccount(true);
-		searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		if(searchActiveAccount) {
+			searchCriteriaGarbageAccount.setIsActiveAccount(true);
+			searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		}
+		
 //		List<Long> ids = new ArrayList<>();
 		List<Long> garbageIds = new ArrayList<>();
 		List<String> applicationNos = new ArrayList<>();
@@ -2136,7 +2139,7 @@ public class GarbageAccountService {
 				.singletonList(GarbageAccount.builder().grbgApplicationNumber(grbgId).build());
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-				garbageAccounts);
+				garbageAccounts,false);
 
 		SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest = SearchCriteriaGarbageAccountRequest
 				.builder().searchCriteriaGarbageAccount(searchCriteriaGarbageAccount)
@@ -2230,7 +2233,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
