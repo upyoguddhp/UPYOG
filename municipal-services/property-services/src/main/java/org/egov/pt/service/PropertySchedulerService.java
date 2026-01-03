@@ -98,6 +98,8 @@ public class PropertySchedulerService {
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
     List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
+    
+    Boolean isBilling = false;
 
     JsonNode ulbModules = null;
     JsonNode propertyTaxRateModules = null;
@@ -137,6 +139,12 @@ public class PropertySchedulerService {
     properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
 
     for (Property property : properties) {
+    	
+    	if (!Boolean.TRUE.equals(property.getIsBilling())) {
+            log.info("Skipping tax calculation for property {} as isBilling={}",
+                    property.getPropertyId(), property.getIsBilling());
+            continue;
+        }
 
         ArrayNode trackeradditionalDetails = objectMapper.createArrayNode();
         BigDecimal totalPropertyTax = BigDecimal.ZERO;
@@ -523,8 +531,16 @@ public class PropertySchedulerService {
 		finalProperty = properties.stream().filter(property -> {
 			List<PtTaxCalculatorTracker> trackers = ptTaxCalculatorTrackerMap.get(property.getPropertyId());
 
-			return trackers == null || trackers.stream().noneMatch(tracker -> isOverlapping(tracker.getFromDate(),
-					tracker.getToDate(), calculateTaxRequest.getFromDate(), calculateTaxRequest.getToDate()));
+			return trackers == null || trackers.stream().noneMatch(tracker ->
+		    tracker.getBillStatus() != BillStatus.CANCELLED &&
+		    isOverlapping(
+		        tracker.getFromDate(),
+		        tracker.getToDate(),
+		        calculateTaxRequest.getFromDate(),
+		        calculateTaxRequest.getToDate()
+		    )
+		);
+
 		}).collect(Collectors.toList());
 
 		return finalProperty;
