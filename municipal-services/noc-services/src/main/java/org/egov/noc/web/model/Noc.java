@@ -1,6 +1,7 @@
 package org.egov.noc.web.model;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 import org.egov.noc.web.model.enums.ApplicationType;
 import org.egov.noc.web.model.enums.Status;
@@ -90,6 +92,25 @@ public class Noc   {
 
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
+  
+  @SafeHtml
+  @JsonProperty("businessService")
+  private String businessService;
+
+  @SafeHtml
+  @JsonProperty("nocReason")
+  private String nocReason;
+
+  @SafeHtml
+  @JsonProperty("connectionType")
+  private String connectionType;
+
+  @JsonProperty("propertyDetail")
+  private Object propertyDetail; 
+  
+  @JsonProperty("citizenDetail")
+  private Object citizenDetail; 
+
 
   public Noc id(String id) {
     this.id = id;
@@ -405,6 +426,48 @@ public class Noc   {
     this.additionalDetails = additionalDetails;
   }
 
+	public String getNocReason() {
+	    return nocReason;
+	}
+	
+	public void setNocReason(String nocReason) {
+	    this.nocReason = nocReason;
+	}
+	
+	public String getBusinessService() {
+		return businessService;
+	}
+	
+	public void setBusinessService(String businessService) {
+	    this.businessService = businessService;
+	}
+
+	public String getConnectionType() {
+	    return connectionType;
+	}
+
+	public void setConnectionType(String connectionType) {
+	    this.connectionType = connectionType;
+	}
+
+	public Object getPropertyDetail() {
+	    return propertyDetail;
+	}
+
+	public void setPropertyDetail(Object propertyDetail) {
+	    this.propertyDetail = propertyDetail;
+	}
+	
+	public Object getCitizenDetail() {
+	    return citizenDetail;
+	}
+
+	public void setCitizenDetail(Object citizenDetail) {
+	    this.citizenDetail = citizenDetail;
+	}
+
+
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -430,12 +493,18 @@ public class Noc   {
         Objects.equals(this.documents, noc.documents) &&
         Objects.equals(this.workflow, noc.workflow) &&
         Objects.equals(this.auditDetails, noc.auditDetails) &&
-        Objects.equals(this.additionalDetails, noc.additionalDetails);
+        Objects.equals(this.additionalDetails, noc.additionalDetails) &&
+        Objects.equals(this.nocReason, noc.nocReason) &&
+        Objects.equals(this.businessService, noc.businessService) &&
+        Objects.equals(this.connectionType, noc.connectionType) &&
+        Objects.equals(this.propertyDetail, noc.propertyDetail) &&
+        Objects.equals(this.citizenDetail, noc.citizenDetail);
+        
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, tenantId, applicationNo, nocNo, applicationType, nocType, accountId, source, sourceRefId, landId, status, applicationStatus, documents, workflow, auditDetails, additionalDetails);
+    return Objects.hash(id, tenantId, applicationNo, nocNo, applicationType, nocType, accountId, source, sourceRefId, landId, status, applicationStatus, documents, workflow, auditDetails, additionalDetails, nocReason, businessService, connectionType, propertyDetail, citizenDetail);
   }
 
   @Override
@@ -459,6 +528,11 @@ public class Noc   {
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
     sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
+    sb.append("    nocReason: ").append(toIndentedString(nocReason)).append("\n");
+    sb.append("    businessService").append(toIndentedString(businessService)).append("\n");
+    sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
+    sb.append("    propertyDetail: ").append(toIndentedString(propertyDetail)).append("\n");
+    sb.append("    citizenDetail: ").append(toIndentedString(citizenDetail)).append("\n");
     sb.append("}");
     return sb.toString();
   }
