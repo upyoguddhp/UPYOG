@@ -88,6 +88,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
+import org.egov.garbageservice.model.GarbageBillIdResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -1505,6 +1507,19 @@ public class GarbageAccountService {
 
 		return garbageAccountResponse;
 	}
+	
+	public GarbageBillIdResponse searchGarbageBillIds(GarbageBillIdSearchRequest request) {
+
+	    // basic validation
+	    if (request.getTenantId() == null) {
+	        throw new CustomException("INVALID_REQUEST", "tenantId is mandatory");
+	    }
+
+	    List<String> billIds = garbageAccountRepository.searchGarbageBillIds(request);
+
+	    return new GarbageBillIdResponse(billIds);
+	}
+
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
 

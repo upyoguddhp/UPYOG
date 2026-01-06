@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -336,6 +337,39 @@ public class GarbageAccountRepository {
         
         return garbageAccounts;
     }
+	
+public List<String> searchGarbageBillIds(GarbageBillIdSearchRequest request) {
+
+    StringBuilder query = new StringBuilder(
+        "SELECT DISTINCT id FROM egbs_bill_v1 WHERE tenantid = :tenantId"
+    );
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("tenantId", request.getTenantId());
+
+    if (!CollectionUtils.isEmpty(request.getConsumerCodes())) {
+        query.append(" AND consumercode IN (:consumerCodes)");
+        params.put("consumerCodes", request.getConsumerCodes());
+    }
+
+    if (request.getIsActive() != null) {
+        query.append(" AND isactive = :isActive");
+        params.put("isActive", request.getIsActive());
+    }
+
+    if (request.getIsCancelled() != null) {
+        query.append(" AND iscancelled = :isCancelled");
+        params.put("isCancelled", request.getIsCancelled());
+    }
+
+    return namedParameterJdbcTemplate.queryForList(
+        query.toString(),
+        params,
+        String.class
+    );
+}
+
+
 
 	private StringBuilder getSearchQueryByCriteria(StringBuilder searchQuery,
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount, List<Object> preparedStatementValues,
