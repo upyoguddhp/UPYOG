@@ -20,6 +20,5 @@ public class Notes {
 	private String service;
 	
 	private String gatewayTxnId;
-	
-	private String ulbName;
+
 }
