@@ -108,7 +108,8 @@ public class TransactionsSchedulerService {
 												: 0)
 										.notes(Notes.builder().service(mapProductInfo(transaction.getProductInfo()))
 												.name(transaction.getUser().getName())
-												.gatewayTxnId(transaction.getGatewayTxnId()).build())
+												.gatewayTxnId(transaction.getGatewayTxnId())
+												.build())
 										.build();
 
 								TransferWrapper transferWrapper = TransferWrapper.builder()
