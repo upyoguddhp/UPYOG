@@ -98,9 +98,9 @@ public class TransactionsSchedulerService {
 											.equalsIgnoreCase(bankAccountTenantIds.getValue().get(0).getTenantId()))
 							.findFirst().ifPresent(bankAccountTenantIds -> {
 								BankAccount bankAccount = bankAccountTenantIds.getValue().get(0);
-//								String ulbName = transaction.getTenantId().split("\\.").length > 1
-//										? transaction.getTenantId().split("\\.")[1]
-//										: "";
+								String ulbName = transaction.getTenantId().split("\\.").length > 1
+										? transaction.getTenantId().split("\\.")[1]
+										: "";
 								// enrich transfer object
 								Transfer transfer = Transfer.builder().account(bankAccount.getPayTo())
 										.amount(null != transaction.getTxnAmount()
@@ -108,7 +108,9 @@ public class TransactionsSchedulerService {
 												: 0)
 										.notes(Notes.builder().service(mapProductInfo(transaction.getProductInfo()))
 												.name(transaction.getUser().getName())
-												.gatewayTxnId(transaction.getGatewayTxnId()).build())
+												.gatewayTxnId(transaction.getGatewayTxnId())
+												.ulbName(ulbName)
+												.build())
 										.build();
 
 								TransferWrapper transferWrapper = TransferWrapper.builder()
