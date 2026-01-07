@@ -3,12 +3,14 @@ package org.upyog.chb.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.upyog.chb.config.CommunityHallBookingConfiguration;
+import org.upyog.chb.constants.CommunityHallBookingConstants;
 import org.upyog.chb.enums.BookingStatusEnum;
 import org.upyog.chb.repository.IdGenRepository;
 import org.upyog.chb.repository.impl.CommunityHallBookingRepositoryImpl;
@@ -116,12 +118,24 @@ public class EnrichmentService {
 				.getAuditDetails(communityHallsBookingRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		CommunityHallBookingDetail bookingDetail = communityHallsBookingRequest.getHallsBookingApplication();
 		if (statusEnum != null) {
+
 			bookingDetail.setBookingStatus(statusEnum.toString());
 			// bookingDetail.setReceiptNo(paymentRequest.getPayment().getTransactionNumber());;
-			bookingDetail.getBookingSlotDetails().stream().forEach(slot -> {
-				slot.setStatus(statusEnum.toString());
-			});
+
+			if (StringUtils.equalsIgnoreCase(CommunityHallBookingConstants.ACTION_REJECT,
+					communityHallsBookingRequest.getHallsBookingApplication().getWorkflow().getAction())) {
+
+				bookingDetail.getBookingSlotDetails().stream().forEach(slot -> {
+					slot.setStatus("AVAILABLE");
+				});
+
+			} else {
+				bookingDetail.getBookingSlotDetails().stream().forEach(slot -> {
+					slot.setStatus(statusEnum.toString());
+				});
+			}
 		}
+
 		communityHallsBookingRequest.getHallsBookingApplication().setPaymentDate(auditDetails.getLastModifiedTime());
 		communityHallsBookingRequest.getHallsBookingApplication().setAuditDetails(auditDetails);
 
