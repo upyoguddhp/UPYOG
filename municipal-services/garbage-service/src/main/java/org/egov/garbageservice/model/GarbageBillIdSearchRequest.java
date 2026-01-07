@@ -11,4 +11,5 @@ public class GarbageBillIdSearchRequest {
 	private List<String> consumerCodes;
 	private Boolean isActive;
 	private Boolean isCancelled;
+	private List<String> propertyIds;
 }

@@ -61,11 +61,12 @@ public class GarbageAccountController {
 	}
 	
 	@PostMapping("/_public/searchBillIds")
-	public ResponseEntity<GarbageBillIdResponse> searchGarbageBillIds(
+	public ResponseEntity<GarbageAccountActionResponse> searchGarbageBillIds(
 	        @RequestBody GarbageBillIdSearchRequest request) {
 
 	    return ResponseEntity.ok(service.searchGarbageBillIds(request));
 	}
+
 
 
 	@PostMapping({ "/fetch", "/fetch/{value}" })

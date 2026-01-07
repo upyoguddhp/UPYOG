@@ -25,6 +25,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.egov.garbageservice.contract.bill.DemandRepository;
+import org.egov.garbageservice.model.ApplicationBillDTO;
+import org.egov.garbageservice.model.ApplicationDetails;
 
 import javax.validation.Valid;
 
@@ -158,6 +160,7 @@ public class GarbageAccountService {
 
 	@Autowired
 	private GrbgUtils grbgUtils;
+	
 
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
@@ -1508,17 +1511,60 @@ public class GarbageAccountService {
 		return garbageAccountResponse;
 	}
 	
-	public GarbageBillIdResponse searchGarbageBillIds(GarbageBillIdSearchRequest request) {
+public GarbageAccountActionResponse searchGarbageBillIds(GarbageBillIdSearchRequest request) {
 
-	    // basic validation
-	    if (request.getTenantId() == null) {
-	        throw new CustomException("INVALID_REQUEST", "tenantId is mandatory");
-	    }
+    if (request.getTenantId() == null) {
+        throw new CustomException("INVALID_REQUEST", "tenantId is mandatory");
+    }
 
-	    List<String> billIds = garbageAccountRepository.searchGarbageBillIds(request);
+    List<ApplicationBillDTO> results =
+            garbageAccountRepository.searchGarbageBillDetails(request);
 
-	    return new GarbageBillIdResponse(billIds);
-	}
+    GarbageAccountActionResponse response = new GarbageAccountActionResponse();
+
+    if (CollectionUtils.isEmpty(results)) {
+        response.setApplicationDetails(Collections.emptyList());
+        return response;
+    }
+
+    Map<String, List<ApplicationBillDTO>> grouped =
+            results.stream().collect(Collectors.groupingBy(ApplicationBillDTO::getApplicationNo));
+
+    List<GarbageAccountDetail> applicationDetailsList = new ArrayList<>();
+
+    for (Map.Entry<String, List<ApplicationBillDTO>> entry : grouped.entrySet()) {
+
+        List<ApplicationBillDTO> rows = entry.getValue();
+        ApplicationBillDTO first = rows.get(0);
+
+        GarbageAccountDetail details = new GarbageAccountDetail();
+
+        details.setApplicationNumber(first.getApplicationNo());
+
+        double totalAmount = rows.stream()
+                .filter(r -> r.getTotalAmount() != null)
+                .mapToDouble(ApplicationBillDTO::getTotalAmount)
+                .sum();
+        details.setTotalPayableAmount(BigDecimal.valueOf(totalAmount));
+
+        // billDetails
+        Map<Object, Object> billDetails = new HashMap<>();
+        billDetails.put("billId", first.getBillId());
+        details.setBillDetails(billDetails);
+
+        // userDetails
+        Map<Object, Object> userDetails = new HashMap<>();
+        userDetails.put("MobileNo", first.getMobileNumber());
+        userDetails.put("UserName", first.getName());
+        userDetails.put("Email", first.getEmail());
+        details.setUserDetails(userDetails);
+
+        applicationDetailsList.add(details);
+    }
+
+    response.setApplicationDetails(applicationDetailsList);
+    return response;
+}
 
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {

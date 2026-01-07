@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
+import org.egov.garbageservice.model.ApplicationBillDTO;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.repository.rowmapper.GarbageAccountRowMapper;
@@ -25,6 +28,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -338,34 +342,38 @@ public class GarbageAccountRepository {
         return garbageAccounts;
     }
 	
-public List<String> searchGarbageBillIds(GarbageBillIdSearchRequest request) {
+public List<ApplicationBillDTO> searchGarbageBillDetails(GarbageBillIdSearchRequest request) {
 
-    StringBuilder query = new StringBuilder(
-        "SELECT DISTINCT id FROM egbs_bill_v1 WHERE tenantid = :tenantId"
-    );
+    String sql =
+        "SELECT " +
+        "  acc.name, acc.mobile_number, acc.email_id, " +
+        "  app.application_no, " +
+        "  bill.id AS bill_id, bill.status, bill.consumercode, bill.mobilenumber, " +
+        "  bill.additionaldetails " +
+        "FROM eg_grbg_account acc " +
+        "JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id " +
+        "JOIN egbs_bill_v1 bill ON bill.consumercode = app.application_no " +
+        "WHERE acc.tenant_id = :tenantId " +
+        "AND acc.property_id IN (:propertyIds)";
 
     Map<String, Object> params = new HashMap<>();
     params.put("tenantId", request.getTenantId());
-
-    if (!CollectionUtils.isEmpty(request.getConsumerCodes())) {
-        query.append(" AND consumercode IN (:consumerCodes)");
-        params.put("consumerCodes", request.getConsumerCodes());
-    }
+    params.put("propertyIds", request.getPropertyIds());
 
     if (request.getIsActive() != null) {
-        query.append(" AND isactive = :isActive");
+        sql += " AND bill.isactive = :isActive";
         params.put("isActive", request.getIsActive());
     }
 
     if (request.getIsCancelled() != null) {
-        query.append(" AND iscancelled = :isCancelled");
+        sql += " AND bill.iscancelled = :isCancelled";
         params.put("isCancelled", request.getIsCancelled());
     }
 
-    return namedParameterJdbcTemplate.queryForList(
-        query.toString(),
-        params,
-        String.class
+    return namedParameterJdbcTemplate.query(
+            sql,
+            params,
+            new BeanPropertyRowMapper<>(ApplicationBillDTO.class)
     );
 }
 
