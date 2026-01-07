@@ -1511,6 +1511,24 @@ public class GarbageAccountService {
 		return garbageAccountResponse;
 	}
 	
+
+private RequestInfo buildPublicRequestInfo(String tenantId) {
+
+    User user = User.builder()
+            .tenantId(tenantId)
+            .type("SYSTEM")
+            .build();
+
+    return RequestInfo.builder()
+            .apiId("garbage-service")
+            .ver("1.0")
+            .ts(System.currentTimeMillis())
+            .userInfo(user)  
+            .authToken(null)
+            .build();
+}
+
+	
 public GarbageAccountActionResponse searchGarbageBillIds(GarbageBillIdSearchRequest request) {
 
     if (request.getTenantId() == null) {
@@ -1528,43 +1546,62 @@ public GarbageAccountActionResponse searchGarbageBillIds(GarbageBillIdSearchRequ
     }
 
     Map<String, List<ApplicationBillDTO>> grouped =
-            results.stream().collect(Collectors.groupingBy(ApplicationBillDTO::getApplicationNo));
+            results.stream()
+                   .collect(Collectors.groupingBy(ApplicationBillDTO::getApplicationNo));
 
     List<GarbageAccountDetail> applicationDetailsList = new ArrayList<>();
 
     for (Map.Entry<String, List<ApplicationBillDTO>> entry : grouped.entrySet()) {
 
-        List<ApplicationBillDTO> rows = entry.getValue();
-        ApplicationBillDTO first = rows.get(0);
+    	String applicationNo = entry.getKey();
+    	List<ApplicationBillDTO> rows = entry.getValue();
+    	ApplicationBillDTO first = rows.get(0);
 
-        GarbageAccountDetail details = new GarbageAccountDetail();
 
-        details.setApplicationNumber(first.getApplicationNo());
-
-        double totalAmount = rows.stream()
-                .filter(r -> r.getTotalAmount() != null)
-                .mapToDouble(ApplicationBillDTO::getTotalAmount)
-                .sum();
-        details.setTotalPayableAmount(BigDecimal.valueOf(totalAmount));
-
-        // billDetails
-        Map<Object, Object> billDetails = new HashMap<>();
-        billDetails.put("billId", first.getBillId());
-        details.setBillDetails(billDetails);
-
-        // userDetails
+        GarbageAccountDetail detail = new GarbageAccountDetail();
+        detail.setApplicationNumber(applicationNo);
+        
         Map<Object, Object> userDetails = new HashMap<>();
-        userDetails.put("MobileNo", first.getMobileNumber());
         userDetails.put("UserName", first.getName());
+        userDetails.put("MobileNo", first.getMobileNumber());
         userDetails.put("Email", first.getEmail());
-        details.setUserDetails(userDetails);
+        userDetails.put("Address", first.getAddress());
+        detail.setUserDetails(userDetails);
 
-        applicationDetailsList.add(details);
+        BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+                .tenantId(request.getTenantId())
+                .consumerCode(Collections.singleton(applicationNo))
+                .service("GB")
+                .build();
+
+        BillResponse billResponse =
+                billService.searchBill(
+                        billSearchCriteria,
+                        buildPublicRequestInfo(request.getTenantId())
+                );
+
+
+        if (!CollectionUtils.isEmpty(billResponse.getBill())) {
+
+            detail.setBills(billResponse.getBill());
+            billResponse.getBill().stream()
+                .filter(b -> StatusEnum.ACTIVE.name().equalsIgnoreCase(b.getStatus().name()))
+                .findFirst()
+                .ifPresent(bill -> {
+                    detail.setTotalPayableAmount(bill.getTotalAmount());
+                    Map<Object, Object> billDetails = new HashMap<>();
+                    billDetails.put("billId", bill.getId());
+                    detail.setBillDetails(billDetails);
+                });
+        }
+
+        applicationDetailsList.add(detail);
     }
 
     response.setApplicationDetails(applicationDetailsList);
     return response;
 }
+
 
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {

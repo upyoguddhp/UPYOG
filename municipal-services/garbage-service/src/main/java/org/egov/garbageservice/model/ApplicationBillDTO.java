@@ -11,6 +11,7 @@ public class ApplicationBillDTO {
     private String name;
     private String mobileNumber;
     private String email;
+    private String address;
 
     private Double totalAmount;
 }
