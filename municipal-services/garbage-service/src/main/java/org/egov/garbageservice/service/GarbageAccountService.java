@@ -1567,6 +1567,23 @@ public GarbageAccountActionResponse searchGarbageBillIds(GarbageBillIdSearchRequ
         userDetails.put("Email", first.getEmail());
         userDetails.put("Address", first.getAddress());
         detail.setUserDetails(userDetails);
+       
+        
+        String feeCalculationFormula = rows.stream()
+                .map(ApplicationBillDTO::getFormula)
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(f -> {
+                    String[] parts = f.split(" - ", 2); 
+                    String category = parts.length > 0 ? parts[0] : "";
+                    String subCategory = parts.length > 1 ? parts[1] : "";
+                    return "category: (" + category + "), SubCategory: (" + subCategory + ")";
+                })
+                .collect(Collectors.joining("; "));
+
+        detail.setFeeCalculationFormula(feeCalculationFormula);
+
+
 
         BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
                 .tenantId(request.getTenantId())

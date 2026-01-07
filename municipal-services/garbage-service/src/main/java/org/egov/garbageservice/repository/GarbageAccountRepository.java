@@ -346,13 +346,24 @@ public List<ApplicationBillDTO> searchGarbageBillDetails(GarbageBillIdSearchRequ
 
     String sql =
         "SELECT " +
-        "  acc.name, acc.mobile_number, acc.email_id, " +
+        "  acc.name, acc.mobile_number, acc.email_id AS email, " +
         "  app.application_no, " +
+        "  concat_ws(', ', " +
+        "    addr.address1, " +
+        "    addr.pincode, " +
+        "    addr.zone, " +
+        "    addr.city, " +
+        "    addr.ward_name, " +
+        "    addr.additional_detail->>'district' " +
+        "  ) AS address, " +
         "  bill.id AS bill_id, bill.status, bill.consumercode, bill.mobilenumber, " +
-        "  bill.additionaldetails " +
+        "  bill.additionaldetails, " +
+        "  concat(cu.category, ' - ', cu.sub_category) AS formula " +
         "FROM eg_grbg_account acc " +
         "JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id " +
         "JOIN egbs_bill_v1 bill ON bill.consumercode = app.application_no " +
+        "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id " +
+        "LEFT JOIN eg_grbg_collection_unit cu ON cu.garbage_id = acc.garbage_id " +
         "WHERE acc.tenant_id = :tenantId " +
         "AND acc.property_id IN (:propertyIds)";
 
