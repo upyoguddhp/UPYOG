@@ -2,7 +2,7 @@
 <html lang="en">
    <head>
       <meta charset="UTF-8" />
-      <title>Garbage Collection Bill</title>
+      <title>Property Tax Bill</title>
       <style>
          @page {
          size: A4;
@@ -188,21 +188,19 @@
          border-top: 1px solid #ccc;
          padding: 5px;
          }
-		  .footer-list {
-		    list-style: none;       /* removes bullets */
-		    margin: 0;
-		    text-align: left;       /* ensures left alignment */
-		    line-height: 1.4;
-		  list-style-type: decimal;
-		  padding-left: 20px;
-		    }
-
-		  
-		    .footer-list .highlight {
-		    color: red;
-		    text-align: center;
-		    font-weight: bold;
-		    }
+         .footer-list {
+         list-style: none;       /* removes bullets */
+         margin: 0;
+         text-align: left;       /* ensures left alignment */
+         line-height: 1.4;
+         list-style-type: decimal;
+         padding-left: 20px;
+         }
+         .footer-list .highlight {
+         color: red;
+         text-align: center;
+         font-weight: bold;
+         }
          .qr-code {
          width: 300px;
          min-height: 300px;
@@ -213,7 +211,6 @@
          margin-right: auto;
          /* Center the QR code */
          }
-
       </style>
    </head>
    <body>
@@ -230,7 +227,7 @@
                   </td>
                   <td>
                      <div class="title">
-                        <span>Municipal Council Solan</span><br />
+                        <span th:text="${ulbType}">NA</span>, <span th:text="${ulbName}">NA</span>
                         <img th:src="${citiSevaImage}"
                            alt="Citizen Seva" height="30" />
                      </div>
@@ -241,41 +238,38 @@
             </table>
          </div>
          <!-- Invoice Header -->
-		 <div class="invoice-header">
-		    <table>
-		       <tr>
-		          <td colspan="2">
-		             <h1>Property Tax - Bill Receipt</h1>
-		          </td>
-		       </tr>
-
-		       <tr>
-		          <td>
-		             <strong>Bill No:</strong>
-		             <span th:text="${billNo}">NA</span>
-		          </td>
-		          <td>
-		             <strong>Financial Year:</strong>
-		             <span th:text="${billPeriod}">NA</span>
-		          </td>
-		       </tr>
-			   <tr>
-			   		          <td>
-			   		             <strong>From:</strong>
-			   		             <span th:text="${from}">NA</span>
-			   		          </td>
-			   		          <td>
-			   		             <strong>To:</strong>
-			   		             <span th:text="${to}">NA</span>
-			   		          </td>
-			   		       </tr>
-		    </table>
-		 </div>
+         <div class="invoice-header">
+            <table>
+               <tr>
+                  <td colspan="2">
+                     <h1>Property Tax - Bill Receipt</h1>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <strong>Bill No:</strong>
+                     <span th:text="${billNo}">NA</span>
+                  </td>
+                  <td>
+                     <strong>Financial Year:</strong>
+                     <span th:text="${billPeriod}">NA</span>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <strong>From:</strong>
+                     <span th:text="${from}">NA</span>
+                  </td>
+                  <td>
+                     <strong>To:</strong>
+                     <span th:text="${to}">NA</span>
+                  </td>
+               </tr>
+            </table>
+         </div>
          <!-- Bill Details / Customer Details -->
          <table width="100%" style="margin-bottom:20px;">
             <tr>
-               
-               
                <td width="48%">
                   <div class="card-box">
                      <h3>Bill Details</h3>
@@ -293,7 +287,7 @@
                            <td><span th:text="${propertyTaxPlusArrear}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Rebate (Withen N/A Days)</th>
+                           <th>Rebate (Within 15 Days)</th>
                            <td><span th:text="${rebate}">NA</span></td>
                         </tr>
                         <tr>
@@ -312,59 +306,53 @@
                            <th>Payment Status</th>
                            <td><span th:text="${paymentStatus}">NA</span></td>
                         </tr>
-						<tr>
-						  <th>Bill Generated Date</th>
-						  <td><span th:text="${billGeneratedDate}">NA</span></td>
-						</tr>
-
-						<tr>
-						  <th>Payment Date</th>
-						  <td><span th:text="${paymentDate}">NA</span></td>
-						</tr>
-						
-						<tr>
-							<th>Bill Expiry Date</th>
-							<td><span th:text="${billDueDate}">NA</span></td>
-						</tr>
-						
-
+                        <tr>
+                           <th>Bill Generated Date</th>
+                           <td><span th:text="${billGeneratedDate}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Payment Date</th>
+                           <td><span th:text="${paymentDate}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Bill Due Date</th>
+                           <td><span th:text="${billDueDate}">NA</span></td>
+                        </tr>
                      </table>
                   </div>
                </td>
-			   <td width="4%"></td>
-			   <td width="48%">
-			                     <div class="card-box">
-			                        <h3>Customer Details</h3>
-			                        <table class="card-table">
-			   						<tr>
-			   						     <th>Owner/Occeupier</th>
-			   						     <td><span th:text="${ownerOrOccupier}">NA</span></td>
-			   						</tr>
-			   						<tr>
-			   						    <th>Customer ID</th>
-			   						    <td><span th:text="${customerId}">NA</span></td>
-			   						 </tr>
-			   						 <tr>
-			   						 <th>Property ID</th>
-			   						  <td><span th:text="${propertyId}">NA</span></td>
-			   						 </tr> 
-			   						 <tr>
-			   						 	<th>Mobile Number</th>
-			   						 	<td><span th:text="${mobileNumber}">NA</span></td>   
-			   						</tr>
-			                           <tr>
-			                              <th>Ward Number</th>
-			                              <td><span th:text="${wardNumber}">NA</span></td>
-			                           </tr>
-			                           <tr>
-			                              <th>Address</th>
-			                              <td><span th:text="${address}">NA</span></td>
-			                           </tr>                                        
-			   						
-
-			                        </table>
-			                     </div>
-			                  </td>
+               <td width="4%"></td>
+               <td width="48%">
+                  <div class="card-box">
+                     <h3>Customer Details</h3>
+                     <table class="card-table">
+                        <tr>
+                           <th>Owner/Occupier</th>
+                           <td><span th:text="${ownerOrOccupier}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Customer ID</th>
+                           <td><span th:text="${customerId}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Property ID</th>
+                           <td><span th:text="${propertyId}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Mobile Number</th>
+                           <td><span th:text="${mobileNumber}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Ward Number</th>
+                           <td><span th:text="${wardNumber}">NA</span></td>
+                        </tr>
+                        <tr>
+                           <th>Address</th>
+                           <td><span th:text="${address}">NA</span></td>
+                        </tr>
+                     </table>
+                  </div>
+               </td>
             </tr>
          </table>
          <!-- Main Table -->
@@ -402,17 +390,17 @@
                <tr style="display:none">
                   <td style="display:none"> PROPERTY_TAX_BILL_TABLE_ROW_START </td>
                </tr>
-			   <tr style="display:none">
-			      <td><span th:text="slNo">NA</span></td>
-			      <td><span th:text="f1">NA</span></td>
-			      <td><span th:text="f2">NA</span></td>
-			      <td><span th:text="f3">NA</span></td>
-			      <td><span th:text="f4">NA</span></td>
-			      <td><span th:text="f5">NA</span></td>
-			      <td><span th:text="floorNo">NA</span></td>
-			      <td><span th:text="taxCalculated">NA</span></td>
-			      <td><span th:text="plinthArea">NA</span></td>
-			   </tr>
+               <tr style="display:none">
+                  <td><span th:text="slNo">NA</span></td>
+                  <td><span th:text="f1">NA</span></td>
+                  <td><span th:text="f2">NA</span></td>
+                  <td><span th:text="f3">NA</span></td>
+                  <td><span th:text="f4">NA</span></td>
+                  <td><span th:text="f5">NA</span></td>
+                  <td><span th:text="floorNo">NA</span></td>
+                  <td><span th:text="taxCalculated">NA</span></td>
+                  <td><span th:text="plinthArea">NA</span></td>
+               </tr>
                <tr style="display:none">
                   <td style="display:none"> PROPERTY_TAX_BILL_TABLE_ROW_END </td>
                </tr>
@@ -427,23 +415,21 @@
             </table>
          </div>
          <div class="footer">
-			<ul class="footer-list">
-			            <li class="highlight">
-			               <strong>
-			               The generated bill will be expired after 
-			               <span th:text="${billDueDate}"> NA </span>.
-			               </strong>
-			            </li>
-						<li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
-						               <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
-						            </li>
-									<li>Disclaimer: Property Tax payment does not legalize unauthorized properties.</li>
-									<li>			Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
-									                 regarding the regularization or ownership of the property.</li>
-								</ul>
-            
-			
-
+            <ul class="footer-list">
+               <li class="highlight">
+                  <strong>
+                  The generated bill will be expired after 
+                  <span th:text="${billDueDate}"> NA </span>.
+                  </strong>
+               </li>
+               <li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
+                  <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
+               </li>
+               <li>Disclaimer: Property Tax payment does not legalize unauthorized properties.</li>
+               <li>			Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
+                  regarding the regularization or ownership of the property.
+               </li>
+            </ul>
          </div>
       </div>
    </body>
