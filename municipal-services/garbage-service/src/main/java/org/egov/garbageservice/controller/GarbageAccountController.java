@@ -1,6 +1,7 @@
 package org.egov.garbageservice.controller;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -19,9 +20,11 @@ import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.egov.garbageservice.model.GarbageBillIdResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,6 +59,15 @@ public class GarbageAccountController {
 	
 			return ResponseEntity.ok(service.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,IsIndex));
 	}
+	
+	@PostMapping("/_public/searchBillIds")
+	public ResponseEntity<GarbageAccountActionResponse> searchGarbageBillIds(
+	        @RequestBody GarbageBillIdSearchRequest request) {
+
+	    return ResponseEntity.ok(service.searchGarbageBillIds(request));
+	}
+
+
 
 	@PostMapping({ "/fetch", "/fetch/{value}" })
 	public ResponseEntity<?> calculateTLFee(@RequestBody GarbageAccountActionRequest garbageAccountActionRequest,

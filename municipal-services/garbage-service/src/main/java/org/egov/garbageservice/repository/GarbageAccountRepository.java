@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
+import org.egov.garbageservice.model.ApplicationBillDTO;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.repository.rowmapper.GarbageAccountRowMapper;
@@ -26,9 +29,11 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -336,6 +341,54 @@ public class GarbageAccountRepository {
         
         return garbageAccounts;
     }
+	
+public List<ApplicationBillDTO> searchGarbageBillDetails(GarbageBillIdSearchRequest request) {
+
+    String sql =
+        "SELECT " +
+        "  acc.name, acc.mobile_number, acc.email_id AS email, " +
+        "  app.application_no, " +
+        "  concat_ws(', ', " +
+        "    addr.address1, " +
+        "    addr.pincode, " +
+        "    addr.zone, " +
+        "    addr.city, " +
+        "    addr.ward_name, " +
+        "    addr.additional_detail->>'district' " +
+        "  ) AS address, " +
+        "  bill.id AS bill_id, bill.status, bill.consumercode, bill.mobilenumber, " +
+        "  bill.additionaldetails, " +
+        "  concat(cu.category, ' - ', cu.sub_category) AS formula " +
+        "FROM eg_grbg_account acc " +
+        "JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id " +
+        "JOIN egbs_bill_v1 bill ON bill.consumercode = app.application_no " +
+        "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id " +
+        "LEFT JOIN eg_grbg_collection_unit cu ON cu.garbage_id = acc.garbage_id " +
+        "WHERE acc.tenant_id = :tenantId " +
+        "AND acc.property_id IN (:propertyIds)";
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("tenantId", request.getTenantId());
+    params.put("propertyIds", request.getPropertyIds());
+
+    if (request.getIsActive() != null) {
+        sql += " AND bill.isactive = :isActive";
+        params.put("isActive", request.getIsActive());
+    }
+
+    if (request.getIsCancelled() != null) {
+        sql += " AND bill.iscancelled = :isCancelled";
+        params.put("isCancelled", request.getIsCancelled());
+    }
+
+    return namedParameterJdbcTemplate.query(
+            sql,
+            params,
+            new BeanPropertyRowMapper<>(ApplicationBillDTO.class)
+    );
+}
+
+
 
 	private StringBuilder getSearchQueryByCriteria(StringBuilder searchQuery,
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount, List<Object> preparedStatementValues,
