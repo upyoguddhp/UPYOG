@@ -1,12 +1,15 @@
 package org.egov.pt.web.controllers;
 
 import org.egov.pt.models.CalculateTaxRequest;
+import org.egov.pt.models.CalculateTaxPreviewResponse;
 import org.egov.pt.service.PropertySchedulerService;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +28,17 @@ public class PropertySchedulerController {
 //		return ResponseEntity.ok("Tax calculated successfully!!!");
 		return ResponseEntity.ok(service.calculateTax(calculateTaxRequest));
 	}
+	
+	@PostMapping("/tax-calculator/preview")
+	public ResponseEntity<List<CalculateTaxPreviewResponse>> taxCalculatorPreview(
+	        @RequestBody CalculateTaxRequest calculateTaxRequest) {
+
+	    return ResponseEntity.ok(
+	            service.taxCalculatorPreview(calculateTaxRequest)
+	    );
+	}
+
+
 
 	@PostMapping("/update-tracker-bill-status")
 	public ResponseEntity<?> updateTrackerBillStatus(@RequestBody RequestInfoWrapper requestInfoWrapper) {
