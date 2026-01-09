@@ -1,7 +1,11 @@
 package org.egov.garbageservice.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
+
 import java.util.Map;
+import java.util.UUID;
+
 
 import javax.validation.Valid;
 
@@ -12,6 +16,9 @@ import org.egov.garbageservice.model.GarbageAccountActionResponse;
 import org.egov.garbageservice.model.GarbageAccountRequest;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.PayNowRequest;
+import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.common.contract.request.RequestInfo;
+
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.service.GarbageAccountService;
@@ -22,6 +29,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.egov.common.contract.request.User;
+import org.egov.common.contract.request.Role;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +38,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
+import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
+import org.egov.tracer.model.CustomException;
+
 
 @Slf4j
 
@@ -56,6 +68,53 @@ public class GarbageAccountController {
 	
 			return ResponseEntity.ok(service.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,IsIndex));
 	}
+	
+	@PostMapping("/open/_search")
+	public ResponseEntity<?> openSearch(
+	        @RequestBody SearchCriteriaGarbageAccountRequest request,
+	        @RequestParam(name = "IsIndex", required = false, defaultValue = "false") Boolean isIndex) {
+
+		if (request.getRequestInfo() == null) {
+		    RequestInfo requestInfo = new RequestInfo();
+		    requestInfo.setApiId("open-search");
+		    requestInfo.setVer("1.0");
+		    requestInfo.setTs(System.currentTimeMillis());
+
+		    User user = new User();
+		    user.setType(GrbgConstants.USER_TYPE_CITIZEN);
+		    user.setUuid("OPEN-SEARCH");
+		    user.setRoles(Collections.emptyList());
+
+		    requestInfo.setUserInfo(user);
+		    request.setRequestInfo(requestInfo);
+		}
+
+		if (request.getSearchCriteriaGarbageAccount() == null) {
+		    request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
+		}
+
+	    
+	    SearchCriteriaGarbageAccount sc =
+	            request.getSearchCriteriaGarbageAccount();
+
+
+		if ((sc.getMobileNumber() == null || sc.getMobileNumber().isEmpty())
+		        && (sc.getApplicationNumber() == null || sc.getApplicationNumber().isEmpty())
+		        && (sc.getPropertyId() == null || sc.getPropertyId().isEmpty())
+		        && (sc.getOldGarbageIds() == null || sc.getOldGarbageIds().isEmpty())
+		        && (sc.getName() == null || sc.getName().isEmpty())) {
+		
+		    throw new CustomException(
+		            "INVALID_SEARCH",
+		            "Provide at least one of mobileNumber, applicationNumber, propertyId, oldGarbageIds or owner name"
+		    );
+		}
+	    return ResponseEntity.ok(
+	            service.openSearchPayPreview(request, isIndex)
+	    );
+	}
+
+
 
 	@PostMapping({ "/fetch", "/fetch/{value}" })
 	public ResponseEntity<?> calculateTLFee(@RequestBody GarbageAccountActionRequest garbageAccountActionRequest,

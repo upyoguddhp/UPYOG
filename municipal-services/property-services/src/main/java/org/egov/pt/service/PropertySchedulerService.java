@@ -1,6 +1,7 @@
 package org.egov.pt.service;
 
 import java.math.BigDecimal;
+
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,6 +27,7 @@ import org.egov.mdms.model.MdmsResponse;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.CalculateTaxRequest;
 import org.egov.pt.models.CalculateTaxResponse;
+import org.egov.pt.models.CalculateTaxPreviewResponse;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyBillFailure;
@@ -94,6 +96,8 @@ public class PropertySchedulerService {
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
+	
+	
 
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
@@ -423,7 +427,221 @@ public class PropertySchedulerService {
     }
 
     return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).build();
+	}
+	
+	public List<CalculateTaxPreviewResponse> taxCalculatorPreview(
+        CalculateTaxRequest calculateTaxRequest) {
+
+    List<CalculateTaxPreviewResponse> previewResponses = new ArrayList<>();
+
+    JsonNode ulbModules = null;
+    JsonNode propertyTaxRateModules = null;
+    JsonNode zones = null;
+    JsonNode buildingStructures = null;
+    JsonNode buildingEstablishmentYears = null;
+    JsonNode buildingPurposes = null;
+    JsonNode buildingUses = null;
+    JsonNode overAllRebatePercentages = null;
+    JsonNode earlyPaymentRebatePercentages = null;
+    JsonNode propertyTaxRates = null;
+
+    BigDecimal days = calculateDays(calculateTaxRequest);
+
+    MdmsResponse mdmsResponse =
+            mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), null);
+
+    if (mdmsResponse != null && mdmsResponse.getMdmsRes() != null
+            && mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS) != null) {
+
+        ulbModules = objectMapper.valueToTree(
+                mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS));
+
+        propertyTaxRateModules = objectMapper.valueToTree(
+                mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE));
+
+        zones = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_ZONES);
+        buildingStructures = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE);
+        buildingEstablishmentYears = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR);
+        buildingPurposes = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE);
+        buildingUses = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE);
+        overAllRebatePercentages = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE);
+        earlyPaymentRebatePercentages = ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE);
+        propertyTaxRates = propertyTaxRateModules.get(
+                PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE);
+    }
+
+    List<Property> properties = getProperties(calculateTaxRequest);
+    properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+
+    for (Property property : properties) {
+
+        if (!Boolean.TRUE.equals(property.getIsBilling())) {
+            continue;
+        }
+
+        ArrayNode calculationDetails = objectMapper.createArrayNode();
+        BigDecimal totalPropertyTax = BigDecimal.ZERO;
+        BigDecimal finalPropertyTax = BigDecimal.ZERO;
+        BigDecimal rebateAmount = BigDecimal.ZERO;
+
+        String ulbName = property.getTenantId().split("\\.")[1];
+        JsonNode addressAdditionalDetails =
+                objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+        
+        Object address =
+                objectMapper.convertValue(property.getAddress(), Object.class);
+
+
+        for (Unit unit : property.getUnits()) {
+
+            JsonNode unitAdditionalDetails =
+                    objectMapper.valueToTree(unit.getAdditionalDetails());
+
+            String zoneLabel = null;
+            String structureLabel = null;
+            String ageLabel = null;
+            String occupancyLabel = null;
+            String useLabel = null;
+            String floorNo =
+                    unitAdditionalDetails.has("floorNo")
+                            ? unitAdditionalDetails.get("floorNo").asText()
+                            : "0";
+
+            BigDecimal structuralFactor = null;
+            BigDecimal ageFactor = null;
+            BigDecimal occupancyFactor = null;
+            BigDecimal useFactor = null;
+            BigDecimal locationFactor = null;
+            BigDecimal oAndMRebatePercentage = null;
+            BigDecimal propertyTaxRatePercentage = null;
+
+            for (JsonNode n : buildingStructures)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+                        && n.get("structureType").asText()
+                        .equalsIgnoreCase(unitAdditionalDetails.get("propBuildingType").asText())) {
+
+                    structuralFactor = new BigDecimal(n.get("rate").asText());
+                    structureLabel = n.get("structureType").asText();
+                }
+
+            for (JsonNode n : buildingEstablishmentYears)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+                        && n.get("yearRange").asText()
+                        .equalsIgnoreCase(ulbName + "." +
+                                unitAdditionalDetails.get("propYearOfCons").asText())) {
+
+                    ageFactor = new BigDecimal(n.get("rate").asText());
+                    ageLabel = unitAdditionalDetails.get("propYearOfCons").asText();
+                }
+
+            for (JsonNode n : buildingPurposes)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+                        && n.get("purposeName").asText()
+                        .equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)) {
+
+                    occupancyFactor = new BigDecimal(n.get("rate").asText());
+                    occupancyLabel = unitAdditionalDetails.get("propType").asText();
+                }
+
+            for (JsonNode n : buildingUses)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+                        && n.get("useOfBuilding").asText()
+                        .equalsIgnoreCase(ulbName + "." +
+                                unitAdditionalDetails.get("useOfBuilding").asText())) {
+
+                    useFactor = new BigDecimal(n.get("rate").asText());
+                    useLabel = unitAdditionalDetails.get("useOfBuilding").asText();
+                }
+
+            for (JsonNode n : zones)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+                        && addressAdditionalDetails.get("zone").asText()
+                        .equalsIgnoreCase(n.get("zoneName").asText())) {
+
+                    locationFactor = new BigDecimal(n.get("propertyRate").asText());
+                    zoneLabel = n.get("zoneName").asText();
+                }
+
+            for (JsonNode n : overAllRebatePercentages)
+                if (ulbName.equalsIgnoreCase(n.get("ulbName").asText()))
+                    oAndMRebatePercentage = new BigDecimal(n.get("rate").asText());
+
+            BigDecimal area =
+                    new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+
+            BigDecimal totalRateableValue =
+                    area.multiply(structuralFactor)
+                            .multiply(ageFactor)
+                            .multiply(occupancyFactor)
+                            .multiply(useFactor)
+                            .multiply(locationFactor);
+
+            BigDecimal netRateableValue =
+                    totalRateableValue.subtract(
+                            totalRateableValue.multiply(
+                                    oAndMRebatePercentage.divide(BigDecimal.valueOf(100))));
+
+            for (JsonNode rate : propertyTaxRates)
+                if (ulbName.equalsIgnoreCase(rate.get("ulbName").asText())
+                        && isAreaWithinRange(rate.get("propertyArea").asText(), area))
+                    propertyTaxRatePercentage =
+                            new BigDecimal(rate.get("rate").asText());
+
+            BigDecimal unitTax =
+                    netRateableValue.multiply(
+                            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+
+            BigDecimal unitTaxForPeriod =
+                    unitTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP)
+                            .multiply(days);
+
+            totalPropertyTax = totalPropertyTax.add(unitTax);
+
+            ObjectNode node = objectMapper.createObjectNode();
+            node.put("unitId", unit.getId());
+            node.put("floorNo", floorNo);
+            node.put("zone", zoneLabel);
+            node.put("structure", structureLabel);
+            node.put("age", ageLabel);
+            node.put("occupancy", occupancyLabel);
+            node.put("use", useLabel);
+            node.put("plinthArea", area);
+            node.put("taxAmount", unitTaxForPeriod);
+
+            calculationDetails.add(node);
+        }
+
+        finalPropertyTax =
+                totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP)
+                        .multiply(days);
+
+        for (JsonNode n : earlyPaymentRebatePercentages)
+            if (ulbName.equalsIgnoreCase(n.get("ulbName").asText()))
+                rebateAmount =
+                        finalPropertyTax.multiply(
+                                new BigDecimal(n.get("rate").asText())
+                                        .divide(BigDecimal.valueOf(100)));
+
+        finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
+
+        previewResponses.add(
+                CalculateTaxPreviewResponse.builder()
+                        .propertyId(property.getPropertyId())
+                        .tenantId(property.getTenantId())
+                        .totalAnnualTax(totalPropertyTax)
+                        .address(address) 
+                        .taxForPeriod(finalPropertyTax)
+                        .rebateAmount(rebateAmount)
+                        .days(days)
+                        .calculationDetails(calculationDetails)
+                        .build()
+        );
+    }
+
+    return previewResponses;
 }
+
+
 	
 	private void createFailureLog(Property property,CalculateTaxRequest generateBillRequest, BillResponse billResponse,Set<String> errorMap) {
 		PropertyBillFailure propertyBillFailure	= enrichmentService.enrichPtBillFailure(property, generateBillRequest,billResponse,errorMap);

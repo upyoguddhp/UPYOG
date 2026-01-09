@@ -25,6 +25,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.egov.garbageservice.contract.bill.DemandRepository;
+import org.egov.garbageservice.model.ApplicationBillDTO;
+import org.egov.garbageservice.model.ApplicationDetails;
 
 import javax.validation.Valid;
 
@@ -156,6 +158,7 @@ public class GarbageAccountService {
 
 	@Autowired
 	private GrbgUtils grbgUtils;
+	
 
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
@@ -1505,6 +1508,25 @@ public class GarbageAccountService {
 
 		return garbageAccountResponse;
 	}
+	
+
+private RequestInfo buildPublicRequestInfo(String tenantId) {
+
+    User user = User.builder()
+            .tenantId(tenantId)
+            .type("SYSTEM")
+            .build();
+
+    return RequestInfo.builder()
+            .apiId("garbage-service")
+            .ver("1.0")
+            .ts(System.currentTimeMillis())
+            .userInfo(user)  
+            .authToken(null)
+            .build();
+}
+
+
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
 
@@ -1936,6 +1958,39 @@ public class GarbageAccountService {
 
 		return garbageAccountActionResponse;
 	}
+	
+public GarbageAccountActionResponse openSearchPayPreview(
+        SearchCriteriaGarbageAccountRequest request,
+        Boolean isIndex) {
+
+    GarbageAccountResponse searchResponse =
+            searchGarbageAccounts(request, isIndex);
+
+    if (CollectionUtils.isEmpty(searchResponse.getGarbageAccounts())) {
+        return GarbageAccountActionResponse.builder()
+                .applicationDetails(Collections.emptyList())
+                .responseInfo(
+                        responseInfoFactory.createResponseInfoFromRequestInfo(
+                                request.getRequestInfo(), true))
+                .build();
+    }
+
+  
+    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
+            .stream()
+            .map(acc -> acc.getGrbgApplication().getApplicationNo())
+            .collect(Collectors.toList());
+
+    
+    GarbageAccountActionRequest actionRequest =
+            GarbageAccountActionRequest.builder()
+                    .applicationNumbers(applicationNumbers)
+                    .requestInfo(request.getRequestInfo())
+                    .skipValidation(true) 
+                    .build();
+
+    return getApplicationDetails(actionRequest);
+}
 
 	public GrbgBillTrackerRequest enrichGrbgBillTrackerCreateRequest(GarbageAccount garbageAccount,
 			GenerateBillRequest generateBillRequest, BigDecimal billAmount, Bill bill,
