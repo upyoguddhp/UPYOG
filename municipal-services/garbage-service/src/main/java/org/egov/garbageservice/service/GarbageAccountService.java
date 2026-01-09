@@ -1958,6 +1958,39 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 		return garbageAccountActionResponse;
 	}
+	
+public GarbageAccountActionResponse openSearchPayPreview(
+        SearchCriteriaGarbageAccountRequest request,
+        Boolean isIndex) {
+
+    GarbageAccountResponse searchResponse =
+            searchGarbageAccounts(request, isIndex);
+
+    if (CollectionUtils.isEmpty(searchResponse.getGarbageAccounts())) {
+        return GarbageAccountActionResponse.builder()
+                .applicationDetails(Collections.emptyList())
+                .responseInfo(
+                        responseInfoFactory.createResponseInfoFromRequestInfo(
+                                request.getRequestInfo(), true))
+                .build();
+    }
+
+  
+    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
+            .stream()
+            .map(acc -> acc.getGrbgApplication().getApplicationNo())
+            .collect(Collectors.toList());
+
+    
+    GarbageAccountActionRequest actionRequest =
+            GarbageAccountActionRequest.builder()
+                    .applicationNumbers(applicationNumbers)
+                    .requestInfo(request.getRequestInfo())
+                    .skipValidation(true) 
+                    .build();
+
+    return getApplicationDetails(actionRequest);
+}
 
 	public GrbgBillTrackerRequest enrichGrbgBillTrackerCreateRequest(GarbageAccount garbageAccount,
 			GenerateBillRequest generateBillRequest, BigDecimal billAmount, Bill bill,

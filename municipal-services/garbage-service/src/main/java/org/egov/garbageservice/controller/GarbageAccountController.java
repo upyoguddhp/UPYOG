@@ -70,36 +70,47 @@ public class GarbageAccountController {
 	}
 	
 	@PostMapping("/open/_search")
-	public ResponseEntity<GarbageAccountResponse> openSearch(
+	public ResponseEntity<?> openSearch(
 	        @RequestBody SearchCriteriaGarbageAccountRequest request,
 	        @RequestParam(name = "IsIndex", required = false, defaultValue = "false") Boolean isIndex) {
-	
-	    if (request.getRequestInfo() == null) {
-	        RequestInfo requestInfo = new RequestInfo();
-	        requestInfo.setApiId("open-search");
-	        requestInfo.setVer("1.0");
-	        requestInfo.setTs(System.currentTimeMillis());
-	
-	        User user = new User();
-	        user.setType(GrbgConstants.USER_TYPE_CITIZEN);
-	        user.setRoles(Collections.emptyList());
-	        user.setUuid("OPEN-SEARCH");
-	
-	        requestInfo.setUserInfo(user);
-	        request.setRequestInfo(requestInfo);
-	    }
-	
-	    if (request.getSearchCriteriaGarbageAccount() == null) {
-	        request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
-	    }
-	
-	    if (request.getSearchCriteriaGarbageAccount().getTenantId() == null) {
-	        throw new CustomException("TENANT_ID_MISSING",
-	                "tenantId is mandatory for open garbage search");
-	    }
-	
+
+		if (request.getRequestInfo() == null) {
+		    RequestInfo requestInfo = new RequestInfo();
+		    requestInfo.setApiId("open-search");
+		    requestInfo.setVer("1.0");
+		    requestInfo.setTs(System.currentTimeMillis());
+
+		    User user = new User();
+		    user.setType(GrbgConstants.USER_TYPE_CITIZEN);
+		    user.setUuid("OPEN-SEARCH");
+		    user.setRoles(Collections.emptyList());
+
+		    requestInfo.setUserInfo(user);
+		    request.setRequestInfo(requestInfo);
+		}
+
+		if (request.getSearchCriteriaGarbageAccount() == null) {
+		    request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
+		}
+
+	    
+	    SearchCriteriaGarbageAccount sc =
+	            request.getSearchCriteriaGarbageAccount();
+
+
+		if ((sc.getMobileNumber() == null || sc.getMobileNumber().isEmpty())
+		        && (sc.getApplicationNumber() == null || sc.getApplicationNumber().isEmpty())
+		        && (sc.getPropertyId() == null || sc.getPropertyId().isEmpty())
+		        && (sc.getOldGarbageIds() == null || sc.getOldGarbageIds().isEmpty())
+		        && (sc.getName() == null || sc.getName().isEmpty())) {
+		
+		    throw new CustomException(
+		            "INVALID_SEARCH",
+		            "Provide at least one of mobileNumber, applicationNumber, propertyId, oldGarbageIds or owner name"
+		    );
+		}
 	    return ResponseEntity.ok(
-	            service.searchGarbageAccounts(request, isIndex)
+	            service.openSearchPayPreview(request, isIndex)
 	    );
 	}
 
