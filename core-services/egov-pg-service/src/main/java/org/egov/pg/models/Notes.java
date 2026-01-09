@@ -20,4 +20,5 @@ public class Notes {
 	private String service;
 	
 	private String gatewayTxnId;
+
 }
