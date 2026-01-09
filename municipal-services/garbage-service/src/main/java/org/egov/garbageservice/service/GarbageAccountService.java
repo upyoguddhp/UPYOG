@@ -90,8 +90,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
-import org.egov.garbageservice.model.GarbageBillIdResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -1526,97 +1524,6 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
             .userInfo(user)  
             .authToken(null)
             .build();
-}
-
-	
-public GarbageAccountActionResponse searchGarbageBillIds(GarbageBillIdSearchRequest request) {
-
-    if (request.getTenantId() == null) {
-        throw new CustomException("INVALID_REQUEST", "tenantId is mandatory");
-    }
-
-    List<ApplicationBillDTO> results =
-            garbageAccountRepository.searchGarbageBillDetails(request);
-
-    GarbageAccountActionResponse response = new GarbageAccountActionResponse();
-
-    if (CollectionUtils.isEmpty(results)) {
-        response.setApplicationDetails(Collections.emptyList());
-        return response;
-    }
-
-    Map<String, List<ApplicationBillDTO>> grouped =
-            results.stream()
-                   .collect(Collectors.groupingBy(ApplicationBillDTO::getApplicationNo));
-
-    List<GarbageAccountDetail> applicationDetailsList = new ArrayList<>();
-
-    for (Map.Entry<String, List<ApplicationBillDTO>> entry : grouped.entrySet()) {
-
-    	String applicationNo = entry.getKey();
-    	List<ApplicationBillDTO> rows = entry.getValue();
-    	ApplicationBillDTO first = rows.get(0);
-
-
-        GarbageAccountDetail detail = new GarbageAccountDetail();
-        detail.setApplicationNumber(applicationNo);
-        
-        Map<Object, Object> userDetails = new HashMap<>();
-        userDetails.put("UserName", first.getName());
-        userDetails.put("MobileNo", first.getMobileNumber());
-        userDetails.put("Email", first.getEmail());
-        userDetails.put("Address", first.getAddress());
-        detail.setUserDetails(userDetails);
-       
-        
-        String feeCalculationFormula = rows.stream()
-                .map(ApplicationBillDTO::getFormula)
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(f -> {
-                    String[] parts = f.split(" - ", 2); 
-                    String category = parts.length > 0 ? parts[0] : "";
-                    String subCategory = parts.length > 1 ? parts[1] : "";
-                    return "category: (" + category + "), SubCategory: (" + subCategory + ")";
-                })
-                .collect(Collectors.joining("; "));
-
-        detail.setFeeCalculationFormula(feeCalculationFormula);
-
-
-
-        BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-                .tenantId(request.getTenantId())
-                .consumerCode(Collections.singleton(applicationNo))
-                .service("GB")
-                .build();
-
-        BillResponse billResponse =
-                billService.searchBill(
-                        billSearchCriteria,
-                        buildPublicRequestInfo(request.getTenantId())
-                );
-
-
-        if (!CollectionUtils.isEmpty(billResponse.getBill())) {
-
-            detail.setBills(billResponse.getBill());
-            billResponse.getBill().stream()
-                .filter(b -> StatusEnum.ACTIVE.name().equalsIgnoreCase(b.getStatus().name()))
-                .findFirst()
-                .ifPresent(bill -> {
-                    detail.setTotalPayableAmount(bill.getTotalAmount());
-                    Map<Object, Object> billDetails = new HashMap<>();
-                    billDetails.put("billId", bill.getId());
-                    detail.setBillDetails(billDetails);
-                });
-        }
-
-        applicationDetailsList.add(detail);
-    }
-
-    response.setApplicationDetails(applicationDetailsList);
-    return response;
 }
 
 

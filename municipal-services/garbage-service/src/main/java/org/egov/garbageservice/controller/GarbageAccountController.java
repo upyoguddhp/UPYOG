@@ -1,8 +1,11 @@
 package org.egov.garbageservice.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.UUID;
+
 
 import javax.validation.Valid;
 
@@ -13,6 +16,9 @@ import org.egov.garbageservice.model.GarbageAccountActionResponse;
 import org.egov.garbageservice.model.GarbageAccountRequest;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.PayNowRequest;
+import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.common.contract.request.RequestInfo;
+
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.service.GarbageAccountService;
@@ -20,11 +26,11 @@ import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.egov.garbageservice.model.GarbageBillIdResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.egov.garbageservice.model.GarbageBillIdSearchRequest;
+import org.egov.common.contract.request.User;
+import org.egov.common.contract.request.Role;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +38,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
+import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
+import org.egov.tracer.model.CustomException;
+
 
 @Slf4j
 
@@ -60,12 +69,39 @@ public class GarbageAccountController {
 			return ResponseEntity.ok(service.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,IsIndex));
 	}
 	
-	@PostMapping("/_public/searchBillIds")
-	public ResponseEntity<GarbageAccountActionResponse> searchGarbageBillIds(
-	        @RequestBody GarbageBillIdSearchRequest request) {
+@PostMapping("/open/_search")
+public ResponseEntity<GarbageAccountResponse> openSearch(
+        @RequestBody SearchCriteriaGarbageAccountRequest request,
+        @RequestParam(name = "IsIndex", required = false, defaultValue = "false") Boolean isIndex) {
 
-	    return ResponseEntity.ok(service.searchGarbageBillIds(request));
-	}
+    if (request.getRequestInfo() == null) {
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setApiId("open-search");
+        requestInfo.setVer("1.0");
+        requestInfo.setTs(System.currentTimeMillis());
+
+        User user = new User();
+        user.setType(GrbgConstants.USER_TYPE_CITIZEN);
+        user.setRoles(Collections.emptyList());
+        user.setUuid("OPEN-SEARCH");
+
+        requestInfo.setUserInfo(user);
+        request.setRequestInfo(requestInfo);
+    }
+
+    if (request.getSearchCriteriaGarbageAccount() == null) {
+        request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
+    }
+
+    if (request.getSearchCriteriaGarbageAccount().getTenantId() == null) {
+        throw new CustomException("TENANT_ID_MISSING",
+                "tenantId is mandatory for open garbage search");
+    }
+
+    return ResponseEntity.ok(
+            service.searchGarbageAccounts(request, isIndex)
+    );
+}
 
 
 
