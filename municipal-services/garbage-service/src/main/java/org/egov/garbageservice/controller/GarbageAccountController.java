@@ -93,13 +93,22 @@ public class GarbageAccountController {
 		    request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
 		}
 
-	    if (request.getSearchCriteriaGarbageAccount().getTenantId() == null) {
-	        throw new CustomException(
-	                "TENANT_ID_MISSING",
-	                "tenantId is mandatory for open garbage search"
-	        );
-	    }
+	    
+	    SearchCriteriaGarbageAccount sc =
+	            request.getSearchCriteriaGarbageAccount();
 
+
+		if ((sc.getMobileNumber() == null || sc.getMobileNumber().isEmpty())
+		        && (sc.getApplicationNumber() == null || sc.getApplicationNumber().isEmpty())
+		        && (sc.getPropertyId() == null || sc.getPropertyId().isEmpty())
+		        && (sc.getOldGarbageIds() == null || sc.getOldGarbageIds().isEmpty())
+		        && (sc.getName() == null || sc.getName().isEmpty())) {
+		
+		    throw new CustomException(
+		            "INVALID_SEARCH",
+		            "Provide at least one of mobileNumber, applicationNumber, propertyId, oldGarbageIds or owner name"
+		    );
+		}
 	    return ResponseEntity.ok(
 	            service.openSearchPayPreview(request, isIndex)
 	    );
