@@ -69,39 +69,39 @@ public class GarbageAccountController {
 			return ResponseEntity.ok(service.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,IsIndex));
 	}
 	
-@PostMapping("/open/_search")
-public ResponseEntity<GarbageAccountResponse> openSearch(
-        @RequestBody SearchCriteriaGarbageAccountRequest request,
-        @RequestParam(name = "IsIndex", required = false, defaultValue = "false") Boolean isIndex) {
-
-    if (request.getRequestInfo() == null) {
-        RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setApiId("open-search");
-        requestInfo.setVer("1.0");
-        requestInfo.setTs(System.currentTimeMillis());
-
-        User user = new User();
-        user.setType(GrbgConstants.USER_TYPE_CITIZEN);
-        user.setRoles(Collections.emptyList());
-        user.setUuid("OPEN-SEARCH");
-
-        requestInfo.setUserInfo(user);
-        request.setRequestInfo(requestInfo);
-    }
-
-    if (request.getSearchCriteriaGarbageAccount() == null) {
-        request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
-    }
-
-    if (request.getSearchCriteriaGarbageAccount().getTenantId() == null) {
-        throw new CustomException("TENANT_ID_MISSING",
-                "tenantId is mandatory for open garbage search");
-    }
-
-    return ResponseEntity.ok(
-            service.searchGarbageAccounts(request, isIndex)
-    );
-}
+	@PostMapping("/open/_search")
+	public ResponseEntity<GarbageAccountResponse> openSearch(
+	        @RequestBody SearchCriteriaGarbageAccountRequest request,
+	        @RequestParam(name = "IsIndex", required = false, defaultValue = "false") Boolean isIndex) {
+	
+	    if (request.getRequestInfo() == null) {
+	        RequestInfo requestInfo = new RequestInfo();
+	        requestInfo.setApiId("open-search");
+	        requestInfo.setVer("1.0");
+	        requestInfo.setTs(System.currentTimeMillis());
+	
+	        User user = new User();
+	        user.setType(GrbgConstants.USER_TYPE_CITIZEN);
+	        user.setRoles(Collections.emptyList());
+	        user.setUuid("OPEN-SEARCH");
+	
+	        requestInfo.setUserInfo(user);
+	        request.setRequestInfo(requestInfo);
+	    }
+	
+	    if (request.getSearchCriteriaGarbageAccount() == null) {
+	        request.setSearchCriteriaGarbageAccount(new SearchCriteriaGarbageAccount());
+	    }
+	
+	    if (request.getSearchCriteriaGarbageAccount().getTenantId() == null) {
+	        throw new CustomException("TENANT_ID_MISSING",
+	                "tenantId is mandatory for open garbage search");
+	    }
+	
+	    return ResponseEntity.ok(
+	            service.searchGarbageAccounts(request, isIndex)
+	    );
+	}
 
 
 
