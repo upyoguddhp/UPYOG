@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.egov.pt.web.contracts.PropertyBillSearchRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -221,10 +222,12 @@ public class PropertyController {
 
 	@PostMapping("/open/_search")
 	public ResponseEntity<?> searchPropertyAndBill(
-		@RequestParam String propertyUuid,
-	    @RequestParam String billId) {
-	    	return propertyService.searchPropertyAndBillOpen(propertyUuid, billId);
-	    }
+	        @RequestBody PropertyBillSearchRequest request) {
+
+	    return propertyService.searchPropertyAndBillOpen(
+	            request.getPropertyUuid(),
+	            request.getBillId());
+	}
 
 
 	@PostMapping("/_migration")
