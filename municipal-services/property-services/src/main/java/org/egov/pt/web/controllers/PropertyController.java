@@ -219,6 +219,14 @@ public class PropertyController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping("/open/_search")
+	public ResponseEntity<?> searchPropertyAndBill(
+		@RequestParam String propertyUuid,
+	    @RequestParam String billId) {
+	    	return propertyService.searchPropertyAndBillOpen(propertyUuid, billId);
+	    }
+
+
 	@PostMapping("/_migration")
 	public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute OldPropertyCriteria propertyCriteria) {
@@ -481,5 +489,7 @@ return ResponseEntity
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	
 
 }

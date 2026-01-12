@@ -1341,5 +1341,44 @@ public class PropertyService {
 		return userService.createNewObPassUser(createUserRequest, requestInfo);
 
 	}
+	
+	public ResponseEntity<?> searchPropertyAndBillOpen( String propertyUuid, String billId) {
 
+	    RequestInfo systemRequestInfo = requestInfoUtils.getSystemRequestInfo();
+
+	    PropertyCriteria propertyCriteria = PropertyCriteria.builder()
+	    		.uuids(Collections.singleton(propertyUuid)) 
+	            .isSearchInternal(true)
+	            .build();
+
+	    List<Property> properties =
+	            searchProperty(propertyCriteria, systemRequestInfo, null);
+
+	    if (CollectionUtils.isEmpty(properties)) {
+	        throw new CustomException("PROPERTY_NOT_FOUND",
+	                "No property found for propertyId: " + propertyUuid);
+	    }
+
+	    Property property = properties.get(0);
+	    String tenantId = property.getTenantId();  
+
+	    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+	            .tenantId(tenantId)
+	            .billId(Collections.singleton(billId))
+	            .build();
+
+	    BillResponse billResponse =
+	            billService.searchBill(billSearchCriteria, systemRequestInfo);
+
+	    if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+	        throw new CustomException("BILL_NOT_FOUND",
+	                "No bill found for billId: " + billId);
+	    }
+
+	    ObjectNode response = objectMapper.createObjectNode();
+	    response.set("property", objectMapper.valueToTree(property));
+	    response.set("bill", objectMapper.valueToTree(billResponse.getBill().get(0)));
+
+	    return ResponseEntity.ok(response);
+	}
 }
