@@ -224,11 +224,8 @@ public class PropertyController {
 	public ResponseEntity<?> searchPropertyAndBill(
 	        @RequestBody PropertyBillSearchRequest request) {
 
-	    return propertyService.searchPropertyAndBillOpen(
-	            request.getPropertyUuid(),
-	            request.getBillId());
+		return propertyService.searchPropertyAndBillOpen(request);
 	}
-
 
 	@PostMapping("/_migration")
 	public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
