@@ -17,7 +17,7 @@ public class CalculateTaxPreviewResponse {
     private String oldPropertyId;
     private Object address;  
     private BigDecimal totalAnnualTax;
-    private BigDecimal taxForPeriod;
+    private BigDecimal propertyTaxWithoutRebate;
     private BigDecimal rebateAmount;
     private BigDecimal days;
 
