@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.egov.web.contract.GetUserTokenRequest;
+import org.egov.web.contract.GetUserTokenResponse;
+
 
 import javax.validation.Valid;
 
@@ -42,6 +45,15 @@ public class OtpController {
         }
         return new OtpResponse(token);
     }
+    
+    @PostMapping("v1/_getUserToken")
+    public GetUserTokenResponse getUserToken(
+            @RequestBody @Valid GetUserTokenRequest request) {
+
+        String accessToken = tokenService.getUserAccesToken(request.getUuid());
+        return new GetUserTokenResponse(accessToken);
+    }
+
 
     @PostMapping("v1/_search")
     public OtpResponse search(@RequestBody OtpRequest request) {
