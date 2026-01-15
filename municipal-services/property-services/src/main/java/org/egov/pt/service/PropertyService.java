@@ -37,6 +37,7 @@ import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.PropertySearchRequest;
 import org.egov.pt.models.PropertySearchResponse;
 import org.egov.pt.web.contracts.CancelPropertyBillRequest;
+import org.egov.pt.web.contracts.PropertyBillSearchRequest;
 import org.egov.pt.models.PtTaxCalculatorTracker;
 import org.egov.pt.models.PtTaxCalculatorTrackerSearchCriteria;
 import org.egov.pt.models.bill.BillSearchCriteria;
@@ -1341,5 +1342,80 @@ public class PropertyService {
 		return userService.createNewObPassUser(createUserRequest, requestInfo);
 
 	}
+	
+	public ResponseEntity<?> searchPropertyAndBillOpen(PropertyBillSearchRequest request){
 
+
+	    RequestInfo systemRequestInfo = requestInfoUtils.getSystemRequestInfo();
+
+	    PropertyCriteria.PropertyCriteriaBuilder builder =
+	            PropertyCriteria.builder()
+	                    .isSearchInternal(true);
+
+	    if (StringUtils.isNotBlank(request.getPropertyUuid())) {
+	        builder.uuids(Collections.singleton(request.getPropertyUuid()));
+	    }
+
+	    if (StringUtils.isNotBlank(request.getPropertyId())) {
+	        builder.propertyIds(Collections.singleton(request.getPropertyId()));
+	    }
+
+	    if (StringUtils.isNotBlank(request.getApplicationNumber())) {
+	        builder.acknowledgementIds(
+	                Collections.singleton(request.getApplicationNumber())
+	        );
+	    }
+
+	    if (StringUtils.isNotBlank(request.getMobileNumber())) {
+	        builder.mobileNumber(request.getMobileNumber());
+	    }
+	    
+	    if (StringUtils.isNotBlank(request.getOldPropertyId())) {
+	        builder.oldPropertyId(request.getOldPropertyId());
+	    }
+
+	    if (StringUtils.isNotBlank(request.getOwnerName())) {
+	        builder.name(request.getOwnerName());
+	    }
+
+	    PropertyCriteria propertyCriteria = builder.build();
+
+	    if (propertyCriteria.getUuids() == null
+	            && propertyCriteria.getPropertyIds() == null
+	            && StringUtils.isBlank(propertyCriteria.getMobileNumber())
+	            && StringUtils.isBlank(propertyCriteria.getOldPropertyId())
+	            && StringUtils.isBlank(propertyCriteria.getName())) {
+
+	        throw new CustomException(
+	                "INVALID_SEARCH",
+	                "Provide at least one property filter"
+	        );
+	    }
+
+
+	    List<Property> properties =
+	            searchProperty(propertyCriteria, systemRequestInfo, null);
+
+	    Property property = properties.get(0);
+	    String tenantId = property.getTenantId();  
+
+	    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+	            .tenantId(tenantId)
+	            .billId(Collections.singleton(request.getBillId()))
+	            .build();
+
+	    BillResponse billResponse =
+	            billService.searchBill(billSearchCriteria, systemRequestInfo);
+
+	    if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+	        throw new CustomException("BILL_NOT_FOUND",
+	                "No bill found for billId: " + request.getBillId());
+	    }
+
+	    ObjectNode response = objectMapper.createObjectNode();
+	    response.set("property", objectMapper.valueToTree(property));
+	    response.set("bill", objectMapper.valueToTree(billResponse.getBill().get(0)));
+
+	    return ResponseEntity.ok(response);
+	}
 }

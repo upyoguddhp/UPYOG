@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.egov.pt.web.contracts.PropertyBillSearchRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -217,6 +218,13 @@ public class PropertyController {
 		propertyService.setAllCount(properties, response);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping("/open/_search")
+	public ResponseEntity<?> searchPropertyAndBill(
+	        @RequestBody PropertyBillSearchRequest request) {
+
+		return propertyService.searchPropertyAndBillOpen(request);
 	}
 
 	@PostMapping("/_migration")
@@ -481,5 +489,7 @@ return ResponseEntity
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	
 
 }
