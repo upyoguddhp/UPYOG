@@ -557,13 +557,13 @@ public class NotificationService {
 		String smsBody = SMS_BODY_GENERATE_BILL;
 		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
 	
-		Property property = new Property();
-		property.setPropertyId(propertyTracker.getPropertyId());
-		property.setTenantId(bill.getTenantId());
+		Property newproperty = new Property();
+		newproperty.setPropertyId(propertyTracker.getPropertyId());
+		newproperty.setTenantId(bill.getTenantId());
 		
-		emailBody = populateNotificationPlaceholders(emailBody, property, bill, propertyTracker);
-		smsBody   = populateNotificationPlaceholders(smsBody, property, bill, propertyTracker);
-		emailSubject = populateNotificationPlaceholders(emailSubject, property, bill, propertyTracker);
+		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
+		smsBody   = populateNotificationPlaceholders(smsBody, newproperty, bill, propertyTracker);
+		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
 			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
@@ -618,15 +618,14 @@ public class NotificationService {
 	        PtTaxCalculatorTracker tracker) {
 		
 		String payNowUrl =
-		        frontEndUri
-		        + "citizen/payment/pt/"
+		        "https://citizenseva.hp.gov.in/hp-udd/"
+		        + "citizen-payment"
 		        + "/"
-		        + property.getPropertyId()
+		        + property.getId()
 		        + "/"
-		        + bill.getBillNumber()
-				+"/pt";
+		        + bill.getId()
+				+"/pt/";
 
-		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
 
 
 	    SimpleDateFormat monthFormat = new SimpleDateFormat("dd MMMM - yyyy");
@@ -656,6 +655,8 @@ public class NotificationService {
 	            AMOUNT_PLACEHOLDER,
 	            String.valueOf(bill.getTotalAmount())
 	    );
+
+		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
 
 	    body = body.replace(LINK_PLACEHOLDER, shortUrl);
 
