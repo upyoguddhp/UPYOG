@@ -619,11 +619,11 @@ public class NotificationService {
 		
 		String payNowUrl =
 		        frontEndUri
-		        + "citizen/payment/pt/"
+		        + "citizen-payment"
 		        + "/"
-		        + property.getPropertyId()
+		        + property.getId()
 		        + "/"
-		        + bill.getBillNumber()
+		        + bill.getId()
 				+"/pt";
 
 		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
