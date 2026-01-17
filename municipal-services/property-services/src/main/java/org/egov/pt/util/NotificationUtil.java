@@ -384,19 +384,36 @@ public class NotificationUtil {
      * returns the same url if shortening fails 
      * @param url
      */
-    public String getShortenedUrl(String url){
+    public String getShortenedUrl(String url) {
 
-        HashMap<String,String> body = new HashMap<>();
-        body.put("url",url);
+        HashMap<String, String> body = new HashMap<>();
+        body.put("url", url);
+
         StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
         builder.append(config.getUrlShortnerEndpoint());
+
         String res = restTemplate.postForObject(builder.toString(), body, String.class);
 
-        if(StringUtils.isEmpty(res)){
-            log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
+        if (StringUtils.isEmpty(res)) {
+            log.error("URL_SHORTENING_ERROR", "Unable to shorten url: " + url);
             return url;
+        } else {
+            return getUriParam(res);
         }
-        else return res;
+    }
+    
+    private String getUriParam(String uri) {
+        if (uri == null || !uri.contains("/egov-url-shortening/")) {
+            throw new IllegalArgumentException("Invalid short URL format.");
+        }
+
+        String[] parts = uri.split("/egov-url-shortening/");
+        if (parts.length != 2 || parts[1].isEmpty()) {
+            throw new IllegalArgumentException("Unable to extract short ID from URL.");
+        }
+
+        String id = parts[1];
+        return parts[0] + "/egov-url-shortening?id=" + id;
     }
 
     /**
