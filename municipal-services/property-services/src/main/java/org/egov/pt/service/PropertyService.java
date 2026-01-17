@@ -1418,4 +1418,100 @@ public class PropertyService {
 
 	    return ResponseEntity.ok(response);
 	}
+	
+	public ResponseEntity<?> searchPropertyWithAllBills(PropertyBillSearchRequest request) {
+
+    RequestInfo systemRequestInfo = requestInfoUtils.getSystemRequestInfo();
+
+    PropertyCriteria.PropertyCriteriaBuilder builder =
+            PropertyCriteria.builder()
+                    .isSearchInternal(true);
+
+    if (StringUtils.isNotBlank(request.getPropertyId())) {
+        builder.propertyIds(Collections.singleton(request.getPropertyId()));
+    }
+
+    if (StringUtils.isNotBlank(request.getMobileNumber())) {
+        builder.mobileNumber(request.getMobileNumber());
+    }
+
+    if (StringUtils.isNotBlank(request.getOldPropertyId())) {
+        builder.oldPropertyId(request.getOldPropertyId());
+    }
+
+    if (StringUtils.isNotBlank(request.getOwnerName())) {
+        builder.name(request.getOwnerName());
+    }
+
+    PropertyCriteria propertyCriteria = builder.build();
+
+    if (propertyCriteria.getPropertyIds() == null
+            && StringUtils.isBlank(propertyCriteria.getMobileNumber())
+            && StringUtils.isBlank(propertyCriteria.getOldPropertyId())
+            && StringUtils.isBlank(propertyCriteria.getName())) {
+
+        throw new CustomException(
+                "INVALID_SEARCH",
+                "Provide at least one property filter"
+        );
+    }
+
+    List<Property> properties =
+            searchProperty(propertyCriteria, systemRequestInfo, null);
+
+    if (CollectionUtils.isEmpty(properties)) {
+        throw new CustomException("PROPERTY_NOT_FOUND",
+                "No property found for given criteria");
+    }
+
+    Property property = properties.get(0);
+    
+    BillSearchCriteria debugCriteria = BillSearchCriteria.builder()
+            .tenantId(property.getTenantId())
+            .service("PROPERTY")
+            .retrieveAll(true)
+            .skipValidation(true)
+            .build();
+
+    BillResponse allBillsResponse =
+            billService.searchBill(debugCriteria, systemRequestInfo);
+
+    log.info("TOTAL BILLS IN SYSTEM: {}",
+            allBillsResponse != null && allBillsResponse.getBill() != null
+                    ? allBillsResponse.getBill().size()
+                    : "NULL");
+
+    if (allBillsResponse != null && allBillsResponse.getBill() != null) {
+
+        allBillsResponse.getBill().forEach(b -> {
+        });
+    }
+
+    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+            .tenantId(property.getTenantId())
+            .consumerCode(Collections.singleton(property.getPropertyId()))
+            .retrieveAll(true)  
+            .service("PROPERTY")
+            .skipValidation(true)
+            .isActive(true)         
+            .build();
+    
+    BillResponse billResponse =
+            billService.searchBill(billSearchCriteria, systemRequestInfo);
+
+    ObjectNode response = objectMapper.createObjectNode();
+
+    response.set("property", objectMapper.valueToTree(property));
+
+    if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+        response.putArray("bills");
+    } else {
+        response.set("bills",
+                objectMapper.valueToTree(billResponse.getBill()));
+    }
+
+    return ResponseEntity.ok(response);
+}
+
+
 }
