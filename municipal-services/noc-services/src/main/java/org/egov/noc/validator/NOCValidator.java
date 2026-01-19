@@ -108,7 +108,9 @@ public class NOCValidator {
 			throw new CustomException("MDMS DATA ERROR", "Unable to fetch NocType from MDMS");
 		}
 
-		String filterExp = "$.[?(@.code == '" + noc.getNocType() + "' )]";
+		// if multi busines service is requieed then use from nonoc.getNocType()
+		//String filterExp = "$.[?(@.code == '" + noc.getNocType() + "' )]";
+		String filterExp = "$.[?(@.code == '" + "NOC" + "' )]";
 		List<Map<String, Object>> jsonOutput = JsonPath.read(result, filterExp);
 		if (jsonOutput.isEmpty()) {
 			throw new CustomException("MDMS DATA ERROR", "Unable to fetch " + noc.getNocType() + " workflow mode from MDMS");
