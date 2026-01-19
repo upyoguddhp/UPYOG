@@ -117,8 +117,19 @@ public class SmsTrackerRepository {
 	}
    
    public Short fetchResendCounterByBillId(String billId) {
-	    String query = "SELECT COALESCE(resend_counter, 0) FROM eg_notification_sms_tracker WHERE bill_id = ? LIMIT 1";
-	    return jdbcTemplate.queryForObject(query, new Object[]{billId}, Short.class);
+	   String selectSql = "SELECT COALESCE(resend_counter, 0) " +
+               "FROM eg_notification_sms_tracker " +
+               "WHERE bill_id = ? LIMIT 1";
+			Short counter = jdbcTemplate.queryForObject(selectSql,
+			                                        new Object[]{billId},
+			                                        Short.class);
+			
+			String updateSql = "UPDATE eg_notification_sms_tracker " +
+			               "SET sms_status = false " +
+			               "WHERE bill_id = ?";
+			jdbcTemplate.update(updateSql, billId);
+			
+			return counter != null ? counter : 0;
 	}
 
 
