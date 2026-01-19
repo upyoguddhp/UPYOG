@@ -21,6 +21,7 @@ public class Sms {
 	private Category category;
 	private Long expiryTime;
 	private String templateId;
+	private String smsServiceType;
 
 	public boolean isValid() {
 		return isNotEmpty(mobileNumber) && isNotEmpty(message);
