@@ -107,7 +107,7 @@ public class NOCValidator {
 		if (result.isEmpty()) {
 			throw new CustomException("MDMS DATA ERROR", "Unable to fetch NocType from MDMS");
 		}
-
+ 
 		// if multi busines service is requieed then use from nonoc.getNocType()
 		//String filterExp = "$.[?(@.code == '" + noc.getNocType() + "' )]";
 		String filterExp = "$.[?(@.code == '" + "NOC" + "' )]";
