@@ -76,8 +76,7 @@ public class SMSServiceImpl implements SMSService {
 		smsBody = smsBody.replace(VALID_FOR_PLACEHOLDER, String.valueOf(otpValidFor));
 
 		Sms sms = Sms.builder().mobileNumber(otpSentRequest.getNumber()).message(smsBody)
-				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).build();
-
+				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).smsServiceType("otpmsg").build();
 		baseSmsService.sendSMS(sms);
 	}
 
