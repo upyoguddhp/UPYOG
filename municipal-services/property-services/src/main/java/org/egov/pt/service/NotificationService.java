@@ -557,9 +557,13 @@ public class NotificationService {
 		String smsBody = SMS_BODY_GENERATE_BILL;
 		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
 	
-		emailBody = populateNotificationPlaceholders(emailBody, propertyTracker, bill);
-		smsBody = populateNotificationPlaceholders(smsBody, propertyTracker, bill);
-		emailSubject = populateNotificationPlaceholders(emailSubject, propertyTracker, bill);
+		Property newproperty = new Property();
+		newproperty.setPropertyId(propertyTracker.getPropertyId());
+		newproperty.setTenantId(bill.getTenantId());
+		
+		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
+		smsBody   = populateNotificationPlaceholders(smsBody, newproperty, bill, propertyTracker);
+		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
 			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
@@ -606,49 +610,23 @@ public class NotificationService {
 
     return smsRequest;
 }
-
-
-
-	
-	private String populateNotificationPlaceholders(String body, PtTaxCalculatorTracker propertyTracker, Bill bill) {
-
-        SimpleDateFormat monthFormat = new SimpleDateFormat("dd MMMM - yyyy");
-
-//		Instant instant = Instant.ofEpochMilli(bill.getBillDate());
-//		LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-		body = body.replace(MONTH_PLACEHOLDER,  monthFormat.format(propertyTracker.getFromDate())+" / "+monthFormat.format(propertyTracker.getToDate()));
-
-		body = body.replace(RECIPINTS_NAME_PLACEHOLDER, StringUtils.isEmpty(bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText())?"N/A":bill.getBillDetails().get(0).getAdditionalDetails().get("name").asText());
-		//		body = body.replace(YEAR_PLACEHOLDER, propertyTracker.getFinancialYear());
-		body = body.replace(BILL_NO_PLACEHOLDER, bill.getBillNumber());
-//		if (!CollectionUtils.isEmpty(garbageAccount.getAddresses())) {
-//			body = body.replace(ADDRESS_PLACEHOLDER, prepareAddress(garbageAccount.getAddresses().get(0)));
-//		}
-//		if (!CollectionUtils.isEmpty(garbageAccount.getGrbgCollectionUnits())) {
-//			body = body.replace(COLLECTION_UNIT_TYPE_PLACEHOLDER,
-//					!StringUtils.isEmpty(garbageAccount.getGrbgCollectionUnits().get(0).getUnitType())
-//							? garbageAccount.getGrbgCollectionUnits().get(0).getUnitType()
-//							: "");
-//		}
-		body = body.replace(AMOUNT_PLACEHOLDER, String.valueOf(bill.getTotalAmount()));
-//		body = body.replace(DUE_DATE_PLACEHOLDER, "");
-
-		body = body.replace(LINK_PLACEHOLDER, "https://citizenseva.hp.gov.in/hp-udd/ ");
-		body = body.replace(PROPERTY_ID_PLACEHOLDER, propertyTracker.getPropertyId());
-		body = body.replace(PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER,frontEndUri);
-//		body = body.replace(GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER,
-//				grbgConfig.getGrbgServiceHostUrl() + "" + grbgConfig.getGrbgPayNowBillEndpoint() + ""
-//						+ encryptionService.encryptString(garbageAccount.getCreated_by()));
-
-		return body;
-	}
 	
 	private String populateNotificationPlaceholders(
 	        String body,
 	        Property property,
 	        Bill bill,
 	        PtTaxCalculatorTracker tracker) {
+		
+		String payNowUrl =
+		        "https://citizenseva.hp.gov.in/hp-udd/"
+		        + "citizen-payment"
+		        + "/"
+		        + property.getId()
+		        + "/"
+		        + bill.getId()
+				+"/pt/";
+
+
 
 	    SimpleDateFormat monthFormat = new SimpleDateFormat("dd MMMM - yyyy");
 
@@ -658,10 +636,10 @@ public class NotificationService {
 	                    + monthFormat.format(tracker.getToDate())
 	    );
 
-	    body = body.replace(
-	            RECIPINTS_NAME_PLACEHOLDER,
-	            property.getOwners().get(0).getName()
-	    );
+	    String ownerName = bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText();
+	     
+	     body = body.replace(
+	             RECIPINTS_NAME_PLACEHOLDER,ownerName);
 
 	    body = body.replace(
 	            PROPERTY_ID_PLACEHOLDER,
@@ -678,15 +656,11 @@ public class NotificationService {
 	            String.valueOf(bill.getTotalAmount())
 	    );
 
-	    body = body.replace(
-	            LINK_PLACEHOLDER,
-	            "https://citizenseva.hp.gov.in/hp-udd/"
-	    );
+		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
 
-	    body = body.replace(
-	            PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER,
-	            frontEndUri
-	    );
+	    body = body.replace(LINK_PLACEHOLDER, shortUrl);
+
+	    body = body.replace(PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER, shortUrl);
 
 	    return body;
 	}

@@ -145,17 +145,6 @@
 			font-weight: bold;
 		}
 
-		.footer {
-			position: fixed;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			text-align: center;
-			font-size: 10px;
-			border-top: 1px solid #ccc;
-			padding: 5px;
-		}
-
 		.watermark {
 			position: absolute;
 			top: 40%;
@@ -164,6 +153,46 @@
 			opacity: 0.08;
 			transform: translate(-50%, -50%);
 			z-index: 0;
+		}
+
+		.certificate-footer {
+			margin-bottom: 0px;
+			padding-top: 15px;
+			font-size: 11px;
+			color: #1e2a4a;
+		}
+
+		.footer-divider {
+			height: 2px;
+			background: linear-gradient(to right, #1a3a8f, #2a56c6, #1a3a8f);
+			margin-bottom: 12px;
+		}
+
+		.footer-content {	
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		.footer-right {
+			width: 35%;
+			text-align: right;
+		}
+
+		.disclaimer {
+			font-style: italic;
+			line-height: 1.5;
+			color: #333;
+		}
+
+		.footer-right p {
+			margin: 2px 0;
+		}
+
+		.footer-note {
+			margin-top: 10px;
+			text-align: center;
+			font-size: 10px;
+			color: #555;
 		}
 	</style>
 </head>
@@ -243,15 +272,15 @@
 						Premises Address
 					</th>
 					<td colspan="3" style="padding:8px; border:1px solid #ccc;">
-						HOTEL SURYA, SHOP NO 2, TEMPLE ROAD, NOLEDO SAMU, TEH DHARAMSHALA, DISTT KANGRA, HP
+						<span th:text="${tradePremisesAddress}">NA</span>
 					</td>
 				</tr>
 				<tr>
 					<th style="text-align:left; padding:6px; background:#e3f2fd; border:1px solid #ccc;">
 						Contact No
 					</th>
-					<td colspan="3" style="padding:8px; border:1px solid #ccc;"><span
-							th:text="${licenseeMobileNumber}">NA</span>
+					<td colspan="3" style="padding:8px; border:1px solid #ccc;">
+						<span th:text="${licenseeMobileNumber}">NA</span>
 					</td>
 
 				</tr>
@@ -276,10 +305,11 @@
 					<div class="signature">
 						<img th:src="${signature}" alt="signature..." style="width:120px; height:10px right;" />
 
-						<div class="line"></div>
 						<div class="name" style="text-align: center;"><b><span th:text="${userName}">userName</span></b>
 						</div>
-						<div class="title" style="text-align: center;">
+						<div class="line"></div>
+
+						<div class="title" style="margin-right:50px;">Issued From : O/o
 							<span th:if="${ulbType == 'Municipal Corporation'}">Commissioner</span>
 							<span th:if="${ulbType == 'Municipal Council'}">Executive Officer</span>
 							<span
@@ -287,8 +317,9 @@
 							, <span th:text="${ulbType}">NA</span>, <span th:text="${ulbName}">NA</span>
 						</div>
 						<div class="title" style="text-align: center;"></div>
-						<div class="title" style="text-align: center;">This certificate Signed at <span
+						<div class="title1" style="margin-left: 65px;">This certificate Signed at <span
 								th:text="${approvalTime}">NA</span></div>
+
 					</div>
 				</td>
 			</tr>
@@ -297,7 +328,8 @@
 		<div class="terms">
 			<h3>Terms and Conditions of this License</h3>
 			<ul style="font-size: 8px;">
-				<li>This license is for the Trade Sector <b><span th:text="${licenseCategory}">NA</span> </b> and is valid for the trade/ business of: <b><span th:text="${licenseSubCategory}">NA</span></b></li>
+				<li>This license is for the Trade Sector <b><span th:text="${licenseCategory}">NA</span> </b> and is
+					valid for the trade/ business of: <b><span th:text="${licenseSubCategory}">NA</span></b></li>
 				<li>The licensee shall apply for renewal of license at least two months prior to the date of expiry of
 					license period to the licensing officer.</li>
 				<li>The trade license is solely for the purpose of conducting business activities as specified within
@@ -334,7 +366,26 @@
 
 			</ul>
 		</div>
+			<div class="certificate-footer">
+		<div class="footer-divider"></div>
+
+		<div class="footer-content">
+			<div class="footer-left">
+				<p class="disclaimer">
+					Merely paying and processing a Trade License does not confer any right or imply any statement regarding the regularization or ownership of the property.
+				</p>
+			</div>
+		</div>
+
+		<div class="footer-note">
+			This is a system generated certificate and does not require a physical signature.
+		</div>
 	</div>
+	</div>
+
+
+
 </body>
+
 
 </html>

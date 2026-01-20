@@ -32,9 +32,9 @@ public class PropertyQueryBuilder {
 
 	@Autowired
 	private PropertyConfiguration config;
-	
+
 	private static final String PT_TAX_CALCULATOR_TRACKER_SEARCH_QUERY = "SELECT * FROM eg_pt_tax_calculator_tracker eptct";
-	
+
 	private static final String PT_TAX_CALCULATOR_TRACKER_TENANT_ID_SEARCH_QUERY = "SELECT distinct(eptct.tenantid) FROM eg_pt_tax_calculator_tracker eptct";
 
 	private static final String SELECT = "SELECT ";
@@ -42,7 +42,7 @@ public class PropertyQueryBuilder {
 	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
 	private static final String AND_QUERY = " AND ";
 
-	private static final String PROPERTY_DEFAULTER_SEARCH = "select * from (SELECT property.id as pid, property.propertyid, property.tenantid as ptenantid, surveyid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory,property.usagecategory as pusagecategory, creationreason, nooffloors, landarea, property.superbuiltuparea as propertysbpa, linkedproperties, source, channel, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, (CASE WHEN property.status='ACTIVE' then 0 WHEN property.status='INWORKFLOW' then 1 WHEN property.status='INACTIVE' then 2 ELSE 3 END) as statusorder, address.tenantid as adresstenantid, address.id as addressid, address.propertyid as addresspid, latitude, longitude, doorno, plotno, buildingname, street, landmark, city, pincode, locality, district, region, state, country, address.createdby as addresscreatedby, address.lastmodifiedby as addresslastmodifiedby, address.createdtime as addresscreatedtime, address.lastmodifiedtime as addresslastmodifiedtime, address.additionaldetails as addressadditionaldetails, owner.tenantid as owntenantid, ownerInfoUuid, owner.propertyid as ownpropertyid, userid, owner.status as ownstatus,owner.additionaldetails as oadditionaldetails, isprimaryowner, ownertype, ownershippercentage, owner.institutionid as owninstitutionid, relationship, owner.createdby as owncreatedby, owner.createdtime as owncreatedtime,owner.lastmodifiedby as ownlastmodifiedby, owner.lastmodifiedtime as ownlastmodifiedtime, unit.id as unitid, unit.tenantid as unittenantid, unit.propertyid as unitpid, floorno, unittype, unit.usagecategory as unitusagecategory, occupancytype, occupancydate, carpetarea, builtuparea, plintharea, unit.superbuiltuparea as unitspba, arv, constructiontype, constructiondate, dimensions, unit.active as isunitactive, unit.createdby as unitcreatedby, unit.createdtime as unitcreatedtime, unit.lastmodifiedby as unitlastmodifiedby, unit.lastmodifiedtime as unitlastmodifiedtime  FROM EG_PT_PROPERTY property INNER JOIN EG_PT_ADDRESS address         ON property.id = address.propertyid INNER JOIN EG_PT_OWNER owner             ON property.id = owner.propertyid  LEFT OUTER JOIN EG_PT_UNIT unit ON property.id =  unit.propertyid  WHERE  property.tenantId= ?  AND property.usagecategory like ? AND address.locality = ? AND owner.status = ? AND property.status = ?) as propertydata"
+	private static final String PROPERTY_DEFAULTER_SEARCH = "select * from (SELECT property.id as pid, property.propertyid, property.tenantid as ptenantid, surveyid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory,property.usagecategory as pusagecategory, creationreason, nooffloors, landarea, property.superbuiltuparea as propertysbpa, linkedproperties, source, channel, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.isbilling as isbilling, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, (CASE WHEN property.status='ACTIVE' then 0 WHEN property.status='INWORKFLOW' then 1 WHEN property.status='INACTIVE' then 2 ELSE 3 END) as statusorder, address.tenantid as adresstenantid, address.id as addressid, address.propertyid as addresspid, latitude, longitude, doorno, plotno, buildingname, street, landmark, city, pincode, locality, district, region, state, country, address.createdby as addresscreatedby, address.lastmodifiedby as addresslastmodifiedby, address.createdtime as addresscreatedtime, address.lastmodifiedtime as addresslastmodifiedtime, address.additionaldetails as addressadditionaldetails, owner.tenantid as owntenantid, ownerInfoUuid, owner.propertyid as ownpropertyid, userid, owner.status as ownstatus,owner.additionaldetails as oadditionaldetails, isprimaryowner, ownertype, ownershippercentage, owner.institutionid as owninstitutionid, relationship, owner.createdby as owncreatedby, owner.createdtime as owncreatedtime,owner.lastmodifiedby as ownlastmodifiedby, owner.lastmodifiedtime as ownlastmodifiedtime, unit.id as unitid, unit.tenantid as unittenantid, unit.propertyid as unitpid, floorno, unittype, unit.usagecategory as unitusagecategory, occupancytype, occupancydate, carpetarea, builtuparea, plintharea, unit.superbuiltuparea as unitspba, arv, constructiontype, constructiondate, dimensions, unit.active as isunitactive, unit.createdby as unitcreatedby, unit.createdtime as unitcreatedtime, unit.lastmodifiedby as unitlastmodifiedby, unit.lastmodifiedtime as unitlastmodifiedtime FROM EG_PT_PROPERTY property INNER JOIN EG_PT_ADDRESS address         ON property.id = address.propertyid INNER JOIN EG_PT_OWNER owner             ON property.id = owner.propertyid  LEFT OUTER JOIN EG_PT_UNIT unit ON property.id =  unit.propertyid  WHERE  property.tenantId= ?  AND property.usagecategory like ? AND address.locality = ? AND owner.status = ? AND property.status = ?) as propertydata"
 			+ " LEFT OUTER JOIN (select consumercode,sum(taxdue) as taxDue,STRING_AGG(year || '(Rs.' || taxdue || ')',',')  as taxDueYear from ( select d.consumercode, (to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YY')) as year ,  sum(dd.taxamount)-sum(dd.collectionamount) as taxdue from egbs_demanddetail_v1 dd, egbs_demand_v1 d "
 			+ " where dd.demandid=d.id and d.status!='CANCELLED' and dd.tenantid='pg.citya' and d.tenantid='pg.citya' and (to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YY')) != ? group by d.consumercode,(to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YY'))) tax where taxDue>0 group by tax.consumercode) as taxdata on propertydata.propertyid=taxdata.consumercode";
 
@@ -60,7 +60,7 @@ public class PropertyQueryBuilder {
 
 	// Select query
 
-	private static String propertySelectValues = "property.id as pid, property.propertyid, property.tenantid as ptenantid, surveyid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory,property.usagecategory as pusagecategory, creationreason, nooffloors, landarea, property.superbuiltuparea as propertysbpa, linkedproperties, source, channel, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime,"
+	private static String propertySelectValues = "property.id as pid, property.propertyid, property.isbilling as isbilling, property.tenantid as ptenantid, surveyid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory,property.usagecategory as pusagecategory, creationreason, nooffloors, landarea, property.superbuiltuparea as propertysbpa, linkedproperties, source, channel, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime,"
 			+ " property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, property.business_service as pbusiness_service, (CASE WHEN property.status='ACTIVE' then 0 WHEN property.status='INWORKFLOW' then 1 WHEN property.status='INACTIVE' then 2 ELSE 3 END) as statusorder, ";
 
 	private static String addressSelectValues = "address.tenantid as adresstenantid, address.id as addressid, address.propertyid as addresspid, latitude, longitude, doorno, plotno, buildingname, street, landmark, city, pincode, locality, district, region, state, country, address.createdby as addresscreatedby, address.lastmodifiedby as addresslastmodifiedby, address.createdtime as addresscreatedtime, address.lastmodifiedtime as addresslastmodifiedtime, address.additionaldetails as addressadditionaldetails, ";
@@ -76,79 +76,40 @@ public class PropertyQueryBuilder {
 	private static String UnitSelectValues = "unit.id as unitid, unit.tenantid as unittenantid, unit.propertyid as unitpid, floorno, unittype, unit.usagecategory as unitusagecategory, occupancytype, occupancydate, carpetarea, builtuparea, plintharea, unit.superbuiltuparea as unitspba, arv, constructiontype, constructiondate, dimensions, unit.active as isunitactive, unit.createdby as unitcreatedby, unit.createdtime as unitcreatedtime, unit.lastmodifiedby as unitlastmodifiedby, unit.lastmodifiedtime as unitlastmodifiedtime, unit.additional_details as unitadditional_details ";
 
 	private static final String TOTAL_APPLICATIONS_COUNT_QUERY = "select count(*) from eg_pt_property where tenantid = ?;";
-	
-	private static final String BASE_QUERY = "SELECT \n"
-			+"     property.id AS pid,\n"
-			+ "    property.id AS property_id,\n"
+
+	private static final String BASE_QUERY = "SELECT \n" + "     property.id AS pid,\n"
+			+ "    property.id AS property_id,\n" 
+			+ "    property.isbilling as isbilling,\n" 
 			+ "    property.propertyid AS propertyid,\n"
-			+ "    property.tenantid AS ptenantid,\n"
-			+ "    property.surveyid,\n"
-			+ "    property.accountid,\n"
-			+ "    property.oldpropertyid,\n"
-			+ "    property.status AS propertystatus,\n"
-			+ "    property.acknowldgementnumber,\n"
-			+ "    property.propertytype,\n"
-			+ "    property.ownershipcategory,\n"
-			+ "    property.usagecategory as pusagecategory,\n"
-			+ "    property.creationreason,\n"
-			+ "    property.nooffloors,\n"
-			+ "    property.landarea,\n"
-			+ "    property.superbuiltuparea as propertysbpa,\n"
-			+ "    property.linkedproperties,\n"
-			+ "    property.source AS source,\n"
-			+ "    property.channel,\n"
-			+ "    property.createdby AS pcreatedby,\n"
-			+ "    property.lastmodifiedby AS plastmodifiedby,\n"
-			+ "    property.createdtime AS pcreatedtime,\n"
+			+ "    property.tenantid AS ptenantid,\n" + "    property.surveyid,\n" + "    property.accountid,\n"
+			+ "    property.oldpropertyid,\n" + "    property.status AS propertystatus,\n"
+			+ "    property.acknowldgementnumber,\n" + "    property.propertytype,\n"
+			+ "    property.ownershipcategory,\n" + "    property.usagecategory as pusagecategory,\n"
+			+ "    property.creationreason,\n" + "    property.nooffloors,\n" + "    property.landarea,\n"
+			+ "    property.superbuiltuparea as propertysbpa,\n" + "    property.linkedproperties,\n"
+			+ "    property.source AS source,\n" + "    property.channel,\n" + "    property.createdby AS pcreatedby,\n"
+			+ "    property.lastmodifiedby AS plastmodifiedby,\n" + "    property.createdtime AS pcreatedtime,\n"
 			+ "    property.lastmodifiedtime AS plastmodifiedtime,\n"
-			+ "    property.additionaldetails AS padditionaldetails,\n"
-			+ "    a.id AS addressid,\n"
-			+ "    a.propertyid AS address_propertyid,\n"
-			+ "    a.tenantid AS address_tenantid,\n"
-			+ "    a.doorno,\n"
-			+ "    a.plotno,\n"
-			+ "    a.buildingname,\n"
-			+ "    a.street,\n"
-			+ "    a.landmark,\n"
-			+ "    a.city,\n"
-			+ "    a.pincode,\n"
-			+ "    a.locality,\n"
-			+ "    a.district,\n"
-			+ "    a.region,\n"
-			+ "    a.state,\n"
-			+ "    a.country,\n"
-			+ "    a.latitude,\n"
-			+ "    a.longitude,\n"
-			+ "    a.createdby AS address_createdby,\n"
-			+ "    a.createdtime AS address_createdtime,\n"
+			+ "    property.additionaldetails AS padditionaldetails,\n" + "    a.id AS addressid,\n"
+			+ "    a.propertyid AS address_propertyid,\n" + "    a.tenantid AS address_tenantid,\n" + "    a.doorno,\n"
+			+ "    a.plotno,\n" + "    a.buildingname,\n" + "    a.street,\n" + "    a.landmark,\n" + "    a.city,\n"
+			+ "    a.pincode,\n" + "    a.locality,\n" + "    a.district,\n" + "    a.region,\n" + "    a.state,\n"
+			+ "    a.country,\n" + "    a.latitude,\n" + "    a.longitude,\n"
+			+ "    a.createdby AS address_createdby,\n" + "    a.createdtime AS address_createdtime,\n"
 			+ "    a.lastmodifiedby AS address_lastmodifiedby,\n"
 			+ "    a.lastmodifiedtime AS address_lastmodifiedtime,\n"
-			+ "    a.additionaldetails AS addressadditionaldetails,\n"
-			+ "    o.ownerinfouuid,\n"
-			+ "    o.tenantid AS owntenantid,\n"
-			+ "    o.propertyid AS owner_propertyid,\n"
-			+ "    o.institutionid as owninstitutionid,\n"
-			+ "    o.userid,\n"
-			+ "    o.status AS ownstatus,\n"
-			+ "    o.isprimaryowner,\n"
-			+ "    o.ownertype,\n"
-			+ "    o.ownershippercentage,\n"
-			+ "    o.relationship,\n"
-			+ "    o.createdby AS owner_createdby,\n"
-			+ "    o.createdtime AS owner_createdtime,\n"
-			+ "    o.lastmodifiedby AS owner_lastmodifiedby,\n"
-			+ "    o.lastmodifiedtime AS owner_lastmodifiedtime,\n"
-			+ "    o.additionaldetails AS oadditionaldetails\n"
-			//+"     o.institutionid AS institution_id\n"
-			+ "\n"
-			+ "FROM \n"
-			+ "    public.eg_pt_property property\n"
-			+ "LEFT JOIN \n"
-			+ "    public.eg_pt_address a ON property.id = a.propertyid\n"
-			+ "LEFT JOIN \n"
-			+ "    public.eg_pt_owner o ON property.id = o.propertyid\n"
-			+"LEFT JOIN \n"
-			+"     public.eg_pt_institution i ON property.id  = i.propertyid";
+			+ "    a.additionaldetails AS addressadditionaldetails,\n" + "    o.ownerinfouuid,\n"
+			+ "    o.tenantid AS owntenantid,\n" + "    o.propertyid AS owner_propertyid,\n"
+			+ "    o.institutionid as owninstitutionid,\n" + "    o.userid,\n" + "    o.status AS ownstatus,\n"
+			+ "    o.isprimaryowner,\n" + "    o.ownertype,\n" + "    o.ownershippercentage,\n"
+			+ "    o.relationship,\n" + "    o.createdby AS owner_createdby,\n"
+			+ "    o.createdtime AS owner_createdtime,\n" + "    o.lastmodifiedby AS owner_lastmodifiedby,\n"
+			+ "    o.lastmodifiedtime AS owner_lastmodifiedtime,\n" + "    o.additionaldetails AS oadditionaldetails\n"
+			// +" o.institutionid AS institution_id\n"
+			+ "\n" + "FROM \n" + "    public.eg_pt_property property\n" + "LEFT JOIN \n"
+			+ "    public.eg_pt_address a ON property.id = a.propertyid\n" + "LEFT JOIN \n"
+			+ "    public.eg_pt_owner o ON property.id = o.propertyid\n" + "LEFT JOIN \n"
+			+ "     public.eg_pt_institution i ON property.id  = i.propertyid";
 
 	private static final String QUERY = SELECT
 
@@ -217,7 +178,7 @@ public class PropertyQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 
 	private static final String LATEST_EXECUTED_MIGRATION_QUERY = "select * from eg_pt_enc_audit where tenantid = ? order by createdTime desc limit 1;";
-	
+
 	private static final String COUNT_STATUS_BASED_QUERY = "SELECT COUNT(DISTINCT property.id) AS count,"
 			+ "COUNT(DISTINCT CASE WHEN property.status = 'INITIATED' THEN property.id END) AS applicationInitiated,"
 			+ "COUNT(DISTINCT CASE WHEN property.status = 'PENDINGFORVERIFICATION' THEN property.id END) AS applicationPendingForVerification,"
@@ -226,42 +187,27 @@ public class PropertyQueryBuilder {
 			+ "COUNT(distinct case when property.status = 'APPROVED' then property.id end) as applicationApproved,"
 			+ "COUNT(distinct case when property.status = 'REJECTED' then property.id end) as applicationRejected "
 			+ "from EG_PT_PROPERTY property";
-	
-	private static final String PROPERTY_OWNERS_SEARCH_QUERY = "select * from eg_pt_owner epo where mobile_number is null limit 500";
-	
-	private static final String CHECK_PROPERTY_MASTER_STATUS_QUERY =
-		      "SELECT "
-		    + "  data->>'ulbName' AS ulb_name, "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.Zones' THEN 'YES' ELSE 'NO' END) AS \"LocationFactor(F1)\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.BuildingStructure' THEN 'YES' ELSE 'NO' END) AS \"BuildingType(F2)\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.BuildingEstablishmentYear' THEN 'YES' ELSE 'NO' END) AS \"BuildingEstablishment(F3)\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.BuildingPurpose' THEN 'YES' ELSE 'NO' END) AS \"OccupationFactor(F4)\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.BuildingUse' THEN 'YES' ELSE 'NO' END) AS \"UsesOfBuilding(F5)\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.OverAllRebate' THEN 'YES' ELSE 'NO' END) AS \"OverallRebateRate\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.PenaltyRate' THEN 'YES' ELSE 'NO' END) AS \"PenaltyRate\", "
-		    + "  MAX(CASE WHEN schemacode = 'ULBS.EarlyPaymentRebate' THEN 'YES' ELSE 'NO' END) AS \"EarlyPaymentRebate\", "
-		    + "  MAX(CASE WHEN schemacode = 'PropertyTaxRate.PropertyTaxRate' THEN 'YES' ELSE 'NO' END) AS \"PropertyTaxCalculation\", "
-		    + "  CASE "
-		    + "    WHEN COUNT(DISTINCT schemacode) = 9 THEN 'YES' "
-		    + "    ELSE 'NO' "
-		    + "  END AS \"All_Complete\" "
-		    + "FROM eg_mdms_data "
-		    + "WHERE schemacode IN ( "
-		    + "  'ULBS.Zones', "
-		    + "  'ULBS.BuildingEstablishmentYear', "
-		    + "  'ULBS.BuildingStructure', "
-		    + "  'ULBS.BuildingPurpose', "
-		    + "  'ULBS.BuildingUse', "
-		    + "  'ULBS.OverAllRebate', "
-		    + "  'ULBS.PenaltyRate', "
-		    + "  'ULBS.EarlyPaymentRebate', "
-		    + "  'PropertyTaxRate.PropertyTaxRate' "
-		    + ") ";
-		    
 
+	private static final String PROPERTY_OWNERS_SEARCH_QUERY = "select * from eg_pt_owner epo where mobile_number is null limit 500";
+
+	private static final String CHECK_PROPERTY_MASTER_STATUS_QUERY = "SELECT " + "  data->>'ulbName' AS ulb_name, "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.Zones' THEN 'YES' ELSE 'NO' END) AS \"LocationFactor(F1)\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.BuildingStructure' THEN 'YES' ELSE 'NO' END) AS \"BuildingType(F2)\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.BuildingEstablishmentYear' THEN 'YES' ELSE 'NO' END) AS \"BuildingEstablishment(F3)\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.BuildingPurpose' THEN 'YES' ELSE 'NO' END) AS \"OccupationFactor(F4)\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.BuildingUse' THEN 'YES' ELSE 'NO' END) AS \"UsesOfBuilding(F5)\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.OverAllRebate' THEN 'YES' ELSE 'NO' END) AS \"OverallRebateRate\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.PenaltyRate' THEN 'YES' ELSE 'NO' END) AS \"PenaltyRate\", "
+			+ "  MAX(CASE WHEN schemacode = 'ULBS.EarlyPaymentRebate' THEN 'YES' ELSE 'NO' END) AS \"EarlyPaymentRebate\", "
+			+ "  MAX(CASE WHEN schemacode = 'PropertyTaxRate.PropertyTaxRate' THEN 'YES' ELSE 'NO' END) AS \"PropertyTaxCalculation\", "
+			+ "  CASE " + "    WHEN COUNT(DISTINCT schemacode) = 9 THEN 'YES' " + "    ELSE 'NO' "
+			+ "  END AS \"All_Complete\" " + "FROM eg_mdms_data " + "WHERE schemacode IN ( " + "  'ULBS.Zones', "
+			+ "  'ULBS.BuildingEstablishmentYear', " + "  'ULBS.BuildingStructure', " + "  'ULBS.BuildingPurpose', "
+			+ "  'ULBS.BuildingUse', " + "  'ULBS.OverAllRebate', " + "  'ULBS.PenaltyRate', "
+			+ "  'ULBS.EarlyPaymentRebate', " + "  'PropertyTaxRate.PropertyTaxRate' " + ") ";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
-		
+
 		if (criteria.getIsSchedulerCall()) {
 			return query;
 		}
@@ -326,31 +272,25 @@ public class PropertyQueryBuilder {
 			Boolean isPlainSearch, Boolean onlyIds, Map<Integer, PropertyCriteria> propertyCriteriaMap) {
 
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
-					&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
-					&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
-					&& CollectionUtils.isEmpty(criteria.getUuids())
-					&& null == criteria.getMobileNumber()
-					&& null == criteria.getName()
-					&& null == criteria.getDoorNo()
-					&& null == criteria.getOldPropertyId()
-					&& null == criteria.getDocumentNumbers()
-					&& null == criteria.getLocality()
-					&& null == criteria.getPropertyType()
-					&& (null == criteria.getFromDate() && null == criteria.getToDate())
-					&& CollectionUtils.isEmpty(criteria.getCreationReason())
-					&& StringUtils.isEmpty(criteria.getTenantId());
-		
-		if(isEmpty && !criteria.getIsSchedulerCall())
-			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
-		
+				&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
+				&& CollectionUtils.isEmpty(criteria.getOldpropertyids()) && CollectionUtils.isEmpty(criteria.getUuids())
+				&& null == criteria.getMobileNumber() && null == criteria.getName() && null == criteria.getDoorNo()
+				&& null == criteria.getOldPropertyId() && null == criteria.getDocumentNumbers()
+				&& null == criteria.getLocality() && null == criteria.getPropertyType()
+				&& (null == criteria.getFromDate() && null == criteria.getToDate())
+				&& CollectionUtils.isEmpty(criteria.getCreationReason()) && StringUtils.isEmpty(criteria.getTenantId());
+
+		if (isEmpty && !criteria.getIsSchedulerCall())
+			throw new CustomException("EG_PT_SEARCH_ERROR", " No criteria given for the property search");
+
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append(QUERY);
-		
+
 		addClauseIfRequired(preparedStmtList, builder);
 		builder.append(" 1 = ? ");
 		preparedStmtList.add(1);
-		
+
 		String whereClause = "";
 		if (null != propertyCriteriaMap && !propertyCriteriaMap.isEmpty()) {
 			List<String> clause = new ArrayList<>();
@@ -366,14 +306,14 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			whereClause = addWhereClause(criteria, preparedStmtList, isPlainSearch);
 		}
-		
+
 		builder.append(whereClause);
 
 		String withClauseQuery = WITH_CLAUSE_QUERY.replace(REPLACE_STRING, builder);
 //		if (onlyIds || criteria.getIsRequestForCount() || StringUtils.isNotEmpty(criteria.getTenantId()))
 //			return builder.toString();
 //		else 
-			return addPaginationWrapper(withClauseQuery, preparedStmtList, criteria);
+		return addPaginationWrapper(withClauseQuery, preparedStmtList, criteria);
 	}
 
 	private String addWhereClause(PropertyCriteria criteria, List<Object> preparedStmtList, Boolean isPlainSearch) {
@@ -532,41 +472,39 @@ public class PropertyQueryBuilder {
 					.append(createQuery(criteria.getAdditionalDetailsPropertyIds())).append(")");
 			addToPreparedStatement(preparedStmtList, criteria.getAdditionalDetailsPropertyIds());
 		}
-		
+
 		if (!CollectionUtils.isEmpty(criteria.getAddressAdditionalDetailsWardNumbers())) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("address.additionaldetails->>'wardNumber' IN (")
 					.append(createQuery(criteria.getAddressAdditionalDetailsWardNumbers())).append(")");
 			addToPreparedStatement(preparedStmtList, criteria.getAddressAdditionalDetailsWardNumbers());
 		}
-		
+
 		if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("owner.additionaldetails->>'ownerOldCustomerId' IN (")
 					.append(createQuery(criteria.getOwnerOldCustomerIds())).append(")");
 			addToPreparedStatement(preparedStmtList, criteria.getOwnerOldCustomerIds());
 		}
-		
+
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("owner.name = ?");
 			preparedStmtList.add(criteria.getName());
 		}
-		
+
 		if (null != criteria.getMobileNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("owner.mobile_number = ?");
 			preparedStmtList.add(criteria.getMobileNumber());
 		}
-		
-		if (null !=criteria.getIsActiveUnit() && criteria.getIsActiveUnit()) {
+
+		if (null != criteria.getIsActiveUnit() && criteria.getIsActiveUnit()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("unit.active = ?");
 			preparedStmtList.add(criteria.getIsActiveUnit());
 		}
-		
-		
-		
+
 		return builder.toString();
 	}
 
@@ -706,8 +644,8 @@ public class PropertyQueryBuilder {
 		return PROPERTY_AUDIT_ENC_QUERY;
 	}
 
-	public String getTaxCalculatedPropertiesSearchQuery(
-			PtTaxCalculatorTrackerSearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getTaxCalculatedPropertiesSearchQuery(PtTaxCalculatorTrackerSearchCriteria criteria,
+			List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_SEARCH_QUERY);
 
 		builder.append(" WHERE 1 = 1 ");
@@ -727,8 +665,8 @@ public class PropertyQueryBuilder {
 				preparedStmtList.add(criteria.getTenantId());
 			}
 		}
-		
-		if(criteria.getBillId() != null) {
+
+		if (criteria.getBillId() != null) {
 			andClauseIfRequired(preparedStmtList, builder);
 			builder.append(" eptct.bill_id=? ");
 			preparedStmtList.add(criteria.getBillId());
@@ -771,7 +709,7 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
-	
+
 	public String getTaxCalculatedTenantIdsSearchQuery(PtTaxCalculatorTrackerSearchCriteria criteria,
 			List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_TENANT_ID_SEARCH_QUERY);
@@ -785,7 +723,7 @@ public class PropertyQueryBuilder {
 			builder.append(" eptct.bill_status IN (").append(createQuery(billStatus)).append(")");
 			addToPreparedStatement(preparedStmtList, billStatus);
 		}
-		
+
 		if (!CollectionUtils.isEmpty(criteria.getNotInBillStatus())) {
 			andClauseIfRequired(preparedStmtList, builder);
 			Set<String> notInBillStatus = criteria.getNotInBillStatus().stream().map(BillStatus::name)
@@ -796,12 +734,12 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
-	
+
 	private static void andClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		queryString.append(" AND");
 	}
-	
-	public String getStatusBasedCountQuery(TotalCountRequest totalCountRequest,List<Object> preparedStmtList) {
+
+	public String getStatusBasedCountQuery(TotalCountRequest totalCountRequest, List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(COUNT_STATUS_BASED_QUERY);
 		builder.append(" WHERE 1 = 1 ");
@@ -819,7 +757,7 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
-	
+
 	public String getLimitAndOrderByUpdatedTimeDesc(PtTaxCalculatorTrackerSearchCriteria criteria, String query,
 			List<Object> preparedStmtList) {
 		StringBuilder queryBuilder = new StringBuilder(query);
@@ -851,7 +789,7 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
-	
+
 	public String getPropertyMastersStatusQuery(String ulbName, List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(CHECK_PROPERTY_MASTER_STATUS_QUERY);
@@ -861,10 +799,60 @@ public class PropertyQueryBuilder {
 			builder.append(" data->>'ulbName' = ? ");
 			preparedStmtList.add(ulbName);
 		}
-		// add group by and 
+		// add group by and
 		builder.append(" GROUP BY data->>'ulbName' ORDER BY ulb_name;");
 
 		return builder.toString();
 	}
+	
+public String getOnlyPropertyIdQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+
+    StringBuilder builder = new StringBuilder();
+    builder.append("SELECT DISTINCT property.propertyid FROM EG_PT_PROPERTY property WHERE 1=1 ");
+
+    if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+        Set<String> propertyIds = criteria.getPropertyIds().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!propertyIds.isEmpty()) {
+            builder.append(" AND property.propertyid IN (").append(createQuery(propertyIds)).append(")");
+            addToPreparedStatement(preparedStmtList, propertyIds);
+        }
+    }
+
+    if (!CollectionUtils.isEmpty(criteria.getOldpropertyids())) {
+        Set<String> oldPropertyIds = criteria.getOldpropertyids().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!oldPropertyIds.isEmpty()) {
+            builder.append(" AND property.oldpropertyid IS NOT NULL AND property.oldpropertyid <> '' ")
+                   .append(" AND property.oldpropertyid IN (")
+                   .append(createQuery(oldPropertyIds))
+                   .append(")");
+            addToPreparedStatement(preparedStmtList, oldPropertyIds);
+        }
+    }
+
+    if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
+        Set<String> ownerIds = criteria.getOwnerOldCustomerIds().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!ownerIds.isEmpty()) {
+            builder.append(" AND EXISTS (SELECT 1 FROM EG_PT_OWNER owner WHERE owner.propertyid = property.id AND owner.additionaldetails->>'ownerOldCustomerId' IN (")
+                   .append(createQuery(ownerIds)).append("))");
+            addToPreparedStatement(preparedStmtList, ownerIds);
+        }
+    }
+
+    if (criteria.getTenantId() != null) {
+        builder.append(" AND property.tenantid = ?");
+        preparedStmtList.add(criteria.getTenantId());
+    }
+
+    return builder.toString();
+}
+
+
+
 
 }

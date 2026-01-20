@@ -86,6 +86,14 @@ public class SmsTrackerRepository {
 	    return jdbcTemplate.query(query, new SmsTrackerRowMapper());
 	}
    
+   public List<SmsTracker> fetchPendingSmsForBill(String billId) {
+
+	    String query = "SELECT * FROM eg_notification_sms_tracker WHERE sms_status = false AND bill_id = ?";
+
+	    return jdbcTemplate.query(query, new Object[]{billId}, new SmsTrackerRowMapper());
+	}
+
+   
    public void updateSmsStatus(SmsTracker tracker) {
        String query = "UPDATE eg_notification_sms_tracker SET sms_status = true, sms_response = ? WHERE uuid = ?";
        PGobject smsResponseJson = null;
@@ -100,5 +108,30 @@ public class SmsTrackerRepository {
        }
        jdbcTemplate.update(query, smsResponseJson, tracker.getUuid());
    }
+   
+   public void incrementResendCounter(String uuid) {
+	    String query = "UPDATE eg_notification_sms_tracker " +
+	                   "SET resend_counter = COALESCE(resend_counter, 0) + 1 " +
+	                   "WHERE uuid = ?";
+	    jdbcTemplate.update(query, uuid);
+	}
+   
+   public Short fetchResendCounterByBillId(String billId) {
+	   String selectSql = "SELECT COALESCE(resend_counter, 0) " +
+               "FROM eg_notification_sms_tracker " +
+               "WHERE bill_id = ? LIMIT 1";
+			Short counter = jdbcTemplate.queryForObject(selectSql,
+			                                        new Object[]{billId},
+			                                        Short.class);
+			
+			String updateSql = "UPDATE eg_notification_sms_tracker " +
+			               "SET sms_status = false " +
+			               "WHERE bill_id = ?";
+			jdbcTemplate.update(updateSql, billId);
+			
+			return counter != null ? counter : 0;
+	}
+
+
 }
 

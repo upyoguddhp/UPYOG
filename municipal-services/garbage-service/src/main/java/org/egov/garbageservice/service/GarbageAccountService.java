@@ -25,6 +25,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.egov.garbageservice.contract.bill.DemandRepository;
+import org.egov.garbageservice.model.ApplicationBillDTO;
+import org.egov.garbageservice.model.ApplicationDetails;
 
 import javax.validation.Valid;
 
@@ -157,6 +159,7 @@ public class GarbageAccountService {
 
 	@Autowired
 	private GrbgUtils grbgUtils;
+	
 
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
@@ -663,7 +666,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
@@ -799,7 +802,7 @@ public class GarbageAccountService {
 		// Build the search criteria request
 		SearchCriteriaGarbageAccountRequest searchCriteria = SearchCriteriaGarbageAccountRequest.builder()
 				.requestInfo(updateGarbageRequest.getRequestInfo()).searchCriteriaGarbageAccount(
-						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts()))
+						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts(),true))
 				.build();
 
 		// Get the response from the database
@@ -1385,11 +1388,14 @@ public class GarbageAccountService {
 		return existingGarbageAccountsMap;
 	}
 
-	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts) {
+	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts,Boolean searchActiveAccount) {
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = SearchCriteriaGarbageAccount.builder().build();
-		searchCriteriaGarbageAccount.setIsActiveAccount(true);
-		searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		if(searchActiveAccount) {
+			searchCriteriaGarbageAccount.setIsActiveAccount(true);
+			searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		}
+		
 //		List<Long> ids = new ArrayList<>();
 		List<Long> garbageIds = new ArrayList<>();
 		List<String> applicationNos = new ArrayList<>();
@@ -1503,6 +1509,25 @@ public class GarbageAccountService {
 
 		return garbageAccountResponse;
 	}
+	
+
+private RequestInfo buildPublicRequestInfo(String tenantId) {
+
+    User user = User.builder()
+            .tenantId(tenantId)
+            .type("SYSTEM")
+            .build();
+
+    return RequestInfo.builder()
+            .apiId("garbage-service")
+            .ver("1.0")
+            .ts(System.currentTimeMillis())
+            .userInfo(user)  
+            .authToken(null)
+            .build();
+}
+
+
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
 
@@ -1667,8 +1692,14 @@ public class GarbageAccountService {
 		}
 
 	}
+	
 
 	public GarbageAccountActionResponse getApplicationDetails(GarbageAccountActionRequest garbageAccountActionRequest) {
+
+		
+		boolean skipValidation =
+		        Boolean.TRUE.equals(garbageAccountActionRequest.getSkipValidation());
+
 
 		SearchCriteriaGarbageAccount criteria = SearchCriteriaGarbageAccount.builder().build();
 		GarbageAccountActionResponse garbageAccountActionResponse = GarbageAccountActionResponse.builder()
@@ -1682,7 +1713,7 @@ public class GarbageAccountService {
 					&& !StringUtils.isEmpty(garbageAccountActionRequest.getRequestInfo().getUserInfo().getUuid())) {
 				criteria.setUser_uuid(Collections
 						.singletonList(garbageAccountActionRequest.getRequestInfo().getUserInfo().getUuid()));
-			} else {
+			} else if (!skipValidation) {
 				throw new CustomException("INVALID REQUEST", "Provide Application Number.");
 			}
 		} else {
@@ -1898,23 +1929,28 @@ public class GarbageAccountService {
 		return roleCodes;
 	}
 
-	public GarbageAccountActionResponse payNowGrbgBill(PayNowRequest payNowRequest) {
-
-		if (StringUtils.isEmpty(payNowRequest.getUserUuid())) {
-			throw new CustomException("INVALID REQUEST", "Please Provide User Uuid.");
-		}
+	public GarbageAccountActionResponse payNowGrbgBill(PayNowRequest payNowRequest, Boolean skipValidation) {
+		
+		 if (!skipValidation) {
+		        if (StringUtils.isEmpty(payNowRequest.getUserUuid())) {
+		            throw new CustomException("INVALID REQUEST", "Please Provide User Uuid.");
+		        }
+		    }
 
 		// validate user
 		UserSearchResponse userSearchResponse = userService.searchUser(payNowRequest.getUserUuid());
 
+		if (!skipValidation) {
 		if (null == userSearchResponse || CollectionUtils.isEmpty(userSearchResponse.getUserSearchResponseContent())) {
 			throw new CustomException("USER NOT FOUND", "User not found for given user uuid.");
+		}
 		}
 
 		GarbageAccountActionRequest garbageAccountActionRequest = GarbageAccountActionRequest.builder()
 				.applicationNumbers(payNowRequest.getGarbageApplicationNumbers())
 				.billStatus(payNowRequest.getBillStatus()).month(payNowRequest.getMonth()).year(payNowRequest.getYear())
 				.propertyIds(payNowRequest.getPropertyIds()).garbageUuid(payNowRequest.getGarbageUuid())
+				.skipValidation(skipValidation)
 				.requestInfo(RequestInfo.builder().userInfo(User.builder().uuid(payNowRequest.getUserUuid()).build())
 						.build())
 				.build();
@@ -1923,6 +1959,39 @@ public class GarbageAccountService {
 
 		return garbageAccountActionResponse;
 	}
+	
+public GarbageAccountActionResponse openSearchPayPreview(
+        SearchCriteriaGarbageAccountRequest request,
+        Boolean isIndex) {
+
+    GarbageAccountResponse searchResponse =
+            searchGarbageAccounts(request, isIndex);
+
+    if (CollectionUtils.isEmpty(searchResponse.getGarbageAccounts())) {
+        return GarbageAccountActionResponse.builder()
+                .applicationDetails(Collections.emptyList())
+                .responseInfo(
+                        responseInfoFactory.createResponseInfoFromRequestInfo(
+                                request.getRequestInfo(), true))
+                .build();
+    }
+
+  
+    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
+            .stream()
+            .map(acc -> acc.getGrbgApplication().getApplicationNo())
+            .collect(Collectors.toList());
+
+    
+    GarbageAccountActionRequest actionRequest =
+            GarbageAccountActionRequest.builder()
+                    .applicationNumbers(applicationNumbers)
+                    .requestInfo(request.getRequestInfo())
+                    .skipValidation(true) 
+                    .build();
+
+    return getApplicationDetails(actionRequest);
+}
 
 	public GrbgBillTrackerRequest enrichGrbgBillTrackerCreateRequest(GarbageAccount garbageAccount,
 			GenerateBillRequest generateBillRequest, BigDecimal billAmount, Bill bill,
@@ -2120,13 +2189,13 @@ public class GarbageAccountService {
 	}
 
 	public ResponseEntity<Resource> generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
-			@Valid String grbgId, @Valid String billid) {
+			@Valid String grbgId, @Valid String billid, @Valid String status) {
 
 		List<GarbageAccount> garbageAccounts = Collections
 				.singletonList(GarbageAccount.builder().grbgApplicationNumber(grbgId).build());
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-				garbageAccounts);
+				garbageAccounts,false);
 
 		SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest = SearchCriteriaGarbageAccountRequest
 				.builder().searchCriteriaGarbageAccount(searchCriteriaGarbageAccount)
@@ -2153,8 +2222,11 @@ public class GarbageAccountService {
 		int conut = 1;
 		List<String> slNos = new ArrayList<>();
 		Set<String> garbapplicationNos = new HashSet<>();
+		Set<String> reqbillIds = new HashSet<>();
+		
 
 		garbapplicationNos.add(grbAccount.getGrbgApplicationNumber());
+		reqbillIds.add(grbAccount.getGrbgApplicationNumber());
 
 		for (GarbageAccount childGrbgAccount : grbAccount.getChildGarbageAccounts()) {
 			slNos.add(String.valueOf(conut++));
@@ -2176,9 +2248,22 @@ public class GarbageAccountService {
 		Set<String> billIds = grbgTaxCalculatorTracker.stream().map(GrbgBillTracker::getBillId)
 				.collect(Collectors.toSet());
 
-		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-				.tenantId(grbgTaxCalculatorMonthTracker.getTenantId()).service(grbAccount.getBusinessService())
-				.billId(billIds).build();
+		BillSearchCriteria.BillSearchCriteriaBuilder builder = BillSearchCriteria.builder()
+		        .tenantId(grbgTaxCalculatorMonthTracker.getTenantId())
+		        .service(grbAccount.getBusinessService())
+		        .billId(billIds);
+
+		
+		if (status != null && !status.trim().isEmpty()) {
+		     
+		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+		        builder.status(dynamicStatus);
+		   
+		}
+
+
+		BillSearchCriteria billSearchCriteria = builder.build();
+
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
@@ -2204,7 +2289,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
@@ -2360,7 +2445,7 @@ public class GarbageAccountService {
 				.builder().requestInfo(genrateArrearRequest.getRequestInfo())
 				.searchCriteriaGarbageAccount(searchCriteriaGarbageAccount).build();
 		GarbageAccountResponse garbageAccountResponse = searchGarbageAccounts(searchCriteriaGarbageAccountRequest,
-				true);
+				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
