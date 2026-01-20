@@ -35,8 +35,8 @@ public class GenerateBillRequest {
 	@JsonProperty("mobileNumbers")
 	private List<String> mobileNumbers;
 
-	@JsonProperty("month")
-	private String month;
+	@JsonProperty("months")
+	private List<String> months;
 
 	@JsonProperty("year")
 	private String year;

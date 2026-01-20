@@ -2000,7 +2000,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		AuditDetails createAuditDetails = grbgUtils.buildCreateAuditDetails(generateBillRequest.getRequestInfo());
 		GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder().uuid(UUID.randomUUID().toString())
 				.grbgApplicationId(garbageAccount.getGrbgApplicationNumber()).tenantId(garbageAccount.getTenantId())
-				.month(null != generateBillRequest.getMonth() ? generateBillRequest.getMonth().toUpperCase() : null)
+				.month(null)
 				.year(generateBillRequest.getYear())
 				.fromDate(
 						null != generateBillRequest.getFromDate() ? dateFormat.format(generateBillRequest.getFromDate())
@@ -2028,7 +2028,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 						null != generateBillRequest.getFromDate() ? dateFormat.format(generateBillRequest.getFromDate())
 								: null)
 				.id(UUID.randomUUID()).module_name("GB").failure_reason(failure_reason)
-				.month(null != generateBillRequest.getMonth() ? generateBillRequest.getMonth().toUpperCase() : null)
+				.month(null)
 				.request_payload(request_payload).response_payload(response_payload).status_code("400")
 				.created_time(new Date().getTime()).last_modified_time(new Date().getTime()).error_json(errorList)
 				.to_date(null != generateBillRequest.getToDate() ? dateFormat.format(generateBillRequest.getToDate())
