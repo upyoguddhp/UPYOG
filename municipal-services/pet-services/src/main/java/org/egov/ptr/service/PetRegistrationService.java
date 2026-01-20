@@ -118,6 +118,23 @@ public class PetRegistrationService {
 
 		return petRegistrationRequest.getPetRegistrationApplications();
 	}
+	
+
+	public List<PetRegistrationApplication> registerPtrRequestRenewal(
+	        PetRegistrationRequest request) {
+
+	    validator.validatePetApplication(request);
+
+	    // Renewal-specific enrichment
+	    enrichmentService.enrichPetApplicationForRenewal(request);
+
+	    // Workflow (INITIATE only)
+	    wfService.updateWorkflowStatus(request);
+
+	    producer.push(config.getCreatePtrTopic(), request);
+
+	    return request.getPetRegistrationApplications();
+	}
 
 	public List<PetRegistrationApplication> searchPtrApplications(RequestInfo requestInfo,
 			PetApplicationSearchCriteria petApplicationSearchCriteria) {
@@ -180,13 +197,13 @@ public class PetRegistrationService {
 			}else if(StringUtils.equalsAnyIgnoreCase(role, PTRConstants.USER_ROLE_SUPERVISOR, PTRConstants.USER_ROLE_SECRETARY)) {
 				statusWithRoles.addAll(Arrays.asList(
 						PTRConstants.APPLICATION_STATUS_INITIATED,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
-					    PTRConstants.APPLICATION_STATUS_APPROVED,
-					    PTRConstants.APPLICATION_STATUS_REJECTED
-		            ));
+						PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
+						PTRConstants.APPLICATION_STATUS_APPROVED,
+						PTRConstants.APPLICATION_STATUS_REJECTED
+					));
 				if(StringUtils.equalsIgnoreCase(petApplicationSearchCriteria.getTenantId()
 						, PTRConstants.STATE_LEVEL_TENANT_ID)) {
 					tempTenantId.set(null);
@@ -320,19 +337,19 @@ public class PetRegistrationService {
 
 		try {
 			if (lastVaccineDateStr != null) {
-			    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			    Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
+				SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
 
-			    SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-			    lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
+				SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
 			} 
 //			else {
 //			    lastVaccineDate = null; // or assign a default value if needed
 //			}
 
 		} catch (Exception e) {
-		    System.err.println("Error parsing last vaccine date: " + e.getMessage());
-		    e.printStackTrace();
+			System.err.println("Error parsing last vaccine date: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 //		String lastVaccineDate = dateFormat.format(petRegistrationApplication.getPetDetails().getLastVaccineDate().toString());
@@ -682,8 +699,8 @@ public class PetRegistrationService {
 		                        .filter(Objects::nonNull) // Ensure no null entries
 		                        .filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
 		                        .collect(Collectors.toList())); // Collect the filtered list
-			  
-			  if (statusList.get(0).containsKey("total_applications")) {
+
+				if (statusList.get(0).containsKey("total_applications")) {
 		            Object totalApplicationsObj = statusList.get(0).get("total_applications");
 		            if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
 		            	response.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());

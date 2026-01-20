@@ -53,6 +53,18 @@ public class PetController {
 				.responseInfo(responseInfo).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+    
+    @RequestMapping(value = "/_renewal", method = RequestMethod.POST)
+	public ResponseEntity<PetRegistrationResponse> petRegistrationRenewal(
+			@ApiParam(value = "Details for the renewal Pet Registration Application(s) + RequestInfo meta data.", required = true) @Valid @RequestBody PetRegistrationRequest petRegistrationRequest) {
+		List<PetRegistrationApplication> applications = petRegistrationService
+				.registerPtrRequestRenewal(petRegistrationRequest);
+		ResponseInfo responseInfo = responseInfoFactory
+				.createResponseInfoFromRequestInfo(petRegistrationRequest.getRequestInfo(), true);
+		PetRegistrationResponse response = PetRegistrationResponse.builder().petRegistrationApplications(applications)
+				.responseInfo(responseInfo).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	
     @RequestMapping(value = "/_search", method = RequestMethod.POST)
