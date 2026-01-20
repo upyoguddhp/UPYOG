@@ -2000,7 +2000,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		AuditDetails createAuditDetails = grbgUtils.buildCreateAuditDetails(generateBillRequest.getRequestInfo());
 		GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder().uuid(UUID.randomUUID().toString())
 				.grbgApplicationId(garbageAccount.getGrbgApplicationNumber()).tenantId(garbageAccount.getTenantId())
-				.month(null)
+				.month(resolveTrackerMonth(generateBillRequest))
 				.year(generateBillRequest.getYear())
 				.fromDate(
 						null != generateBillRequest.getFromDate() ? dateFormat.format(generateBillRequest.getFromDate())
@@ -2014,6 +2014,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		return GrbgBillTrackerRequest.builder().requestInfo(generateBillRequest.getRequestInfo())
 				.grbgBillTracker(grbgBillTracker).build();
 	}
+	
+	private String resolveTrackerMonth(GenerateBillRequest request) {
+	    if (!CollectionUtils.isEmpty(request.getMonths())) {
+	        return request.getMonths()
+	                .get(request.getMonths().size() - 1)
+	                .toUpperCase();
+	    }
+	    return null;
+	}
+
 
 	public GrbgBillFailure enrichGrbgBillFailure(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
 			BillResponse billResponse, List<String> errorList) {

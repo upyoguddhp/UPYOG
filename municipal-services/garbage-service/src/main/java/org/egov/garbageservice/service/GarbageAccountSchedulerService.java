@@ -119,6 +119,11 @@ public class GarbageAccountSchedulerService {
 			garbageAccounts.stream().forEach(garbageAccount -> {
 				List<String> errorList = new ArrayList<>();
 				ObjectNode  calculationBreakdown = objectMapper.createObjectNode();
+				  calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
+				    calculationBreakdown.put("month",
+				            generateBillRequest.getMonths()
+				                               .get(generateBillRequest.getMonths().size() - 1));
+				    
 				if(null != garbageAccount.getUserUuid()) {
 					Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
 							garbageAccount.getTenantId());
