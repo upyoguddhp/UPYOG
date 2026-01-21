@@ -136,6 +136,30 @@ public class GarbageAccountSchedulerService {
 					int numberOfMonths = generateBillRequest.getMonths().size();
 	
 					BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
+					
+					BigDecimal rebatePercentage =
+					        mdmsService.fetchGarbageRebateRate(
+					                generateBillRequest.getRequestInfo(),
+					                garbageAccount.getTenantId()
+					        );
+
+					BigDecimal rebateAmount = BigDecimal.ZERO;
+					BigDecimal finalBillAmount = billAmount;
+
+					if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
+					    rebateAmount = billAmount
+					            .multiply(rebatePercentage)
+					            .divide(BigDecimal.valueOf(100))
+					            .setScale(2, RoundingMode.HALF_UP);
+
+					    finalBillAmount = billAmount.subtract(rebateAmount);
+					}
+
+					calculationBreakdown.put("baseAmount", billAmount);
+					calculationBreakdown.put("rebatePercentage", rebatePercentage);
+					calculationBreakdown.put("rebateAmount", rebateAmount);
+					calculationBreakdown.put("finalAmount", finalBillAmount);
+
 
 					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
 					
@@ -144,7 +168,9 @@ public class GarbageAccountSchedulerService {
 						        ? "MULTI_MONTH"
 						        : "MONTHLY";
 						        
-						BillResponse billResponse = generateDemandAndBill(generateBillRequest, garbageAccount, billAmount, billType);
+						        BillResponse billResponse =
+						                generateDemandAndBill(generateBillRequest, garbageAccount, finalBillAmount, billType);
+
 	
 						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService

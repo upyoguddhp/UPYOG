@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -246,5 +247,51 @@ public class MdmsService {
 
     return rate;
 }
+	
+	public BigDecimal fetchGarbageRebateRate(RequestInfo requestInfo, String tenantId) {
+
+	    String moduleName = "ULBS";
+	    String masterName = "GarbageRebate";
+
+	    String filter = "$.[?(@.active==true)]";
+
+	    MasterDetail masterDetail = MasterDetail.builder()
+	            .name(masterName)
+	            .filter(filter)
+	            .build();
+
+	    ModuleDetail moduleDetail = ModuleDetail.builder()
+	            .moduleName(moduleName)
+	            .masterDetails(Collections.singletonList(masterDetail))
+	            .build();
+
+	    MdmsCriteria mdmsCriteria = MdmsCriteria.builder()
+	            .tenantId("hp")
+	            .moduleDetails(Collections.singletonList(moduleDetail))
+	            .build();
+
+	    MdmsCriteriaReq request = MdmsCriteriaReq.builder()
+	            .requestInfo(requestInfo)
+	            .mdmsCriteria(mdmsCriteria)
+	            .build();
+
+	    String url = config.getMdmsV2Host() + config.getMdmsV2SearchEndpoint();
+
+	    Object mdmsResponse = restTemplate.postForObject(url, request, Object.class);
+
+	    JsonNode root = objectMapper.convertValue(mdmsResponse, JsonNode.class);
+	    JsonNode rebateArray = root.path("MdmsRes").path(moduleName).path(masterName);
+
+	    if (!rebateArray.isArray() || rebateArray.isEmpty()) {
+	        log.warn("[MDMS][Rebate] GarbageRebate not found for tenantId={}", tenantId);
+	        return BigDecimal.ZERO;
+	    }
+
+	    BigDecimal rate = rebateArray.get(0).path("rate").decimalValue();
+	    log.info("[MDMS][Rebate] Rebate rate resolved = {}", rate);
+
+	    return rate;
+	}
+
 
 }
