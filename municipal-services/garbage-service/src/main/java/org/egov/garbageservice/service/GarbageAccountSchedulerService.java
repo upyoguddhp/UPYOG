@@ -137,30 +137,32 @@ public class GarbageAccountSchedulerService {
 	
 					BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
 					
-					BigDecimal rebatePercentage =
-					        mdmsService.fetchGarbageRebateRate(
-					                generateBillRequest.getRequestInfo(),
-					                garbageAccount.getTenantId()
-					        );
-
+					BigDecimal rebatePercentage = BigDecimal.ZERO;
 					BigDecimal rebateAmount = BigDecimal.ZERO;
 					BigDecimal finalBillAmount = billAmount;
+					
+					if (Boolean.TRUE.equals(generateBillRequest.getIsRebate())) {
+						rebatePercentage =
+					            mdmsService.fetchGarbageRebateRate(
+					                    generateBillRequest.getRequestInfo(),
+					                    garbageAccount.getTenantId()
+					            );
+						
+						if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
+						    rebateAmount = billAmount
+						            .multiply(rebatePercentage)
+						            .divide(BigDecimal.valueOf(100))
+						            .setScale(2, RoundingMode.HALF_UP);
 
-					if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
-					    rebateAmount = billAmount
-					            .multiply(rebatePercentage)
-					            .divide(BigDecimal.valueOf(100))
-					            .setScale(2, RoundingMode.HALF_UP);
-
-					    finalBillAmount = billAmount.subtract(rebateAmount);
+						    finalBillAmount = billAmount.subtract(rebateAmount);
+						}
 					}
 
 					calculationBreakdown.put("baseAmount", billAmount);
 					calculationBreakdown.put("rebatePercentage", rebatePercentage);
 					calculationBreakdown.put("rebateAmount", rebateAmount);
 					calculationBreakdown.put("finalAmount", finalBillAmount);
-
-
+					
 					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
 					
 						String billType =
@@ -203,8 +205,6 @@ public class GarbageAccountSchedulerService {
 							                billResponse.getBill().get(0),
 							                grbgBillTracker
 							        );
-
-							
 							
 							SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 							String fromDateStr = formatter.format(generateBillRequest.getFromDate());

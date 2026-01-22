@@ -53,5 +53,8 @@ public class GenerateBillRequest {
 	
     @JsonProperty("additionalDetail")
     private Object additionalDetail;
+    
+    @Builder.Default
+    private Boolean isRebate = false;
 
 }
