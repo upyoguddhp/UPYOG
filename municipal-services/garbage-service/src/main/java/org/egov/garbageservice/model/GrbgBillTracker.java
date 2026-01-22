@@ -36,5 +36,7 @@ public class GrbgBillTracker {
 	private Long expiryDate;                  
 	private BigDecimal grbgBillWithoutPenalty;
 	private BigDecimal penaltyAmount;
+	private BigDecimal rebateAmount;
+	private BigDecimal garbageBillWithoutRebate;
 
 }

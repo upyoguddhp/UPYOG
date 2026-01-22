@@ -42,9 +42,9 @@ public class GarbageBillTrackerRepository {
 
 	private static final String GRBG_BILL_TRACKER_SEARCH_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt";
 
-	private static final String INSERT_BILL_TRACKER = "INSERT INTO eg_grbg_bill_tracker (uuid, grbg_application_id, tenant_id, month, year, from_date, "
+	private static final String INSERT_BILL_TRACKER = "INSERT INTO eg_grbg_bill_tracker (uuid, grbg_application_id, tenant_id, month, year, from_date, garbage_bill_without_rebate, rebate_amount, "
 			+ "to_date, grbg_bill_amount, grbg_bill_without_penalty, created_by, created_time, last_modified_by, last_modified_time,ward,bill_id,type,additionaldetail) VALUES "
-			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:type,:additionaldetail::JSONB)";
+			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:type,:additionaldetail::JSONB)";
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
 		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
@@ -104,6 +104,8 @@ public class GarbageBillTrackerRepository {
 		billTrackerInputs.put("toDate", grbgBillTracker.getToDate());
 		billTrackerInputs.put("grbgBillAmount", grbgBillTracker.getGrbgBillAmount());
 		billTrackerInputs.put("grbgBillWithoutPenalty", grbgBillTracker.getGrbgBillAmount());
+		billTrackerInputs.put( "garbageBillWithoutRebate",grbgBillTracker.getGarbageBillWithoutRebate());
+		billTrackerInputs.put("rebateAmount",grbgBillTracker.getRebateAmount());
 		billTrackerInputs.put("billId", grbgBillTracker.getBillId());
 		billTrackerInputs.put("ward", grbgBillTracker.getWard());
 		billTrackerInputs.put("createdBy", grbgBillTracker.getAuditDetails().getCreatedBy());

@@ -176,6 +176,10 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
 									.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,billResponse.getBill().get(0),calculationBreakdown);
 							// add to garbage bill tracker
+							GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
+							tracker.setGarbageBillWithoutRebate(billAmount);
+							tracker.setRebateAmount(rebateAmount);
+							
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);

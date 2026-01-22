@@ -266,7 +266,7 @@ public class MdmsService {
 	            .build();
 
 	    MdmsCriteria mdmsCriteria = MdmsCriteria.builder()
-	            .tenantId("hp")
+	            .tenantId(tenantId)
 	            .moduleDetails(Collections.singletonList(moduleDetail))
 	            .build();
 
