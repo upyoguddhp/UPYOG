@@ -1814,17 +1814,36 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 			// enrich userDetails
 			Map<Object, Object> userDetails = new HashMap<>();
+
 			userDetails.put("UserName", account.getName());
+			userDetails.put("Uuid", account.getUserUuid());
 			userDetails.put("MobileNo", account.getMobileNumber());
 			userDetails.put("Email", account.getEmailId());
-			userDetails.put("Address",
-					new String(account.getAddresses().get(0).getAddress1().concat(", "))
-							.concat(account.getAddresses().get(0).getPincode().concat(", "))
-							.concat(account.getAddresses().get(0).getZone().concat(", "))
-							.concat(account.getAddresses().get(0).getUlbName().concat(", "))
-							.concat(account.getAddresses().get(0).getWardName().concat(", "))
-							.concat(account.getAddresses().get(0).getAdditionalDetail().get("district").asText()));
+			userDetails.put("OwnerName", account.getAdditionalDetail().get("propertyOwnerName").asText());
+			userDetails.put("ApplicantName", account.getAdditionalDetail().get("applicantName").asText());
+			userDetails.put("ApplicantEmail", account.getAdditionalDetail().get("applicantEmail").asText());
+			userDetails.put("OwnerFatherName", account.getAdditionalDetail().get("ownerFatherName").asText());
+			userDetails.put("ApplicantPhoneNumber", account.getAdditionalDetail().get("applicantPhoneNumber").asText());
 
+			userDetails.put("ApplicationNumber", account.getGrbgApplication().getApplicationNo());
+		    userDetails.put("ApplicationStatus", account.getGrbgApplication().getStatus());
+
+			userDetails.put("IsOwner", account.getIsOwner());
+			userDetails.put("BusinessService", account.getBusinessService());
+			userDetails.put("Gender", account.getGender());
+
+			GrbgAddress addr = account.getAddresses().get(0);
+			userDetails.put("Address", addr.getAddress1() + ", " + addr.getPincode() + ", " +
+			            addr.getZone() + ", " + addr.getUlbName() + ", " + addr.getWardName() + ", " +
+			            addr.getAdditionalDetail().get("district").asText());
+			userDetails.put("AddressLine1", addr.getAddress1());
+			userDetails.put("Pincode", addr.getPincode());
+			userDetails.put("Zone", addr.getZone());
+			userDetails.put("ULBName", addr.getUlbName());
+			userDetails.put("ULBType", addr.getUlbType());
+			userDetails.put("WardName", addr.getWardName());
+			userDetails.put("District", addr.getAdditionalDetail().get("district").asText());
+			 
 			garbageAccountDetail.setUserDetails(userDetails);
 
 			if (garbageAccountActionRequest.getIsEmptyBillFilter()) {
