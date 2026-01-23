@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -46,6 +47,8 @@ import org.springframework.util.CollectionUtils;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.util.RestCallRepository;
+import org.egov.mdms.model.MdmsResponse;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.egov.garbageservice.service.GarbageAccountService;
 import org.egov.garbageservice.contract.bill.DemandDetail;
@@ -54,7 +57,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-
+import org.egov.garbageservice.util.RequestInfoWrapper;
 
 
 
@@ -574,74 +577,76 @@ public class GarbageAccountSchedulerService {
 		}
 	}
 	
-public void processGarbagePenalty(RequestInfo requestInfo) {
-
-    List<GrbgBillTracker> trackers = garbageAccountService.fetchExpiredUnpaidBills();
-
-    for (GrbgBillTracker tracker : trackers) {
-        try {
-            log.info("Processing tracker for consumerCode {}", tracker.getGrbgApplicationId());
-
-            // fetch tenantId and ULB from tracker
-            String tenantId = tracker.getTenantId();
-
-            log.info(tenantId); //hp.Shimla
-
-            BigDecimal penaltyRate = mdmsService.fetchGarbagePenaltyRate(requestInfo, tenantId);
-            
-            log.info("[Penalty] Penalty rate resolved = {}", penaltyRate);
-
-            if (penaltyRate.compareTo(BigDecimal.ZERO) <= 0) {
-                continue;
-            }
-
-            String service =
-                    "MULTI_MONTH".equals(tracker.getType()) ? "GB_BULK" : "GB";
-
-            Demand demand = demandService.searchDemand(
-                tracker.getTenantId(),
-                Collections.singleton(tracker.getGrbgApplicationId()),
-                requestInfo,
-                service
-            ).get(0);
-
-            BigDecimal baseAmount = demand.getDemandDetails().stream()
-                .filter(d -> GrbgConstants.BILLING_TAX_HEAD_MASTER_CODE.equals(d.getTaxHeadMasterCode()))
-                .map(DemandDetail::getTaxAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
-
-            // months overdue
-            Long billExpiryTime = demand.getBillExpiryTime();
-            if (billExpiryTime == null || billExpiryTime >= System.currentTimeMillis()) {
-                continue; // demand not expired → skip penalty
-            }
-
-            LocalDate expiryDate = Instant.ofEpochMilli(billExpiryTime)
-                                          .atZone(ZoneId.systemDefault())
-                                          .toLocalDate();
-
-            long monthsOverdue = ChronoUnit.MONTHS.between(expiryDate, LocalDate.now());
-            if (monthsOverdue <= 0) monthsOverdue = 1;
-
-            BigDecimal penalty = baseAmount
-                    .multiply(penaltyRate)
-                    .divide(BigDecimal.valueOf(100))
-                    .multiply(BigDecimal.valueOf(monthsOverdue))
-                    .setScale(2, RoundingMode.HALF_UP);
-            
-            if (tracker.getGrbgBillWithoutPenalty() == null) {
-                tracker.setGrbgBillWithoutPenalty(baseAmount);
-            }
-            
-            garbageAccountService.applyPenalty(tracker, demand, penalty, requestInfo);
-            log.info("Base={}, Rate={}, Months={}", baseAmount, penaltyRate, monthsOverdue);
-
-        } catch (Exception e) {
-            log.error("Penalty failed for consumerCode {}", tracker.getGrbgApplicationId(), e);
-        }
-    }
-}
-
-
+	public void processGarbagePenalty(RequestInfo requestInfo) {
+	
+	    List<GrbgBillTracker> trackers = garbageAccountService.fetchExpiredUnpaidBills();
+	
+	    for (GrbgBillTracker tracker : trackers) {
+	        try {
+	            log.info("Processing tracker for consumerCode {}", tracker.getGrbgApplicationId());
+	
+	            // fetch tenantId and ULB from tracker
+	            String tenantId = tracker.getTenantId();
+	
+	            log.info(tenantId); //hp.Shimla
+	
+	            BigDecimal penaltyRate = mdmsService.fetchGarbagePenaltyRate(requestInfo, tenantId);
+	            
+	            log.info("[Penalty] Penalty rate resolved = {}", penaltyRate);
+	
+	            if (penaltyRate.compareTo(BigDecimal.ZERO) <= 0) {
+	                continue;
+	            }
+	
+	            String service =
+	                    "MULTI_MONTH".equals(tracker.getType()) ? "GB_BULK" : "GB";
+	
+	            Demand demand = demandService.searchDemand(
+	                tracker.getTenantId(),
+	                Collections.singleton(tracker.getGrbgApplicationId()),
+	                requestInfo,
+	                service
+	            ).get(0);
+	
+	            BigDecimal baseAmount = demand.getDemandDetails().stream()
+	                .filter(d -> GrbgConstants.BILLING_TAX_HEAD_MASTER_CODE.equals(d.getTaxHeadMasterCode()))
+	                .map(DemandDetail::getTaxAmount)
+	                .reduce(BigDecimal.ZERO, BigDecimal::add);
+	            
+	
+	            // months overdue
+	            Long billExpiryTime = demand.getBillExpiryTime();
+	            if (billExpiryTime == null || billExpiryTime >= System.currentTimeMillis()) {
+	                continue; // demand not expired → skip penalty
+	            }
+	
+	            LocalDate expiryDate = Instant.ofEpochMilli(billExpiryTime)
+	                                          .atZone(ZoneId.systemDefault())
+	                                          .toLocalDate();
+	
+	            long monthsOverdue = ChronoUnit.MONTHS.between(expiryDate, LocalDate.now());
+	            if (monthsOverdue <= 0) monthsOverdue = 1;
+	
+	            BigDecimal penalty = baseAmount
+	                    .multiply(penaltyRate)
+	                    .divide(BigDecimal.valueOf(100))
+	                    .multiply(BigDecimal.valueOf(monthsOverdue))
+	                    .setScale(2, RoundingMode.HALF_UP);
+	            
+	            if (tracker.getGrbgBillWithoutPenalty() == null) {
+	                tracker.setGrbgBillWithoutPenalty(baseAmount);
+	            }
+	            
+	            garbageAccountService.applyPenalty(tracker, demand, penalty, requestInfo);
+	            log.info("Base={}, Rate={}, Months={}", baseAmount, penaltyRate, monthsOverdue);
+	
+	        } catch (Exception e) {
+	            log.error("Penalty failed for consumerCode {}", tracker.getGrbgApplicationId(), e);
+	        }
+	    }
+	}
+	
+	public List<GrbgBillTracker> reverseGarbageRebate(RequestInfoWrapper requestInfoWrapper) {
+		return null;
+	}
 }

@@ -175,5 +175,13 @@ public class Scheduler {
         garbageService.updatePenaltyAmount(requestInfo);
         log.info("Garbage updatePenaltyAmount CRON JOB Ends");
     }
+	
+//	@Scheduled(cron = "${cron.job.default.garbage.tracker.rebate.amount.reverser}", zone = "IST")
+	public void reverseGarbageRebateAmount() {
+		log.info("reverseRebateAmount CRON JOB Starts");
+		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+		garbageService.reverseRebateAmount(requestInfo);
+		log.info("reverseRebateAmount CRON JOB Ends");
+	}
 
 }

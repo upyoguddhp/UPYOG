@@ -47,5 +47,14 @@ public class GarbageAccountSchedulerController {
         );
         return ResponseEntity.ok().build();
     }
+	
+	@PostMapping("/reverse-rebate-amount")
+	public ResponseEntity<?> reverseRebateAmount(@RequestBody RequestInfoWrapper requestInfoWrapper) {
+
+		service.reverseGarbageRebate(requestInfoWrapper);
+
+		return ResponseEntity.ok("Rebate amount reversed successfully!!!");
+//		return ResponseEntity.ok(service.reverseRebateAmount(requestInfoWrapper));
+	}
 
 }

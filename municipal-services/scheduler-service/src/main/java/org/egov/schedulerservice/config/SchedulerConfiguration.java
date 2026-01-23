@@ -99,6 +99,7 @@ public class SchedulerConfiguration {
 	@Value("${egov.garbage.endpoint.update-penalty-amount}")
 	private String garbageUpdatePenaltyAmountEndpoint;
 	
-	
+	@Value("${egov.garbage.endpoint.reverse-rebate-amount}")
+	private String garbageReverseRebateAmountEndpoint;
 	
 }

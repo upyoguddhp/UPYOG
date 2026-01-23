@@ -60,5 +60,23 @@ public class GarbageService {
 	                    "Error occured while updating garbage penalty amount. Message: " + e.getMessage());
 	        }
 	    }
+	 
+	 public String reverseRebateAmount(RequestInfo requestInfo) {
+
+			try {
+				StringBuilder url = new StringBuilder(applicationConfig.getGarbageServiceHostUrl());
+				
+				url.append(applicationConfig.getPropertyReverseRebateAmountEndpoint());
+				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+				ResponseEntity<String> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
+						String.class);
+				return responseEntity.getBody();
+			} catch (Exception e) {
+				log.error("Error occured while reverse rebate amount.", e);
+				throw new SchedulerServiceException(ErrorConstants.ERR_GARBAGE_SERVICE_ERROR,
+						"Error occured while reverse rebate amount. Message: " + e.getMessage());
+			}
+		}
 
 }
