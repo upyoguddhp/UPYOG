@@ -19,5 +19,6 @@ public class PropertyBillSearchRequest {
     private String mobileNumber;      
     private String ownerName; 
     private String oldPropertyId;
+    private String ownerOldCustomerIds;
 
 }

@@ -2,6 +2,7 @@
 package org.egov.pt.repository;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 
 import com.google.common.collect.Sets;
 
@@ -120,6 +122,22 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), new SingleColumnRowMapper<>());
 		
 	}
+	
+	public List<String> getOnlyPropertyIds(PropertyCriteria criteria) {
+
+	    List<Object> preparedStmtList = new ArrayList<>();
+
+	    String query = queryBuilder.getOnlyPropertyIdQuery(criteria, preparedStmtList);
+
+	    log.info("Property ID Query: " + query);
+
+	    return jdbcTemplate.query(
+	            query,
+	            preparedStmtList.toArray(),
+	            new SingleColumnRowMapper<>(String.class)
+	    );
+	}
+
 
 	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria, Boolean isPlainSearch) {
 		List<Object> preparedStmtList = new ArrayList<>();

@@ -226,6 +226,14 @@ public class PropertyController {
 
 		return propertyService.searchPropertyAndBillOpen(request);
 	}
+	
+	@PostMapping("/open/property-bills-search")
+	public ResponseEntity<?> searchPropertyWithBills(
+	        @RequestBody PropertyBillSearchRequest request) {
+
+	    return propertyService.searchPropertyWithAllBills(request);
+	}
+
 
 	@PostMapping("/_migration")
 	public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,

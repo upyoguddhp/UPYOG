@@ -804,5 +804,55 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
+	
+public String getOnlyPropertyIdQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+
+    StringBuilder builder = new StringBuilder();
+    builder.append("SELECT DISTINCT property.propertyid FROM EG_PT_PROPERTY property WHERE 1=1 ");
+
+    if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+        Set<String> propertyIds = criteria.getPropertyIds().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!propertyIds.isEmpty()) {
+            builder.append(" AND property.propertyid IN (").append(createQuery(propertyIds)).append(")");
+            addToPreparedStatement(preparedStmtList, propertyIds);
+        }
+    }
+
+    if (!CollectionUtils.isEmpty(criteria.getOldpropertyids())) {
+        Set<String> oldPropertyIds = criteria.getOldpropertyids().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!oldPropertyIds.isEmpty()) {
+            builder.append(" AND property.oldpropertyid IS NOT NULL AND property.oldpropertyid <> '' ")
+                   .append(" AND property.oldpropertyid IN (")
+                   .append(createQuery(oldPropertyIds))
+                   .append(")");
+            addToPreparedStatement(preparedStmtList, oldPropertyIds);
+        }
+    }
+
+    if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
+        Set<String> ownerIds = criteria.getOwnerOldCustomerIds().stream()
+                .filter(id -> id != null && !id.trim().isEmpty())
+                .collect(Collectors.toSet());
+        if (!ownerIds.isEmpty()) {
+            builder.append(" AND EXISTS (SELECT 1 FROM EG_PT_OWNER owner WHERE owner.propertyid = property.id AND owner.additionaldetails->>'ownerOldCustomerId' IN (")
+                   .append(createQuery(ownerIds)).append("))");
+            addToPreparedStatement(preparedStmtList, ownerIds);
+        }
+    }
+
+    if (criteria.getTenantId() != null) {
+        builder.append(" AND property.tenantid = ?");
+        preparedStmtList.add(criteria.getTenantId());
+    }
+
+    return builder.toString();
+}
+
+
+
 
 }
