@@ -205,6 +205,9 @@ public class GrbgConstants {
 	
 	@Value("${egov.url.shortning.endpoint}")
 	private String urlShortenEndpoint;
+	
+	@Value("${egov.update.bill.endpoint}")
+	private String updateBillEndpoint;
 
 	public static String generateApplicationNumberFormat(String id, String ulbName, String district) {
 		String appNo = null;

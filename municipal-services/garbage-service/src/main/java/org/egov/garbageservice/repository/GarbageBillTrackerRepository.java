@@ -21,6 +21,9 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.postgresql.util.PGobject;
+import java.sql.SQLException;
+import org.egov.tracer.model.CustomException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +80,22 @@ public class GarbageBillTrackerRepository {
 		    "    last_modified_by = :lastModifiedBy, " +
 		    "    last_modified_time = :lastModifiedTime " +
 		    "WHERE uuid = :uuid";
+	
+	private static final String UPDATE_REBATE_REVERSAL =
+		    "UPDATE eg_grbg_bill_tracker " +
+		    "SET rebate_amount = :rebateAmount, " +
+		    "    grbg_bill_amount = :billAmount, " +
+		    "    additionaldetail = :additionaldetail::jsonb, " +
+		    "    last_modified_by = :lastModifiedBy, " +
+		    "    last_modified_time = :lastModifiedTime " +
+		    "WHERE uuid = :uuid";
 
+	
+	private static final String FETCH_REBATE_ELIGIBLE_TRACKERS =
+		    "SELECT * FROM eg_grbg_bill_tracker egbt " +
+		    "WHERE egbt.status = 'ACTIVE' " +
+		    "AND egbt.rebate_amount > 0 " +
+		    "AND egbt.bill_id IS NOT NULL";
 
 
 	public int updatePenalty(GrbgBillTracker tracker) {
@@ -314,4 +332,41 @@ public class GarbageBillTrackerRepository {
 		}
 		namedParameterJdbcTemplate.update(query.toString(), new HashMap<>());
 	}
+	
+	public int updateRebateReversal(GrbgBillTracker tracker) {
+	
+	    Map<String, Object> params = new HashMap<>();
+	
+	    params.put("rebateAmount", tracker.getRebateAmount());
+	    params.put("billAmount", tracker.getGrbgBillAmount());
+	    params.put("uuid", tracker.getUuid());
+	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
+	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+	
+	    PGobject additionalDetailObj = null;
+	    if (tracker.getAdditionaldetail() != null) {
+	        try {
+	            additionalDetailObj = new PGobject();
+	            additionalDetailObj.setType("jsonb");
+	            additionalDetailObj.setValue(tracker.getAdditionaldetail().toString());
+	        } catch (SQLException e) {
+	            throw new CustomException(
+	                "JSON_CONVERSION_FAILED",
+	                "Failed to convert additionaldetail to JSONB: "
+	            );
+	        }
+	    }
+	
+	    params.put("additionaldetail", additionalDetailObj);
+	    return namedParameterJdbcTemplate.update(UPDATE_REBATE_REVERSAL, params);
+	}
+
+	public List<GrbgBillTracker> fetchRebateEligibleTrackers() {
+	    return jdbcTemplate.query(
+	        FETCH_REBATE_ELIGIBLE_TRACKERS,
+	        grbgBillTrackerRowMapper
+	    );
+	}
+
+
 }

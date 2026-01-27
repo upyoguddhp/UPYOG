@@ -13,6 +13,7 @@ import org.egov.garbageservice.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.egov.garbageservice.model.BillV2;
 
 import lombok.extern.slf4j.Slf4j; 
 
@@ -54,6 +55,10 @@ public class BillService {
 		 billRepository.cancelBill(updateBillCriteria, requestInfo);
 //		return BillResponse.builder().resposneInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
 //				.bill(bills).build();
+	}
+	
+	public void updateBill(RequestInfo requestInfo, List<BillV2> bills) {
+	    billRepository.updateBill(requestInfo, bills);
 	}
 	
 	
