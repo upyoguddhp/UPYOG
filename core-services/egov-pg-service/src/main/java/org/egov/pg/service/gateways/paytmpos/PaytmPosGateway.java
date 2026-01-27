@@ -89,7 +89,10 @@ public class PaytmPosGateway implements Gateway {
         	if(setCreds(object)) {
         		transaction.setGatewayTxnId(ORDERID);
             	transaction.setOrderId(ORDERID);
-        		createTransaction(Utils.formatAmtAsPaise(transaction.getTxnAmount()), transaction.getTxnId());
+            	String ulbName = transaction.getTenantId().split("\\.").length > 1
+						? transaction.getTenantId().split("\\.")[1]
+					: "";
+        		createTransaction(Utils.formatAmtAsPaise(transaction.getTxnAmount()), transaction.getTxnId(), ulbName, transaction.getProductInfo(),transaction.getUser().getName());
         		return URI.create(StringUtils.EMPTY); // Return an empty URI
         	}else {
                 throw new CustomException("PAYTMTRANSACTIONFAIL", "mdms request no creds found");
@@ -211,7 +214,7 @@ public class PaytmPosGateway implements Gateway {
     	}	
     }
     
-    private void createTransaction(String amount, String transactionId  ) {
+    private void createTransaction(String amount, String transactionId, String ulbName, String service, String name ) {
 
 
     	   LocalDateTime now = LocalDateTime.now();
@@ -245,6 +248,15 @@ public class PaytmPosGateway implements Gateway {
         	 
      		String checksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(MERCHANT_KEY,Body);
 	        Head.put("checksum", checksum);
+	        
+	        
+	        
+	        Map<String, String> printInfo = new HashMap<>();
+	        printInfo.put("ulbName", ulbName);
+	        printInfo.put("name", name);
+	        printInfo.put("service", service);
+	        String printInfoJson = new ObjectMapper().writeValueAsString(printInfo);
+	        Body.put("printInfo", printInfoJson); 
 	        
 	        HashMap<String, Object> requestPayload = new HashMap<>();
             requestPayload.put("head",Head);
