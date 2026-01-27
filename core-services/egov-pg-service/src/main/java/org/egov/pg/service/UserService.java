@@ -151,7 +151,7 @@ public class UserService {
 
         UserResponse userResponse = null;
         request.put("RequestInfo", requestInfo);
-        request.put("name", name);
+       // request.put("name", name);
         request.put("mobileNumber", phoneNo);
         request.put("type", "CITIZEN");
         request.put("tenantid", tenantId.split("\\.")[0]);
@@ -187,7 +187,7 @@ public class UserService {
         role.put("tenantId", transaction.getTenantId().split("\\.")[0]);
         roles.add(role);
 
-        user.put("name", transaction.getUser().getName());
+        user.put("name",  transaction.getUser().getName() != null ? transaction.getUser().getName() : "Citizen");
         user.put("mobileNumber", transaction.getUser().getMobileNumber());
         user.put("userName", transaction.getUser().getName());
         user.put("active", true);
