@@ -756,12 +756,20 @@ public class GarbageAccountSchedulerService {
 	            } else {
 	                billAdditionalDetails = JsonNodeFactory.instance.objectNode();
 	            }
-	
-	            billAdditionalDetails.put("isAmendment", true);
-	            billAdditionalDetails.put("amended", true);
+
 	            billAdditionalDetails.put("rebateReversed", true);
 	
 	            bill.setAdditionalDetails(billAdditionalDetails);
+	            
+	            bill.setStatus(Bill.StatusEnum.ACTIVE);
+
+	         if (bill.getAmountPaid() == null) {
+	             bill.setAmountPaid(BigDecimal.ZERO);
+	         }
+
+	         if (bill.getBillDate() == null) {
+	             bill.setBillDate(System.currentTimeMillis());
+	         }
 	
 	            billService.updateBill(
 	                    requestInfo,
