@@ -62,6 +62,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.model.BillV2;
 import org.egov.garbageservice.contract.bill.Bill;
+import org.egov.garbageservice.model.contract.User;
+import org.egov.garbageservice.contract.bill.BillDetail;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +107,7 @@ public class GarbageAccountSchedulerService {
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
 	
-	@Value("${garbage.rebate.grace.days:15}")
+	@Value("${garbage.rebate.grace.days:0}")
 	private Integer rebateGraceDays;
 	
 	@Value("${egov.sms.host}")
@@ -188,6 +192,7 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
 							tracker.setGarbageBillWithoutRebate(billAmount);
 							tracker.setRebateAmount(rebateAmount);
+							tracker.setGrbgBillAmount(finalBillAmount);
 							
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
@@ -667,110 +672,131 @@ public class GarbageAccountSchedulerService {
 	}
 	
 	public List<GrbgBillTracker> reverseGarbageRebate(RequestInfoWrapper wrapper) {
-
-    RequestInfo requestInfo = wrapper.getRequestInfo();
-    List<GrbgBillTracker> trackers = fetchRebateEligibleTrackers();
-
-    for (GrbgBillTracker tracker : trackers) {
-        try {
-            if (tracker.getRebateAmount() == null
-                || tracker.getRebateAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                continue;
-            }
-
-            String service =
-                "MULTI_MONTH".equals(tracker.getType()) ? "GB_BULK" : "GB";
-
-            BigDecimal originalAmount = tracker.getGarbageBillWithoutRebate();
-
-            JsonNode additionalDetailNode = tracker.getAdditionaldetail();
-            ObjectNode additionalDetail = null;
-            if (additionalDetailNode != null && additionalDetailNode.isObject()) {
-                additionalDetail = (ObjectNode) additionalDetailNode;
-                additionalDetail.put("rebateAmount", 0);
-                additionalDetail.put("rebatePercentage", 0);
-                additionalDetail.put("finalAmount", originalAmount);
-                additionalDetail.put("rebateReversed", true);
-            }
-
-            tracker.setAdditionaldetail(additionalDetail);
-            tracker.setRebateAmount(BigDecimal.ZERO);
-            tracker.setGrbgBillAmount(originalAmount);
-
-            garbageBillTrackerRepository.updateRebateReversal(tracker);
-            Demand demand = demandService.searchDemand(
-                tracker.getTenantId(),
-                Collections.singleton(tracker.getGrbgApplicationId()),
-                requestInfo,
-                service
-            ).get(0);
-
-            DemandDetail baseTaxDetail = demand.getDemandDetails().stream()
-                .filter(d -> GrbgConstants.BILLING_TAX_HEAD_MASTER_CODE
-                    .equals(d.getTaxHeadMasterCode()))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(
-                    "BASE_TAX_HEAD_MISSING",
-                    "Billing tax head not found for rebate reversal"
-                ));
-
-            baseTaxDetail.setTaxAmount(originalAmount);
-            baseTaxDetail.setCollectionAmount(BigDecimal.ZERO);
-
-            demandService.updateDemand(
-                requestInfo,
-                Collections.singletonList(demand)
-            );
-            
-            BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-            	    .tenantId(tracker.getTenantId())
-            	    .consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
-            	    .build();
-
-            	List<Bill> bills = billService
-            	    .searchBill(billSearchCriteria, requestInfo)
-            	    .getBill();
-
-            	if (CollectionUtils.isEmpty(bills)) {
-            	    throw new CustomException(
-            	        "BILL_NOT_FOUND",
-            	        "No bill found for rebate reversal"
-            	    );
-            	}
-
-            	Bill existingBill = bills.get(0);
-
-            	BillV2 billV2 = BillV2.builder()
-            		    .id(existingBill.getId())
-            		    .tenantId(existingBill.getTenantId())
-            		    .consumerCode(existingBill.getConsumerCode())
-            		    .payerName(existingBill.getPayerName())
-            		    .payerAddress(existingBill.getPayerAddress())
-            		    .payerEmail(existingBill.getPayerEmail())
-            		    .mobileNumber(existingBill.getMobileNumber())
-            		    .status(
-            		        existingBill.getStatus() != null
-            		            ? existingBill.getStatus().toString()
-            		            : null
-            		    )
-            		    .additionalDetails(existingBill.getAdditionalDetails())
-            		    .auditDetails(existingBill.getAuditDetails())
-            		    .build();
-
-            	billService.updateBill(
-            	    requestInfo,
-            	    Collections.singletonList(billV2)
-            	);
-
-            log.info("Garbage rebate reversed for {}", tracker.getGrbgApplicationId());
-
-        } catch (Exception e) {
-            log.error("Garbage rebate reversal failed for {}", tracker.getGrbgApplicationId(), e);
-        }
-    }
-
-    return trackers;
-}
-
+	
+	    RequestInfo requestInfo = wrapper.getRequestInfo();
+	    List<GrbgBillTracker> trackers = fetchRebateEligibleTrackers();
+	
+	    for (GrbgBillTracker tracker : trackers) {
+	        try {
+	            if (tracker.getRebateAmount() == null
+	                    || tracker.getRebateAmount().compareTo(BigDecimal.ZERO) <= 0) {
+	                continue;
+	            }
+	
+	            String service =
+	                    "MULTI_MONTH".equals(tracker.getType()) ? "GB_BULK" : "GB";
+	
+	            BigDecimal originalAmount = tracker.getGarbageBillWithoutRebate();
+	
+	            List<Demand> demands = demandService.searchDemand(
+	                    tracker.getTenantId(),
+	                    Collections.singleton(tracker.getGrbgApplicationId()),
+	                    requestInfo,
+	                    service
+	            );
+	
+	            if (CollectionUtils.isEmpty(demands)) {
+	                throw new CustomException(
+	                        "DEMAND_NOT_FOUND",
+	                        "No demand found for rebate reversal"
+	                );
+	            }
+	
+	            Demand demand = demands.get(0);
+	            demand.setMinimumAmountPayable(originalAmount);
+	
+	            if (demand.getDemandDetails() != null) {
+	                for (DemandDetail dd : demand.getDemandDetails()) {
+	                    dd.setTaxAmount(originalAmount);
+	                    dd.setCollectionAmount(BigDecimal.ZERO);
+	                }
+	            }
+	
+	            demandService.updateDemand(
+	                    requestInfo,
+	                    Collections.singletonList(demand)
+	            );
+	
+	            BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+	                    .tenantId(tracker.getTenantId())
+	                    .consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+	                    .build();
+	
+	            List<Bill> bills = billService
+	                    .searchBill(billSearchCriteria, requestInfo)
+	                    .getBill();
+	
+	            if (CollectionUtils.isEmpty(bills)) {
+	                throw new CustomException(
+	                        "BILL_NOT_FOUND",
+	                        "No bill found for rebate reversal"
+	                );
+	            }
+	
+	            Bill bill = bills.get(0);
+	
+	            for (BillDetail billDetail : bill.getBillDetails()) {
+	
+	                billDetail.setAmount(originalAmount);
+	                billDetail.setAmountPaid(BigDecimal.ZERO);
+	
+	                if (billDetail.getBillAccountDetails() != null) {
+	                    billDetail.getBillAccountDetails().forEach(bad -> {
+	                        bad.setAmount(originalAmount);
+	                        bad.setAdjustedAmount(BigDecimal.ZERO);
+	                    });
+	                }
+	            }
+	
+	            bill.setTotalAmount(originalAmount);
+	
+	            ObjectNode billAdditionalDetails;
+	            if (bill.getAdditionalDetails() != null && bill.getAdditionalDetails().isObject()) {
+	                billAdditionalDetails = (ObjectNode) bill.getAdditionalDetails();
+	            } else {
+	                billAdditionalDetails = JsonNodeFactory.instance.objectNode();
+	            }
+	
+	            billAdditionalDetails.put("isAmendment", true);
+	            billAdditionalDetails.put("amended", true);
+	            billAdditionalDetails.put("rebateReversed", true);
+	
+	            bill.setAdditionalDetails(billAdditionalDetails);
+	
+	            billService.updateBill(
+	                    requestInfo,
+	                    Collections.singletonList(bill)
+	            );
+	            JsonNode additionalDetailNode = tracker.getAdditionaldetail();
+	            ObjectNode trackerAdditionalDetail;
+	
+	            if (additionalDetailNode != null && additionalDetailNode.isObject()) {
+	                trackerAdditionalDetail = (ObjectNode) additionalDetailNode;
+	            } else {
+	                trackerAdditionalDetail = JsonNodeFactory.instance.objectNode();
+	            }
+	
+	            trackerAdditionalDetail.put("rebateAmount", 0);
+	            trackerAdditionalDetail.put("rebatePercentage", 0);
+	            trackerAdditionalDetail.put("finalAmount", originalAmount);
+	            trackerAdditionalDetail.put("rebateReversed", true);
+	
+	            tracker.setAdditionaldetail(trackerAdditionalDetail);
+	            tracker.setRebateAmount(BigDecimal.ZERO);
+	            tracker.setGrbgBillAmount(originalAmount);
+	
+	            garbageBillTrackerRepository.updateRebateReversal(tracker);
+	
+	        } catch (Exception e) {
+	            log.error(
+	                    "Garbage rebate reversal failed for applicationId {}",
+	                    tracker.getGrbgApplicationId(),
+	                    e
+	            );
+	        }
+	    }
+	
+	    return trackers;
+	}
 
 }

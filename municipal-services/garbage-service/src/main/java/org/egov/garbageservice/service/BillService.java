@@ -57,7 +57,7 @@ public class BillService {
 //				.bill(bills).build();
 	}
 	
-	public void updateBill(RequestInfo requestInfo, List<BillV2> bills) {
+	public void updateBill(RequestInfo requestInfo, List<Bill> bills) {
 	    billRepository.updateBill(requestInfo, bills);
 	}
 	

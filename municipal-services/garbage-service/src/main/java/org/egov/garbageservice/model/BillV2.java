@@ -1,10 +1,12 @@
 package org.egov.garbageservice.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.egov.garbageservice.contract.bill.BillDetail;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,4 +26,6 @@ public class BillV2 {
     private String status;
     private AuditDetails auditDetails;
     private JsonNode additionalDetails;
+    private List<BillDetail> billDetails;
+    private Long expiryDate;
 }

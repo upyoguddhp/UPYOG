@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.egov.garbageservice.model.BillV2;
 import org.egov.garbageservice.model.BillRequestV2;
+import org.egov.garbageservice.model.BillRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -109,32 +110,20 @@ public class BillRepository {
 		}
 	}
 	
-	public void updateBill(RequestInfo requestInfo, List<BillV2> bills) {
+	public List<Bill> updateBill(RequestInfo requestInfo, List<Bill> bills) {
+		StringBuilder url = new StringBuilder(config.getBillHost());
+		url.append(config.getUpdateBillEndpoint());
+		BillRequest request = new BillRequest(requestInfo, bills);
+		Object result = restCallRepository.fetchResult(url, request);
+		BillResponse response = null;
+		try {
+			response = objectMapper.convertValue(result, BillResponse.class);
 
-	    if (CollectionUtils.isEmpty(bills)) {
-	        throw new CustomException("NO_BILLS", "No bills provided for update");
-	    }
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response of update bill");
+		}
 
-	    String uri = config.getBillHost()
-	        .concat(config.getUpdateBillEndpoint());
-
-	    BillRequestV2 request = BillRequestV2.builder()
-	        .requestInfo(requestInfo)
-	        .bills(bills)
-	        .build();
-
-	    try {
-	        restCallRepository.fetchResult(
-	            new StringBuilder(uri),
-	            request
-	        );
-	    } catch (Exception e) {
-	        log.error("Failed to update bill", e);
-	        throw new CustomException(
-	            "BILL_UPDATE_FAILED",
-	            "Error while calling billing _update"
-	        );
-	    }
+		return response.getBill();
 	}
 
 	
