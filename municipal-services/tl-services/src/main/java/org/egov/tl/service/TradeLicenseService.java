@@ -1265,24 +1265,10 @@ public class TradeLicenseService {
 																												// Address
 		tlObject.put("licenseIssueDate", licenseIssueDate);// License Issue Date
 		tlObject.put("licenseValidity", licenseValidity);// License Validity
-//		tlObject.put("licenseCategory",
-//				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeCategory").asText());// License
-		// Category
-		JsonNode tradeCategoryNode = tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeCategory");
-
-		String licenseCategory = "";
-
-		if (tradeCategoryNode != null && !tradeCategoryNode.isNull()) {
-			if (tradeCategoryNode.isArray() && tradeCategoryNode.size() > 0) {
-				licenseCategory = StreamSupport.stream(tradeCategoryNode.spliterator(), false).map(JsonNode::asText)
-						.collect(Collectors.joining(", "));
-			} else {
-				licenseCategory = tradeCategoryNode.asText();
-			}
-		}
-
-		tlObject.put("licenseCategory", licenseCategory);
-        //licenseSubCategory
+		tlObject.put("licenseCategory",
+				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeCategory").asText());// License
+																											// Category
+		 //licenseSubCategory
 		JsonNode tradeSubTypeNode = tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeSubType");
 
 		String licenseSubCategory = null;
@@ -1299,7 +1285,6 @@ public class TradeLicenseService {
 		}
 
 		tlObject.put("licenseSubCategory", licenseSubCategory);
-
 		tlObject.put("licenseApplicantName",
 				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("applicantName").asText());// License
 																											// Applicant
