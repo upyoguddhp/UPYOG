@@ -214,70 +214,137 @@ public class PaytmPosGateway implements Gateway {
     	}	
     }
     
-    private void createTransaction(String amount, String transactionId, String ulbName, String service, String name ) {
-
-
-    	   LocalDateTime now = LocalDateTime.now();
-           
-           // Define the desired format
-           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-           
-           // Format the current date and time
-           String formattedDateTime = now.format(formatter);
-           TreeMap<String, String> Body = new TreeMap<>();
-   		    log.info(MID.toString()+"mid"+TID+"tid"+MERCHANT_KEY+"key");
-
-           Body.put("paytmMid", MID);//put  mid  here Testin39635949826983//Gaurav09015494045385//s-Prachi65794223240821  , p-Prachi57804451957605
-           Body.put("paytmTid", TID);//put  tid  here 70000398//10714205  //10955450
-           Body.put("transactionDateTime", formattedDateTime);// ("2022-03-15 9:42:00")); //
-           Body.put("merchantTransactionId",transactionId.replaceAll("_", ""));
-           Body.put("merchantReferenceNo", transactionId);
-           Body.put("transactionAmount", amount);
-           
-           HashMap<String, String> Head = new HashMap<>();
-	        Head.put("version","3.1" );
-	        Head.put("requestTimeStamp", formattedDateTime);
-	        Head.put("channelId", "EDC");
-
-         try {
-        	 for (Map.Entry<String, String> entry : Body.entrySet()) {
-        		    if (entry.getValue() == null || entry.getValue().isEmpty()) {
-        		        throw new IllegalArgumentException("Missing or empty parameter: " + entry.getKey());
-        		    }
-        		}
-        	 
-     		String checksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(MERCHANT_KEY,Body);
-	        Head.put("checksum", checksum);
-	        
-	        
-	        
-	        Map<String, String> printInfo = new HashMap<>();
-	        printInfo.put("ulbName", ulbName);
-	        printInfo.put("name", name);
-	        printInfo.put("service", service);
-	        String printInfoJson = new ObjectMapper().writeValueAsString(printInfo);
-	        Body.put("printInfo", printInfoJson); 
-	        
-	        HashMap<String, Object> requestPayload = new HashMap<>();
-            requestPayload.put("head",Head);
-            requestPayload.put("body", Body);
-    		JSONObject Obj1 = new JSONObject(requestPayload);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> requestEntity = new HttpEntity<>(Obj1.toString(), headers);
-            ResponseEntity<PaymentStatusResponse> responseEntity =restTemplate.postForEntity(MERCHANT_URL_DEBIT, 
-            		requestEntity,
-            		PaymentStatusResponse.class);
-            log.info("Paytm Transaction generation message "+responseEntity.getBody().getBody().getResultInfo().getResultMsg());
-            System.out.println(responseEntity.getBody().getBody().getResultInfo().getResultStatus());
-//              return Body.get("merchantTransactionId");
-         }
-         catch (Exception e) {
-             log.error("Paytm Transaction generation failed", e);
-             throw new CustomException("PAYTMTRANSACTIONFAIL", "transaction could not be generated");
-         }
-    }
+//    private void createTransaction(String amount, String transactionId, String ulbName, String service, String name ) {
+//
+//
+//    	   LocalDateTime now = LocalDateTime.now();
+//           
+//           // Define the desired format
+//           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//           
+//           // Format the current date and time
+//           String formattedDateTime = now.format(formatter);
+//           TreeMap<String, String> Body = new TreeMap<>();
+//   		    log.info(MID.toString()+"mid"+TID+"tid"+MERCHANT_KEY+"key");
+//
+//           Body.put("paytmMid", MID);//put  mid  here Testin39635949826983//Gaurav09015494045385//s-Prachi65794223240821  , p-Prachi57804451957605
+//           Body.put("paytmTid", TID);//put  tid  here 70000398//10714205  //10955450
+//           Body.put("transactionDateTime", formattedDateTime);// ("2022-03-15 9:42:00")); //
+//           Body.put("merchantTransactionId",transactionId.replaceAll("_", ""));
+//           Body.put("merchantReferenceNo", transactionId);
+//           Body.put("transactionAmount", amount);
+//           
+//           HashMap<String, String> Head = new HashMap<>();
+//	        Head.put("version","3.1" );
+//	        Head.put("requestTimeStamp", formattedDateTime);
+//	        Head.put("channelId", "EDC");
+//
+//         try {
+//        	 for (Map.Entry<String, String> entry : Body.entrySet()) {
+//        		    if (entry.getValue() == null || entry.getValue().isEmpty()) {
+//        		        throw new IllegalArgumentException("Missing or empty parameter: " + entry.getKey());
+//        		    }
+//        		}
+//        	 
+//     		String checksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(MERCHANT_KEY,Body);
+//	        Head.put("checksum", checksum);
+//	        
+//	        
+//	        
+//	        Map<String, String> printInfo = new HashMap<>();
+//	        printInfo.put("ulbName", ulbName);
+//	        printInfo.put("name", name);
+//	        printInfo.put("service", service);
+//	        String printInfoJson = new ObjectMapper().writeValueAsString(printInfo);
+//	        Body.put("printInfo", printInfoJson); 
+//	        
+//	        HashMap<String, Object> requestPayload = new HashMap<>();
+//            requestPayload.put("head",Head);
+//            requestPayload.put("body", Body);
+//    		JSONObject Obj1 = new JSONObject(requestPayload);
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            HttpEntity<String> requestEntity = new HttpEntity<>(Obj1.toString(), headers);
+//            ResponseEntity<PaymentStatusResponse> responseEntity =restTemplate.postForEntity(MERCHANT_URL_DEBIT, 
+//            		requestEntity,
+//            		PaymentStatusResponse.class);
+//            log.info("Paytm Transaction generation message "+responseEntity.getBody().getBody().getResultInfo().getResultMsg());
+//            System.out.println(responseEntity.getBody().getBody().getResultInfo().getResultStatus());
+////              return Body.get("merchantTransactionId");
+//         }
+//         catch (Exception e) {
+//             log.error("Paytm Transaction generation failed", e);
+//             throw new CustomException("PAYTMTRANSACTIONFAIL", "transaction could not be generated");
+//         }
+//    }
     
+	private void createTransaction(String amount, String transactionId, String ulbName, String service, String name) {
+
+		try {
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String formattedDateTime = now.format(formatter);
+
+			log.info(MID + " mid " + TID + " tid " + MERCHANT_KEY + " key");
+
+			TreeMap<String, String> checksumBody = new TreeMap<>();
+			checksumBody.put("paytmMid", MID);
+			checksumBody.put("paytmTid", TID);
+			checksumBody.put("transactionDateTime", formattedDateTime);
+			checksumBody.put("merchantTransactionId", transactionId.replaceAll("_", ""));
+			checksumBody.put("merchantReferenceNo", transactionId);
+			checksumBody.put("transactionAmount", amount);
+
+			for (Map.Entry<String, String> entry : checksumBody.entrySet()) {
+				if (entry.getValue() == null || entry.getValue().isEmpty()) {
+					throw new IllegalArgumentException("Missing or empty parameter: " + entry.getKey());
+				}
+			}
+
+			String checksum = CheckSumServiceHelper.getCheckSumServiceHelper().genrateCheckSum(MERCHANT_KEY,
+					checksumBody);
+
+			Map<String, String> head = new HashMap<>();
+			head.put("version", "3.1");
+			head.put("requestTimeStamp", formattedDateTime);
+			head.put("channelId", "EDC");
+			head.put("checksum", checksum);
+
+			Map<String, Object> body = new HashMap<>(checksumBody);
+
+			Map<String, String> printInfo = new HashMap<>();
+			printInfo.put("ulbName", ulbName);
+			printInfo.put("name", name);
+			printInfo.put("service", service);
+
+			body.put("printInfo", printInfo); 
+
+			Map<String, Object> requestPayload = new HashMap<>();
+			requestPayload.put("head", head);
+			requestPayload.put("body", body);
+
+			JSONObject requestJson = new JSONObject(requestPayload);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+
+			HttpEntity<String> requestEntity = new HttpEntity<>(requestJson.toString(), headers);
+
+			ResponseEntity<PaymentStatusResponse> responseEntity = restTemplate.postForEntity(MERCHANT_URL_DEBIT,
+					requestEntity, PaymentStatusResponse.class);
+
+			log.info("Paytm Transaction message : {}",
+					responseEntity.getBody().getBody().getResultInfo().getResultMsg());
+
+			log.info("Paytm Transaction status : {}",
+					responseEntity.getBody().getBody().getResultInfo().getResultStatus());
+
+		} catch (Exception e) {
+			log.error("Paytm Transaction generation failed", e);
+			throw new CustomException("PAYTMTRANSACTIONFAIL", "transaction could not be generated");
+		}
+	}
+     
     private ObjectNode refineMdmsData(MdmsResponse mdmsResponse) {
         JsonNode mdmsResNode = objectMapper.valueToTree(mdmsResponse.getMdmsRes());
         if (mdmsResNode.has("PaytmPos")) {
