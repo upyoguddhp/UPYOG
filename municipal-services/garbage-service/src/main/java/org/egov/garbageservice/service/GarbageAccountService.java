@@ -90,6 +90,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.egov.garbageservice.contract.bill.BillDetail;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -2568,60 +2570,185 @@ public GarbageAccountActionResponse openSearchPayPreview(
 	}
 	
 	
-	public List<GrbgBillTracker> fetchExpiredUnpaidBills() {
-
-	    GrbgBillTrackerSearchCriteria criteria =
-	        GrbgBillTrackerSearchCriteria.builder()
-	            .status(Collections.singleton("ACTIVE"))
-	            .type("MONTHLY")
-	            .build();
-
-	    List<GrbgBillTracker> trackers =
-	        garbageBillTrackerRepository.getBillTracker(criteria);
-
-	    return trackers.stream()
-	        .filter(t -> t.getPenaltyAmount() == null
-	                  || t.getPenaltyAmount().compareTo(BigDecimal.ZERO) == 0)
-	        .collect(Collectors.toList());
-	}
-
-	
-	public void applyPenalty(
-        GrbgBillTracker tracker,
-        Demand demand,
-        BigDecimal penalty,
-        RequestInfo requestInfo) {
-
-		BigDecimal newBillAmount =
-		        tracker.getGrbgBillWithoutPenalty().add(penalty);
+		public List<GrbgBillTracker> fetchExpiredUnpaidBills(RequestInfo requestInfo) {
 		
-    tracker.setGrbgBillAmount(newBillAmount);
+		    GrbgBillTrackerSearchCriteria criteria =
+		        GrbgBillTrackerSearchCriteria.builder()
+		            .status(Collections.singleton("ACTIVE"))
+		            .type("MONTHLY")
+		            .build();
+		
+		    List<GrbgBillTracker> trackers =
+		        garbageBillTrackerRepository.getBillTracker(criteria);
+		
+		    long now = System.currentTimeMillis();
+		
+		    List<GrbgBillTracker> expiredTrackers = new ArrayList<>();
+		
+		    for (GrbgBillTracker tracker : trackers) {
+		        if (tracker.getPenaltyAmount() != null
+		                && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
+		            continue;
+		        }
+		        BillSearchCriteria billSearchCriteria =
+		            BillSearchCriteria.builder()
+		                .tenantId(tracker.getTenantId())
+		                .billId(Collections.singleton(tracker.getBillId()))
+		                .build();
+		
+		        Bill bill;
+		        try {
+		            bill = billService
+		                .searchBill(billSearchCriteria, requestInfo)
+		                .getBill()
+		                .get(0);
+		        } catch (Exception e) {
+		            log.warn("No bill found for {}", tracker.getGrbgApplicationId());
+		            continue;
+		        }
+		
+		        if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+		            continue;
+		        }
+		
+		        BillDetail billDetail = bill.getBillDetails().get(0);
+		        Long expiry = billDetail.getExpiryDate();
+		
+		        if (expiry == null || expiry >= now) {
+		            continue;
+		        }
+		        tracker.setExpiryDate(expiry);
+		
+		        expiredTrackers.add(tracker);
+		    }
+		
+		    return expiredTrackers;
+		}
 
-    demandService.addPenaltyTaxHead(
-        demand,
-        GrbgConstants.GARBAGE_PENALTY_TAX_HEAD,
-        penalty
-    );
 
+	 
+		public void applyPenalty(
+		        GrbgBillTracker tracker,
+		        Demand demand,
+		        BigDecimal penalty,
+		        RequestInfo requestInfo) {
+		
+		    if (tracker.getPenaltyAmount() != null
+		            && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
+		        return;
+		    }
+		
+		    if (tracker.getGrbgBillWithoutPenalty() == null) {
+		        tracker.setGrbgBillWithoutPenalty(tracker.getGrbgBillAmount());
+		    }
+		
+		    demandService.addPenaltyTaxHead(
+		        demand,
+		        GrbgConstants.GARBAGE_PENALTY_TAX_HEAD,
+		        penalty
+		    );
 
-    demandService.updateDemand(
-        requestInfo,
-        Collections.singletonList(demand)
-    );
-    GenerateBillCriteria billCriteria =
-        GenerateBillCriteria.builder()
-            .tenantId(tracker.getTenantId())
-            .businessService("GB")
-            .consumerCode(tracker.getGrbgApplicationId())
-            .build();
+		    if (demand.getMinimumAmountPayable() == null
+		            || demand.getMinimumAmountPayable().compareTo(BigDecimal.ZERO) == 0) {
 
-    BillResponse billResponse =
-        billService.generateBill(requestInfo, billCriteria);
+		        BigDecimal existingBase = demand.getDemandDetails().stream()
+		            .map(DemandDetail::getTaxAmount)
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    tracker.setPenaltyAmount(penalty);
-    tracker.setBillId(billResponse.getBill().get(0).getId());
-    garbageBillTrackerRepository.updatePenalty(tracker);
-}
+		        demand.setMinimumAmountPayable(existingBase);
+		    }
+		    demand.setMinimumAmountPayable(
+		        demand.getMinimumAmountPayable().add(penalty)
+		    );
+		
+		    demandService.updateDemand(
+		        requestInfo,
+		        Collections.singletonList(demand)
+		    );
+		
+		    BillSearchCriteria billSearchCriteria =
+		        BillSearchCriteria.builder()
+		            .tenantId(tracker.getTenantId())
+		            .consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+		            .build();
+		
+		    Bill bill = billService
+		        .searchBill(billSearchCriteria, requestInfo)
+		        .getBill()
+		        .get(0);
+		
+		    for (BillDetail bd : bill.getBillDetails()) {
+		
+		        bd.setAmount(bd.getAmount().add(penalty));
+		        bd.setAmountPaid(BigDecimal.ZERO);
+		        
+		
+		        boolean penaltyFound = false;
+		
+		        for (BillAccountDetail bad : bd.getBillAccountDetails()) {
+		        	
+		        	if (bad.getTenantId() == null) {
+		        	    bad.setTenantId(tracker.getTenantId());
+		        	}
+		        	
+		        	if (bad.getAuditDetails() == null) {
+		        	    bad.setAuditDetails(
+		        	        AuditDetails.builder()
+		        	            .createdBy(requestInfo.getUserInfo().getUuid())
+		        	            .createdTime(System.currentTimeMillis())
+		        	            .lastModifiedBy(requestInfo.getUserInfo().getUuid())
+		        	            .lastModifiedTime(System.currentTimeMillis())
+		        	            .build()
+		        	    );
+		        	}
+		            if (GrbgConstants.GARBAGE_PENALTY_TAX_HEAD.equals(bad.getTaxHeadCode())) {
+		            	bad.setAmount(bad.getAmount().add(penalty));
+		            	bad.setAdjustedAmount(BigDecimal.ZERO);
+		            	bad.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+		            	bad.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+		                penaltyFound = true;
+		            }
+		        }
+		
+		        if (!penaltyFound) {
+		            BillAccountDetail penaltyBAD = new BillAccountDetail();
+		            penaltyBAD.setBillDetailId(bd.getId());
+		            penaltyBAD.setDemandDetailId(
+		            	    bd.getBillAccountDetails().get(0).getDemandDetailId()
+		            	);
+		            penaltyBAD.setId(UUID.randomUUID().toString());
+		            penaltyBAD.setTenantId(tracker.getTenantId());
+		            penaltyBAD.setTaxHeadCode(GrbgConstants.GARBAGE_PENALTY_TAX_HEAD);
+		            penaltyBAD.setAmount(penalty);
+		            penaltyBAD.setAdjustedAmount(BigDecimal.ZERO);
+		            penaltyBAD.setOrder(1);
 
-
+		            penaltyBAD.setAuditDetails(
+		                AuditDetails.builder()
+		                    .createdBy(requestInfo.getUserInfo().getUuid())
+		                    .createdTime(System.currentTimeMillis())
+		                    .lastModifiedBy(requestInfo.getUserInfo().getUuid())
+		                    .lastModifiedTime(System.currentTimeMillis())
+		                    .build()
+		            );
+		            bd.getBillAccountDetails().add(penaltyBAD);
+		        }
+		    }
+		
+		    bill.setTotalAmount(bill.getTotalAmount().add(penalty));
+		    bill.setAmountPaid(BigDecimal.ZERO);
+		    bill.setStatus(Bill.StatusEnum.ACTIVE);
+		
+		    billService.updateBill(
+		        requestInfo,
+		        Collections.singletonList(bill)
+		    );
+		
+		    tracker.setPenaltyAmount(penalty);
+		    tracker.setGrbgBillAmount(
+		        tracker.getGrbgBillWithoutPenalty().add(penalty)
+		    );
+		
+		    garbageBillTrackerRepository.updatePenalty(tracker);
+		}
 }

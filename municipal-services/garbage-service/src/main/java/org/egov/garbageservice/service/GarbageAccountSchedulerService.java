@@ -107,7 +107,7 @@ public class GarbageAccountSchedulerService {
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
 	
-	@Value("${garbage.rebate.grace.days:0}")
+	@Value("${garbage.rebate.grace.days:15}")
 	private Integer rebateGraceDays;
 	
 	@Value("${egov.sms.host}")
@@ -588,7 +588,7 @@ public class GarbageAccountSchedulerService {
 	
 	public void processGarbagePenalty(RequestInfo requestInfo) {
 	
-	    List<GrbgBillTracker> trackers = garbageAccountService.fetchExpiredUnpaidBills();
+	    List<GrbgBillTracker> trackers = garbageAccountService.fetchExpiredUnpaidBills(requestInfo);
 	
 	    for (GrbgBillTracker tracker : trackers) {
 	        try {
@@ -621,15 +621,13 @@ public class GarbageAccountSchedulerService {
 	                .filter(d -> GrbgConstants.BILLING_TAX_HEAD_MASTER_CODE.equals(d.getTaxHeadMasterCode()))
 	                .map(DemandDetail::getTaxAmount)
 	                .reduce(BigDecimal.ZERO, BigDecimal::add);
-	            
-	
-	            // months overdue
-	            Long billExpiryTime = demand.getBillExpiryTime();
-	            if (billExpiryTime == null || billExpiryTime >= System.currentTimeMillis()) {
-	                continue; // demand not expired → skip penalty
+
+	            Long expiry = tracker.getExpiryDate();
+	            if (expiry == null || expiry >= System.currentTimeMillis()) {
+	                continue; 
 	            }
 	
-	            LocalDate expiryDate = Instant.ofEpochMilli(billExpiryTime)
+	            LocalDate expiryDate = Instant.ofEpochMilli(expiry)
 	                                          .atZone(ZoneId.systemDefault())
 	                                          .toLocalDate();
 	
