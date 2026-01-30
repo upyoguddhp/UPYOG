@@ -107,7 +107,7 @@ public class GarbageAccountSchedulerService {
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
 	
-	@Value("${garbage.rebate.grace.days:15}")
+	@Value("${garbage.rebate.grace.days:0}")
 	private Integer rebateGraceDays;
 	
 	@Value("${egov.sms.host}")
@@ -790,6 +790,7 @@ public class GarbageAccountSchedulerService {
 	            tracker.setAdditionaldetail(trackerAdditionalDetail);
 	            tracker.setRebateAmount(BigDecimal.ZERO);
 	            tracker.setGrbgBillAmount(originalAmount);
+	            tracker.setGrbgBillWithoutPenalty(originalAmount);
 	
 	            garbageBillTrackerRepository.updateRebateReversal(tracker);
 	

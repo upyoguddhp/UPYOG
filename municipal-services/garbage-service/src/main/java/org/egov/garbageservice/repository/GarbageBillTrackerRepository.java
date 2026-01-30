@@ -87,6 +87,7 @@ public class GarbageBillTrackerRepository {
 		    "    grbg_bill_amount = :billAmount, " +
 		    "    additionaldetail = :additionaldetail::jsonb, " +
 		    "    last_modified_by = :lastModifiedBy, " +
+		    "    grbg_bill_without_penalty = :grbgBillWithoutPenalty, " + 
 		    "    last_modified_time = :lastModifiedTime " +
 		    "WHERE uuid = :uuid";
 
@@ -342,6 +343,8 @@ public class GarbageBillTrackerRepository {
 	    params.put("uuid", tracker.getUuid());
 	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
 	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+	    params.put("grbgBillWithoutPenalty", tracker.getGrbgBillWithoutPenalty());
+
 	
 	    PGobject additionalDetailObj = null;
 	    if (tracker.getAdditionaldetail() != null) {
