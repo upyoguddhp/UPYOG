@@ -1810,6 +1810,8 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 						.setFeeCalculationFormula("category: (" + account.getGrbgCollectionUnits().get(0).getCategory()
 								+ "), SubCategory: (" + account.getGrbgCollectionUnits().get(0).getSubCategory() + ")");
 			}
+			
+			log.info("Error Account :{}",account);
 
 			// enrich userDetails
 			Map<Object, Object> userDetails = new HashMap<>();
@@ -1823,7 +1825,7 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 							.concat(account.getAddresses().get(0).getUlbName().concat(", "))
 							.concat(account.getAddresses().get(0).getWardName().concat(", "))
 							.concat(account.getAddresses().get(0).getAdditionalDetail().get("district").asText()));
-
+			log.info("Error user details Account :{}",userDetails);
 			garbageAccountDetail.setUserDetails(userDetails);
 
 			if (garbageAccountActionRequest.getIsEmptyBillFilter()) {
