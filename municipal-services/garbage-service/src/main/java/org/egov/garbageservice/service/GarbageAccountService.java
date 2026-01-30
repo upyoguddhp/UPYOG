@@ -1802,7 +1802,7 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 			} else {
 				garbageAccountDetail.setTotalPayableAmount(new BigDecimal(100.00));
 			}
-			garbageAccountDetail.setBillDetails(billDetailsMap);
+			//garbageAccountDetail.setBillDetails(billDetailsMap);
 
 			// enrich formula
 			if (!CollectionUtils.isEmpty(account.getGrbgCollectionUnits())) {
@@ -1835,7 +1835,11 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 			}
 		});
 
-		return garbageAccountDetails;
+
+		return garbageAccountDetails.stream()
+		            .filter(detail -> !CollectionUtils.isEmpty(detail.getBills()))
+		            .collect(Collectors.toList());
+		
 	}
 
 	public GarbageAccountActionResponse getActionsOnApplication(
