@@ -1810,6 +1810,8 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 						.setFeeCalculationFormula("category: (" + account.getGrbgCollectionUnits().get(0).getCategory()
 								+ "), SubCategory: (" + account.getGrbgCollectionUnits().get(0).getSubCategory() + ")");
 			}
+			
+			log.info("Error Account :{}",account);
 
 			// enrich userDetails
 			Map<Object, Object> userDetails = new HashMap<>();
@@ -1818,6 +1820,14 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 			userDetails.put("Uuid", account.getUserUuid());
 			userDetails.put("MobileNo", account.getMobileNumber());
 			userDetails.put("Email", account.getEmailId());
+			userDetails.put("Address",
+					new String(account.getAddresses().get(0).getAddress1().concat(", "))
+							.concat(account.getAddresses().get(0).getPincode().concat(", "))
+							.concat(account.getAddresses().get(0).getZone().concat(", "))
+							.concat(account.getAddresses().get(0).getUlbName().concat(", "))
+							.concat(account.getAddresses().get(0).getWardName().concat(", "))
+							.concat(account.getAddresses().get(0).getAdditionalDetail().get("district").asText()));
+			log.info("Error user details Account :{}",userDetails);
 			userDetails.put("OwnerName", account.getAdditionalDetail().get("propertyOwnerName").asText());
 			userDetails.put("ApplicantName", account.getAdditionalDetail().get("applicantName").asText());
 			userDetails.put("ApplicantEmail", account.getAdditionalDetail().get("applicantEmail").asText());
@@ -1842,7 +1852,6 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 			userDetails.put("ULBType", addr.getUlbType());
 			userDetails.put("WardName", addr.getWardName());
 			userDetails.put("District", addr.getAdditionalDetail().get("district").asText());
-			 
 			garbageAccountDetail.setUserDetails(userDetails);
 
 			if (garbageAccountActionRequest.getIsEmptyBillFilter()) {
