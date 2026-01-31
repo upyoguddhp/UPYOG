@@ -250,38 +250,38 @@ public class PetRegistrationService {
 
 	private void createAndUploadPDF(PetRegistrationRequest petRegistrationRequest) {
 		
-		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
-			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
-
-//				Thread pdfGenerationThread = new Thread(() -> {
-
-					// for NEW TL
-					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
-
-						// validate trade license
-						validatePetCertificateGeneration(petApplication);
-
-						// create pdf
-						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
-
-						//upload pdf
-						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
-								petRegistrationRequest.getRequestInfo());
-						try {
-							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
-									petRegistrationRequest.getRequestInfo());
-						} catch (IOException e) {
-							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
-									"Upload Attachment failed." + e.getMessage());
-						}
-					}
-
-//				});
-
-//				pdfGenerationThread.start();
-
-			});
-		}
+//		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
+//			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
+//
+////				Thread pdfGenerationThread = new Thread(() -> {
+//
+//					// for NEW TL
+//					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
+//
+//						// validate trade license
+//						validatePetCertificateGeneration(petApplication);
+//
+//						// create pdf
+//						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
+//
+//						//upload pdf
+//						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
+//								petRegistrationRequest.getRequestInfo());
+//						try {
+//							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
+//									petRegistrationRequest.getRequestInfo());
+//						} catch (IOException e) {
+//							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
+//									"Upload Attachment failed." + e.getMessage());
+//						}
+//					}
+//
+////				});
+//
+////				pdfGenerationThread.start();
+//
+//			});
+//		}
 		
 		
 	}
@@ -444,32 +444,50 @@ public class PetRegistrationService {
 			}
 	}
 
-	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest ) {
-		if (petRegistrationRequest.getPetRegistrationApplications().get(0).getWorkflow().getAction()
-				.equals(PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT)) {
-			
-			// fetch fees from MDMS
-			
-			
-			BigDecimal taxAmount = getFeesFromMdms(petRegistrationRequest);
-//			taxAmount = ;
-			// create demands
-			List<Demand> savedDemands = demandService.createDemand(petRegistrationRequest, taxAmount);
+	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest) {
 
-	        if(CollectionUtils.isEmpty(savedDemands)) {
-	            throw new CustomException("INVALID_CONSUMERCODE","Bill not generated due to no Demand found for the given consumerCode");
-	        }
+	    if (!PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT.equals(
+	            petRegistrationRequest.getPetRegistrationApplications()
+	                    .get(0).getWorkflow().getAction())) {
+	        return;
+	    }
 
-			// fetch/create bill
-            GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
-            									.tenantId(petRegistrationRequest.getPetRegistrationApplications().get(0).getTenantId())
-            									.businessService("pet-services")
-            									.consumerCode(petRegistrationRequest.getPetRegistrationApplications().get(0).getApplicationNumber()).build();
-            BillResponse billResponse = billingService.generateBill(petRegistrationRequest.getRequestInfo(),billCriteria);
-            
-		}
+	    PetRegistrationApplication application =
+	            petRegistrationRequest.getPetRegistrationApplications().get(0);
+
+	    BigDecimal taxAmount;
+
+	    // Renewal
+	    if (PTRConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(application.getApplicationType())) {
+	        taxAmount = getFeesFromMdmsv2(petRegistrationRequest);
+	    } else {
+	        taxAmount = getFeesFromMdms(petRegistrationRequest);
+	    }
+
+	    // create demand
+	    List<Demand> savedDemands =
+	            demandService.createDemand(petRegistrationRequest, taxAmount);
+
+	    if (CollectionUtils.isEmpty(savedDemands)) {
+	        throw new CustomException(
+	                "INVALID_CONSUMERCODE",
+	                "Bill not generated due to no Demand found for the given consumerCode"
+	        );
+	    }
+
+	    // generate bill
+	    GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
+	            .tenantId(application.getTenantId())
+	            .businessService("pet-services")
+	            .consumerCode(application.getApplicationNumber())
+	            .build();
+
+	    billingService.generateBill(
+	            petRegistrationRequest.getRequestInfo(),
+	            billCriteria
+	    );
 	}
-	
+
 
 	private BigDecimal getFeesFromMdms(PetRegistrationRequest petRegistrationRequest) {
 
@@ -496,6 +514,76 @@ public class PetRegistrationService {
 
 	}
 
+	private BigDecimal getFeesFromMdmsv2(PetRegistrationRequest request) {
+
+	    PetRegistrationApplication app =
+	            request.getPetRegistrationApplications().get(0);
+
+	    String tenantId = app.getTenantId();
+
+	    boolean isRenewal =
+	            PTRConstants.APPLICATION_TYPE_RENEWAL
+	                    .equalsIgnoreCase(app.getApplicationType());
+
+	    try {
+	        Optional<Object> response = commonUtils.getAttributeValuesv2(
+	                PTRConstants.STATE_LEVEL_TENANT_ID,
+	                PTRConstants.MODULE_NAME_PET_SERVICE,
+	                Arrays.asList(PTRConstants.MASTER_NAME_FEE_STRUCTURE),
+	                request
+	        );
+
+	        if (!response.isPresent()) {
+	            throw new CustomException("MDMS_EMPTY_RESPONSE", "MDMS v2 returned empty response");
+	        }
+
+	        List<LinkedHashMap<String, Object>> mdmsList =
+	                JsonPath.read(response.get(), "$.mdms");
+
+	        return mdmsList.stream()
+	                .filter(entry ->
+	                        "ULBS.PetRenewal"
+	                                .equalsIgnoreCase((String) entry.get("schemaCode")))
+	                .filter(entry -> {
+	                    String mdmsTenant = (String) entry.get("tenantId");
+	                    return tenantId.equalsIgnoreCase(mdmsTenant)
+	                            || tenantId.startsWith(mdmsTenant);
+	                })
+	                
+	                
+	                .map(entry -> {
+	                    Map<String, Object> data =
+	                            (Map<String, Object>) entry.get("data");
+
+	                    Object fee = isRenewal
+	                            ? data.get("renewalFees")
+	                            : data.get("newFee");
+
+	                    if (fee == null) {
+	                        throw new CustomException(
+	                                "FEE_NOT_CONFIGURED",
+	                                (isRenewal ? "Renewal" : "New")
+	                                        + " fee not configured for tenantId=" + tenantId
+	                        );
+	                    }
+
+	                    return new BigDecimal(fee.toString());
+	                })
+	                .findFirst()
+	                .orElseThrow(() -> new CustomException(
+	                        "FEE_NOT_CONFIGURED",
+	                        "No matching fee found for tenantId=" + tenantId
+	                ));
+
+	    } catch (CustomException e) {
+	        throw e;
+	    } catch (Exception e) {
+	        throw new CustomException(
+	                "FETCH_FEES_FAILED",
+	                "Failed to fetch fees from MDMS v2 for tenant id: " + tenantId
+	        );
+	    }
+	}
 	public Object enrichResponseDetail(List<PetRegistrationApplication> applications) {
 		
 		Map<String, Object> responseDetail = new HashMap<>();
