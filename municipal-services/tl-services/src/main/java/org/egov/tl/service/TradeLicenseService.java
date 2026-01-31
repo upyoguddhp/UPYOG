@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import java.util.Objects;
 
 import javax.validation.ConstraintViolation;
@@ -88,6 +89,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
@@ -1271,9 +1273,23 @@ public class TradeLicenseService {
 		tlObject.put("licenseCategory",
 				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeCategory").asText());// License
 																											// Category
-		tlObject.put("licenseSubCategory",
-				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeSubType").asText());// License Sub
-																											// Category
+		 //licenseSubCategory
+		JsonNode tradeSubTypeNode = tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeSubType");
+
+		String licenseSubCategory = null;
+
+		if (tradeSubTypeNode != null) {
+			if (tradeSubTypeNode.isArray()) {
+
+				licenseSubCategory = StreamSupport.stream(tradeSubTypeNode.spliterator(), false).map(JsonNode::asText)
+						.collect(Collectors.joining(", "));
+			} else {
+
+				licenseSubCategory = tradeSubTypeNode.asText();
+			}
+		}
+
+		tlObject.put("licenseSubCategory", licenseSubCategory);
 		tlObject.put("licenseApplicantName",
 				tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("applicantName").asText());// License
 																											// Applicant
