@@ -250,38 +250,38 @@ public class PetRegistrationService {
 
 	private void createAndUploadPDF(PetRegistrationRequest petRegistrationRequest) {
 		
-//		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
-//			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
-//
-////				Thread pdfGenerationThread = new Thread(() -> {
-//
-//					// for NEW TL
-//					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
-//
-//						// validate trade license
-//						validatePetCertificateGeneration(petApplication);
-//
-//						// create pdf
-//						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
-//
-//						//upload pdf
-//						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
-//								petRegistrationRequest.getRequestInfo());
-//						try {
-//							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
-//									petRegistrationRequest.getRequestInfo());
-//						} catch (IOException e) {
-//							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
-//									"Upload Attachment failed." + e.getMessage());
-//						}
-//					}
-//
-////				});
-//
-////				pdfGenerationThread.start();
-//
-//			});
-//		}
+		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
+			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
+
+//				Thread pdfGenerationThread = new Thread(() -> {
+
+					// for NEW TL
+					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
+
+						// validate trade license
+						validatePetCertificateGeneration(petApplication);
+
+						// create pdf
+						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
+
+						//upload pdf
+						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
+								petRegistrationRequest.getRequestInfo());
+						try {
+							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
+									petRegistrationRequest.getRequestInfo());
+						} catch (IOException e) {
+							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
+									"Upload Attachment failed." + e.getMessage());
+						}
+					}
+
+//				});
+
+//				pdfGenerationThread.start();
+
+			});
+		}
 		
 		
 	}
