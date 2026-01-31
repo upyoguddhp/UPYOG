@@ -107,7 +107,7 @@ public class GarbageAccountSchedulerService {
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
 	
-	@Value("${garbage.rebate.grace.days:0}")
+	@Value("${garbage.rebate.grace.days:15}")
 	private Integer rebateGraceDays;
 	
 	@Value("${egov.sms.host}")
