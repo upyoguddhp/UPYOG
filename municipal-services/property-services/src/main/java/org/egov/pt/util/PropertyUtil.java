@@ -76,14 +76,12 @@ public class PropertyUtil extends CommonUtils {
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
 		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
 		
-		log.info("User object {} ",users);
+
 
 		properties.forEach(property -> {
 			
-			log.info("property object {} ",property);
 
 			property.getOwners().forEach(owner -> {
-
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
 					log.info("OWNER SEARCH ERROR",
 							"The owner with UUID : \"" + owner.getUuid() + "\" for the property with Id \""
