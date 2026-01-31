@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Property Tax Bill</title>
+    <title>Asset Booking Confirmation</title>
     <style>
         @page {
             size: A4;
@@ -396,13 +396,13 @@
             <td><span th:text="${numberOfDays}">NA</span></td>
             <td><span th:text="${perDayCost}">NA</span></td>
             <td><span th:text="${securityAmount}">NA</span></td>
-            <td><span th:text="${TotalAmount}">NA</span></td>
+            <td><span th:text="${totalAmount}">NA</span></td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="3">Total Payable</td>
-            <td><span th:text="${TotalAmount}">NA</span></td>
+            <td><span th:text="${totalAmount}">NA</span></td>
           </tr>
         </tfoot>
       </table>

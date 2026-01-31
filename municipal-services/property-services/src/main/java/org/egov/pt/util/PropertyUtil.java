@@ -75,8 +75,12 @@ public class PropertyUtil extends CommonUtils {
 		List<OwnerInfo> users = userDetailResponse.getUser();
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
 		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
+		
+		log.info("User object {} ",users);
 
 		properties.forEach(property -> {
+			
+			log.info("property object {} ",property);
 
 			property.getOwners().forEach(owner -> {
 
