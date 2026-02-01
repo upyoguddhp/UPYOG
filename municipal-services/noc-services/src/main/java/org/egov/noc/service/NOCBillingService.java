@@ -54,6 +54,7 @@ public class NOCBillingService {
         demand.put("consumerCode", noc.getApplicationNo());
         demand.put("consumerType", "NOC");
         demand.put("businessService", "NOC");
+        demand.put("payer", buildPayer(requestInfo, noc));;
         demand.put("taxPeriodFrom", System.currentTimeMillis());
         demand.put("taxPeriodTo", System.currentTimeMillis());
         demand.put("demandDetails", Collections.singletonList(demandDetail));
@@ -147,5 +148,13 @@ public class NOCBillingService {
 	    log.info("NOC fee fetched from MDMS: {}", rate);
 	    return new BigDecimal(rate.toString());
 	}
+	
+	private Map<String, Object> buildPayer(RequestInfo requestInfo, Noc noc) {
+		Map<String, Object> payer = new HashMap<>();
+		payer.put("uuid", noc.getAuditDetails().getCreatedBy());
+		payer.put("tenantId", noc.getTenantId());
+	    return payer;
+	}
+
 
 }
