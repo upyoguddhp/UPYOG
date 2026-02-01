@@ -102,7 +102,7 @@ public class NOCBillingService {
 	    if (!(response instanceof Map)) return false;
 	
 	    Map<?, ?> responseMap = (Map<?, ?>) response;
-	    Object bills = responseMap.get("bill");
+	    Object bills = responseMap.get("Bill");
 	
 	    return bills instanceof List && !CollectionUtils.isEmpty((List<?>) bills);
 	}
