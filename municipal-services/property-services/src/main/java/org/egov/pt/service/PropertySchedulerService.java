@@ -1,6 +1,7 @@
 package org.egov.pt.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -1059,14 +1060,55 @@ public class PropertySchedulerService {
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days) {
-		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
-				.toEpochMilli();
+//		long startDateTimes = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
+//				.toEpochMilli();
+//
+//		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+//				.startDateTime(startDateTimes).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
+//				.build();
+	//return propertyService.getTaxCalculatedProperties(criteria);
+		
+		
+		
 
-		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
-				.startDateTime(startDateTime).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
-				.build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+	    long startDateTime = LocalDate.now()
+	            .minusDays(days)
+	            .atStartOfDay(ZoneId.systemDefault())
+	            .toInstant()
+	            .toEpochMilli();
+
+	    PtTaxCalculatorTrackerSearchCriteria criteria =
+	            PtTaxCalculatorTrackerSearchCriteria.builder()
+	                    .startDateTime(startDateTime)
+	                    .tenantId(tenantId)
+	                    .billStatus(Collections.singleton(BillStatus.ACTIVE))
+	                    .build();
+
+	    List<PtTaxCalculatorTracker> trackers =
+	            propertyService.getTaxCalculatedProperties(criteria);
+
+	    long todayStart = LocalDate.now()
+	            .atStartOfDay(ZoneId.systemDefault())
+	            .toInstant()
+	            .toEpochMilli();
+
+	    return trackers.stream()
+	            .filter(tracker -> {
+	                long createdTime = tracker.getAuditDetails().getCreatedTime(); // confirm field name
+	                long diffDays = ChronoUnit.DAYS.between(
+	                        Instant.ofEpochMilli(createdTime)
+	                                .atZone(ZoneId.systemDefault())
+	                                .toLocalDate(),
+	                        Instant.ofEpochMilli(todayStart)
+	                                .atZone(ZoneId.systemDefault())
+	                                .toLocalDate()
+	                );
+	                return diffDays > 0 && diffDays % 30 == 0;
+	            })
+	            .collect(Collectors.toList());
+
+		
 	}
 
 	private Map<String, Bill> fetchBillsByBatch(Set<String> billIds, RequestInfoWrapper requestInfoWrapper) {
@@ -1243,7 +1285,7 @@ public class PropertySchedulerService {
 		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
-			Integer days = 30; // need to change if needed
+			Integer days = 365; // need to change if needed
 
 			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, days);
 
