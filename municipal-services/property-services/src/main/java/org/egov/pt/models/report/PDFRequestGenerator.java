@@ -177,8 +177,9 @@ public class PDFRequestGenerator {
 				? ptTaxCalculatorTracker.getPenaltyAmount()
 				: new BigDecimal("0.00");
 		ptbr.put("penalty", String.valueOf(penalty));
+		
+		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax());
 
-		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax()).subtract(penalty);
 		ptbr.put("arrear", String.valueOf(arrear));
 
 		ptbr.put("propertyTaxPlusArrear", String.valueOf(propertyTax.add(arrear)));
