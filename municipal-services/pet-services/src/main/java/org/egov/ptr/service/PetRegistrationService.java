@@ -314,7 +314,7 @@ public class PetRegistrationService {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		String createdTime = dateFormat.format(new Date(petRegistrationApplication.getAuditDetails().getCreatedTime()));
-		String lastModifiedTime = dateFormat.format(new Date(petRegistrationApplication.getAuditDetails().getLastModifiedBy()));
+		String lastModifiedTime = dateFormat.format(new Date(System.currentTimeMillis()));
 
 		
 		String lastVaccineDateStr = petRegistrationApplication.getPetDetails().getLastVaccineDate().toString();
