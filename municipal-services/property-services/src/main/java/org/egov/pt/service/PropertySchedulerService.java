@@ -1066,11 +1066,7 @@ public class PropertySchedulerService {
 //		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 //				.startDateTime(startDateTimes).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
 //				.build();
-	//return propertyService.getTaxCalculatedProperties(criteria);
-		
-		
-		
-
+	//return propertyService.getTaxCalculatedProperties(criteria);//comment previous code 
 
 	    long startDateTime = LocalDate.now()
 	            .minusDays(days)
