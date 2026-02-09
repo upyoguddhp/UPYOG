@@ -11,6 +11,7 @@ import org.egov.pg.web.models.TransactionCriteria;
 import org.egov.pg.web.models.TransactionDetailsCriteria;
 import org.egov.pg.web.models.TransactionRequest;
 import org.egov.tracer.model.CustomException;
+import org.egov.pg.models.DemandAmountInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.egov.pg.models.TaxAndPayment;
 import org.egov.pg.models.Transaction;
@@ -19,7 +20,10 @@ import org.egov.pg.service.PaymentsService;
 import org.egov.pg.repository.TransactionDetailsRepository;
 import org.egov.pg.config.AppProperties;
 import org.springframework.stereotype.Service;
-
+import org.egov.pg.service.BillingService;
+import org.egov.pg.service.TransactionServiceV2;
+import org.springframework.util.CollectionUtils;
+import org.egov.common.contract.request.RequestInfo;
 
 @Service
 public class TransactionValidatorV2 {
@@ -35,6 +39,13 @@ public class TransactionValidatorV2 {
 	
 	@Autowired
 	private PaymentsService paymentsService;
+	
+	@Autowired
+	private BillingService billingService;
+	
+	@Autowired
+	private TransactionServiceV2 transactionServiceV2;
+
 
 
 	/**
@@ -71,46 +82,65 @@ public class TransactionValidatorV2 {
 	}
 
 	private void validateIfTxnExistsForBill(TransactionRequest transactionRequest, Map<String, String> errorMap) {
-		List<TransactionDetails> txnDetails = transactionRequest.getTransaction().getTransactionDetails();
-		
-		Set<String> billIds = txnDetails.stream()
-			    .map(TransactionDetails::getBillId)
-			    .collect(Collectors.toSet());
-		
-		TransactionDetailsCriteria criteria = TransactionDetailsCriteria.builder().billIds(billIds)
-		   		            .build();
-        List<TransactionDetails> existingTxnsForBill = transactionDetailsRepository.fetchTransactionDetails(criteria);
-	        
-	        for (TransactionDetails curr : existingTxnsForBill) {
-				if (curr.getStatus().equals("PENDING")) {
-					errorMap.put("TXN_ABRUPTLY_DISCARDED",
-							"A transaction for this bill has been abruptly discarded, please retry after "
-									+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
-				}
-				if (curr.getStatus().equals("SUCCESS")) {
-					errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
-				}
-			}
+    	List<TransactionDetails> txnDetails = transactionRequest.getTransaction().getTransactionDetails();
+	
+	    Set<String> billIds = txnDetails.stream()
+	            .map(TransactionDetails::getBillId)
+	            .collect(Collectors.toSet());
+	
+	    RequestInfo requestInfo = transactionRequest.getRequestInfo();
+	    String tenantId = transactionRequest.getTransaction().getTenantId();
+	
+	    for (String billId : billIds) {
+	
+	        DemandAmountInfo demandAmountInfo =
+	                transactionServiceV2.fetchDemandAmountsForBill(
+	                        requestInfo,
+	                        tenantId,
+	                        billId
+	                );
+	
+	        if (demandAmountInfo.getCollectionAmount()
+	                .compareTo(demandAmountInfo.getTaxAmount()) == 0) {
+	
+	            errorMap.put(
+	                    "TXN_CREATE_BILL_ALREADY_PAID",
+	                    "Bill has already been paid"
+	            );
+	            return;
+	        }
+	    }
+	
+	    TransactionDetailsCriteria criteria =
+	            TransactionDetailsCriteria.builder()
+	                    .billIds(billIds)
+	                    .build();
+	
+	    List<TransactionDetails> existingTxnsForBill =
+	            transactionDetailsRepository.fetchTransactionDetails(criteria);
+	
+	    for (TransactionDetails curr : existingTxnsForBill) {
+	
+	        if (curr.getStatus() == null) continue;
+	
+	        if ("PENDING".equalsIgnoreCase(curr.getStatus())) {
+	            errorMap.put(
+	                    "TXN_ABRUPTLY_DISCARDED",
+	                    "A transaction for this bill is already in progress, please retry after "
+	                            + (props.getEarlyReconcileJobRunInterval() * 2) + " mins"
+	            );
+	            return;
+	        }
+	
+	        if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
+	            errorMap.put(
+	                    "TXN_CREATE_BILL_ALREADY_PAID",
+	                    "Bill has already been paid"
+	            );
+	            return;
+	        }
+	    }
+		}
 
-	        // You can do something with existingTxnsForBill here
-	        System.out.println("Fetched " + existingTxnsForBill.size() + " transactions.");
-//	    });
-		
-//		TransactionCriteria criteria = TransactionCriteria.builder().billId(txn.getBillId()).build();
-//	
-//		List<Transaction> existingTxnsForBill = transactionRepository.fetchTransactions(criteria);
-	
-//		for (Transaction curr : existingTxnsForBill) {
-//			if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.PENDING)) {
-//				errorMap.put("TXN_ABRUPTLY_DISCARDED",
-//						"A transaction for this bill has been abruptly discarded, please retry after "
-//								+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
-//			}
-//			if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.SUCCESS)) {
-//				errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
-//			}
-//		}
-	
-	}
 
 }

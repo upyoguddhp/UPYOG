@@ -42,9 +42,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import org.egov.pg.models.DemandAmountInfo;
+import org.egov.pg.models.Bill;
+import org.egov.pg.models.BillResponse;
+import org.egov.pg.models.Demand;
 import lombok.extern.slf4j.Slf4j;
-
+import org.egov.pg.models.DemandResponse;
+import org.egov.pg.models.DemandDetail;
 /**
  * Handles all transaction related requests
  */
@@ -78,6 +82,9 @@ public class TransactionServiceV2 {
 
 	@Autowired
 	private PaymentsService paymentsService;
+	
+	@Autowired
+	private BillingService billingService;
 
 	/**
 	 * Initiates a transaction by generating a gateway redirect URI for the request
@@ -353,6 +360,57 @@ public class TransactionServiceV2 {
 				.totalPayableAmount(totalPayableAmount).callbackUrl(callbackUrl).orderIdArray(orderIdArray)
 				.consumerCodeArray(consumerCodeArray).user(user).build();
 	}
+	
+	public DemandAmountInfo fetchDemandAmountsForBill(
+        RequestInfo requestInfo,
+        String tenantId,
+        String billId) {
+
+	    BillResponse billResponse = billingService.searchBillById(requestInfo, tenantId, billId);
+	
+	    if (billResponse == null || billResponse.getBill() == null
+	            || billResponse.getBill().isEmpty()) {
+	        throw new CustomException(
+	                "INVALID_BILL",
+	                "No bill found for billId: " + billId
+	        );
+	    }
+	
+	    Bill bill = billResponse.getBill().get(0);
+	
+	    String consumerCode = bill.getConsumerCode();
+	
+	    DemandResponse demandResponse = billingService.searchDemand(requestInfo, tenantId, consumerCode);
+	
+	    if (demandResponse == null || demandResponse.getDemands() == null
+	            || demandResponse.getDemands().isEmpty()) {
+	        throw new CustomException(
+	                "DEMAND_NOT_FOUND",
+	                "No demand found for consumerCode: " + consumerCode
+	        );
+	    }
+	
+	    Demand demand = demandResponse.getDemands().get(0);
+	
+	    if (demand.getDemandDetails() == null || demand.getDemandDetails().isEmpty()) {
+	        throw new CustomException(
+	                "INVALID_DEMAND",
+	                "No demand details found for consumerCode: " + consumerCode
+	        );
+	    }
+	
+	    BigDecimal taxAmount = BigDecimal.ZERO;
+	    BigDecimal collectionAmount = BigDecimal.ZERO;
+	
+	    for (DemandDetail detail : demand.getDemandDetails()) {
+	        taxAmount = taxAmount.add(detail.getTaxAmount());
+	        collectionAmount = collectionAmount.add(detail.getCollectionAmount());
+	    }
+	
+	    return new DemandAmountInfo(taxAmount, collectionAmount);
+}
+
+
 
 
 }

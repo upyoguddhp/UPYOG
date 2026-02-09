@@ -100,6 +100,8 @@ public class AppProperties {
 
     private final String internalMicroserviceUserType;
     
+    private final String billservicedemandsearchendpoint;
+    
     @Value("${egov.mdmsv2.host}")
     private String mdmsV2host;
     
@@ -157,6 +159,7 @@ public class AppProperties {
         this.internalMicroserviceUserUsername = environment.getRequiredProperty("internal.microservice.user.username");
         this.internalMicroserviceUserMobilenumber = environment.getRequiredProperty("internal.microservice.user.mobilenumber");
         this.internalMicroserviceUserType = environment.getRequiredProperty("internal.microservice.user.type");
+        this.billservicedemandsearchendpoint = environment.getRequiredProperty("egov.bill.searchdemandendpoint"); 
     }
 
 }
