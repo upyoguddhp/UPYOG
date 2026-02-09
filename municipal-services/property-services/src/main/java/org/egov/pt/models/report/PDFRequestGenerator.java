@@ -102,6 +102,19 @@ public class PDFRequestGenerator {
 			return nameObj.toString().replaceAll("\"", "");
 		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", ")));
 
+		
+		String fatherOrHusbandName = property.getOwners().stream().map(owner -> {
+			if (owner.getAdditionalDetails() == null)
+				return null;
+
+			Object nameObj = owner.getAdditionalDetails().get("fatherOrHusbandName");
+			if (nameObj == null)
+				return null;
+
+			return nameObj.toString().replaceAll("\"", "");
+		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", "));
+
+		ptbr.put("fatherOrHusbandName", escapeHtml(fatherOrHusbandName));
 		ptbr.put("noOfStories", String.valueOf(property.getNoOfFloors()));
 		ptbr.put("buildingNo", ""); // TODO blank
 
