@@ -53,6 +53,8 @@ public class AppProperties {
     private final String userServiceCreatePath;
 
     private final String userServiceSearchPath;
+    
+    private final String userServiceSearchNewPath;
 
     private final Boolean isUserCreationEnable;
 
@@ -136,6 +138,7 @@ public class AppProperties {
         this.userServiceHost = environment.getRequiredProperty("egov.userservice.host");
         this.userServiceCreatePath = environment.getRequiredProperty("egov.userservice.create.path");
         this.userServiceSearchPath = environment.getRequiredProperty("egov.userservice.search.path");
+        this.userServiceSearchNewPath = environment.getRequiredProperty("egov.userservice.search.new.path");
         this.isUserCreationEnable = Boolean.valueOf(environment.getRequiredProperty("pg.is.user.create.enabled"));
         this.isSMSEnable = Boolean.valueOf(environment.getRequiredProperty("notification.sms.enabled"));
         this.isLocalizationStateLevel = Boolean.valueOf(environment.getRequiredProperty("egov.localization.statelevel"));
