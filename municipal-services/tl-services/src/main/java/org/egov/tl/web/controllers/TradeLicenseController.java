@@ -1,6 +1,5 @@
 package org.egov.tl.web.controllers;
 
-
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
 import java.util.HashMap;
@@ -43,160 +42,173 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RestController	
+@RestController
 
-    @RequestMapping("/v1")
-    public class TradeLicenseController {
+@RequestMapping("/v1")
+public class TradeLicenseController {
 
-        private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-        private final HttpServletRequest request;
+	private final HttpServletRequest request;
 
-        private final TradeLicenseService tradeLicenseService;
+	private final TradeLicenseService tradeLicenseService;
 
-        private final ResponseInfoFactory responseInfoFactory;
+	private final ResponseInfoFactory responseInfoFactory;
 
-        private final PaymentNotificationService paymentNotificationService;
+	private final PaymentNotificationService paymentNotificationService;
 
-        private final TLNotificationService tlNotificationService;
+	private final TLNotificationService tlNotificationService;
 
-    @Autowired
-    public TradeLicenseController(ObjectMapper objectMapper, HttpServletRequest request, TradeLicenseService tradeLicenseService,
-                                  ResponseInfoFactory responseInfoFactory, PaymentNotificationService paymentNotificationService, TLNotificationService tlNotificationService) {
-        this.objectMapper = objectMapper;
-        this.request = request;
-        this.tradeLicenseService = tradeLicenseService;
-        this.responseInfoFactory = responseInfoFactory;
-        this.paymentNotificationService = paymentNotificationService;
-        this.tlNotificationService = tlNotificationService;
-    }
+	@Autowired
+	public TradeLicenseController(ObjectMapper objectMapper, HttpServletRequest request,
+			TradeLicenseService tradeLicenseService, ResponseInfoFactory responseInfoFactory,
+			PaymentNotificationService paymentNotificationService, TLNotificationService tlNotificationService) {
+		this.objectMapper = objectMapper;
+		this.request = request;
+		this.tradeLicenseService = tradeLicenseService;
+		this.responseInfoFactory = responseInfoFactory;
+		this.paymentNotificationService = paymentNotificationService;
+		this.tlNotificationService = tlNotificationService;
+	}
+	@PostMapping({ "/{servicename}/_create", "/_create" })
+	public ResponseEntity<TradeLicenseResponse> create(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
+			@PathVariable(required = false) String servicename) {
+		List<TradeLicense> licenses = tradeLicenseService.create(tradeLicenseRequest, servicename);
+		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
+	@PostMapping({ "/{servicename}/_renewal", "/_renewal" })
+	public ResponseEntity<TradeLicenseResponse> renewal(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
+			@PathVariable(required = false) String servicename) {
 
+		List<TradeLicense> licenses = tradeLicenseService.renew(tradeLicenseRequest, servicename);
 
+		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-    
-    @PostMapping({"/{servicename}/_create", "/_create"})
-    public ResponseEntity<TradeLicenseResponse> create(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
-                                                       @PathVariable(required = false) String servicename) {
-        List<TradeLicense> licenses = tradeLicenseService.create(tradeLicenseRequest, servicename);
-        TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+	@RequestMapping(value = { "/{servicename}/_search", "/_search" }, method = RequestMethod.POST)
+	public ResponseEntity<TradeLicenseResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute TradeLicenseSearchCriteria criteria,
+			@PathVariable(required = false) String servicename, @RequestHeader HttpHeaders headers) {
+		List<TradeLicense> licenses = tradeLicenseService.search(criteria, requestInfoWrapper.getRequestInfo(),
+				servicename, headers);
 
-    
-    @RequestMapping(value = {"/{servicename}/_search", "/_search"}, method = RequestMethod.POST)
-    public ResponseEntity<TradeLicenseResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                       @Valid @ModelAttribute TradeLicenseSearchCriteria criteria,
-                                                       @PathVariable(required = false) String servicename
-            , @RequestHeader HttpHeaders headers) {
-        List<TradeLicense> licenses = tradeLicenseService.search(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers);
-        
-        int count = tradeLicenseService.countLicenses(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers);
-        
-        int applicationsIssued = tradeLicenseService.countApplications(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers).get(TLConstants.ISSUED_COUNT);
-        int applicationsRenewed = tradeLicenseService.countApplications(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers).get(TLConstants.RENEWED_COUNT);
-        int validity = tradeLicenseService.getApplicationValidity();
+		int count = tradeLicenseService.countLicenses(criteria, requestInfoWrapper.getRequestInfo(), servicename,
+				headers);
 
-        TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).count(count).applicationsIssued(applicationsIssued)
-        		.applicationsRenewed(applicationsRenewed).validity(validity).build();
-        tradeLicenseService.processResponse(response);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+		int applicationsIssued = tradeLicenseService
+				.countApplications(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers)
+				.get(TLConstants.ISSUED_COUNT);
+		int applicationsRenewed = tradeLicenseService
+				.countApplications(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers)
+				.get(TLConstants.RENEWED_COUNT);
+		int validity = tradeLicenseService.getApplicationValidity();
 
-    
-    @RequestMapping(value = {"/{servicename}/_update", "/_update"}, method = RequestMethod.POST)
-    public ResponseEntity<TradeLicenseResponse> update(@RequestBody TradeLicenseRequest tradeLicenseRequest,
-                                                       @PathVariable(required = false) String servicename) {
-    	
-        List<TradeLicense> licenses = tradeLicenseService.update(tradeLicenseRequest, servicename);
+		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),
+						true))
+				.count(count).applicationsIssued(applicationsIssued).applicationsRenewed(applicationsRenewed)
+				.validity(validity).build();
+		tradeLicenseService.processResponse(response);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-        TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+	@RequestMapping(value = { "/{servicename}/_update", "/_update" }, method = RequestMethod.POST)
+	public ResponseEntity<TradeLicenseResponse> update(@RequestBody TradeLicenseRequest tradeLicenseRequest,
+			@PathVariable(required = false) String servicename) {
 
-	@RequestMapping(value = {"/{servicename}/{jobname}/_batch", "/_batch"}, method = RequestMethod.POST)
-    public ResponseEntity sendReminderSMS(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                          @PathVariable(required = false) String servicename,
-                                          @PathVariable(required = true) String jobname) {
+		List<TradeLicense> licenses = tradeLicenseService.update(tradeLicenseRequest, servicename);
 
-        tradeLicenseService.runJob(servicename, jobname, requestInfoWrapper.getRequestInfo());
+		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-        return new ResponseEntity(HttpStatus.ACCEPTED);
-    }
+	@RequestMapping(value = { "/{servicename}/{jobname}/_batch", "/_batch" }, method = RequestMethod.POST)
+	public ResponseEntity sendReminderSMS(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@PathVariable(required = false) String servicename, @PathVariable(required = true) String jobname) {
 
-    @RequestMapping(value="/_plainsearch", method = RequestMethod.POST)
-    public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                            @Valid @ModelAttribute TradeLicenseSearchCriteria criteria){
+		tradeLicenseService.runJob(servicename, jobname, requestInfoWrapper.getRequestInfo());
 
-        List<TradeLicense> licenses = tradeLicenseService.plainSearch(criteria,requestInfoWrapper.getRequestInfo());
+		return new ResponseEntity(HttpStatus.ACCEPTED);
+	}
 
-        TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+	@RequestMapping(value = "/_plainsearch", method = RequestMethod.POST)
+	public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute TradeLicenseSearchCriteria criteria) {
 
-    @PostMapping("/_test")
-    public ResponseEntity test(@Valid @RequestBody HashMap<String, Object> record){
-        paymentNotificationService.processBusinessService(record, businessService_TL);
-        return new ResponseEntity(HttpStatus.OK);
-    }
+		List<TradeLicense> licenses = tradeLicenseService.plainSearch(criteria, requestInfoWrapper.getRequestInfo());
 
-    @PostMapping("/_test1")
-    public ResponseEntity test1(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest){
-        tlNotificationService.process(tradeLicenseRequest);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-    
-    
-    @PostMapping("/update/state")
-    public ResponseEntity<ProcessInstanceResponse> updateStateWf(@RequestBody UpdateTLStatusCriteriaRequest updateTLStatusCriteriaRequest){
-    	ProcessInstanceResponse processInstanceResponse = tradeLicenseService.updateState(updateTLStatusCriteriaRequest);
-        return new ResponseEntity(processInstanceResponse , HttpStatus.OK);
-    }
-    
-    @PostMapping("/updateApplicationAppliedStatus")
-    public ResponseEntity<?> updateStateOfApplication(@RequestBody ApplicationStatusChangeRequest applicationStatusChangeRequest){
-    	ApplicationStatusChangeRequest applicationStatusChangeRequest2 = tradeLicenseService.updateStateOfApplication(applicationStatusChangeRequest);
-        return new ResponseEntity(applicationStatusChangeRequest2 , HttpStatus.OK);
-    }
+		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-    @PostMapping("/testPdfCreateAndUpload")
-    public ResponseEntity<Resource> testPdfCreateAndUpload(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest){
-    	Resource object = tradeLicenseService.createNoSavePDF(tradeLicenseRequest.getLicenses().get(0)
-    														, tradeLicenseRequest.getRequestInfo());
-    	
+	@PostMapping("/_test")
+	public ResponseEntity test(@Valid @RequestBody HashMap<String, Object> record) {
+		paymentNotificationService.processBusinessService(record, businessService_TL);
+		return new ResponseEntity(HttpStatus.OK);
+	}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "generated.pdf");
+	@PostMapping("/_test1")
+	public ResponseEntity test1(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest) {
+		tlNotificationService.process(tradeLicenseRequest);
+		return new ResponseEntity(HttpStatus.OK);
+	}
 
-        return new ResponseEntity(object, headers, HttpStatus.OK);
-    }
+	@PostMapping("/update/state")
+	public ResponseEntity<ProcessInstanceResponse> updateStateWf(
+			@RequestBody UpdateTLStatusCriteriaRequest updateTLStatusCriteriaRequest) {
+		ProcessInstanceResponse processInstanceResponse = tradeLicenseService
+				.updateState(updateTLStatusCriteriaRequest);
+		return new ResponseEntity(processInstanceResponse, HttpStatus.OK);
+	}
 
+	@PostMapping("/updateApplicationAppliedStatus")
+	public ResponseEntity<?> updateStateOfApplication(
+			@RequestBody ApplicationStatusChangeRequest applicationStatusChangeRequest) {
+		ApplicationStatusChangeRequest applicationStatusChangeRequest2 = tradeLicenseService
+				.updateStateOfApplication(applicationStatusChangeRequest);
+		return new ResponseEntity(applicationStatusChangeRequest2, HttpStatus.OK);
+	}
 
-    
-    @PostMapping({"/fetch","/fetch/{value}"})
-    public ResponseEntity<?> calculateTLFee(@RequestBody TradeLicenseActionRequest tradeLicenseActionRequest
-    										, @PathVariable String value){
-    	
-    	TradeLicenseActionResponse response = null;
-    	
-    	if(StringUtils.equalsIgnoreCase(value, "CALCULATEFEE")) {
-    		response = tradeLicenseService.getApplicationDetails(tradeLicenseActionRequest);
-    	}else if(StringUtils.equalsIgnoreCase(value, "ACTIONS")){
-    		response = tradeLicenseService.getActionsOnApplication(tradeLicenseActionRequest);
-    	}else if(StringUtils.equalsIgnoreCase(value, "APPLICATIONDETAILS")){
-    		response = tradeLicenseService.getCountOfAllApplicationTypes(tradeLicenseActionRequest);
-    	}else {
-    		return new ResponseEntity("Provide parameter to be fetched in URL.", HttpStatus.BAD_REQUEST);
-    	}
-    	
-    	return new ResponseEntity(response, HttpStatus.OK);
-    }
+	@PostMapping("/testPdfCreateAndUpload")
+	public ResponseEntity<Resource> testPdfCreateAndUpload(
+			@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest) {
+		Resource object = tradeLicenseService.createNoSavePDF(tradeLicenseRequest.getLicenses().get(0),
+				tradeLicenseRequest.getRequestInfo());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("attachment", "generated.pdf");
+
+		return new ResponseEntity(object, headers, HttpStatus.OK);
+	}
+
+	@PostMapping({ "/fetch", "/fetch/{value}" })
+	public ResponseEntity<?> calculateTLFee(@RequestBody TradeLicenseActionRequest tradeLicenseActionRequest,
+			@PathVariable String value) {
+
+		TradeLicenseActionResponse response = null;
+
+		if (StringUtils.equalsIgnoreCase(value, "CALCULATEFEE")) {
+			response = tradeLicenseService.getApplicationDetails(tradeLicenseActionRequest);
+		} else if (StringUtils.equalsIgnoreCase(value, "ACTIONS")) {
+			response = tradeLicenseService.getActionsOnApplication(tradeLicenseActionRequest);
+		} else if (StringUtils.equalsIgnoreCase(value, "APPLICATIONDETAILS")) {
+			response = tradeLicenseService.getCountOfAllApplicationTypes(tradeLicenseActionRequest);
+		} else {
+			return new ResponseEntity("Provide parameter to be fetched in URL.", HttpStatus.BAD_REQUEST);
+		}
+
+		return new ResponseEntity(response, HttpStatus.OK);
+	}
 }

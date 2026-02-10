@@ -517,4 +517,9 @@ public class TLConstants {
     // kafka
     public static final String KAFKA_TOPIC_TL_CERTIFICATE = "save-tl-certificate";
 
+	public static final String ACTION_PENDING_FOR_MODIFICATION = "PENDING_FOR_MODIFICATION";
+
+	public static final String STATUS_PENDING_FOR_MODIFICATION = "PENDING_FOR_MODIFICATION";
+	
+
 }

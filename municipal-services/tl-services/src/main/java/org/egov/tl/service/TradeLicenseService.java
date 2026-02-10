@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.Objects;
@@ -244,6 +245,60 @@ public class TradeLicenseService {
 
 		return tradeLicenseRequest.getLicenses();
 	}
+	
+	//-------renew
+	public List<TradeLicense> renew(
+	        TradeLicenseRequest request,
+	        String businessServicefromPath) {
+
+	    if (businessServicefromPath == null)
+	        businessServicefromPath = businessService_TL;
+
+	    //  Fetch existing license
+	    TradeLicense oldLicense =
+	            getLicensesWithOwnerInfoRenewal(request).get(0);
+
+	    //  Allow renewal ONLY if APPROVED
+	    if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(oldLicense.getStatus())) {
+	        throw new CustomException(
+	                "RENEWAL_NOT_ALLOWED",
+	                "Renewal is allowed only for APPROVED licenses. Current status: "
+	                        + oldLicense.getStatus()
+	        );
+	    }
+
+	    //  Create new renewal license
+	    TradeLicense renewalLicense =
+	            enrichmentService.enrichRenewalLicense(request, oldLicense);
+
+	    //  Mandatory fields for NEW ROW
+	    renewalLicense.setId(UUID.randomUUID().toString());
+	    renewalLicense.setApplicationType(TLConstants.APPLICATION_TYPE_RENEWAL);
+
+	    // SAME numbers (as per your requirement)
+	    renewalLicense.setLicenseNumber(oldLicense.getLicenseNumber());
+	    renewalLicense.setApplicationNumber(oldLicense.getApplicationNumber());
+
+	    renewalLicense.setBusinessService(oldLicense.getBusinessService());
+
+	    //  THIS IS THE WORKFLOW ACTION
+	    renewalLicense.setAction(TLConstants.ACTION_PENDING_FOR_MODIFICATION);
+
+	    //  Replace request
+	    request.setLicenses(Collections.singletonList(renewalLicense));
+
+	    //  Validate
+	    tlValidator.validateRenewal(request);
+
+	    //  Persist new row
+	    repository.save(request);
+
+	    //  Call workflow
+	    workflowIntegrator.callWorkFlow(request);
+
+	    return request.getLicenses();
+	}
+	//-------	
 
 	private void enrichPreCreateNewTLValues(TradeLicenseRequest tradeLicenseRequest) {
 		tradeLicenseRequest.getLicenses().forEach(license -> {
@@ -637,6 +692,40 @@ public class TradeLicenseService {
 		licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria, request.getRequestInfo());
 		return licenses;
 	}
+	//-----
+	public List<TradeLicense> getLicensesWithOwnerInfoRenewal(TradeLicenseRequest request) {
+
+	    TradeLicenseSearchCriteria criteria = new TradeLicenseSearchCriteria();
+
+	    TradeLicense input = request.getLicenses().get(0);
+
+	    criteria.setTenantId(input.getTenantId());
+	    criteria.setBusinessService(input.getBusinessService());
+	    	
+	    //  SEARCH BY LICENSE NUMBER
+	    criteria.setLicenseNumbers(
+	            Collections.singletonList(input.getLicenseNumber())
+	    );
+
+	    List<TradeLicense> licenses = repository.getLicenses(criteria);
+
+//	    if (licenses.isEmpty()) {
+//	        throw new CustomException(
+//	                "LICENSE_NOT_FOUND",
+//	                "No approved license found for renewal"
+//	        );
+//	    }
+	    
+	    if (licenses.isEmpty())
+			return Collections.emptyList();
+		licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria, request.getRequestInfo());
+		return licenses;
+
+//	    return enrichmentService.enrichTradeLicenseSearch(
+//	            licenses, criteria, request.getRequestInfo()
+////	    );
+	}
+	//----
 
 	/**
 	 * Updates the tradeLicenses
@@ -813,7 +902,7 @@ public class TradeLicenseService {
 				// enrich input fields
 				licenses.get(0).setAction(action);
 				licenses.get(0).setComment(comment);
-				licenses.get(0).setApplicationType(applicationType.toString());
+				//licenses.get(0).setApplicationType(applicationType.toString());
 				// created date of application will be whenever it went to verifier
 				if (StringUtils.equalsIgnoreCase(license.getAction(), TLConstants.ACTION_FORWARD_TO_VERIFIER)) {
 					licenses.get(0).getAuditDetails().setCreatedTime(new Date().getTime());
