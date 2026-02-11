@@ -91,26 +91,6 @@ public class TransactionValidatorV2 {
 	    RequestInfo requestInfo = transactionRequest.getRequestInfo();
 	    String tenantId = transactionRequest.getTransaction().getTenantId();
 	
-	    for (String billId : billIds) {
-	
-	        DemandAmountInfo demandAmountInfo =
-	                transactionServiceV2.fetchDemandAmountsForBill(
-	                        requestInfo,
-	                        tenantId,
-	                        billId
-	                );
-	
-	        if (demandAmountInfo.getCollectionAmount()
-	                .compareTo(demandAmountInfo.getTaxAmount()) == 0) {
-	
-	            errorMap.put(
-	                    "TXN_CREATE_BILL_ALREADY_PAID",
-	                    "Bill has already been paid"
-	            );
-	            return;
-	        }
-	    }
-	
 	    TransactionDetailsCriteria criteria =
 	            TransactionDetailsCriteria.builder()
 	                    .billIds(billIds)
@@ -119,28 +99,33 @@ public class TransactionValidatorV2 {
 	    List<TransactionDetails> existingTxnsForBill =
 	            transactionDetailsRepository.fetchTransactionDetails(criteria);
 	
-	    for (TransactionDetails curr : existingTxnsForBill) {
-	
-	        if (curr.getStatus() == null) continue;
-	
-	        if ("PENDING".equalsIgnoreCase(curr.getStatus())) {
-	            errorMap.put(
-	                    "TXN_ABRUPTLY_DISCARDED",
-	                    "A transaction for this bill is already in progress, please retry after "
-	                            + (props.getEarlyReconcileJobRunInterval() * 2) + " mins"
-	            );
-	            return;
-	        }
-	
-	        if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
-	            errorMap.put(
-	                    "TXN_CREATE_BILL_ALREADY_PAID",
-	                    "Bill has already been paid"
-	            );
-	            return;
-	        }
-	    }
+		for (TransactionDetails curr : existingTxnsForBill) {
+
+			if (curr.getStatus() == null)
+				continue;
+
+			if ("PENDING".equalsIgnoreCase(curr.getStatus())) {
+				errorMap.put("TXN_ABRUPTLY_DISCARDED",
+						"A transaction for this bill is already in progress, please retry after "
+								+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
+				return;
+			}
+
+			if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
+
+				DemandAmountInfo demandAmountInfo = transactionServiceV2.fetchDemandAmountsForBill(requestInfo,
+						tenantId, curr.getBillId() // IMPORTANT
+				);
+
+				if (demandAmountInfo.getCollectionAmount().compareTo(demandAmountInfo.getTaxAmount()) == 0) {
+
+					errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid");
+					return;
+				}
+
+			}
 		}
+	}
 
 
 }
