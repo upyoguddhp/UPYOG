@@ -291,14 +291,13 @@ public class DemandService {
 			updateBillCriteria.setStatusToBeUpdated(BillStatus.EXPIRED);
 			billRepoV2.updateBillStatus(updateBillCriteria);
 		} else {
-			
-			updateBillCriteria.setStatusToBeUpdated(BillStatus.PAID);
-			billRepoV2.updateBillStatus(updateBillCriteria);
+			 BillStatus status = getBillStatusFromDemands(demands);
+			 updateBillCriteria.setStatusToBeUpdated(status);
+			 billRepoV2.updateBillStatus(updateBillCriteria);
 		}
 		// producer.push(applicationProperties.getDemandIndexTopic(), demandRequest);
 		return new DemandResponse(responseInfoFactory.getResponseInfo(requestInfo, HttpStatus.CREATED), demands);
 	}
-
 
 	private void validateDemandAndUpdateBill(DemandRequest demandRequest, UpdateBillCriteria updateBillCriteria) {
 		
@@ -324,6 +323,36 @@ public class DemandService {
 		}
 		
 	}
+	
+	private BillStatus getBillStatusFromDemands(List<Demand> demands) {
+
+	    BigDecimal totalTax = BigDecimal.ZERO;
+	    BigDecimal totalCollection = BigDecimal.ZERO;
+
+	    for (Demand demand : demands) {
+	        if (demand.getDemandDetails() == null) continue;
+
+	        for (DemandDetail detail : demand.getDemandDetails()) {
+
+	            if (detail.getTaxAmount() != null) {
+	                totalTax = totalTax.add(detail.getTaxAmount());
+	            }
+
+	            if (detail.getCollectionAmount() != null) {
+	                totalCollection = totalCollection.add(detail.getCollectionAmount());
+	            }
+	        }
+	    }
+
+	    if (totalCollection.compareTo(BigDecimal.ZERO) == 0) {
+	        return BillStatus.ACTIVE;
+	    }
+
+	    return totalCollection.compareTo(totalTax) >= 0
+	            ? BillStatus.PAID
+	            : BillStatus.PARTIALLY_PAID;
+	}
+
 
 	/**
 	 * Search method to fetch demands from DB

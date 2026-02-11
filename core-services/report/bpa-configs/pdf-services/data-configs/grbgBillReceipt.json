@@ -103,6 +103,12 @@
 						}
 					},
 					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+						   "path": "$.fatherOrHusbandName"
+						}
+					},
+					{
 						"variable": "totalTax",
 						"value": {
 							"path": "$.totalTax"

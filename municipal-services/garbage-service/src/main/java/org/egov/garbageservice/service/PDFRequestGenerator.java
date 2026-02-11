@@ -211,6 +211,11 @@ public class PDFRequestGenerator {
 				AdditionalDetail.has("propertyOwnerName") && !AdditionalDetail.get("propertyOwnerName").isNull()
 						? AdditionalDetail.get("propertyOwnerName").asText()
 						: "N/A");
+		
+		grbg.put("fatherOrHusbandName",
+				AdditionalDetail.has("ownerFatherName") && !AdditionalDetail.get("ownerFatherName").isNull()
+						? AdditionalDetail.get("ownerFatherName").asText()
+						: "N/A");
 
 		StringBuilder uri = new StringBuilder(applicationPropertiesAndConstant.getFrontEndBaseUri());
 		
