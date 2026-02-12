@@ -95,6 +95,9 @@ public class PaymentQueryBuilder {
             "            :partpaymentallowed, :isadvanceallowed, :minimumamounttobepaid," +
             "            :businessservice, :totalamount, :consumercode, :billnumber, :billdate," +
             "            :createdby, :createdtime, :lastmodifiedby, :lastmodifiedtime);";
+    
+    public static final String BILL_EXISTS_QUERY =
+            "SELECT COUNT(1) FROM egcl_bill WHERE id = :id";
 
 
     public static final String INSERT_BILLDETAIL_SQL = "INSERT INTO egcl_billdetial(" +

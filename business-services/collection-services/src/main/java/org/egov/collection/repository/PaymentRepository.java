@@ -64,20 +64,29 @@ public class PaymentRepository {
 
             for (PaymentDetail paymentDetail : payment.getPaymentDetails()) {
                 paymentDetailSource.add(getParametersForPaymentDetailCreate(payment.getId(), paymentDetail));
-                billSource.add(getParamtersForBillCreate(paymentDetail.getBill()));
-                paymentDetail.getBill().getBillDetails().forEach(billDetail -> {
-                    billDetailSource.add(getParamtersForBillDetailCreate(billDetail));
-                    billDetail.getBillAccountDetails().forEach(billAccountDetail -> {
-                        billAccountDetailSource.add(getParametersForBillAccountDetailCreate(billAccountDetail));
+                String billId = paymentDetail.getBill().getId();
+                if (!billExists(billId)) {
+                    billSource.add(getParamtersForBillCreate(paymentDetail.getBill()));
+                    paymentDetail.getBill().getBillDetails().forEach(billDetail -> {
+                        billDetailSource.add(getParamtersForBillDetailCreate(billDetail));
+                        billDetail.getBillAccountDetails().forEach(billAccountDetail -> {
+                            billAccountDetailSource.add(
+                                    getParametersForBillAccountDetailCreate(billAccountDetail)
+                            );
+                        });
                     });
-                });
-
+                }
             }
-            namedParameterJdbcTemplate.update(INSERT_PAYMENT_SQL, getParametersForPaymentCreate(payment));
-            namedParameterJdbcTemplate.batchUpdate(INSERT_PAYMENTDETAIL_SQL, paymentDetailSource.toArray(new MapSqlParameterSource[0]));
-            namedParameterJdbcTemplate.batchUpdate(INSERT_BILL_SQL, billSource.toArray(new MapSqlParameterSource[0]));
-            namedParameterJdbcTemplate.batchUpdate(INSERT_BILLDETAIL_SQL, billDetailSource.toArray(new MapSqlParameterSource[0]));
-            namedParameterJdbcTemplate.batchUpdate(INSERT_BILLACCOUNTDETAIL_SQL,  billAccountDetailSource.toArray(new MapSqlParameterSource[0]));
+
+            if (!billSource.isEmpty()) {
+
+                namedParameterJdbcTemplate.batchUpdate( INSERT_BILL_SQL, billSource.toArray(new MapSqlParameterSource[0]));
+                namedParameterJdbcTemplate.batchUpdate(INSERT_BILLDETAIL_SQL,billDetailSource.toArray(new MapSqlParameterSource[0]));
+                namedParameterJdbcTemplate.batchUpdate( INSERT_BILLACCOUNTDETAIL_SQL, billAccountDetailSource.toArray(new MapSqlParameterSource[0]));
+            }
+
+            namedParameterJdbcTemplate.update( INSERT_PAYMENT_SQL, getParametersForPaymentCreate(payment));
+            namedParameterJdbcTemplate.batchUpdate( INSERT_PAYMENTDETAIL_SQL,paymentDetailSource.toArray(new MapSqlParameterSource[0]));
 
         }catch (Exception e){
             log.error("Failed to persist payment to database", e);
@@ -311,4 +320,18 @@ public class PaymentRepository {
 				emptyAddtlParameterSource.toArray(new MapSqlParameterSource[0]));
 
 	}
+	
+	private boolean billExists(String billId) {
+	    Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("id", billId);
+
+	    Integer count = namedParameterJdbcTemplate.queryForObject(
+	            BILL_EXISTS_QUERY,
+	            paramMap,
+	            Integer.class
+	    );
+
+	    return count != null && count > 0;
+	}
+
 }

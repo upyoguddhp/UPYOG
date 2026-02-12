@@ -149,7 +149,8 @@ public class PaymentValidator {
             String paymentStatus = payment.getInstrumentStatus().toString();
             if (paymentStatus.equalsIgnoreCase(APPROVED.toString())
                     || paymentStatus.equalsIgnoreCase(APPROVAL_PENDING.toString())
-                    || paymentStatus.equalsIgnoreCase(REMITTED.toString())) {
+               ) 
+            {
                 errorMap.put("BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
                 return;
             }

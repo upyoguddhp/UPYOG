@@ -256,12 +256,22 @@ public class TransactionServiceV2 {
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
 			}
+			
+			String tenantId = currentTxnStatus.getTenantId();
+			String BillId = currentTxnStatus.getBillId();
+			DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo,tenantId, BillId);
 
 			// Check if transaction is successful, amount matches etc
 			if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
-				TransactionRequest request = TransactionRequest.builder().requestInfo(requestInfo).transaction(newTxn)
-						.build();
-				paymentsService.registerPayment(request);
+				TransactionRequest request = TransactionRequest.builder().requestInfo(requestInfo).transaction(newTxn).build();
+			    if (demandAmountInfo.getCollectionAmount()
+			            .compareTo(demandAmountInfo.getTaxAmount()) == 0) {
+			        paymentsService.registerPayment(request);
+			    } 
+			    else if (demandAmountInfo.getCollectionAmount()
+			            .compareTo(demandAmountInfo.getTaxAmount()) < 0) {
+			        paymentsService.updatePayment(request);
+			    }
 			}
 
 			TransactionDump dump = TransactionDump.builder().txnId(currentTxnStatus.getTxnId())

@@ -125,5 +125,49 @@ public class PaymentsService {
 				.payerName(request.getTransaction().getUser().getName())
 				.build();
 	}
+	
+	public CollectionPayment updatePayment(TransactionRequest request) {
+
+	    CollectionPayment payment = getPaymentFromTransaction(request);
+	    payment.setInstrumentDate(request.getTransaction().getAuditDetails().getCreatedTime());
+	    payment.setInstrumentNumber(request.getTransaction().getTxnId());
+	    payment.setTransactionNumber(request.getTransaction().getTxnId());
+	    payment.setAdditionalDetails(
+	            (JsonNode) request.getTransaction().getAdditionalDetails());
+
+	    CollectionPaymentRequest paymentRequest = CollectionPaymentRequest.builder()
+	            .requestInfo(request.getRequestInfo())
+	            .payment(payment)
+	            .build();
+
+	    String uri = props.getCollectionServiceHost() + props.getPaymentUpdatePath();
+
+	    Optional<Object> response = repository.fetchResult(uri, paymentRequest);
+
+	    if (response.isPresent()) {
+	        try {
+	            CollectionPaymentResponse paymentResponse =
+	                    mapper.convertValue(response.get(), CollectionPaymentResponse.class);
+
+	            if (!CollectionUtils.isEmpty(paymentResponse.getPayments()))
+	                return paymentResponse.getPayments().get(0);
+	            else
+	                throw new CustomException(
+	                        "PAYMENT_UPDATE_FAILED",
+	                        "Failed to update this payment at collection-service");
+
+	        } catch (Exception e) {
+	            log.error("Failed to parse the payment update response: ", e);
+	            throw new CustomException(
+	                    "RESPONSE_PARSE_ERROR",
+	                    "Failed to parse the payment update response");
+	        }
+	    } else {
+	        throw new CustomException(
+	                "PAYMENT_UPDATE_FAILED",
+	                "Failed to update this payment at collection-service");
+	    }
+	}
+
 
 }
