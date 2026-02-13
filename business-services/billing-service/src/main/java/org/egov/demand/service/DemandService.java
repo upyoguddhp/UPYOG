@@ -337,7 +337,6 @@ public class DemandService {
 	            if (detail.getTaxAmount() != null) {
 	                totalTax = totalTax.add(detail.getTaxAmount());
 	            }
-
 	            if (detail.getCollectionAmount() != null) {
 	                totalCollection = totalCollection.add(detail.getCollectionAmount());
 	            }
@@ -348,9 +347,11 @@ public class DemandService {
 	        return BillStatus.ACTIVE;
 	    }
 
-	    return totalCollection.compareTo(totalTax) >= 0
-	            ? BillStatus.PAID
-	            : BillStatus.PARTIALLY_PAID;
+	    if (totalCollection.compareTo(totalTax) >= 0) {
+	        return BillStatus.PAID;
+	    }
+	    
+	    return BillStatus.PARTIALLY_PAID;
 	}
 
 

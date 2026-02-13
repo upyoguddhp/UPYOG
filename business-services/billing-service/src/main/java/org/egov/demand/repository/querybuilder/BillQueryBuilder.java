@@ -21,7 +21,7 @@ public class BillQueryBuilder {
 	
 	public static final String REPLACE_STRING = "{replace}";
 	
-	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status='ACTIVE' AND tenantId = ? ";
+	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID') AND tenantId = ? ";
 	
 	public static final String BILL_CANCEL_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN('ACTIVE','EXPIRED') AND tenantId = ? ";
 

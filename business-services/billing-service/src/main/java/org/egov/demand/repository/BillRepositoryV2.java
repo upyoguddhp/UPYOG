@@ -212,21 +212,8 @@ public class BillRepositoryV2 {
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!status.equals(BillStatus.ACTIVE)) {
-			if (status.equals(BillStatus.PAID) || status.equals(BillStatus.PARTIALLY_PAID)) {
-				return -1;
-			}
-			else {
-				if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated()) && status.equals(BillStatus.EXPIRED)) {
-					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
-					updateBillCriteria.setAdditionalDetails(
-							util.jsonMerge(updateBillCriteria.getAdditionalDetails(), bills.get(0).getAdditionalDetails()));
-					String queryStr = billQueryBuilder.getBillCancelQuery(updateBillCriteria, preparedStmtList);
-					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
-				}
-				else
-					return 0;
-			}
+		if (status.equals(BillStatus.PAID)) {
+		    return -1;
 		}
 
 		if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
