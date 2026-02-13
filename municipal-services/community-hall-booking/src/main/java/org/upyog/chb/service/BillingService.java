@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.upyog.chb.web.models.billing.UpdateBillCriteria;
 import org.upyog.chb.web.models.collection.Bill;
 import org.upyog.chb.web.models.collection.BillRepository;
 //import org.egov.ptr.models.Property;
@@ -19,6 +20,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.upyog.chb.web.models.billing.UpdateBillCriteria;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -88,6 +90,25 @@ public class BillingService {
         BillResponse billResponse = mapper.convertValue(result.get(), BillResponse.class);
        
         return billResponse.getBill();
+	}
+	
+	public List<Bill> updateBillStatus(UpdateBillCriteria criteria, RequestInfo requestInfo) {
+	    BillSearchCriteria searchCriteria = BillSearchCriteria.builder()
+	            .tenantId(criteria.getTenantId())
+	            .consumerCode(criteria.getConsumerCodes())
+	            .service(criteria.getBusinessService())
+	            .build();
+
+	    List<Bill> bills = billRepository.searchBill(searchCriteria, requestInfo);
+	    if (bills == null || bills.isEmpty())
+	        throw new CustomException("INVALID UPDATE", "No bills found for update");
+
+	    bills.forEach(bill -> {
+	    	bill.setStatus(Bill.StatusEnum.CANCELLED);
+	        bill.setAdditionalDetails(criteria.getAdditionalDetails());
+	    });
+
+	    return billRepository.updateBill(requestInfo, bills);
 	}
 	
 

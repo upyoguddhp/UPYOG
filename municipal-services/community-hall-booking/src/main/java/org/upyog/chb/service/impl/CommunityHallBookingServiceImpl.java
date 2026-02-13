@@ -15,7 +15,7 @@ import java.util.Map;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
+import org.upyog.chb.web.models.billing.UpdateBillCriteria;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
@@ -72,6 +72,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.upyog.chb.web.models.billing.CancelBillRequest;
 
 import digit.models.coremodels.PaymentDetail;
 import lombok.extern.slf4j.Slf4j;
@@ -273,7 +274,56 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 
 				createCertificate(communityHallsBookingRequest);
 
-			}
+			} else if (StringUtils.equalsIgnoreCase(
+		        CommunityHallBookingConstants.ACTION_CANCEL,
+		        communityHallsBookingRequest.getHallsBookingApplication().getWorkflow().getAction())) {
+		
+		    log.info("Cancelling bill and demand for booking : {}", bookingNo);
+		
+		    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+		            .tenantId(communityHallsBookingRequest.getHallsBookingApplication().getTenantId())
+		            .consumerCode(Collections.singleton(bookingNo))
+		            .service("chb-services")
+		            .build();
+		
+		    List<Bill> bills = billingService.searchBill(
+		            billSearchCriteria,
+		            communityHallsBookingRequest.getRequestInfo());
+		
+		    if (CollectionUtils.isEmpty(bills)) {
+		        log.warn("No active bill found for booking {}", bookingNo);
+		    } else {
+		
+		        Bill bill = bills.get(0);
+		
+		        if (Bill.StatusEnum.PAID.equals(bill.getStatus())) {
+		            throw new CustomException("INVALID_CANCEL",
+		                    "Cannot cancel booking. Bill already paid.");
+		        }
+
+		        bill.getBillDetails().forEach(bd -> {
+		            demandService.cancelDemand(
+		                    bd.getTenantId(),
+		                    Collections.singleton(bd.getDemandId()),
+		                    communityHallsBookingRequest.getRequestInfo(),
+		                    bill.getBusinessService()
+		            );
+		        });
+		
+		        UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder()
+		                .tenantId(bill.getTenantId())
+		                .consumerCodes(Collections.singleton(bill.getConsumerCode()))
+		                .billIds(Collections.singleton(bill.getId()))
+		                .businessService(bill.getBusinessService())
+		                .statusToBeUpdated(Bill.StatusEnum.CANCELLED)
+		                .additionalDetails(null)
+		                .build();
+				
+		        billingService.updateBillStatus(updateBillCriteria,communityHallsBookingRequest.getRequestInfo());		
+		        log.info("Bill and demand cancelled successfully for booking {}", bookingNo);
+		    }
+		}
+
 		}
 
 		enrichmentService.enrichUpdateBookingRequest(communityHallsBookingRequest, status);

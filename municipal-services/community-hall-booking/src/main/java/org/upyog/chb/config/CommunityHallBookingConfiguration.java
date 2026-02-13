@@ -247,5 +247,8 @@ public class CommunityHallBookingConfiguration {
 	public String reportCreateEndPoint;
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
+	
+	@Value("${egov.bill.endpoint.update}")
+	public String updateBillEndpoint;
 
 }

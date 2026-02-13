@@ -9,11 +9,16 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
+import org.upyog.chb.web.models.billing.DemandResponse;
+import org.upyog.chb.web.models.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.upyog.chb.config.CommunityHallBookingConfiguration;
 import org.upyog.chb.constants.CommunityHallBookingConstants;
 import org.upyog.chb.repository.DemandRepository;
@@ -202,9 +207,32 @@ public class DemandService {
 	        .max(LocalDate::compareTo)
 	        .orElseThrow(() -> new IllegalArgumentException("No booking dates available"));
 	}
+	
+	public List<Demand> cancelDemand(String tenantId, Set<String> demandIds, RequestInfo requestInfo,
+			String businessService){
+        List<Demand> demands = new LinkedList<>();
+        // null as parameter as cancellation  is done on the basis of tenant id 
+            List<Demand> searchResult = searchDemand(tenantId,demandIds, null, requestInfo,businessService);
+            if(CollectionUtils.isEmpty(searchResult))
+                throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "); 
+            Demand demand = searchResult.get(0);
+            demand.setStatus(Demand.StatusEnum.CANCELLED);
+            demands.add(demand);
+         return demandRepository.updateDemand(requestInfo,demands);
+    }
+	
+	List<Demand> searchDemand(String tenantId, Set<String> demandIds, Set<String> consumerCodes,
+			RequestInfo requestInfo, String businessService) {
 
-	
-	
-	
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		DemandResponse response = demandRepository.search(tenantId, demandIds, consumerCodes, requestInfoWrapper,
+				businessService);
+
+		if (CollectionUtils.isEmpty(response.getDemands())) {
+			return null;
+		} else {
+			return response.getDemands();
+		}
+	}
 
 }
