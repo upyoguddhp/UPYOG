@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.upyog.chb.web.models.AuditDetails;
 
 @Getter
 @Setter
@@ -103,6 +104,9 @@ public class Bill {
 
 	@JsonProperty("amountPaid")
 	private BigDecimal amountPaid;
+	
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 
 	public enum StatusEnum {
 		ACTIVE("ACTIVE"),
