@@ -95,8 +95,22 @@ public class PaymentValidator {
                 .offset(0).limit(applicationProperties.getReceiptsSearchDefaultLimit()).billIds(billIds).build();
 
         List<Payment> payments = paymentRepository.fetchPayments(criteria);
+        Map<String, BigDecimal> paidAmountByBill = new HashMap<>();
         if (!payments.isEmpty()) {
-            validateIPaymentForBillPresent(payments,errorMap);
+            for (Payment prevPayment : payments) {
+                if (prevPayment.getInstrumentStatus() != null && prevPayment.getInstrumentStatus().equals(APPROVED)) {
+                    if (prevPayment.getPaymentDetails() != null) {
+                        for (PaymentDetail pd : prevPayment.getPaymentDetails()) {
+                            BigDecimal already = paidAmountByBill.getOrDefault(pd.getBillId(), BigDecimal.ZERO);
+                            if (pd.getTotalAmountPaid() != null)
+                                already = already.add(pd.getTotalAmountPaid());
+                            paidAmountByBill.put(pd.getBillId(), already);
+                        }
+                    }
+                }
+            }
+
+            validateIPaymentForBillPresent(payments, paymentDetails, errorMap);
         }
 
         validateIFSCCode(paymentRequest);
@@ -108,7 +122,7 @@ public class PaymentValidator {
                 errorMap.put("INVALID_BUSINESS_DETAILS", "Business details code cannot be empty");
             }
 
-            validatePaymentDetailAgainstBill(payment.getPaymentMode().toString(),paymentDetail,errorMap);
+            validatePaymentDetailAgainstBill(payment.getPaymentMode().toString(), paymentDetail, paidAmountByBill, errorMap);
         }
 
         if (!errorMap.isEmpty())
@@ -140,19 +154,37 @@ public class PaymentValidator {
      * <p>
      * If not, proceed with validateIfReceiptForBillAbsent validations *
      *
-     *  @param payments   List of payment Details
-     * @param errorMap   Map of errors occurred during validations
+     * @param payments List of existing Payment objects
+     * @param paymentDetails List of PaymentDetail objects from the current request
+     * @param errorMap Map of errors occurred during validations
      */
-    private void validateIPaymentForBillPresent(List<Payment> payments, Map<String, String> errorMap) {
+    private void validateIPaymentForBillPresent(List<Payment> payments, List<PaymentDetail> paymentDetails, Map<String, String> errorMap) {
         log.info("receipt present");
+
+        Map<String, Bill> billMap = new HashMap<>();
+        for (PaymentDetail paymentDetail : paymentDetails) {
+            if (paymentDetail.getBill() != null) {
+                billMap.put(paymentDetail.getBillId(), paymentDetail.getBill());
+            }
+        }
+        
         for (Payment payment : payments) {
             String paymentStatus = payment.getInstrumentStatus().toString();
             if (paymentStatus.equalsIgnoreCase(APPROVED.toString())
-                    || paymentStatus.equalsIgnoreCase(APPROVAL_PENDING.toString())
-               ) 
+                    || paymentStatus.equalsIgnoreCase(APPROVAL_PENDING.toString())) 
             {
-                errorMap.put("BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
-                return;
+                boolean partialPaymentAllowed = false;
+                for (PaymentDetail paymentDetail : payment.getPaymentDetails()) {
+                    Bill bill = billMap.get(paymentDetail.getBillId());
+                    if (bill != null && bill.getPartPaymentAllowed() != null && bill.getPartPaymentAllowed()) {
+                        partialPaymentAllowed = true;
+                        break;
+                    }
+                }
+                if (!partialPaymentAllowed) {
+                    errorMap.put("BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
+                    return;
+                }
             }
         }
         // validateIfReceiptForBillAbsent(errorMap, billDetail);
@@ -363,8 +395,9 @@ public class PaymentValidator {
      * @param errorMap
      *            Error map to catch errors
      */
+
     private void validatePaymentDetailAgainstBill(String paymentMode, PaymentDetail paymentDetail,
-                                                  Map<String, String> errorMap) {
+                                                  Map<String, BigDecimal> paidAmountByBill, Map<String, String> errorMap) {
 
         Bill bill = paymentDetail.getBill();
 
@@ -376,7 +409,6 @@ public class PaymentValidator {
             errorMap.put("INVALID_PAYMENTDETAIL",
                     "The amount to be paid is mismatching with bill for paymentDetial with bill id: " + bill.getId());
 
-
         // If advance is not allowed bill total amount should be positive integer
         if(!isAdvanceAllowed && !Utils.isPositiveInteger(paymentDetail.getBill().getTotalAmount()))
             errorMap.put("INVALID_BILL_AMOUNT","The bill amount of bill: "+paymentDetail.getBill().getId()+" is fractional or less than zero");
@@ -386,6 +418,19 @@ public class PaymentValidator {
                 && paymentDetail.getTotalAmountPaid().compareTo(bill.getMinimumAmountToBePaid()) == -1)
             errorMap.put("INVALID_PAYMENTDETAIL",
                     "The amount to be paid cannot be less than minimum amount to be paid");
+
+        BigDecimal alreadyPaid = BigDecimal.ZERO;
+        if (paidAmountByBill != null) {
+            alreadyPaid = paidAmountByBill.getOrDefault(paymentDetail.getBillId(), BigDecimal.ZERO);
+        }
+        BigDecimal remainingDue = bill.getTotalAmount().subtract(alreadyPaid);
+        if (remainingDue.compareTo(BigDecimal.ZERO) <= 0) {
+            errorMap.put("INVALID_PAYMENTDETAIL", "Bill has already been paid");
+            return;
+        }
+        if (paymentDetail.getTotalAmountPaid().compareTo(remainingDue) == 1) {
+            errorMap.put("INVALID_PAYMENTDETAIL", "The amount to be paid is more than remaining amount to be paid");
+        }
 
         // In case of partial payment checks if it is allowed in bill
         if ((bill.getPartPaymentAllowed() == null || !bill.getPartPaymentAllowed())

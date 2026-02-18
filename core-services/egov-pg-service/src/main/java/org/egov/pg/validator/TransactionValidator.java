@@ -177,9 +177,9 @@ public class TransactionValidator {
 						"A transaction for this bill has been abruptly discarded, please retry after "
 								+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
 			}
-			if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.SUCCESS)) {
-				errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
-			}
+			// if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.SUCCESS)) {
+			// 	errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
+			// }
 		}
 
 	}
