@@ -277,9 +277,12 @@ public class PaymentValidator {
 
         Set<String> paymentIds = payments.stream().map(Payment::getId).collect(Collectors.toSet());
 
+        String tenantId = payments.get(0).getTenantId(); 
+        
         List<Payment> paymentsFromDb = paymentRepository.fetchPayments(PaymentSearchCriteria
                 .builder()
                 .ids(paymentIds)
+                .tenantId(tenantId) 
                 .offset(0).limit(applicationProperties.getReceiptsSearchDefaultLimit())
                 .instrumentStatus(InstrumentStatusEnum.statusesByCategory(InstrumentStatusEnum.Category.OPEN))
                 .build());
