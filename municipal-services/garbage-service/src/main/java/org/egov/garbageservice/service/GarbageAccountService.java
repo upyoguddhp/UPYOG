@@ -1429,7 +1429,6 @@ public class GarbageAccountService {
 		List<GarbageAccount> grbgAccs = new ArrayList<>();
 		Map<Integer, SearchCriteriaGarbageAccount> garbageCriteriaMap = new HashMap<>();
 		Integer counter = 1;
-
 		garbageCriteriaMap.put(counter++, searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount());
 
 		if (isCriteriaEmpty(searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount())
@@ -2152,7 +2151,7 @@ public class GarbageAccountService {
 
 		}
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(grbgTaxCalculatorMonthTracker.getType()).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType())).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
@@ -2400,10 +2399,12 @@ public class GarbageAccountService {
 					GrbgBillTrackerRequest grbgBillTrackerRequest = enrichGrbgBillTrackerCreateRequest(garbageAccount,
 							generateBillRequest, demand.getMinimumAmountPayable(), billResponse.getBill().get(0),
 							calculationBreakdown);
+					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(savedDemands.get(0).getId());
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
-							"Bill not generated due to no Demand found for the given consumerCode");				}
+							"Bill not generated due to no Demand found for the given consumerCode");
+				}
 			});
 			message = "Arear Generated Successfully";
 		} else {

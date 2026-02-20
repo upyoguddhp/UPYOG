@@ -16,7 +16,7 @@ public class GrbgBillTrackerSearchCriteria {
 
 	private String tenantId;
 	
-	private String type;
+	private Set<String> type;
 	
 	private String month;
 	

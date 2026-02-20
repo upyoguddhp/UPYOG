@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -102,11 +103,13 @@ public class GarbageAccountSchedulerService {
 
 					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
 					
-						BillResponse billResponse = generateDemandAndBill(generateBillRequest, garbageAccount, billAmount,"MONTHLY");
+						AtomicReference<String> demandId = new AtomicReference<>(null);
+						BillResponse billResponse = generateDemandAndBill(generateBillRequest, garbageAccount, billAmount,"MONTHLY",demandId);
 	
 						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
 									.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,billResponse.getBill().get(0),calculationBreakdown);
+							grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
 							// add to garbage bill tracker
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
@@ -166,7 +169,9 @@ public class GarbageAccountSchedulerService {
 				.collect(Collectors.toSet());
 
 		GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.grbgApplicationIds(grbgApplicationIds).type("MONTHLY").status(new HashSet<>(Arrays.asList("ACTIVE", "PAID"))).build();
+				.grbgApplicationIds(grbgApplicationIds)
+				.type(Collections.singleton("MONTHLY"))
+				.status(new HashSet<>(Arrays.asList("ACTIVE", "PAID"))).build();
 
 		List<GrbgBillTracker> grbgBillTrackers = garbageAccountService
 				.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
@@ -277,7 +282,7 @@ public class GarbageAccountSchedulerService {
 	}
 
 	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
-			BigDecimal billAmount,String Type) {
+			BigDecimal billAmount,String Type,AtomicReference<String> demandId) {
 		try {
 			if(!checkUuidNumber(garbageAccount))
 				return null;
@@ -314,7 +319,7 @@ public class GarbageAccountSchedulerService {
 						"Bill not generated due to no Demand found for the given consumerCode");
 			}
 
-			// fetch/create bill
+			demandId.set(savedDemands.get(0).getId());		// fetch/create bill
 			GenerateBillCriteria billCriteria = GenerateBillCriteria.builder().tenantId(garbageAccount.getTenantId())
 					.businessService(service)
 					.consumerCode(savedDemands.get(0).getConsumerCode())
@@ -405,16 +410,18 @@ public class GarbageAccountSchedulerService {
 		if(garbageAccount !=null) {
 			if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0) {
 				
-				BillResponse billResponse = generateDemandAndBill(onDemandBillRequest.getGenerateBillRequest(), garbageAccount, billAmount,"ON-DEMAND");
+				AtomicReference<String> demandId = new AtomicReference<>(null);
+				BillResponse billResponse = generateDemandAndBill(onDemandBillRequest.getGenerateBillRequest(), garbageAccount, billAmount,"ON-DEMAND",demandId);
 				ObjectMapper mapper = new ObjectMapper();
 		        ObjectNode additionalDetails = mapper.convertValue(onDemandBillRequest.getGenerateBillRequest().getAdditionalDetail(), ObjectNode.class);
 				if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 					GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService.enrichGrbgBillTrackerCreateRequest(garbageAccount, onDemandBillRequest.getGenerateBillRequest(), billAmount,billResponse.getBill().get(0),additionalDetails);
 					// add to garbage bill tracker
+					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
 					GrbgBillTracker grbgBillTracker = garbageAccountService.saveToGarbageBillTracker(grbgBillTrackerRequest);
 					grbgBillTrackers.add(grbgBillTracker);
 					
-	//				triggerNotifications
+//					triggerNotifications
 //					notificationService.triggerNotificationsGenerateBill(garbageAccount, billResponse.getBill().get(0),generateBillRequest.getRequestInfo(),grbgBillTracker);
 					message = "Bill Generated";
 				}else {
