@@ -1025,4 +1025,11 @@ config:
         image-name: "tp-services"
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "municipal-services/tp-services/src/main/resources/db"
-        image-name: "tp-services-db"      
+        image-name: "tp-services-db"     
+  - name: "builds/upyog/municipal-services/garbage-service"
+    build:
+      - work-dir: "municipal-services/garbage-service"
+        image-name: "garbage-service"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "municipal-services/garbage-service/src/main/resources/db"
+        image-name: "garbage-service-db" 
