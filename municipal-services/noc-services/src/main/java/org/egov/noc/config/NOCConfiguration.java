@@ -116,5 +116,23 @@ public class NOCConfiguration {
 
     @Value("${egov.bpa.search.endpoint}")
     private String bpaSearchEndpoint;
+    
+    //billing
+    @Value("${egov.bill.context.host}")
+    private String billingHost;
 
+    @Value("${egov.demand.create.endpoint}")
+    private String demandCreateEndpoint;
+
+    @Value("${egov.bill.endpoint.fetch}")
+    private String billFetchEndpoint;
+
+    @Value("${egov.bill.endpoint.search}")
+    private String billSearchEndpoint;
+    
+    @Value("${egov.mdmsV2.host}")
+    private String mdmsV2Host;
+
+    @Value("${egov.mdms.v2.search}")
+    private String mdmsV2SearchEndpoint;
 }

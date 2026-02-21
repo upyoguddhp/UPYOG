@@ -102,6 +102,19 @@ public class PDFRequestGenerator {
 			return nameObj.toString().replaceAll("\"", "");
 		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", ")));
 
+		
+		String fatherOrHusbandName = property.getOwners().stream().map(owner -> {
+			if (owner.getAdditionalDetails() == null)
+				return null;
+
+			Object nameObj = owner.getAdditionalDetails().get("fatherOrHusbandName");
+			if (nameObj == null)
+				return null;
+
+			return nameObj.toString().replaceAll("\"", "");
+		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", "));
+
+		ptbr.put("fatherOrHusbandName", escapeHtml(fatherOrHusbandName));
 		ptbr.put("noOfStories", String.valueOf(property.getNoOfFloors()));
 		ptbr.put("buildingNo", ""); // TODO blank
 
@@ -177,8 +190,9 @@ public class PDFRequestGenerator {
 				? ptTaxCalculatorTracker.getPenaltyAmount()
 				: new BigDecimal("0.00");
 		ptbr.put("penalty", String.valueOf(penalty));
+		
+		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax());
 
-		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax()).subtract(penalty);
 		ptbr.put("arrear", String.valueOf(arrear));
 
 		ptbr.put("propertyTaxPlusArrear", String.valueOf(propertyTax.add(arrear)));

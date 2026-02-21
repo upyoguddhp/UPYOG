@@ -75,6 +75,9 @@ public class NOCService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private NOCBillingService nocBillingService;
 
 	/**
 	 * entry point from controller, takes care of next level logic from controller to create NOC application
@@ -125,6 +128,12 @@ public class NOCService {
 				&& !StringUtils.isEmpty(nocRequest.getNoc().getWorkflow().getAction())) {
 		   wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		   enrichmentService.postStatusEnrichment(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
+		   
+		   String action = nocRequest.getNoc().getWorkflow().getAction();
+		    if ("RETURN_TO_INITIATOR_FOR_PAYMENT".equalsIgnoreCase(action)) {
+		    	 nocBillingService.generateBill(nocRequest);
+		    }
+		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		   if(businessService == null)
