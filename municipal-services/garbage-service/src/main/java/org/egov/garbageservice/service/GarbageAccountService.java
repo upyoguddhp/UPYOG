@@ -2277,7 +2277,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		}
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(grbgTaxCalculatorMonthTracker.getType()).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType())).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
@@ -2538,6 +2538,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 					GrbgBillTrackerRequest grbgBillTrackerRequest = enrichGrbgBillTrackerCreateRequest(garbageAccount,
 							generateBillRequest, demand.getMinimumAmountPayable(), billResponse.getBill().get(0),
 							calculationBreakdown);
+					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(savedDemands.get(0).getId());
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
@@ -2587,7 +2588,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    GrbgBillTrackerSearchCriteria criteria =
 		        GrbgBillTrackerSearchCriteria.builder()
 		            .status(Collections.singleton("ACTIVE"))
-		            .type("MONTHLY")
+		            .type(Collections.singleton("MONTHLY"))
 		            .build();
 		
 		    List<GrbgBillTracker> trackers =

@@ -46,8 +46,8 @@ public class GarbageBillTrackerRepository {
 	private static final String GRBG_BILL_TRACKER_SEARCH_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt";
 
 	private static final String INSERT_BILL_TRACKER = "INSERT INTO eg_grbg_bill_tracker (uuid, grbg_application_id, tenant_id, month, year, from_date, garbage_bill_without_rebate, rebate_amount, "
-			+ "to_date, grbg_bill_amount, grbg_bill_without_penalty, created_by, created_time, last_modified_by, last_modified_time,ward,bill_id,type,additionaldetail) VALUES "
-			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:type,:additionaldetail::JSONB)";
+			+ "to_date, grbg_bill_amount, grbg_bill_without_penalty, created_by, created_time, last_modified_by, last_modified_time,ward,bill_id,demand_id,type,additionaldetail) VALUES "
+			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:demandId,:type,:additionaldetail::JSONB)";
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
 		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
@@ -126,6 +126,7 @@ public class GarbageBillTrackerRepository {
 		billTrackerInputs.put( "garbageBillWithoutRebate",grbgBillTracker.getGarbageBillWithoutRebate());
 		billTrackerInputs.put("rebateAmount",grbgBillTracker.getRebateAmount());
 		billTrackerInputs.put("billId", grbgBillTracker.getBillId());
+		billTrackerInputs.put("demandId", grbgBillTracker.getDemandId());
 		billTrackerInputs.put("ward", grbgBillTracker.getWard());
 		billTrackerInputs.put("createdBy", grbgBillTracker.getAuditDetails().getCreatedBy());
 		billTrackerInputs.put("createdDate", grbgBillTracker.getAuditDetails().getCreatedDate());
@@ -217,6 +218,10 @@ public class GarbageBillTrackerRepository {
 			builder.append(" AND type = :type");
 		}
 		
+		if(!StringUtils.isEmpty(grbgBillTracker.getDemandId())) {
+	        updateTrackerStatus.put("demandId",grbgBillTracker.getDemandId());
+			builder.append(" AND demand_id = :demandId");
+		}
 
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
         updateTrackerStatus.put("lastModifiedTime", grbgBillTracker.getAuditDetails().getLastModifiedDate());
@@ -273,10 +278,11 @@ public class GarbageBillTrackerRepository {
 			builder.append(" egbt.month =?");
 			preparedStmtList.add(criteria.getMonth());
 		}
-		if (!StringUtils.isEmpty(criteria.getType())) {
+		if (!CollectionUtils.isEmpty(criteria.getType())) {
 			andClauseIfRequired(preparedStmtList, builder);
-			builder.append(" egbt.type =?");
-			preparedStmtList.add(criteria.getType());
+			builder.append(" egbt.type IN (").append(createQuery(criteria.getType()))
+			.append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getType());
 		}
 		
 		if (!CollectionUtils.isEmpty(criteria.getBillIds())) {
