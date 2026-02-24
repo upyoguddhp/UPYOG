@@ -283,10 +283,9 @@ public class GarbageBillService {
 		billService.cancelBill(updateBillCriteria, cancleBillRequest.getRequestInfo());
 
 		AuditDetails audit = grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo());
-		GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
-				.status("CANCELLED")
-				.billId(bill.getId()).auditDetails(audit).build();
-		trackerRepository.updateStatusBillTracker(grbgBillTracker);
+		tracker.setStatus("CANCELLED");
+		tracker.setAuditDetails(audit);
+		trackerRepository.updateStatusBillTracker(tracker);
 
 		GrbgBillTracker previousTracker = getPreviousTracker(tracker);
 		if (previousTracker != null) {
