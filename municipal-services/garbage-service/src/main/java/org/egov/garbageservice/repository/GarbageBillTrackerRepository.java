@@ -293,6 +293,14 @@ public class GarbageBillTrackerRepository {
 
 		}
 		
+		if (!CollectionUtils.isEmpty(criteria.getDemandIds())) {
+			andClauseIfRequired(preparedStmtList, builder);
+			builder.append(" egbt.demand_id IN (").append(createQuery(criteria.getDemandIds()))
+			.append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getDemandIds());
+
+		}
+		
 		String Query = getLimitAndOrderByUpdatedTimeDesc(criteria, builder.toString(), preparedStmtList);
 
 		return Query;

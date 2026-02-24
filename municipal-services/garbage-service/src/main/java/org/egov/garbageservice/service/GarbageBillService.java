@@ -229,67 +229,81 @@ public class GarbageBillService {
 	
 	public Boolean cancelGarbageBill(CancleBillRequest cancleBillRequest) {
 
-		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().status(StatusEnum.ACTIVE)
-				.tenantId(cancleBillRequest.getTenantId()).consumerCode(cancleBillRequest.getConsumerCode()).build();
-		BillResponse billResponse = billService.searchBill(billSearchCriteria, cancleBillRequest.getRequestInfo());
-		if (!CollectionUtils.isEmpty(billResponse.getBill())) {
-			
-			GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-					.billIds(Collections.singleton(billResponse.getBill().get(0).getId()))
-					.status(new HashSet<>(Arrays.asList("ACTIVE")))
-					.build();
+		String demandId = cancleBillRequest.getDemandId().iterator().next();
 
-			List<GrbgBillTracker> grbgBillTrackers = garbageAccountService
-					.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
+		GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
+				.demandIds(Collections.singleton(demandId))
+				.status(new HashSet<>(Arrays.asList("ACTIVE")))
+				.build();
 
-			if (billResponse != null && billResponse.getBill() != null 
-					&& !billResponse.getBill().isEmpty()
-					&& !CollectionUtils.isEmpty(grbgBillTrackers)
-					&& grbgBillTrackers.get(0).getDemandId() != null ) {
-				if(grbgBillTrackers.get(0).getType().equals("MONTHLY") || grbgBillTrackers.get(0).getType().equals("ARREAR"))
-					getPreviousTracker(grbgBillTrackers.get(0));
-				Bill bill = billResponse.getBill().get(0);
+		List<GrbgBillTracker> trackers = garbageAccountService.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
 
-					demandService.cancelDemand(bill.getTenantId(),
-						Collections.singleton(grbgBillTrackers.get(0).getDemandId()), cancleBillRequest.getRequestInfo(),
-						bill.getBusinessService());
-
-					Map<String, Object> additionalDetails = null;
-					if (bill.getAdditionalDetails() != null && !bill.getAdditionalDetails().isNull()
-							&& !bill.getAdditionalDetails().isEmpty()) {
-						additionalDetails = (Map<String, Object>) bill.getAdditionalDetails();
-					}
-					// if null, initialize
-					if (additionalDetails == null) {
-						additionalDetails = new HashMap<>();
-					}
-
-//					Map<String, Object> additionalDetails = new HashMap<>();
-					additionalDetails.put("reasonMessage", cancleBillRequest.getReason());
-					additionalDetails.put("reason", "BILL_GRBG_CANCEL");
-
-					JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
-
-					UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
-							.statusToBeUpdated(StatusEnum.CANCELLED)
-							.consumerCodes(Collections.singleton(bill.getConsumerCode()))
-							.additionalDetails(additionalDetailsNode).businessService(bill.getBusinessService())
-							.build();
-					billService.cancelBill(updateBillCriteria, cancleBillRequest.getRequestInfo());
-					AuditDetails audit = grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo());
-					GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
-							.status("CANCELLED")
-							.billId(bill.getId()).auditDetails(audit).build();
-					trackerRepository.updateStatusBillTracker(grbgBillTracker);
-				return true;
-			} else {
-					throw new CustomException("INVALID UPDATE",
-							"Multi Demand Cancellation Is Not Allowed");
-				}
-		} else {
-			throw new CustomException("INVALID UPDATE",
-					"No Bill exists for The application Number: " + cancleBillRequest.getConsumerCode());
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NO_TRACKER", "No active tracker found for the demand id");
 		}
+
+		GrbgBillTracker tracker = trackers.get(0);
+
+		if (trackers.size() > 1) {
+			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
+		}
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(tracker.getBillId()))
+				.tenantId(cancleBillRequest.getTenantId())
+				.consumerCode(cancleBillRequest.getConsumerCode())
+				.status(StatusEnum.ACTIVE)
+				.build();
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, cancleBillRequest.getRequestInfo());
+
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("NO_BILL", "No bill found for the tracker");
+		}
+
+		Bill bill = billResponse.getBill().get(0);
+
+		demandService.cancelDemand(bill.getTenantId(), Collections.singleton(tracker.getDemandId()), cancleBillRequest.getRequestInfo(), bill.getBusinessService());
+
+		Map<String, Object> additionalDetails = null;
+		if (bill.getAdditionalDetails() != null && !bill.getAdditionalDetails().isNull() && !bill.getAdditionalDetails().isEmpty()) {
+			additionalDetails = (Map<String, Object>) bill.getAdditionalDetails();
+		}
+		if (additionalDetails == null) {
+			additionalDetails = new HashMap<>();
+		}
+		additionalDetails.put("reasonMessage", cancleBillRequest.getReason());
+		additionalDetails.put("reason", "BILL_GRBG_CANCEL");
+		JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
+
+		UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
+				.statusToBeUpdated(StatusEnum.CANCELLED)
+				.consumerCodes(Collections.singleton(bill.getConsumerCode()))
+				.additionalDetails(additionalDetailsNode).businessService(bill.getBusinessService())
+				.build();
+		billService.cancelBill(updateBillCriteria, cancleBillRequest.getRequestInfo());
+
+		AuditDetails audit = grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo());
+		GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
+				.status("CANCELLED")
+				.billId(bill.getId()).auditDetails(audit).build();
+		trackerRepository.updateStatusBillTracker(grbgBillTracker);
+
+		GrbgBillTracker previousTracker = getPreviousTracker(tracker);
+		if (previousTracker != null) {
+			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
+					.billId(Collections.singleton(previousTracker.getBillId()))
+					.tenantId(cancleBillRequest.getTenantId())
+					.consumerCode(cancleBillRequest.getConsumerCode())
+					.build();
+			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancleBillRequest.getRequestInfo());
+			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
+				Bill prevBill = prevBillResponse.getBill().get(0);
+				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				billService.updateBill(cancleBillRequest.getRequestInfo(), Collections.singletonList(prevBill));
+			}
+		}
+
+		return true;
 	}
 	
 	private GrbgBillTracker getPreviousTracker(GrbgBillTracker grbgBillTracker) {
@@ -301,8 +315,13 @@ public class GarbageBillService {
 				.type(type)
 				.status(new HashSet<>(Arrays.asList("ACTIVE"))).build();
 
-		List<GrbgBillTracker> trackr = garbageAccountService.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
-		System.out.println("lkahg");
+		List<GrbgBillTracker> trackers = garbageAccountService.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
+		trackers.sort((a, b) -> Long.compare(b.getAuditDetails().getCreatedDate(), a.getAuditDetails().getCreatedDate()));
+		if (!trackers.isEmpty() && trackers.get(0).getUuid().equals(grbgBillTracker.getUuid())) {
+			if (trackers.size() > 1) {
+				return trackers.get(1);
+			}
+		}
 		return null;
 	}
 }

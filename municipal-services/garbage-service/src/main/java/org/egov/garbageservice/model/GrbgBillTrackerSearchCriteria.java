@@ -30,6 +30,8 @@ public class GrbgBillTrackerSearchCriteria {
 
 	private Set<String> billIds;
 	
+	private Set<String> demandIds;
+	
 	private Integer limit;
 
 
