@@ -198,16 +198,25 @@ public class BillRepositoryV2 {
 	 */
 	public Integer updateBillStatus(UpdateBillCriteria updateBillCriteria) {
 
-		Set<String> consumerCodes = updateBillCriteria.getConsumerCodes();
-		if(CollectionUtils.isEmpty(consumerCodes))
-			return 0;
-		
-		List<BillV2> bills =  findBill(BillSearchCriteria.builder()
-				.service(updateBillCriteria.getBusinessService())
-				.tenantId(updateBillCriteria.getTenantId())
-				.consumerCode(consumerCodes)
-				.build());
-		
+		Set<String> billIds = updateBillCriteria.getBillIds();
+		List<BillV2> bills;
+		if (!CollectionUtils.isEmpty(billIds)) {
+			bills = findBill(BillSearchCriteria.builder()
+					.service(updateBillCriteria.getBusinessService())
+					.tenantId(updateBillCriteria.getTenantId())
+					.billId(billIds)
+					.build());
+		}else {
+			Set<String> consumerCodes = updateBillCriteria.getConsumerCodes();
+			if (CollectionUtils.isEmpty(consumerCodes))
+				return 0;
+			bills = findBill(BillSearchCriteria.builder()
+					.service(updateBillCriteria.getBusinessService())
+					.tenantId(updateBillCriteria.getTenantId())
+					.consumerCode(consumerCodes)
+					.build());
+		}
+
 		if (CollectionUtils.isEmpty(bills))
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -224,22 +233,20 @@ public class BillRepositoryV2 {
 					String queryStr = billQueryBuilder.getBillCancelQuery(updateBillCriteria, preparedStmtList);
 					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 				}
-				else
+				else {
 					return 0;
+				}
 			}
 		}
 
 		if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
-
 			updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
 			updateBillCriteria.setAdditionalDetails(
 					util.jsonMerge(updateBillCriteria.getAdditionalDetails(), bills.get(0).getAdditionalDetails()));
-
 		} else {
-
 			updateBillCriteria.setBillIds(bills.stream().map(BillV2::getId).collect(Collectors.toSet()));
 		}
-		
+
 		String queryStr = billQueryBuilder.getBillStatusUpdateQuery(updateBillCriteria, preparedStmtList);
 		return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 	}

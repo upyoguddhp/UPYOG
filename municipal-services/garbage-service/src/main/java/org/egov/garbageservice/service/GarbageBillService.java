@@ -278,6 +278,7 @@ public class GarbageBillService {
 		UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
 				.statusToBeUpdated(StatusEnum.CANCELLED)
 				.consumerCodes(Collections.singleton(bill.getConsumerCode()))
+				.billIds(Collections.singleton(bill.getId())) 
 				.additionalDetails(additionalDetailsNode).businessService(bill.getBusinessService())
 				.build();
 		billService.cancelBill(updateBillCriteria, cancleBillRequest.getRequestInfo());
@@ -313,14 +314,21 @@ public class GarbageBillService {
 		GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
 				.grbgApplicationIds(Collections.singleton(grbgBillTracker.getGrbgApplicationId()))
 				.type(type)
-				.status(new HashSet<>(Arrays.asList("ACTIVE"))).build();
+				.build();
 
 		List<GrbgBillTracker> trackers = garbageAccountService.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
 		trackers.sort((a, b) -> Long.compare(b.getAuditDetails().getCreatedDate(), a.getAuditDetails().getCreatedDate()));
-		if (!trackers.isEmpty() && trackers.get(0).getUuid().equals(grbgBillTracker.getUuid())) {
-			if (trackers.size() > 1) {
-				return trackers.get(1);
+		
+		int index = -1;
+		for (int i = 0; i < trackers.size(); i++) {
+			if (trackers.get(i).getUuid().equals(grbgBillTracker.getUuid())) {
+				index = i;
+				break;
 			}
+		}
+		
+		if (index >= 0 && index + 1 < trackers.size()) {
+			return trackers.get(index + 1);
 		}
 		return null;
 	}
