@@ -53,7 +53,10 @@ public class SchedulerConfiguration {
 
 	@Value("${egov.pgr.context.host}")
 	private String pgrServiceHostUrl;
-
+	
+	@Value("${egov.pgr.endpoint.data-metrics}")
+	private String pgrDataMetricsEndpoint;
+	
 	@Value("${egov.pgr.endpoint.request-escalator}")
 	private String pgrRequestEscalatorEndpoint;
 

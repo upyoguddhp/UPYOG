@@ -68,15 +68,16 @@ public class UmeedDashboardService {
 		return ingestResponse;
 	}
 
+	//------------------------PGR 
 	public Object pushUmeedDashboardMetricsForPGR(RequestInfo requestInfo) {
 
 		String ingestResponse = "";
 
-		// Step 1: Build request info for Umeed Dashboard
+		// Step 1: Build request info for Umeed Dashboard	
 		RequestInfo umeedDashboardRequestInfo = buildRequestInfo();
 
 		// Step 2: Fetch Trade License dashboard metrics
-		Object umeedDashboardDataMatrics = tlService.getUmeedDashbaordDataMatrics(requestInfo);
+		Object umeedDashboardDataMatrics = pgrService.getUmeedDashbaordDataMatrics(requestInfo);
 
 		if (null != umeedDashboardDataMatrics
 				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
@@ -89,11 +90,11 @@ public class UmeedDashboardService {
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
 			log.info("Response Paylaod {}" ,ingestResponse);
 			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest);
+			Object umeedDashboardLog = ummedDashboardLoggerService;
 
 			 
 		} else {
-			ingestResponse = "No Data from PGR Service";
+			ingestResponse = "No Data from PGR Service";	
 		}
 
 		

@@ -21,6 +21,26 @@ public class PGRService {
 
 	@Autowired
 	private SchedulerConfiguration applicationConfig;
+	
+	//PGR----------------------------------------------
+	public Object getUmeedDashbaordDataMatrics(RequestInfo requestInfo) {
+
+		try {
+			StringBuilder url = new StringBuilder(applicationConfig.getPgrServiceHostUrl());
+			url.append(applicationConfig.getPgrDataMetricsEndpoint());
+			// Make the POST request
+
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+			ResponseEntity<Object> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
+					Object.class);
+			return responseEntity.getBody();
+		} catch (Exception e) {    
+			log.error("Error occured while getting umeed dashbaord data matrics.", e);
+			throw new SchedulerServiceException(ErrorConstants.ERR_TL_SERVICE_ERROR,
+					"Error occured while getting umeed dashbaord data matrics. Message: " + e.getMessage());
+		}
+	}
 
 	public String escalatePGRRequest(RequestInfo requestInfo) {
 
