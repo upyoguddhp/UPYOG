@@ -213,10 +213,10 @@ public class GarbageBillTrackerRepository {
 			builder.append(" AND grbg_application_id = :grbgApplicationId");
 		}
 		
-		if(!StringUtils.isEmpty(grbgBillTracker.getType())) {
-	        updateTrackerStatus.put("type",grbgBillTracker.getType());
-			builder.append(" AND type = :type");
-		}
+//		if(!StringUtils.isEmpty(grbgBillTracker.getType())) {
+//	        updateTrackerStatus.put("type",grbgBillTracker.getType());
+//			builder.append(" AND type = :type");
+//		}
 		
 		if(!StringUtils.isEmpty(grbgBillTracker.getDemandId())) {
 	        updateTrackerStatus.put("demandId",grbgBillTracker.getDemandId());
