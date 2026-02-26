@@ -51,6 +51,7 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 					.totalAmount(BigDecimal.ZERO)
 					.tenantId(rs.getString("b_tenantid"))
 					.userId(rs.getString("b_payerid"))
+					.payerId(rs.getString("b_payerid"))
 					.payerName(rs.getString("b_payername"))
 					.payerAddress(rs.getString("b_payeraddress"))
 					.payerEmail(rs.getString("b_payeremail"))

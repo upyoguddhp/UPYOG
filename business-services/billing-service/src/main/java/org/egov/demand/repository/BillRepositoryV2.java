@@ -287,7 +287,7 @@ public class BillRepositoryV2 {
 				ps.setString(8, bill.getStatus().toString());
 				ps.setObject(9, util.getPGObject(bill.getAdditionalDetails()));
 				ps.setString(10, bill.getFileStoreId());
-				ps.setString(11, bill.getUserId());
+				ps.setString(11, bill.getPayerId());
 				ps.setString(12, bill.getConsumerCode());
 				ps.setString(13, bill.getId()); // WHERE clause uses ID
 			}
