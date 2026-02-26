@@ -35,6 +35,7 @@ import org.egov.garbageservice.contract.bill.UpdateBillCriteria;
 import org.egov.garbageservice.util.GrbgUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.garbageservice.contract.bill.BillDetail;
 
 
 @Service
@@ -300,6 +301,17 @@ public class GarbageBillService {
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
 				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				
+				long newExpiryDate = java.time.Instant.now()
+				        .plus(30, java.time.temporal.ChronoUnit.DAYS)
+				        .toEpochMilli();
+				
+				if (!CollectionUtils.isEmpty(prevBill.getBillDetails())) {
+			        for (BillDetail detail : prevBill.getBillDetails()) {
+			            detail.setExpiryDate(newExpiryDate);
+			        }
+			    }
+
 				billService.updateBill(cancleBillRequest.getRequestInfo(), Collections.singletonList(prevBill));
 			}
 		}
