@@ -853,6 +853,22 @@ public String getOnlyPropertyIdQuery(PropertyCriteria criteria, List<Object> pre
 }
 
 
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList) {
+
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("SELECT * FROM eg_pt_tax_calculator_tracker  WHERE ");
+   //builder.append("WHERE bill_status = ? ");
+    if (status != null && !status.isEmpty()) {
+        builder.append(" bill_status = ? ");
+        preparedStmtList.add(status);
+     }
+
+    builder.append("ORDER BY uuid DESC");
+
+    return builder.toString();
+}
+
 
 
 }

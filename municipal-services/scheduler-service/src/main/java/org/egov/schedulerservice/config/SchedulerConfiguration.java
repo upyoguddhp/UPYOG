@@ -97,4 +97,9 @@ public class SchedulerConfiguration {
 	private String sendNotificationSmsEndpoint;
 	
 	
+	@Value("${egov.property.endpoint.bulk-uploads}")
+	private String PropertyBulkBillUploads;
+
+	
+	
 }

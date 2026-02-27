@@ -12,7 +12,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
+//pdf
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import java.io.*;
+import java.util.*;
 @RestController
 @RequestMapping("/property-scheduler")
 public class PropertySchedulerController {
@@ -66,5 +80,31 @@ public class PropertySchedulerController {
 		return ResponseEntity.ok("Penalty amount updated successfully!!!");
 //		return ResponseEntity.ok(service.updatePenaltyAmount(requestInfoWrapper)); 
 	}
+	
+	
+//	@PostMapping("/bulk-uploads")
+//	public ResponseEntity<?> bulkBillUploads(@RequestBody CalculateTaxRequest calculateTaxRequest) {
+//	service.uploadBulkBills(calculateTaxRequest);
+//	return ResponseEntity.ok("Penalty amount updated successfully!!!");
+// 
+//
+//	}
+	
+	@PostMapping("/bulk-uploads")
+	public ResponseEntity<Resource> bulkBillUploads(
+	        @RequestBody RequestInfoWrapper requestInfoWrapper)
+	        throws Exception {
+
+	    byte[] finalPdf = service.uploadBulkBills(requestInfoWrapper);
+	    ByteArrayResource resource = new ByteArrayResource(finalPdf);
+
+	    return ResponseEntity.ok()
+	            .header(HttpHeaders.CONTENT_DISPOSITION,
+	                    "attachment; filename=Combined_Bills.pdf")
+	            .contentType(MediaType.APPLICATION_PDF)
+	            .contentLength(finalPdf.length)
+	            .body(resource);
+	}
+
 
 }

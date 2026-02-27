@@ -402,4 +402,11 @@ public class PropertyRepository {
 		String query = queryBuilder.getPropertyMastersStatusQuery(UlbName, preparedStmtList);
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray());
 	}
-}
+	
+	public List<Map<String, Object>> getActiveBills(String status) { 
+		List<Object> preparedStmtList = new ArrayList<>();
+		//preparedStmtList.add(status); 
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList);
+		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
+		}
+	}

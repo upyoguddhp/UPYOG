@@ -70,6 +70,14 @@ public class Scheduler {
 		propertyService.generatePropertyTax(requestInfo);
 		log.info("generatePropertyTax CRON JOB Ends");
 	}
+	
+//	@scheduled(cron = "${cron.job.default.property.tax.generator}", zone="IST")testing
+	public void generatePropertyBulkBills() {
+		log.info("bill generating");	
+		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+		propertyService.generatePropertyBulkBill(requestInfo);
+		log.info("bill generated");
+	}
 
 	@Scheduled(cron = "${cron.job.default.pgr.request.escalator}", zone = "IST")
 	public void escalatePGRRequest() {
@@ -167,5 +175,7 @@ public class Scheduler {
 		notificationSmsService.sendSmsNotification(requestInfo);
 		log.info("sendSmsNotification CRON JOB Ends");
 	}
+	
+	
 
 }
