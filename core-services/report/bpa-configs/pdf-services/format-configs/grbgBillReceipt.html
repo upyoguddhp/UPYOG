@@ -370,7 +370,7 @@
             <img class="qr-code" th:src="${qrCodeText}" src="/qr.png" alt="QR Code" />
             </div> -->
          <div class="footer">
-			<ul class="footer-list">
+			<ul class="">
             <li class="highlight">
                <strong>
                The generated bill will be expired after 
@@ -382,6 +382,9 @@
                <li>
                   Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
                   regarding the regularization or ownership of the property.
+               </li>
+               <li>
+                 Bill generation and data accuracy are the responsibility of the concerned ULB. For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> ULB office.
                </li>
                <li>
                   This receipt has been generated electronically and does not require a physical signature. | Generated on 
