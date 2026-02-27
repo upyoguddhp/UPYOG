@@ -346,11 +346,15 @@ public class PropertySchedulerService {
 				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
 				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
+					   String demandId = null;
+					   if (billResponse.getBill().get(0).getBillDetails() != null && !billResponse.getBill().get(0).getBillDetails().isEmpty()) {
+					       demandId = billResponse.getBill().get(0).getBillDetails().get(0).getDemandId();
+					   }
 
 					PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
-							.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest, finalPropertyTax,
-									trackeradditionalDetails, billResponse.getBill(), rebateAmount,
-									propertyTaxWithoutRebate);
+						.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest, finalPropertyTax,
+							trackeradditionalDetails, billResponse.getBill(), rebateAmount,
+							propertyTaxWithoutRebate, demandId);
 
 					PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property,
 							calculateTaxRequest, billResponse, null);
