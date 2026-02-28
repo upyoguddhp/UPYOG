@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.pt.repository.RestCallRepository;
 import org.springframework.beans.factory.annotation.Value;
+import java.util.Comparator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -350,99 +351,92 @@ public class PropertySchedulerService {
 					PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property,
 							calculateTaxRequest, billResponse, null);
 					propertyService.removePtBillFailure(propertyBillFailure);
+					List<BillDetail> relevantBillDetails = billResponse.getBill().stream()
+							.flatMap(bill -> bill.getBillDetails().stream()).filter(bd -> {
+								long from = bd.getFromPeriod();
+								long to = bd.getToPeriod();
+								long fyFrom = calculateTaxRequest.getFromDate().getTime();
+								long fyTo = calculateTaxRequest.getToDate().getTime();
+								return (from >= fyFrom && to <= fyTo);
+							}).collect(Collectors.toList());
 
-					for (Bill bill : billResponse.getBill()) {
+					for (BillDetail billDetail : relevantBillDetails) {
+						String demandId = billDetail.getDemandId();
+						Bill parentBill = billResponse.getBill().stream()
+								.filter(b -> b.getBillDetails().contains(billDetail)).findFirst().orElse(null);
 
-						if (CollectionUtils.isEmpty(bill.getBillDetails()))
-							continue;
+						PtTaxCalculatorTrackerRequest trackerRequest = enrichmentService
+								.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest,
+										finalPropertyTax, trackeradditionalDetails,
+										Collections.singletonList(parentBill), rebateAmount, propertyTaxWithoutRebate,
+										demandId);
 
-						Set<String> demandIds = bill.getBillDetails().stream()
-								.filter(bd -> bd.getFromPeriod().equals(calculateTaxRequest.getFromDate())
-										&& bd.getToPeriod().equals(calculateTaxRequest.getToDate()))
-								.map(BillDetail::getDemandId).filter(Objects::nonNull).collect(Collectors.toSet());
+						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
+						taxCalculatorTrackers.add(tracker);
 
-						for (String demandId : demandIds) {
+						// Notification
+						try {
+							notificationService.triggerNotificationsGenerateBill(tracker, parentBill,
+									trackerRequest.getRequestInfo());
+						} catch (Exception ex) {
+							log.error("Notification failed for billId {}", parentBill.getId(), ex);
+						}
 
-							PtTaxCalculatorTrackerRequest trackerRequest = enrichmentService
-									.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest,
-											finalPropertyTax, trackeradditionalDetails, Collections.singletonList(bill),
-											rebateAmount, propertyTaxWithoutRebate, demandId);
-
-							PtTaxCalculatorTracker tracker = propertyService
-									.saveToPtTaxCalculatorTracker(trackerRequest);
-
-							taxCalculatorTrackers.add(tracker);
-
-							// Notification
-							try {
-								notificationService.triggerNotificationsGenerateBill(tracker, bill,
-										trackerRequest.getRequestInfo());
-							} catch (Exception ex) {
-								log.error("Notification failed for billId {}", bill.getId(), ex);
+						// SMS Tracker (same as your existing code)
+						try {
+							if (CollectionUtils.isEmpty(property.getOwners())) {
+								throw new RuntimeException("No owners found for property " + property.getPropertyId());
 							}
 
-							// SMS Tracker
-							try {
+							ObjectNode smsRequestJson = notificationService
+									.buildGeneratePropertyBillSmsRequest(property, parentBill, tracker);
 
-								if (CollectionUtils.isEmpty(property.getOwners())) {
-									throw new RuntimeException(
-											"No owners found for property " + property.getPropertyId());
+							Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,
+									Map.class);
+
+							StringBuilder smsTrackerUri = new StringBuilder();
+							smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+
+							String ward = null;
+							if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
+								addressAdditionalDetails = objectMapper
+										.valueToTree(property.getAddress().getAdditionalDetails());
+								JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
+								if (wardNumberNode != null && !wardNumberNode.isNull()) {
+									ward = wardNumberNode.asText();
 								}
-
-								ObjectNode smsRequestJson = notificationService
-										.buildGeneratePropertyBillSmsRequest(property, bill, tracker);
-
-								Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,
-										Map.class);
-
-								StringBuilder smsTrackerUri = new StringBuilder();
-								smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
-
-								String ward = null;
-								if (property.getAddress() != null
-										&& property.getAddress().getAdditionalDetails() != null) {
-
-									addressAdditionalDetails = objectMapper
-											.valueToTree(property.getAddress().getAdditionalDetails());
-
-									JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
-									if (wardNumberNode != null && !wardNumberNode.isNull()) {
-										ward = wardNumberNode.asText();
-									}
-								}
-
-								Map<String, Object> smsTrackerRequest = new HashMap<>();
-								smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
-								smsTrackerRequest.put("amount", finalPropertyTax);
-								smsTrackerRequest.put("applicationNo", property.getPropertyId());
-								smsTrackerRequest.put("tenantId", property.getTenantId());
-								smsTrackerRequest.put("service", "PROPERTY");
-								smsTrackerRequest.put("fromDate",
-										new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getFromDate()));
-								smsTrackerRequest.put("toDate",
-										new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getToDate()));
-								smsTrackerRequest.put("createdBy", "system");
-								smsTrackerRequest.put("createdTime", System.currentTimeMillis());
-								smsTrackerRequest.put("billId", bill.getId());
-								smsTrackerRequest.put("demandId", demandId); // ✅ IMPORTANT
-								smsTrackerRequest.put("smsStatus", false);
-								smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
-								smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
-								smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
-								smsTrackerRequest.put("smsRequest", smsRequestMap);
-								smsTrackerRequest.put("smsResponse", null);
-								smsTrackerRequest.put("ward", ward);
-
-								restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
-
-								log.info("SMS tracker entry created for billId {} demandId {}", bill.getId(), demandId);
-
-							} catch (Exception e) {
-								log.error("SMS tracker creation failed for billId {}", bill.getId(), e);
 							}
+
+							Map<String, Object> smsTrackerRequest = new HashMap<>();
+							smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
+							smsTrackerRequest.put("amount", finalPropertyTax);
+							smsTrackerRequest.put("applicationNo", property.getPropertyId());
+							smsTrackerRequest.put("tenantId", property.getTenantId());
+							smsTrackerRequest.put("service", "PROPERTY");
+							smsTrackerRequest.put("fromDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getFromDate()));
+							smsTrackerRequest.put("toDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getToDate()));
+							smsTrackerRequest.put("createdBy", "system");
+							smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+							smsTrackerRequest.put("billId", parentBill.getId());
+							smsTrackerRequest.put("demandId", demandId);
+							smsTrackerRequest.put("smsStatus", false);
+							smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
+							smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
+							smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
+							smsTrackerRequest.put("smsRequest", smsRequestMap);
+							smsTrackerRequest.put("smsResponse", null);
+							smsTrackerRequest.put("ward", ward);
+
+							restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+							log.info("SMS tracker entry created for billId {} demandId {}", parentBill.getId(),
+									demandId);
+
+						} catch (Exception e) {
+							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
 						}
 					}
-
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
 				}
