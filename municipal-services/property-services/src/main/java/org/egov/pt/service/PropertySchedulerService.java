@@ -373,6 +373,40 @@ public class PropertySchedulerService {
 
 						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
 						taxCalculatorTrackers.add(tracker);
+						try {
+							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
+									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
+									.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
+
+							List<PtTaxCalculatorTracker> prevTrackers = propertyService
+									.getTaxCalculatedProperties(prevCriteria);
+
+							if (!CollectionUtils.isEmpty(prevTrackers)) {
+								for (PtTaxCalculatorTracker prev : prevTrackers) {
+									if (prev.getUuid() != null && prev.getUuid().equals(tracker.getUuid()))
+										continue;
+									if (prev.getBillStatus() == BillStatus.PAID)
+										continue;
+
+									prev.setBillStatus(BillStatus.EXPIRED);
+
+									PtTaxCalculatorTrackerRequest prevUpdateRequest = enrichmentService
+											.enrichTaxCalculatorTrackerUpdateRequest(prev,
+													trackerRequest.getRequestInfo());
+
+									try {
+										propertyService.updatePtTaxCalculatorTracker(prevUpdateRequest);
+										log.info("Marked previous tracker {} as EXPIRED for property {}",
+												prev.getUuid(), property.getPropertyId());
+									} catch (Exception e) {
+										log.error("Failed to update previous tracker {} for property {}",
+												prev.getUuid(), property.getPropertyId(), e);
+									}
+								}
+							}
+						} catch (Exception ex) {
+							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(), ex);
+						}
 
 						// Notification
 						try {
