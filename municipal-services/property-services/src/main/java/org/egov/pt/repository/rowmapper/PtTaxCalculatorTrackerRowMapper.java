@@ -40,6 +40,7 @@ public class PtTaxCalculatorTrackerRowMapper implements RowMapper<PtTaxCalculato
 				.propertyTaxWithoutRebate(rs.getBigDecimal("propertytaxwithoutrebate"))
 				.billStatus(BillStatus.fromValue(rs.getString("bill_status")))
 				.type(rs.getString("type"))
+				.demandId(rs.getString("demand_id"))
 				.build();
 	}
 

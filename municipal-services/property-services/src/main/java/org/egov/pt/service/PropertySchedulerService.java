@@ -1141,6 +1141,7 @@ public class PropertySchedulerService {
 						demandIdToTenantMap.put(billDetail.getDemandId(), bill.getTenantId());
 					}
 				}
+				
 			}
 		}
 		return demandIdToTenantMap;
@@ -1186,7 +1187,23 @@ public class PropertySchedulerService {
 				continue;
 			}
 
-			Bill bill = billIdBillMap.get(tracker.getBillId());
+			
+			Map<String, Bill> demandIdBillMap = new HashMap<>();
+
+			billIdBillMap.values().forEach(bill -> {
+			    if (bill.getBillDetails() != null) {
+			        bill.getBillDetails().forEach(detail -> {
+			            demandIdBillMap.put(detail.getDemandId(), bill);
+			        });
+			    }
+			});
+			 //Bill bill = billIdBillMap.get(tracker.getBillId());
+			Bill bill = demandIdBillMap.get(tracker.getDemandId());
+			
+			
+			
+			
+
 			if (bill == null || CollectionUtils.isEmpty(bill.getBillDetails())) {
 				log.warn("No bill or bill details found for billId [{}]. Skipping tracker [{}].", tracker.getBillId(),
 						tracker.getUuid());
