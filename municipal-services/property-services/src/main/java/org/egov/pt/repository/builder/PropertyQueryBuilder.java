@@ -782,8 +782,8 @@ public class PropertyQueryBuilder {
 		builder.append(" eptct.createdtime >= ? ");
 		preparedStmtList.add(ptTaxCalculatorTrackerSearchCriteria.getStartDateTime());
 		if (null != ptTaxCalculatorTrackerSearchCriteria.getEndDateTime()) {
-			builder.append(" AND ");
-			builder.append(" eptct.createdtime <= ? ");
+			//builder.append(" AND ");
+			//builder.append(" eptct.createdtime <= ? ");
 			preparedStmtList.add(ptTaxCalculatorTrackerSearchCriteria.getEndDateTime());
 		}
 
