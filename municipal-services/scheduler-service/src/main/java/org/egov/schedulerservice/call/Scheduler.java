@@ -127,7 +127,7 @@ public class Scheduler {
 		log.info("updateTrackerBillStatus CRON JOB Ends");
 	}
 
-	@Scheduled(cron = "${cron.job.default.property.tracker.rebate.amount.reverser}", zone = "IST")
+	//@Scheduled(cron = "${cron.job.default.property.tracker.rebate.amount.reverser}", zone = "IST")
 	public void reverseRebateAmount() {
 		log.info("reverseRebateAmount CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
@@ -135,7 +135,7 @@ public class Scheduler {
 		log.info("reverseRebateAmount CRON JOB Ends");
 	}
 
-	@Scheduled(cron = "${cron.job.default.property.tracker.penalty.amount.updater}", zone = "IST")
+	//@Scheduled(cron = "${cron.job.default.property.tracker.penalty.amount.updater}", zone = "IST")
 	public void updatePenaltyAmount() {
 		log.info("updatePenaltyAmount CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();

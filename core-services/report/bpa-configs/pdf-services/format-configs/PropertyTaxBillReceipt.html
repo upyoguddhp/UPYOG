@@ -327,6 +327,10 @@
                            <td><span th:text="${ownerOrOccupier}">NA</span></td>
                         </tr>
                         <tr>
+                           <th>Owner’s Father/Husband Name</th>
+                           <td><span th:text="${fatherOrHusbandName}">NA</span></td>
+                        </tr>
+                        <tr>
                            <th>Customer ID</th>
                            <td><span th:text="${customerId}">NA</span></td>
                         </tr>
@@ -411,20 +415,25 @@
             </table>
          </div>
          <div class="footer">
-            <ul class="footer-list">
+            <ul class="">
                <li class="highlight">
                   <strong>
                   The generated bill will be expired after 
                   <span th:text="${billDueDate}"> NA </span>.
                   </strong>
                </li>
-               <li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
-                  <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
-               </li>
-               <li>Disclaimer: Property Tax payment does not legalize unauthorized properties.</li>
-               <li>			Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
+			   </ul>
+			   <ul class="footer-list">
+               <li>Property Tax payment does not legalize unauthorized properties.</li>
+               <li>Merely paying and processing a Property Tax does not confer any right or imply any statement 
                   regarding the regularization or ownership of the property.
                </li>
+			   <li>Bill generation and data accuracy are the responsibility of the concerned ULB. For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> ULB office.
+			   </li>
+			   <li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
+			                     
+               <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
+			   </li>
             </ul>
          </div>
       </div>
