@@ -36,6 +36,8 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 	private Set<BillStatus> billStatus;
 
 	private Set<BillStatus> notInBillStatus;
+	
+	private String demandID;
 
 	private Integer limit;
 
@@ -44,5 +46,6 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 
 	@JsonIgnore
 	private Long endDateTime;
+	
 
 }

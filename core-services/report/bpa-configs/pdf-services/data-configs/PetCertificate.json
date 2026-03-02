@@ -1,34 +1,34 @@
 {
-  "key":"PetCertificate",
-  "DataConfigs": {
+  "key":"petcertificate",
+  "dataconfigs": {
     "version": "1.0.0",
-    "baseKeyPath":"$.ptr",
+    "basekeypath":"$.ptr",
     "mappings":[
       {
         "direct":[
           {
-            "variable":"applicationNumber",
+            "variable":"applicationnumber",
             "value":{
-              "path":"$.applicationNumber"
+              "path":"$.applicationnumber"
             }
           },
           {
-           "variable":"qrCode",
+           "variable":"qrcode",
             "value":{
-              "path":"$.qrCodeText"
+              "path":"$.qrcodetext"
             },
-            "type":"QRCODE"
+            "type":"qrcode"
           },
           {
-           "variable":"petName",
+           "variable":"petname",
             "value":{
-              "path":"$.petName"
+              "path":"$.petname"
             }
           },
           {
-           "variable":"breedType",
+           "variable":"breedtype",
             "value":{
-              "path":"$.breedType"
+              "path":"$.breedtype"
             }
           },
           {
@@ -38,59 +38,65 @@
             }
           },
           {
-           "variable":"createdTime",
+           "variable":"createdtime",
             "value":{
-              "path":"$.createdTime"
+              "path":"$.createdtime"
             }
           },
           {
-           "variable":"lastVaccineDate",
+           "variable":"lastvaccinedate",
             "value":{
-              "path":"$.lastVaccineDate"
+              "path":"$.lastvaccinedate"
             }
           },
           {
-           "variable":"applicantName",
+           "variable":"applicantname",
             "value":{
-              "path":"$.applicantName"
+              "path":"$.applicantname"
             }
           },
           {
-           "variable":"mobileNumber",
+           "variable":"mobilenumber",
             "value":{
-              "path":"$.mobileNumber"
+              "path":"$.mobilenumber"
             }
           },
           {
-           "variable":"petPhotoURL",
+           "variable":"petphotourl",
             "value":{
-              "path":"$.petPhotoURL"
+              "path":"$.petphotourl"
             }
           },
           {
-           "variable":"userName",
+           "variable":"username",
             "value":{
-              "path":"$.userName"
+              "path":"$.username"
             }
           },
           {
-           "variable":"approverName",
+           "variable":"approvername",
             "value":{
-              "path":"$.approverName"
+              "path":"$.approvername"
             }
           },
           {
-            "variable":"ulbType",
+            "variable":"ulbtype",
              "value":{
-               "path":"$.ulbType"
+               "path":"$.ulbtype"
             }
            },			
            {
-            "variable":"ulbName",
+            "variable":"ulbname",
              "value":{
-               "path":"$.ulbName"
+               "path":"$.ulbname"
              }
            }
+		   {
+		     "variable":"modifiedTime",
+		     "value":{
+		     	"path":"$.modifiedTime"
+		      }
+		   },
         ]
       }
     ]
