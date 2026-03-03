@@ -1080,6 +1080,8 @@ public class PropertySchedulerService {
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId)
+				.type("CYCLIC")
+				.rebateamount(BigDecimal.ZERO)
 				.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
 		return propertyService.getTaxCalculatedProperties(criteria);
@@ -1202,13 +1204,8 @@ public class PropertySchedulerService {
 			        });
 			    }
 			});
-			 //Bill bill = billIdBillMap.get(tracker.getBillId());
-			Bill bill = demandIdBillMap.get(tracker.getDemandId());
+			Bill bill = billIdBillMap.get(tracker.getBillId());
 			
-			
-			
-			
-
 			if (bill == null || CollectionUtils.isEmpty(bill.getBillDetails())) {
 				log.warn("No bill or bill details found for billId [{}]. Skipping tracker [{}].", tracker.getBillId(),
 						tracker.getUuid());
@@ -1228,14 +1225,15 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-				tracker.setRebateAmount(BigDecimal.ZERO);
+//				tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
 				try {
-					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper);
+					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper,tracker);
 
 					tracker.setPropertyTax(newAmount);
+					tracker.setRebateAmount(BigDecimal.ZERO);
 
 					PtTaxCalculatorTrackerRequest updateRequest = enrichmentService
 							.enrichTaxCalculatorTrackerUpdateRequest(tracker, requestInfoWrapper.getRequestInfo());
@@ -1270,23 +1268,26 @@ public class PropertySchedulerService {
 	}
 
 	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
-			RequestInfoWrapper requestInfoWrapper) {
+			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
 
 		for (BillDetail billDetail : bill.getBillDetails()) {
 			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand != null) {
-				demand.setMinimumAmountPayable(newAmount);
-				if (demand.getDemandDetails() != null) {
-					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+			if (demand.getId().equals(tracker.getDemandId())) {
+				if (demand != null) {
+					demand.setMinimumAmountPayable(newAmount);
+					if (demand.getDemandDetails() != null) {
+						demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+					}
+					demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
 				}
-				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
-			}
 
-			if (billDetail.getBillAccountDetails() != null) {
-				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-			}
+				if (billDetail.getBillAccountDetails() != null) {
+					billDetail.getBillAccountDetails()
+							.forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+				}
 
-			billDetail.setAmount(newAmount);
+				billDetail.setAmount(newAmount);
+			}
 		}
 
 		bill.setTotalAmount(newAmount);

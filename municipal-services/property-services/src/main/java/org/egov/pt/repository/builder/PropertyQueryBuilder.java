@@ -1,5 +1,6 @@
 package org.egov.pt.repository.builder;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -706,6 +707,17 @@ public class PropertyQueryBuilder {
 			builder.append(" eptct.bill_status NOT IN (").append(createQuery(notInBillStatus)).append(")");
 			addToPreparedStatement(preparedStmtList, notInBillStatus);
 		}
+		if (criteria.getType() == "CYCLIC") {
+			andClauseIfRequired(preparedStmtList, builder);
+			builder.append(" eptct.type=? ");
+			preparedStmtList.add(criteria.getType());
+		}
+		
+//		if (criteria.getRebateamount() != BigDecimal.ZERO) {
+//			andClauseIfRequired(preparedStmtList, builder);
+//			builder.append(" eptct.rebateamount > 0.00 ");
+//			preparedStmtList.add(criteria.getType());
+//		}
 
 		return builder.toString();
 	}
