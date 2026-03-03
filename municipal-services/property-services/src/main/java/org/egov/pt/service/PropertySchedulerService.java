@@ -790,8 +790,15 @@ public class PropertySchedulerService {
 		Set<String> ulbNames = calculateTaxRequest.getUlbNames();
 		Set<String> wardNumbers = calculateTaxRequest.getWardNumbers();
 		Set<String> mobileNumbers = calculateTaxRequest.getMobileNumbers();
+		
+		String tenantId = calculateTaxRequest.getUlbNames()
+		        .stream()
+		        .findFirst()
+		        .map(ulb -> "hp." + ulb)
+		        .orElse(null);
 
 		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
+				.tenantId(tenantId)
 				.status(Collections.singleton(Status.APPROVED)).propertyIds(calculateTaxRequest.getPropertyIds())
 				.isActiveUnit(true).build();
 

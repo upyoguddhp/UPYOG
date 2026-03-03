@@ -195,7 +195,7 @@ public class NotificationService {
 
 		body = body.replace(RECIPINTS_NAME_PLACEHOLDER, garbageAccount.getName());
 		body = body.replace(MONTH_PLACEHOLDER, GrbgUtils.toCamelCase(String.valueOf(grbgBillTracker.getMonth())));
-		body = body.replace(YEAR_PLACEHOLDER, String.valueOf(dateTime.getYear()));
+		body = body.replace(YEAR_PLACEHOLDER, GrbgUtils.toCamelCase(String.valueOf(grbgBillTracker.getYear())));
 		body = body.replace(GARBAGE_BILL_NO_PLACEHOLDER, bill.getBillNumber());
 		if (!CollectionUtils.isEmpty(garbageAccount.getAddresses())) {
 			body = body.replace(ADDRESS_PLACEHOLDER, prepareAddress(garbageAccount.getAddresses().get(0)));

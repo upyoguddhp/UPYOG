@@ -1458,21 +1458,20 @@ public class PropertyService {
 	        throw new CustomException("INVALID_SEARCH", "Provide at least one property filter");
 	    }
 	
-	    List<String> matchedPropertyIds = repository.getOnlyPropertyIds(propertyCriteria);
 	
-	    if (CollectionUtils.isEmpty(matchedPropertyIds)) {
-	        throw new CustomException("PROPERTY_NOT_FOUND", "No property found for given criteria");
-	    }
+//	    if (CollectionUtils.isEmpty(matchedPropertyIds)) {
+//	        throw new CustomException("PROPERTY_NOT_FOUND", "No property found for given criteria");
+//	    }
 	
 	    PropertyCriteria idCriteria = PropertyCriteria.builder()
-	            .propertyIds(new HashSet<>(matchedPropertyIds))
+	            .propertyIds(propertyCriteria.getPropertyIds())
 	            .oldpropertyids(propertyCriteria.getOldpropertyids())
 	            .ownerOldCustomerIds(propertyCriteria.getOwnerOldCustomerIds())
 	            .mobileNumber(propertyCriteria.getMobileNumber())
 	            .name(propertyCriteria.getName())
 	            .isSearchInternal(true)
 	            .build();
-	
+	 
 	    List<Property> properties = searchProperty(idCriteria, systemRequestInfo, null);
 	
 	    if (CollectionUtils.isEmpty(properties)) {
