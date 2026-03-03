@@ -200,6 +200,10 @@ public class TradeUtil {
     public StringBuilder getMdmsSearchUrl() {
         return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
     }
+    //mdms v2 
+    public StringBuilder getMdmsv2SearchUrl() {
+        return new StringBuilder().append(config.getMdmsv2Host()).append(config.getMdmsv2EndPoint());
+    }
 
 
     /**
@@ -458,4 +462,47 @@ public class TradeUtil {
         return mdmsResponse;
     }
 
+
+
+//--------------------------
+
+public MdmsResponse mDMSCallCalculateFeev2(RequestInfo requestInfo, TradeLicense tradeLicense, String scaleOfBusiness, Integer periodOfLicense, String zone, String tradeCategory) {
+	
+	String tenantId = tradeLicense.getTenantId();
+	List<MasterDetail> masterDetails = new ArrayList<>();
+	
+	// add criteria FeeStructure
+	MasterDetail masterDetail = MasterDetail.builder()
+			.name(TLConstants.FEE_STRUCTURE)
+			.filter("[?((@."+STRUCTURE_OF+" =~ /.*"+SCALE_OF_BUSINESS+".*?/ && @."+TYPE+" == \""+scaleOfBusiness+"\" && @."+PERIOD_OF_LICENSE+" == "+periodOfLicense.toString()+" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+ZONE+".*?/ && @.type == \""+zone+"\" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+TRADE_CATEGORY+".*?/ && @."+TYPE+" == \""+tradeCategory+"\" && @."+TENANT_ID+" == \""+tenantId+"\") )]")
+			.build();
+	masterDetails.add(masterDetail);
+	
+	
+	ModuleDetail moduleDetailTL = ModuleDetail.builder()
+			.moduleName(TRADE_LICENSE_MODULE)
+			.masterDetails(masterDetails)
+			.build();
+    
+	List<ModuleDetail> moduleDetails = new LinkedList<>();
+    moduleDetails.add(moduleDetailTL);
+
+    MdmsCriteria mdmsCriteria = MdmsCriteria.builder()
+						        		.moduleDetails(moduleDetails)
+						        		.tenantId(tenantId)
+//						        		.tenantId(TLConstants.STATE_LEVEL_TENANT_ID)
+						                .build();
+
+    MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder()
+						        		.mdmsCriteria(mdmsCriteria)
+						                .requestInfo(requestInfo)
+						                .build();
+    
+    Object result = serviceRequestRepository.fetchResult(getMdmsv2SearchUrl(), mdmsCriteriaReq);
+    MdmsResponse mdmsResponse = objectMapper.convertValue(result, MdmsResponse.class);
+    return mdmsResponse;
 }
+
+}
+
+

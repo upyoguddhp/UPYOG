@@ -769,6 +769,9 @@ public class TradeLicenseService {
 			break;
 
 		}
+		
+		
+		
 		BusinessService businessService = workflowService.getBusinessService(
 				tradeLicenseRequest.getLicenses().get(0).getTenantId(), tradeLicenseRequest.getRequestInfo(),
 				businessServiceName);
@@ -783,6 +786,8 @@ public class TradeLicenseService {
 			validateMobileNumberUniqueness(tradeLicenseRequest);
 			break;
 		}
+		
+		
 		Map<String, Difference> diffMap = diffService.getDifference(tradeLicenseRequest, searchResult);
 		Map<String, Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService, searchResult);
 
@@ -1022,7 +1027,7 @@ public class TradeLicenseService {
 							.requestInfo(tradeLicenseRequest.getRequestInfo())
 							.licenses(Collections.singletonList(license)).build();
 
-					tradeLicenseConsumer.saveTlCertificate(tradeLicenseRequest1);
+			//		tradeLicenseConsumer.saveTlCertificate(tradeLicenseRequest1);
 					// producer.push("save-tl-certificate", tradeLicenseRequest1);
 
 					// .licenses(Collections.singletonList(license)).build();
@@ -1559,6 +1564,14 @@ public class TradeLicenseService {
 
 		return applicationDetail;
 	}
+	
+	
+	
+	
+	
+	
+	
+	//-------
 
 	private ApplicationDetail getApplicationBillUserDetailForNewTL(ApplicationDetail applicationDetail,
 			TradeLicense license, RequestInfo requestInfo, String businessService, String scaleOfBusiness,
@@ -1586,14 +1599,35 @@ public class TradeLicenseService {
 		}
 
 		// mdms call
-		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
-				periodOfLicense, zone, tradeCategory);
+//		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
+//				periodOfLicense, zone, tradeCategory);
 
+		
+		MdmsResponse mdmsDataResponse;
+
+		if (TLConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(license.getApplicationType())) {
+
+			// 🔵 Renewal → Call MDMS V2
+			mdmsDataResponse = tradeUtil.mDMSCallCalculateFeev2(requestInfo, license, scaleOfBusiness, periodOfLicense,
+					zone, tradeCategory);
+
+		} else {
+
+			// 🟢 New TL → Call MDMS V1
+			mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness, periodOfLicense,
+					zone, tradeCategory);
+		}
 		List<Object> feeStructure = mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE)
 				.get(TLConstants.FEE_STRUCTURE);
 		Double scaleOfBusinessToLicensePeriodPrice = 0.00;
 		Double tradeCategoryPrice = 0.00;
 		Double zonePrice = 0.00;
+		
+		
+		
+		
+		
+		
 
 		// reading values from mdms
 		for (Object object : feeStructure) {
@@ -1667,6 +1701,11 @@ public class TradeLicenseService {
 
 		return applicationDetail;
 	}
+	
+	
+	
+	
+	//-----------
 
 	public TradeLicenseActionResponse getCountOfAllApplicationTypes(
 			TradeLicenseActionRequest tradeLicenseActionRequest) {

@@ -1,6 +1,9 @@
 package org.egov.pt.repository.builder;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,14 +81,13 @@ public class PropertyQueryBuilder {
 	private static final String TOTAL_APPLICATIONS_COUNT_QUERY = "select count(*) from eg_pt_property where tenantid = ?;";
 
 	private static final String BASE_QUERY = "SELECT \n" + "     property.id AS pid,\n"
-			+ "    property.id AS property_id,\n" 
-			+ "    property.isbilling as isbilling,\n" 
-			+ "    property.propertyid AS propertyid,\n"
-			+ "    property.tenantid AS ptenantid,\n" + "    property.surveyid,\n" + "    property.accountid,\n"
-			+ "    property.oldpropertyid,\n" + "    property.status AS propertystatus,\n"
-			+ "    property.acknowldgementnumber,\n" + "    property.propertytype,\n"
-			+ "    property.ownershipcategory,\n" + "    property.usagecategory as pusagecategory,\n"
-			+ "    property.creationreason,\n" + "    property.nooffloors,\n" + "    property.landarea,\n"
+			+ "    property.id AS property_id,\n" + "    property.isbilling as isbilling,\n"
+			+ "    property.propertyid AS propertyid,\n" + "    property.tenantid AS ptenantid,\n"
+			+ "    property.surveyid,\n" + "    property.accountid,\n" + "    property.oldpropertyid,\n"
+			+ "    property.status AS propertystatus,\n" + "    property.acknowldgementnumber,\n"
+			+ "    property.propertytype,\n" + "    property.ownershipcategory,\n"
+			+ "    property.usagecategory as pusagecategory,\n" + "    property.creationreason,\n"
+			+ "    property.nooffloors,\n" + "    property.landarea,\n"
 			+ "    property.superbuiltuparea as propertysbpa,\n" + "    property.linkedproperties,\n"
 			+ "    property.source AS source,\n" + "    property.channel,\n" + "    property.createdby AS pcreatedby,\n"
 			+ "    property.lastmodifiedby AS plastmodifiedby,\n" + "    property.createdtime AS pcreatedtime,\n"
@@ -205,6 +207,236 @@ public class PropertyQueryBuilder {
 			+ "  'ULBS.BuildingEstablishmentYear', " + "  'ULBS.BuildingStructure', " + "  'ULBS.BuildingPurpose', "
 			+ "  'ULBS.BuildingUse', " + "  'ULBS.OverAllRebate', " + "  'ULBS.PenaltyRate', "
 			+ "  'ULBS.EarlyPaymentRebate', " + "  'PropertyTaxRate.PropertyTaxRate' " + ") ";
+
+//	private static final String DATA_METRICS_SEARCH_QUERY =
+//
+//		    "SELECT COUNT(*) AS todaysTotalApplications " +
+//		    "FROM eg_pt_property p " +
+//		    "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
+//		    "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = " +
+//		    "TO_DATE(?,'DD-MM-YYYY') " +
+//		    "AND addr.additionaldetails->>'wardNumber' = ? ";
+//	
+//	
+//
+//	
+//	public String getDataMetricsSearchQuery(String date, String wardName, int slaDays, List<Object> preparedStmtList) {
+//		StringBuilder builder = new StringBuilder(DATA_METRICS_SEARCH_QUERY);
+//		// sequence should be same for preparedStmtList.add
+//		preparedStmtList.add(date);
+//		
+//
+//		return builder.toString();
+//	}
+//	
+
+//	private static final String DATA_METRICS_SEARCH_QUERY =
+//
+//			"SELECT COUNT(*) AS todaysTotalApplications "
+//					+ "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = " + "TO_DATE(?,'DD-MM-YYYY') "
+//					
+//					
+//					
+//					+ "FROM eg_pt_property p "
+//					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+//					+ "AND addr.additionaldetails->>'wardNumber' = ? ";
+
+//	
+//	private static final String DATA_METRICS_SEARCH_QUERY =
+//		    "SELECT COUNT(*) AS todaysTotalApplications "
+//		    + "FROM eg_pt_property p "
+//		    + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+//		    + "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = "
+//		    + "TO_DATE(?,'DD-MM-YYYY') "
+//		    + "AND addr.additionaldetails->>'wardNumber' = ? ";
+
+//	private static final String DATA_METRICS_SEARCH_QUERY = "SELECT "
+//			// total Application
+//			+ "COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
+//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, "
+//
+//			// total close
+//			+ "COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications "
+//			
+//			//Total Approved
+//			+ "COUNT(CASE WHEN p.status = 'APPROVED' "
+//			+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications"
+//			
+//			
+//			+ "FROM eg_pt_property p "
+//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+//
+//			+ "WHERE addr.additionaldetails->>'wardNumber' = ? ";
+
+//	private static final String DATA_METRICS_SEARCH_QUERY =
+//
+//			"SELECT " +
+//
+//					// 1️ Total Applications Created Today
+//					"COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
+//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, " +
+//
+//					// 2️ Total Closed Today
+//					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications, " +
+//
+//					// 3️ Total Approved Today
+//					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications " +
+//
+//					// 4 Approved Today Within SLA
+//					"COUNT(CASE WHEN p.status = 'APPROVED' "
+//					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) >= TO_DATE(?,'DD-MM-YYYY') "
+//					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) < TO_DATE(?,'DD-MM-YYYY') + INTERVAL '1 day' "
+//					+ "AND ((p.lastmodifiedtime - p.createdtime) / 86400000) <= ? "
+//					+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
+//
+//					// 5 Pending Beyond Timeline
+//					"COUNT(CASE WHEN p.status NOT IN ('APPROVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') "
+//					+ "AND ((EXTRACT(EPOCH FROM NOW())*1000 - p.createdtime) / 86400000) > ? "
+//					+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
+//
+//					// 6 Average Approval Days
+//					"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
+//					+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END),0) "
+//					+ "AS avgDaysForApplicationApproval, " +
+//
+//					"FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
+//
+//					"WHERE addr.additionaldetails->>'wardNumber' = ? ";
+
+	private static final String DATA_METRICS_SEARCH_QUERY =
+
+			"SELECT " +
+
+			// 1 Total Applications Created Today
+					"COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
+					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, " +
+
+					// 2 Total Closed Today
+					"COUNT(CASE WHEN p.status IN ('APPROVED') " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications, " +
+
+					// 3 Total Approved Today
+					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
+					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications, " +
+
+					// 4 Approved Today Within SLA
+					"COUNT(CASE WHEN p.status = 'APPROVED' "
+					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) >= TO_DATE(?,'DD-MM-YYYY') "
+					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) < TO_DATE(?,'DD-MM-YYYY') + INTERVAL '1 day' "
+					+ "AND ((p.lastmodifiedtime - p.createdtime) / 86400000) <= ? "
+					+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
+
+					// 5 Pending Beyond Timeline
+					"COUNT(CASE WHEN p.status NOT IN ('APPROVED','PENDINGFORAPPROVAL') "
+					+ "AND ((EXTRACT(EPOCH FROM NOW())*1000 - p.createdtime) / 86400000) > ? "
+					+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
+
+					// 6 Average Approval Days
+					"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
+					+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END),0) "
+					+ "AS avgDaysForApplicationApproval, " +
+
+					// 7
+					"? AS StipulatedDays " +
+
+					"FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+					+ "WHERE addr.additionaldetails->>'wardNumber' = ? ";
+
+	private static final String TODAYS_MOVED_APPLICATION_QUERY = "SELECT p.status AS status, COUNT(*) AS value "
+			+ "FROM eg_pt_property p " 
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE p.lastmodifiedtime >= ? " 
+			+ "AND p.lastmodifiedtime < ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? " + "GROUP BY p.status " + "ORDER BY p.status";
+
+	private static final String PROPERTIES_REGISTERED_FY_QUERY =
+
+			"SELECT " + "CASE " + " WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(p.createdtime/1000)) >= 4 " + " THEN CONCAT( "
+					+ "      EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)), '-', "
+					+ "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) + 1)::text, 2) " + " ) "
+					+ " ELSE CONCAT( " + "      EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) - 1, '-', "
+					+ "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2) " + " ) "
+					+ "END AS FYear, " + "COUNT(*) AS value " + "FROM eg_pt_property p "
+					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+					+ "WHERE addr.additionaldetails->>'wardNumber' = ? " + "GROUP BY FYear " + "ORDER BY FYear";
+
+	public String getPropertiesRegisteredFYQuery(String wardName, List<Object> preparedStmtList) {
+
+		preparedStmtList.add(wardName);
+
+		return PROPERTIES_REGISTERED_FY_QUERY;
+	}
+
+	public String getTodaysMovedApplicationQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+		long startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		long endOfDay = localDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		preparedStmtList.add(startOfDay);
+		preparedStmtList.add(endOfDay);
+		preparedStmtList.add(wardName);
+
+		return TODAYS_MOVED_APPLICATION_QUERY;
+	}
+
+	public String getDataMetricsSearchQuery(String date, String wardName, int slaDays, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(DATA_METRICS_SEARCH_QUERY);
+
+		preparedStmtList.add(date); // created
+		preparedStmtList.add(date); // closed
+		preparedStmtList.add(date); // approved
+
+		preparedStmtList.add(date); // within SLA start
+		preparedStmtList.add(date); // within SLA end
+
+		preparedStmtList.add(slaDays); // SLA for within
+		preparedStmtList.add(slaDays); // SLA for pending
+
+		preparedStmtList.add(slaDays); // SLA for pending
+		preparedStmtList.add(wardName); // ward
+
+		return builder.toString();
+	}
+
+//	public String getTodayMovedApplicationQuery(String date, String wardName, List<Object> preparedStmtList) {
+//
+//		StringBuilder query = new StringBuilder();
+//
+//		query.append(" SELECT svc.servicecode AS department, ");
+//		query.append(" COUNT(*) AS todays_complaints ");
+//		query.append(" FROM eg_pgr_service_v2 svc ");
+//		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+//		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+//		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
+//		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+//		query.append(" GROUP BY svc.servicecode ");
+//
+//		preparedStmtList.add(wardName);
+//		preparedStmtList.add(date);
+//
+//		return query.toString();
+//	}
+
+	private static final String UNIQUE_WARDS_SEARCH_QUERY = "SELECT DISTINCT "
+
+			+ "(additionaldetails::jsonb)->>'wardNumber' AS ward, " + "(additionaldetails::jsonb)->>'ulbName' AS ulb, "
+			+ "district AS region " + "FROM eg_pt_address " + "WHERE TO_TIMESTAMP(createdtime / 1000)::date = "
+			+ "TO_DATE(?, 'DD-MM-YYYY')";
+
+	public String getUniqueWardsSearchQuery(String stringDate, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(UNIQUE_WARDS_SEARCH_QUERY);
+		preparedStmtList.add(stringDate);
+
+		return builder.toString();
+	}
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -804,55 +1036,48 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
-	
-public String getOnlyPropertyIdQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
-    StringBuilder builder = new StringBuilder();
-    builder.append("SELECT DISTINCT property.propertyid FROM EG_PT_PROPERTY property WHERE 1=1 ");
+	public String getOnlyPropertyIdQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
-    if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
-        Set<String> propertyIds = criteria.getPropertyIds().stream()
-                .filter(id -> id != null && !id.trim().isEmpty())
-                .collect(Collectors.toSet());
-        if (!propertyIds.isEmpty()) {
-            builder.append(" AND property.propertyid IN (").append(createQuery(propertyIds)).append(")");
-            addToPreparedStatement(preparedStmtList, propertyIds);
-        }
-    }
+		StringBuilder builder = new StringBuilder();
+		builder.append("SELECT DISTINCT property.propertyid FROM EG_PT_PROPERTY property WHERE 1=1 ");
 
-    if (!CollectionUtils.isEmpty(criteria.getOldpropertyids())) {
-        Set<String> oldPropertyIds = criteria.getOldpropertyids().stream()
-                .filter(id -> id != null && !id.trim().isEmpty())
-                .collect(Collectors.toSet());
-        if (!oldPropertyIds.isEmpty()) {
-            builder.append(" AND property.oldpropertyid IS NOT NULL AND property.oldpropertyid <> '' ")
-                   .append(" AND property.oldpropertyid IN (")
-                   .append(createQuery(oldPropertyIds))
-                   .append(")");
-            addToPreparedStatement(preparedStmtList, oldPropertyIds);
-        }
-    }
+		if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+			Set<String> propertyIds = criteria.getPropertyIds().stream()
+					.filter(id -> id != null && !id.trim().isEmpty()).collect(Collectors.toSet());
+			if (!propertyIds.isEmpty()) {
+				builder.append(" AND property.propertyid IN (").append(createQuery(propertyIds)).append(")");
+				addToPreparedStatement(preparedStmtList, propertyIds);
+			}
+		}
 
-    if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
-        Set<String> ownerIds = criteria.getOwnerOldCustomerIds().stream()
-                .filter(id -> id != null && !id.trim().isEmpty())
-                .collect(Collectors.toSet());
-        if (!ownerIds.isEmpty()) {
-            builder.append(" AND EXISTS (SELECT 1 FROM EG_PT_OWNER owner WHERE owner.propertyid = property.id AND owner.additionaldetails->>'ownerOldCustomerId' IN (")
-                   .append(createQuery(ownerIds)).append("))");
-            addToPreparedStatement(preparedStmtList, ownerIds);
-        }
-    }
+		if (!CollectionUtils.isEmpty(criteria.getOldpropertyids())) {
+			Set<String> oldPropertyIds = criteria.getOldpropertyids().stream()
+					.filter(id -> id != null && !id.trim().isEmpty()).collect(Collectors.toSet());
+			if (!oldPropertyIds.isEmpty()) {
+				builder.append(" AND property.oldpropertyid IS NOT NULL AND property.oldpropertyid <> '' ")
+						.append(" AND property.oldpropertyid IN (").append(createQuery(oldPropertyIds)).append(")");
+				addToPreparedStatement(preparedStmtList, oldPropertyIds);
+			}
+		}
 
-    if (criteria.getTenantId() != null) {
-        builder.append(" AND property.tenantid = ?");
-        preparedStmtList.add(criteria.getTenantId());
-    }
+		if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
+			Set<String> ownerIds = criteria.getOwnerOldCustomerIds().stream()
+					.filter(id -> id != null && !id.trim().isEmpty()).collect(Collectors.toSet());
+			if (!ownerIds.isEmpty()) {
+				builder.append(
+						" AND EXISTS (SELECT 1 FROM EG_PT_OWNER owner WHERE owner.propertyid = property.id AND owner.additionaldetails->>'ownerOldCustomerId' IN (")
+						.append(createQuery(ownerIds)).append("))");
+				addToPreparedStatement(preparedStmtList, ownerIds);
+			}
+		}
 
-    return builder.toString();
-}
+		if (criteria.getTenantId() != null) {
+			builder.append(" AND property.tenantid = ?");
+			preparedStmtList.add(criteria.getTenantId());
+		}
 
-
-
+		return builder.toString();
+	}
 
 }

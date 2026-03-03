@@ -47,6 +47,9 @@ public class SchedulerConfiguration {
 
 	@Value("${egov.property.endpoint.reverse-rebate-amount}")
 	private String propertyReverseRebateAmountEndpoint;
+	
+	@Value("${egov.property.endpoint.reverse-rebate-amount}")
+	private String propertyServiceEndpoint;
 
 	@Value("${egov.property.endpoint.update-penalty-amount}")
 	private String propertyUpdatePenaltyAmountEndpoint;

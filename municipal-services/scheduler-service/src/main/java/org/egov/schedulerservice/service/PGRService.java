@@ -37,7 +37,7 @@ public class PGRService {
 			return responseEntity.getBody();
 		} catch (Exception e) {    
 			log.error("Error occured while getting umeed dashbaord data matrics.", e);
-			throw new SchedulerServiceException(ErrorConstants.ERR_TL_SERVICE_ERROR,
+			throw new SchedulerServiceException(ErrorConstants.ERR_PGR_SERVICE_ERROR,
 					"Error occured while getting umeed dashbaord data matrics. Message: " + e.getMessage());
 		}
 	}

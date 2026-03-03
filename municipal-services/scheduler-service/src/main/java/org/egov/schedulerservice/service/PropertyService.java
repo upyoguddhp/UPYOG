@@ -97,5 +97,28 @@ public class PropertyService {
 					"Error occured while update penalty amount. Message: " + e.getMessage());
 		}
 	}
+	
+	//getUmeedDashbaordDataMatrics
+	
+	public String getUmeedDashbaordDataMatrics(RequestInfo requestInfo) {
+
+		try {
+			StringBuilder url = new StringBuilder(applicationConfig.getPropertyServiceHostUrl());
+			url.append(applicationConfig.getPropertyServiceEndpoint());
+
+			// Make the POST request
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
+					String.class);
+			return responseEntity.getBody();
+		} catch (Exception e) {
+			log.error("Error occured while update penalty amount.", e);
+			throw new SchedulerServiceException(ErrorConstants.ERR_PROPERTY_SERVICE_ERROR,
+					"Error occured while update penalty amount. Message: " + e.getMessage());
+		}
+	}
+	
+
 
 }
