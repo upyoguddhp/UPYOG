@@ -632,7 +632,23 @@ public class PetRegistrationService {
 			
 			mdmsrequest.setPetRegistrationApplications(petApplications);			
 
-			BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			//BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			
+			BigDecimal taxAmount;
+
+			String applicationType = petRegistrationApplication.getApplicationType();
+
+			if (PTRConstants.APPLICATION_TYPE_RENEWAL
+			        .equalsIgnoreCase(applicationType)) {
+
+			    //  Renewal → MDMS v2
+			    taxAmount = getFeesFromMdmsv2(mdmsrequest);
+
+			} else {
+
+			    //  NEW or null MDMS v1
+			    taxAmount = getFeesFromMdms(mdmsrequest);
+			}
 	        
 			ApplicationDetail applicationDetail = getApplicationBillUserDetail(petRegistrationApplication, ptradeLicenseActionRequest.getRequestInfo());
 			
