@@ -1,0 +1,1 @@
+ALTER TABLE public.eg_pt_tax_calculator_tracker ADD COLUMN demand_id VARCHAR(256) DEFAULT NULL;
