@@ -1123,11 +1123,15 @@ public class PropertyService {
 		AuditDetails audit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 
 		PtTaxCalculatorTracker ptBilltracker =
-		        PtTaxCalculatorTracker.builder()
-		        .billStatus(BillStatus.CANCELLED)
-		        .billId(bill.getId())
-		        .auditDetails(audit)
-		        .build();
+			PtTaxCalculatorTracker.builder()
+			.uuid(tracker.getUuid())
+			.propertyId(tracker.getPropertyId())
+			.tenantId(tracker.getTenantId())
+			.demandId(tracker.getDemandId())
+			.billStatus(BillStatus.CANCELLED)
+			.billId(bill.getId())
+			.auditDetails(audit)
+			.build();
 
 		PtTaxCalculatorTrackerRequest trackerRequest =
 		        PtTaxCalculatorTrackerRequest.builder()
@@ -1140,6 +1144,24 @@ public class PropertyService {
 		PtTaxCalculatorTracker previousTracker = getPreviousTracker(tracker);
 		
 		if (previousTracker != null) {
+			AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
+			PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
+				.uuid(previousTracker.getUuid())
+				.propertyId(previousTracker.getPropertyId())
+				.tenantId(previousTracker.getTenantId())
+				.demandId(previousTracker.getDemandId())
+				.billStatus(BillStatus.ACTIVE)
+				.billId(previousTracker.getBillId())
+				.auditDetails(prevAudit)
+				.build();
+
+			PtTaxCalculatorTrackerRequest prevTrackerRequest = PtTaxCalculatorTrackerRequest.builder()
+				.ptTaxCalculatorTracker(prevTrackerToUpdate)
+				.requestInfo(cancelRequest.getRequestInfo())
+				.build();
+
+			propertyService.updatePtTaxCalculatorTracker(prevTrackerRequest);
+
 			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
 					.billId(Collections.singleton(previousTracker.getBillId()))
 					.tenantId(cancelRequest.getTenantId())
@@ -1147,6 +1169,21 @@ public class PropertyService {
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
+					BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+						.tenantId(cancelRequest.getTenantId())
+						.consumerCode(Collections.singleton(prevBill.getConsumerCode()))
+						.service(PTConstants.MODULE_PROPERTY)
+						.isActive(true)
+						.build();
+				BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+				if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+					for (Bill other : otherActiveResponse.getBill()) {
+						if (!Objects.equals(other.getId(), prevBill.getId())) {
+							other.setStatus(Bill.StatusEnum.CANCELLED);
+							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+						}
+					}
+				}
 				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
 				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
 			}
