@@ -1178,7 +1178,8 @@ public class PropertyService {
 				BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
 				if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
 					for (Bill other : otherActiveResponse.getBill()) {
-						if (!Objects.equals(other.getId(), prevBill.getId())) {
+						if (!Objects.equals(other.getId(), prevBill.getId())
+								&& other.getStatus() == Bill.StatusEnum.ACTIVE) {
 							other.setStatus(Bill.StatusEnum.CANCELLED);
 							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
 						}
