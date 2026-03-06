@@ -163,16 +163,16 @@ public class PDFRequestGenerator {
 		BigDecimal totalDue = BigDecimal.ZERO;
 
 		for (Bill billObj : bill) {
-		    BigDecimal paid = billObj.getAmountPaid() != null 
-		            ? billObj.getAmountPaid() 
+
+		    BigDecimal amount = billObj.getTotalAmount() != null 
+		            ? billObj.getTotalAmount() 
 		            : BigDecimal.ZERO;
 
-		    BigDecimal total = billObj.getTotalAmount() != null
-		            ? billObj.getTotalAmount()
-		            : BigDecimal.ZERO;
-
-		    totalPaid = totalPaid.add(paid);
-		    totalDue = totalDue.add(total.subtract(paid));
+		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
+		        totalPaid = totalPaid.add(amount);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		        totalDue = totalDue.add(amount);
+		    }
 		}
 
 		grbg.put("amountPaid", totalPaid);
@@ -229,6 +229,10 @@ public class PDFRequestGenerator {
 		grbg.put("ownerOrOccupier",
 				AdditionalDetail.has("propertyOwnerName") && !AdditionalDetail.get("propertyOwnerName").isNull()
 						? AdditionalDetail.get("propertyOwnerName").asText()
+						: "N/A");
+		grbg.put("fatherOrHusbandName",
+				AdditionalDetail.has("ownerFatherName") && !AdditionalDetail.get("ownerFatherName").isNull()
+						? AdditionalDetail.get("ownerFatherName").asText()
 						: "N/A");
 
 		StringBuilder uri = new StringBuilder(applicationPropertiesAndConstant.getFrontEndBaseUri());

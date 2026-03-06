@@ -141,6 +141,12 @@
 						"value": {
 							"path": "$.oldGarbageId"
 						}
+					},
+					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+								"path": "$.fatherOrHusbandName"
+						}
 					}
 				]
 			}
