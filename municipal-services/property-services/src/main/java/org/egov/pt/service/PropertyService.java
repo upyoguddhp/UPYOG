@@ -1067,6 +1067,10 @@ public class PropertyService {
 
 	public Boolean cancelPropertyBill(CancelPropertyBillRequest cancelRequest) {
 		
+		if (CollectionUtils.isEmpty(cancelRequest.getDemandId())) {
+		    throw new CustomException("INVALID_REQUEST", "DemandId is required");
+		}
+		
 		String demandId = cancelRequest.getDemandId().iterator().next();
 		
 		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
@@ -1106,10 +1110,7 @@ public class PropertyService {
 			demandService.cancelDemand(bill.getTenantId(), Collections.singleton(tracker.getDemandId()),
 					cancelRequest.getRequestInfo(), bill.getBusinessService());
 		
-		Map<String, Object> additionalDetails = new HashMap<>();
-		additionalDetails.put("reason", cancelRequest.getReason());
-		additionalDetails.put("reasonMessage", cancelRequest.getReason());
-		JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
+		JsonNode additionalDetailsNode = buildCancelAdditionalDetails(cancelRequest.getReason());
 
 		UpdatePropertyBillCriteria updateBillCriteria = UpdatePropertyBillCriteria.builder().tenantId(bill.getTenantId())
 				.consumerCodes(Collections.singleton(bill.getConsumerCode()))
@@ -1187,6 +1188,7 @@ public class PropertyService {
 						if (!Objects.equals(other.getId(), prevBill.getId())
 								&& other.getStatus() == Bill.StatusEnum.ACTIVE) {
 							other.setStatus(Bill.StatusEnum.CANCELLED);
+					        other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
 							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
 						}
 					}
@@ -1208,6 +1210,7 @@ public class PropertyService {
 		        for (Bill other : otherActiveResponse.getBill()) {
 		            if (other.getStatus() == Bill.StatusEnum.ACTIVE) {
 		                other.setStatus(Bill.StatusEnum.CANCELLED);
+		                other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
 		                billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
 		            }
 		        }
@@ -1236,6 +1239,13 @@ public class PropertyService {
 			return trackers.get(index + 1);
 		}
 		return null;
+	}
+	
+	private JsonNode buildCancelAdditionalDetails(String reason) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("reason", reason);
+	    map.put("reasonMessage", reason);
+	    return objectMapper.valueToTree(map);
 	}
 
 	public Map<String, Integer> getUlbDaysMap(MdmsResponse mdmsResponse) {
