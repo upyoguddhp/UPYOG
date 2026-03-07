@@ -337,55 +337,25 @@ public class TLValidator {
             );
         }
 
-//        TradeLicense existingLicense = dbLicenses.get(0);
-//
-//        if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(existingLicense.getStatus())) {
-//            throw new CustomException(
-//                    "RENEWAL_NOT_ALLOWED",
-//                    "Renewal is allowed only for APPROVED licenses. Current status: "
-//                            + existingLicense.getStatus()
-//            );
-//        }
-        
-        TradeLicense latestLicense = dbLicenses.stream()
-                .max(Comparator.comparing(
-                        l -> l.getAuditDetails().getCreatedTime()
-                ))
-                .orElseThrow(() -> new CustomException(
-                        "LICENSE_NOT_FOUND",
-                        "No license found for renewal"
-                ));
-        
-        boolean renewalInProgress = dbLicenses.stream()
-                .anyMatch(l ->
-                        TLConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(l.getApplicationType())
-                                && !TLConstants.STATUS_APPROVED.equalsIgnoreCase(l.getStatus())
-                );
-        
-        if (renewalInProgress) {
-            throw new CustomException(
-                    "RENEWAL_ALREADY_IN_PROGRESS",
-                    "A renewal application is already in progress for this license"
-            );
-        }
-        
-        if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(latestLicense.getStatus())) {
+        TradeLicense existingLicense = dbLicenses.get(0);
+
+        if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(existingLicense.getStatus())) {
             throw new CustomException(
                     "RENEWAL_NOT_ALLOWED",
                     "Renewal is allowed only for APPROVED licenses. Current status: "
-                            + latestLicense.getStatus()
+                            + existingLicense.getStatus()
             );
         }
 
         // Optional extra checks
-        if (TLConstants.STATUS_CANCELLED.equalsIgnoreCase(latestLicense.getStatus())) {
+        if (TLConstants.STATUS_CANCELLED.equalsIgnoreCase(existingLicense.getStatus())) {
             throw new CustomException(
                     "LICENSE_CANCELLED",
                     "Cancelled licenses cannot be renewed"
             );
         }
 
-        if (TLConstants.STATUS_MANUALLYEXPIRED.equalsIgnoreCase(latestLicense.getStatus())) {
+        if (TLConstants.STATUS_MANUALLYEXPIRED.equalsIgnoreCase(existingLicense.getStatus())) {
             throw new CustomException(
                     "LICENSE_MANUALLY_EXPIRED",
                     "Manually expired licenses cannot be renewed"

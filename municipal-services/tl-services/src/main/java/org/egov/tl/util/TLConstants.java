@@ -501,6 +501,7 @@ public class TLConstants {
     	// mdms keys
     public static final String TRADE_LICENSE = "TradeLicense";
     public static final String FEE_STRUCTURE = "FeeStructure";
+    public static final String RENEWAL_FEE_STRUCTURE = "RenewalFeeStructure";
     public static final String CALCULATION_TYPE = "CalculationType";
     public static final String STRUCTURE_OF = "feeStructureOf";
     public static final String TYPE = "type";

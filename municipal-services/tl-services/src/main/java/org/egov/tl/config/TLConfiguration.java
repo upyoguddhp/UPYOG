@@ -220,14 +220,13 @@ public class TLConfiguration {
 
     @Value("${egov.mdms.search.endpoint}")
     private String mdmsEndPoint;
-    
-  //MDMSV2
-    @Value("${egov.mdmsv2.host}")
-    private String mdmsv2Host;
 
-    @Value("${egov.mdmsv2.search.endpoint}")
-    private String mdmsv2EndPoint;
+    //MDMSV2
+	@Value("${egov.mdmsv2.host}")
+	private String mdmsHostv2;
 
+	@Value("${egov.mdmsv2.search.endpoint}")
+	private String mdmsEndpointv2;
 
     //Allowed Search Parameters
     @Value("${citizen.allowed.search.params}")
