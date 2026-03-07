@@ -1188,6 +1188,24 @@ public class PropertyService {
 				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
 				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
 			}
+		} else {
+		    BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+		            .tenantId(cancelRequest.getTenantId())
+		            .consumerCode(Collections.singleton(bill.getConsumerCode()))
+		            .service(PTConstants.MODULE_PROPERTY)
+		            .isActive(true)
+		            .build();
+
+		    BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+
+		    if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+		        for (Bill other : otherActiveResponse.getBill()) {
+		            if (other.getStatus() == Bill.StatusEnum.ACTIVE) {
+		                other.setStatus(Bill.StatusEnum.CANCELLED);
+		                billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+		            }
+		        }
+		    }
 		}
 		 return true;  
 	}
