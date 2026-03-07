@@ -1131,6 +1131,9 @@ public class PropertyService {
 			.billStatus(BillStatus.CANCELLED)
 			.billId(bill.getId())
 			.auditDetails(audit)
+			.rebateAmount(tracker.getRebateAmount())
+			.penaltyAmount(tracker.getPenaltyAmount())
+			.propertyTax(tracker.getPropertyTax())
 			.build();
 
 		PtTaxCalculatorTrackerRequest trackerRequest =
@@ -1151,6 +1154,9 @@ public class PropertyService {
 				.tenantId(previousTracker.getTenantId())
 				.demandId(previousTracker.getDemandId())
 				.billStatus(BillStatus.ACTIVE)
+				.rebateAmount(previousTracker.getRebateAmount())
+				.penaltyAmount(previousTracker.getPenaltyAmount())
+				.propertyTax(previousTracker.getPropertyTax())
 				.billId(previousTracker.getBillId())
 				.auditDetails(prevAudit)
 				.build();
