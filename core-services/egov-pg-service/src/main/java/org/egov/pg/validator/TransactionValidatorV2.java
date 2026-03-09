@@ -113,14 +113,15 @@ public class TransactionValidatorV2 {
 
 			if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
 
-				DemandAmountInfo demandAmountInfo = transactionServiceV2.fetchDemandAmountsForBill(requestInfo,
-						tenantId, curr.getBillId() // IMPORTANT
-				);
+				 DemandAmountInfo demandAmountInfo =
+				            transactionServiceV2.fetchDemandAmountsForBill(requestInfo, tenantId, curr.getBillId());
+				
+				BigDecimal pendingAmount =
+				        demandAmountInfo.getTaxAmount().subtract(demandAmountInfo.getCollectionAmount());
 
-				if (demandAmountInfo.getCollectionAmount().compareTo(demandAmountInfo.getTaxAmount()) == 0) {
-
-					errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid");
-					return;
+				if (pendingAmount.compareTo(BigDecimal.ZERO) <= 0) {
+				    errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid");
+				    return;
 				}
 
 			}

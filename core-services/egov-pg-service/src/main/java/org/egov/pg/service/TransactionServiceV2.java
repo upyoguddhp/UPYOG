@@ -366,53 +366,40 @@ public class TransactionServiceV2 {
 	}
 	
 	public DemandAmountInfo fetchDemandAmountsForBill(
-        RequestInfo requestInfo,
-        String tenantId,
-        String billId) {
-
+	        RequestInfo requestInfo,
+	        String tenantId,
+	        String billId) {
+	
 	    BillResponse billResponse = billingService.searchBillById(requestInfo, tenantId, billId);
 	
-	    if (billResponse == null || billResponse.getBill() == null
-	            || billResponse.getBill().isEmpty()) {
-	        throw new CustomException(
-	                "INVALID_BILL",
-	                "No bill found for billId: " + billId
-	        );
+	    if (billResponse == null || billResponse.getBill() == null || billResponse.getBill().isEmpty()) {
+	        throw new CustomException("INVALID_BILL", "No bill found for billId: " + billId);
 	    }
 	
 	    Bill bill = billResponse.getBill().get(0);
-	
 	    String consumerCode = bill.getConsumerCode();
 	
 	    DemandResponse demandResponse = billingService.searchDemand(requestInfo, tenantId, consumerCode);
 	
-	    if (demandResponse == null || demandResponse.getDemands() == null
-	            || demandResponse.getDemands().isEmpty()) {
-	        throw new CustomException(
-	                "DEMAND_NOT_FOUND",
-	                "No demand found for consumerCode: " + consumerCode
-	        );
-	    }
-	
-	    Demand demand = demandResponse.getDemands().get(0);
-	
-	    if (demand.getDemandDetails() == null || demand.getDemandDetails().isEmpty()) {
-	        throw new CustomException(
-	                "INVALID_DEMAND",
-	                "No demand details found for consumerCode: " + consumerCode
-	        );
+	    if (demandResponse == null || demandResponse.getDemands() == null || demandResponse.getDemands().isEmpty()) {
+	        throw new CustomException("DEMAND_NOT_FOUND", "No demand found for consumerCode: " + consumerCode);
 	    }
 	
 	    BigDecimal taxAmount = BigDecimal.ZERO;
 	    BigDecimal collectionAmount = BigDecimal.ZERO;
 	
-	    for (DemandDetail detail : demand.getDemandDetails()) {
-	        taxAmount = taxAmount.add(detail.getTaxAmount());
-	        collectionAmount = collectionAmount.add(detail.getCollectionAmount());
+	    for (Demand demand : demandResponse.getDemands()) {
+	
+	        if (demand.getDemandDetails() == null) continue;
+	
+	        for (DemandDetail detail : demand.getDemandDetails()) {
+	            taxAmount = taxAmount.add(detail.getTaxAmount());
+	            collectionAmount = collectionAmount.add(detail.getCollectionAmount());
+	        }
 	    }
 	
 	    return new DemandAmountInfo(taxAmount, collectionAmount);
-}
+	}
 
 
 
