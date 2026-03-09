@@ -158,6 +158,25 @@ public class PDFRequestGenerator {
 		BigDecimal totalTax = allGrbgTaxPlusArrear.stream().map(BigDecimal::new).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		grbg.put("totalTax", totalTax);
+		
+		BigDecimal totalPaid = BigDecimal.ZERO;
+		BigDecimal totalDue = BigDecimal.ZERO;
+
+		for (Bill billObj : bill) {
+		    BigDecimal paid = billObj.getAmountPaid() != null 
+		            ? billObj.getAmountPaid() 
+		            : BigDecimal.ZERO;
+
+		    BigDecimal total = billObj.getTotalAmount() != null
+		            ? billObj.getTotalAmount()
+		            : BigDecimal.ZERO;
+
+		    totalPaid = totalPaid.add(paid);
+		    totalDue = totalDue.add(total.subtract(paid));
+		}
+
+		grbg.put("amountPaid", totalPaid);
+		grbg.put("amountDue", totalDue);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
