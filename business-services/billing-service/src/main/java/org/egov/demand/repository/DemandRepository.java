@@ -290,6 +290,38 @@ public class DemandRepository {
 				return oldDemandDetails.size();
 			}
 		});
+		
+		syncBillAdjustedAmounts(oldDemandDetails);
+	}
+	
+	private void syncBillAdjustedAmounts(List<DemandDetail> demandDetails) {
+
+	    if (demandDetails == null || demandDetails.isEmpty()) return;
+
+	    jdbcTemplate.batchUpdate(
+	        "UPDATE egbs_billaccountdetail_v1 bad\r\n"
+	        + "SET adjustedamount = ?\r\n"
+	        + "FROM egbs_billdetail_v1 bd, egbs_bill_v1 b\r\n"
+	        + "WHERE bad.demanddetailid = ?\r\n"
+	        + "AND bad.billdetail = bd.id\r\n"
+	        + "AND bd.billid = b.id\r\n"
+	        + "AND b.status = 'EXPIRED';",
+	        new BatchPreparedStatementSetter() {
+
+	            @Override
+	            public void setValues(PreparedStatement ps, int i) throws SQLException {
+	                DemandDetail dd = demandDetails.get(i);
+
+	                ps.setBigDecimal(1, dd.getCollectionAmount());
+	                ps.setString(2, dd.getId());
+	            }
+
+	            @Override
+	            public int getBatchSize() {
+	                return demandDetails.size();
+	            }
+	        }
+	    );
 	}
 	
 	
