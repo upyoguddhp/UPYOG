@@ -291,22 +291,22 @@ public class DemandRepository {
 			}
 		});
 		
-		syncBillAdjustedAmounts(oldDemandDetails);
+		syncBillAdjustedAmounts(oldDemands, oldDemandDetails);
 	}
 	
-	private void syncBillAdjustedAmounts(List<DemandDetail> demandDetails) {
+	private void syncBillAdjustedAmounts(List<Demand> demands, List<DemandDetail> demandDetails) {
 
 	    if (demandDetails == null || demandDetails.isEmpty()) return;
+	    
+	    for (Demand demand : demands) {
 
-	    jdbcTemplate.batchUpdate(
-	        "UPDATE egbs_billaccountdetail_v1 bad\r\n"
-	        + "SET adjustedamount = ?\r\n"
-	        + "FROM egbs_billdetail_v1 bd, egbs_bill_v1 b\r\n"
-	        + "WHERE bad.demanddetailid = ?\r\n"
-	        + "AND bad.billdetail = bd.id\r\n"
-	        + "AND bd.billid = b.id\r\n"
-	        + "AND b.status = 'EXPIRED';",
-	        new BatchPreparedStatementSetter() {
+	        if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
+
+	            jdbcTemplate.update(DemandQueryBuilder.SYNC_ALL_ADJUSTED_AMOUNT_QUERY,demand.getId());
+	        }
+	    }
+
+	    jdbcTemplate.batchUpdate(DemandQueryBuilder.SYNC_ADJUSTED_AMOUNT_QUERY, new BatchPreparedStatementSetter() {
 
 	            @Override
 	            public void setValues(PreparedStatement ps, int i) throws SQLException {
