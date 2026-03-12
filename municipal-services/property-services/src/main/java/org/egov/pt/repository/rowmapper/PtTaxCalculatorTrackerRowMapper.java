@@ -41,6 +41,7 @@ public class PtTaxCalculatorTrackerRowMapper implements RowMapper<PtTaxCalculato
 				.billStatus(BillStatus.fromValue(rs.getString("bill_status")))
 				.type(rs.getString("type"))
 				.demandId(rs.getString("demand_id"))
+				.ward(rs.getString("ward"))
 				.build();
 	}
 

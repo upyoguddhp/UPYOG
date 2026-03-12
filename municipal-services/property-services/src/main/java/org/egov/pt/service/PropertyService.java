@@ -1225,11 +1225,12 @@ public class PropertyService {
 					JsonNode node = mapper.createObjectNode();
 					
 					String demandId = savedDemands.get(0).getId();
+					String ward = StringUtils.isNotEmpty(wardName) ? wardName : null;
 					
 					PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
 							.enrichTaxCalculatorTrackerCreateRequest(properties.get(0), calculateTaxRequest,
 									demand.getMinimumAmountPayable(), node, billResponse.getBill(), BigDecimal.ZERO,
-									demand.getMinimumAmountPayable(),demandId);
+									demand.getMinimumAmountPayable(),demandId, ward);
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
 				} else {

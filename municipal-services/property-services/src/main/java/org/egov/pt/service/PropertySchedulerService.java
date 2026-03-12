@@ -362,6 +362,16 @@ public class PropertySchedulerService {
 
 					for (BillDetail billDetail : relevantBillDetails) {
 						String demandId = billDetail.getDemandId();
+						String ward = null;
+
+						if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
+						    JsonNode addrDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+						    JsonNode wardNode = addrDetails.get("wardNumber");
+
+						    if (wardNode != null && !wardNode.isNull()) {
+						        ward = wardNode.asText();
+						    }
+						}
 						Bill parentBill = billResponse.getBill().stream()
 								.filter(b -> b.getBillDetails().contains(billDetail)).findFirst().orElse(null);
 
@@ -369,7 +379,7 @@ public class PropertySchedulerService {
 								.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest,
 										finalPropertyTax, trackeradditionalDetails,
 										Collections.singletonList(parentBill), rebateAmount, propertyTaxWithoutRebate,
-										demandId);
+										demandId, ward);
 
 						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
 						taxCalculatorTrackers.add(tracker);
@@ -430,16 +440,6 @@ public class PropertySchedulerService {
 
 							StringBuilder smsTrackerUri = new StringBuilder();
 							smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
-
-							String ward = null;
-							if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
-								addressAdditionalDetails = objectMapper
-										.valueToTree(property.getAddress().getAdditionalDetails());
-								JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
-								if (wardNumberNode != null && !wardNumberNode.isNull()) {
-									ward = wardNumberNode.asText();
-								}
-							}
 
 							Map<String, Object> smsTrackerRequest = new HashMap<>();
 							smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
