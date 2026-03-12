@@ -183,16 +183,16 @@ public class PDFRequestGenerator {
 		grbg.put("to", grbgBillTracker.get(0).getToDate());
 
 		
-
-		if(!grbgBillTracker.get(0).getType().equals("ARREAR"))
-		{
-			int year = Integer.parseInt(grbgBillTracker.get(0).getYear());
-			grbg.put("finYear", year + "-" + (year + 1));
-			grbg.put("finYear", grbgBillTracker.get(0).getYear() + "-" + (year + 1));
+		Long fromPeriod = bill.get(0).getBillDetails().get(0).getFromPeriod();
+		int year = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getYear();
+		int month = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getMonthValue();
+		int startYear;
+		if (month <= 3) {
+				startYear = year - 1;
+		} else {
+				startYear = year;
 		}
-		else {
-			grbg.put("finYear", grbgBillTracker.get(0).getYear());
-		}
+		grbg.put("finYear", startYear + "-" + (startYear + 1));
 		grbg.put("district", "district");
 		grbg.put("wardNumber", grbgAccount.getAddresses().get(0).getWardName());
 		grbg.put("unitCategory", escapeHtml(grbgAccount.getGrbgCollectionUnits().get(0).getCategory()));
