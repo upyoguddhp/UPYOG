@@ -1,5 +1,6 @@
 package org.egov.pt.models;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import org.egov.pt.models.enums.BillStatus;
@@ -36,6 +37,12 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 	private Set<BillStatus> billStatus;
 
 	private Set<BillStatus> notInBillStatus;
+	
+	private String demandID;
+	
+	private String type;
+	
+	private  BigDecimal rebateamount;
 
 	private Integer limit;
 
@@ -44,5 +51,6 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 
 	@JsonIgnore
 	private Long endDateTime;
+	
 
 }

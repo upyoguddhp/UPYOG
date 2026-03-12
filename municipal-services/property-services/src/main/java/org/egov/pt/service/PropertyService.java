@@ -1223,10 +1223,13 @@ public class PropertyService {
 									getFinancialYearFromTimestamps(demand.getTaxPeriodFrom(), demand.getTaxPeriodTo()))
 							.build();
 					JsonNode node = mapper.createObjectNode();
+					
+					String demandId = savedDemands.get(0).getId();
+					
 					PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
 							.enrichTaxCalculatorTrackerCreateRequest(properties.get(0), calculateTaxRequest,
 									demand.getMinimumAmountPayable(), node, billResponse.getBill(), BigDecimal.ZERO,
-									demand.getMinimumAmountPayable());
+									demand.getMinimumAmountPayable(),demandId);
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
 				} else {

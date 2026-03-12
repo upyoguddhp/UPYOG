@@ -2296,13 +2296,13 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		        .service(grbAccount.getBusinessService())
 		        .billId(billIds);
 
-		
-		if (status != null && !status.trim().isEmpty()) {
-		     
-		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
-		        builder.status(dynamicStatus);
-		   
-		}
+//		
+//		if (status != null && !status.trim().isEmpty()) {
+//		     
+//		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+//		        builder.status(dynamicStatus);
+//		   
+//		}
 
 
 		BillSearchCriteria billSearchCriteria = builder.build();
@@ -2315,6 +2315,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		}
 
 		List<Bill> bill = billResponse.getBill();
+		bill.removeIf(b -> b.getStatus() == Bill.StatusEnum.CANCELLED);
 
 		// return null;
 		PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequestForBill(requestInfoWrapper, grbAccount, bill,

@@ -1,6 +1,7 @@
 package org.egov.pt.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -57,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.pt.repository.RestCallRepository;
 import org.springframework.beans.factory.annotation.Value;
+import java.util.Comparator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -346,93 +348,129 @@ public class PropertySchedulerService {
 
 				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
 
-					PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
-							.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest, finalPropertyTax,
-									trackeradditionalDetails, billResponse.getBill(), rebateAmount,
-									propertyTaxWithoutRebate);
-
 					PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property,
 							calculateTaxRequest, billResponse, null);
 					propertyService.removePtBillFailure(propertyBillFailure);
+					List<BillDetail> relevantBillDetails = billResponse.getBill().stream()
+							.flatMap(bill -> bill.getBillDetails().stream()).filter(bd -> {
+								long from = bd.getFromPeriod();
+								long to = bd.getToPeriod();
+								long fyFrom = calculateTaxRequest.getFromDate().getTime();
+								long fyTo = calculateTaxRequest.getToDate().getTime();
+								return (from >= fyFrom && to <= fyTo);
+							}).collect(Collectors.toList());
 
-					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
-							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
+					for (BillDetail billDetail : relevantBillDetails) {
+						String demandId = billDetail.getDemandId();
+						Bill parentBill = billResponse.getBill().stream()
+								.filter(b -> b.getBillDetails().contains(billDetail)).findFirst().orElse(null);
 
-					taxCalculatorTrackers.add(ptTaxCalculatorTracker);
+						PtTaxCalculatorTrackerRequest trackerRequest = enrichmentService
+								.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest,
+										finalPropertyTax, trackeradditionalDetails,
+										Collections.singletonList(parentBill), rebateAmount, propertyTaxWithoutRebate,
+										demandId);
 
-					// 1️ Notification flow
-					try {
-						notificationService.triggerNotificationsGenerateBill(ptTaxCalculatorTracker,
-								billResponse.getBill().get(0), ptTaxCalculatorTrackerRequest.getRequestInfo());
-					} catch (Exception ex) {
-						log.error("Notification flow failed for property billId {}",
-								billResponse.getBill().get(0).getId(), ex);
-					}
+						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
+						taxCalculatorTrackers.add(tracker);
+						try {
+							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
+									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
+									.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
-					// SMS tracker creation flow
-					try {
-						if (CollectionUtils.isEmpty(property.getOwners())) {
-							throw new RuntimeException("No owners found for property " + property.getPropertyId());
-						}
+							List<PtTaxCalculatorTracker> prevTrackers = propertyService
+									.getTaxCalculatedProperties(prevCriteria);
 
-						ObjectNode smsRequestJson = notificationService.buildGeneratePropertyBillSmsRequest(property,
-								billResponse.getBill().get(0), ptTaxCalculatorTracker);
+							if (!CollectionUtils.isEmpty(prevTrackers)) {
+								for (PtTaxCalculatorTracker prev : prevTrackers) {
+									if (prev.getUuid() != null && prev.getUuid().equals(tracker.getUuid()))
+										continue;
+									if (prev.getBillStatus() == BillStatus.PAID)
+										continue;
 
-						log.info("SMS Request ObjectNode : {}", smsRequestJson);
+									prev.setBillStatus(BillStatus.EXPIRED);
 
-						// Convert ObjectNode to Map
-						Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson, Map.class);
+									PtTaxCalculatorTrackerRequest prevUpdateRequest = enrichmentService
+											.enrichTaxCalculatorTrackerUpdateRequest(prev,
+													trackerRequest.getRequestInfo());
 
-						log.info("SMS Request Map : {}", smsRequestMap);
-
-						StringBuilder smsTrackerUri = new StringBuilder();
-						smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
-
-						SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-						String fromDateStr = formatter.format(calculateTaxRequest.getFromDate());
-						String toDateStr = formatter.format(calculateTaxRequest.getToDate());
-
-						String ward = null;
-						if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
-							JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
-
-							if (wardNumberNode != null && !wardNumberNode.isNull()) {
-								ward = wardNumberNode.asText();
+									try {
+										propertyService.updatePtTaxCalculatorTracker(prevUpdateRequest);
+										log.info("Marked previous tracker {} as EXPIRED for property {}",
+												prev.getUuid(), property.getPropertyId());
+									} catch (Exception e) {
+										log.error("Failed to update previous tracker {} for property {}",
+												prev.getUuid(), property.getPropertyId(), e);
+									}
+								}
 							}
+						} catch (Exception ex) {
+							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(), ex);
 						}
 
-						Map<String, Object> smsTrackerRequest = new HashMap<>();
-						smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
-						smsTrackerRequest.put("amount", finalPropertyTax);
-						smsTrackerRequest.put("applicationNo", property.getPropertyId());
-						smsTrackerRequest.put("tenantId", property.getTenantId());
-						smsTrackerRequest.put("service", "PROPERTY");
-						smsTrackerRequest.put("fromDate", fromDateStr);
-						smsTrackerRequest.put("toDate", toDateStr);
-						smsTrackerRequest.put("createdBy", "system");
-						smsTrackerRequest.put("createdTime", System.currentTimeMillis());
-						smsTrackerRequest.put("billId", billResponse.getBill().get(0).getId());
-						smsTrackerRequest.put("smsStatus", false);
-						smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
-						smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
-						smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
-						smsTrackerRequest.put("smsRequest", smsRequestMap);
-						smsTrackerRequest.put("smsResponse", null);
-						smsTrackerRequest.put("ward", ward);
+						// Notification
+						try {
+							notificationService.triggerNotificationsGenerateBill(tracker, parentBill,
+									trackerRequest.getRequestInfo());
+						} catch (Exception ex) {
+							log.error("Notification failed for billId {}", parentBill.getId(), ex);
+						}
 
-						Object response = restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
-						log.info("SMS Tracker Response : {}", response);
-						log.info("SMS tracker entry created for property billId {}",
-								billResponse.getBill().get(0).getId());
+						// SMS Tracker (same as your existing code)
+						try {
+							if (CollectionUtils.isEmpty(property.getOwners())) {
+								throw new RuntimeException("No owners found for property " + property.getPropertyId());
+							}
 
-						log.info("SMS Tracker URI : {}", smsTrackerUri.toString());
-						log.info("SMS Tracker Request JSON : {}", smsTrackerRequest);
+							ObjectNode smsRequestJson = notificationService
+									.buildGeneratePropertyBillSmsRequest(property, parentBill, tracker);
 
-					} catch (Exception e) {
-						log.error("SMS tracker creation failed for property billId {}",
-								billResponse.getBill().get(0).getId(), e);
+							Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,
+									Map.class);
+
+							StringBuilder smsTrackerUri = new StringBuilder();
+							smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+
+							String ward = null;
+							if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
+								addressAdditionalDetails = objectMapper
+										.valueToTree(property.getAddress().getAdditionalDetails());
+								JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
+								if (wardNumberNode != null && !wardNumberNode.isNull()) {
+									ward = wardNumberNode.asText();
+								}
+							}
+
+							Map<String, Object> smsTrackerRequest = new HashMap<>();
+							smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
+							smsTrackerRequest.put("amount", finalPropertyTax);
+							smsTrackerRequest.put("applicationNo", property.getPropertyId());
+							smsTrackerRequest.put("tenantId", property.getTenantId());
+							smsTrackerRequest.put("service", "PROPERTY");
+							smsTrackerRequest.put("fromDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getFromDate()));
+							smsTrackerRequest.put("toDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getToDate()));
+							smsTrackerRequest.put("createdBy", "system");
+							smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+							smsTrackerRequest.put("billId", parentBill.getId());
+							smsTrackerRequest.put("demandId", demandId);
+							smsTrackerRequest.put("smsStatus", false);
+							smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
+							smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
+							smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
+							smsTrackerRequest.put("smsRequest", smsRequestMap);
+							smsTrackerRequest.put("smsResponse", null);
+							smsTrackerRequest.put("ward", ward);
+
+							restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+							log.info("SMS tracker entry created for billId {} demandId {}", parentBill.getId(),
+									demandId);
+
+						} catch (Exception e) {
+							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
+						}
 					}
-
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
 				}
@@ -686,7 +724,7 @@ public class PropertySchedulerService {
 							locationFactor = new BigDecimal(n.get("propertyRate").asText());
 							zoneLabel = n.get("zoneName").asText();
 						}
-				
+
 					node.put("floorNo", floorNo);
 					node.put("zone", zoneLabel);
 					node.put("structure", structureLabel);
@@ -722,18 +760,12 @@ public class PropertySchedulerService {
 			}
 
 			Object address = objectMapper.convertValue(property.getAddress(), Object.class);
-			previewResponses.add(
-				    CalculateTaxPreviewResponse.builder()
-				        .propertyId(properties.get(0).getPropertyId())
-				        .tenantId(properties.get(0).getTenantId())
-				        .totalAnnualTax(totalPropertyTax.setScale(2, RoundingMode.HALF_UP))
-				        .address(address)
-				        .propertyTaxWithoutRebate(finalPropertyTax.setScale(2, RoundingMode.HALF_UP))
-				        .rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP))
-				        .days(days)
-				        .calculationDetails(trackeradditionalDetails)
-				        .build()
-				);
+			previewResponses.add(CalculateTaxPreviewResponse.builder().propertyId(properties.get(0).getPropertyId())
+					.tenantId(properties.get(0).getTenantId())
+					.totalAnnualTax(totalPropertyTax.setScale(2, RoundingMode.HALF_UP)).address(address)
+					.propertyTaxWithoutRebate(finalPropertyTax.setScale(2, RoundingMode.HALF_UP))
+					.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP)).days(days)
+					.calculationDetails(trackeradditionalDetails).build());
 
 		}
 
@@ -790,15 +822,10 @@ public class PropertySchedulerService {
 		Set<String> ulbNames = calculateTaxRequest.getUlbNames();
 		Set<String> wardNumbers = calculateTaxRequest.getWardNumbers();
 		Set<String> mobileNumbers = calculateTaxRequest.getMobileNumbers();
-		
-		String tenantId = calculateTaxRequest.getUlbNames()
-		        .stream()
-		        .findFirst()
-		        .map(ulb -> "hp." + ulb)
-		        .orElse(null);
 
-		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
-				.tenantId(tenantId)
+		String tenantId = calculateTaxRequest.getUlbNames().stream().findFirst().map(ulb -> "hp." + ulb).orElse(null);
+
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true).tenantId(tenantId)
 				.status(Collections.singleton(Status.APPROVED)).propertyIds(calculateTaxRequest.getPropertyIds())
 				.isActiveUnit(true).build();
 
@@ -1053,12 +1080,23 @@ public class PropertySchedulerService {
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId)
+				.type("CYCLIC")
+				.rebateamount(BigDecimal.ZERO)
 				.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
 		return propertyService.getTaxCalculatedProperties(criteria);
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days) {
+//		long startDateTimes = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
+//				.toEpochMilli();
+//
+//		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+//				.startDateTime(startDateTimes).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
+//				.build();
+		// return propertyService.getTaxCalculatedProperties(criteria);//comment
+		// previous code
+
 		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
 				.toEpochMilli();
 
@@ -1066,7 +1104,18 @@ public class PropertySchedulerService {
 				.startDateTime(startDateTime).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
 				.build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
+
+		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		return trackers.stream().filter(tracker -> {
+			long createdTime = tracker.getAuditDetails().getCreatedTime(); // confirm field name
+			long diffDays = ChronoUnit.DAYS.between(
+					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),
+					Instant.ofEpochMilli(todayStart).atZone(ZoneId.systemDefault()).toLocalDate());
+			return diffDays > 0 && diffDays % 30 == 0;
+		}).collect(Collectors.toList());
+
 	}
 
 	private Map<String, Bill> fetchBillsByBatch(Set<String> billIds, RequestInfoWrapper requestInfoWrapper) {
@@ -1099,6 +1148,7 @@ public class PropertySchedulerService {
 						demandIdToTenantMap.put(billDetail.getDemandId(), bill.getTenantId());
 					}
 				}
+				
 			}
 		}
 		return demandIdToTenantMap;
@@ -1144,7 +1194,18 @@ public class PropertySchedulerService {
 				continue;
 			}
 
+			
+			Map<String, Bill> demandIdBillMap = new HashMap<>();
+
+			billIdBillMap.values().forEach(bill -> {
+			    if (bill.getBillDetails() != null) {
+			        bill.getBillDetails().forEach(detail -> {
+			            demandIdBillMap.put(detail.getDemandId(), bill);
+			        });
+			    }
+			});
 			Bill bill = billIdBillMap.get(tracker.getBillId());
+			
 			if (bill == null || CollectionUtils.isEmpty(bill.getBillDetails())) {
 				log.warn("No bill or bill details found for billId [{}]. Skipping tracker [{}].", tracker.getBillId(),
 						tracker.getUuid());
@@ -1164,14 +1225,15 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-				tracker.setRebateAmount(BigDecimal.ZERO);
+//				tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
 				try {
-					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper);
+					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper,tracker);
 
 					tracker.setPropertyTax(newAmount);
+					tracker.setRebateAmount(BigDecimal.ZERO);
 
 					PtTaxCalculatorTrackerRequest updateRequest = enrichmentService
 							.enrichTaxCalculatorTrackerUpdateRequest(tracker, requestInfoWrapper.getRequestInfo());
@@ -1206,23 +1268,26 @@ public class PropertySchedulerService {
 	}
 
 	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
-			RequestInfoWrapper requestInfoWrapper) {
+			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
 
 		for (BillDetail billDetail : bill.getBillDetails()) {
 			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand != null) {
-				demand.setMinimumAmountPayable(newAmount);
-				if (demand.getDemandDetails() != null) {
-					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+			if (demand.getId().equals(tracker.getDemandId())) {
+				if (demand != null) {
+					demand.setMinimumAmountPayable(newAmount);
+					if (demand.getDemandDetails() != null) {
+						demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+					}
+					demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
 				}
-				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
-			}
 
-			if (billDetail.getBillAccountDetails() != null) {
-				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-			}
+				if (billDetail.getBillAccountDetails() != null) {
+					billDetail.getBillAccountDetails()
+							.forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+				}
 
-			billDetail.setAmount(newAmount);
+				billDetail.setAmount(newAmount);
+			}
 		}
 
 		bill.setTotalAmount(newAmount);
@@ -1243,7 +1308,7 @@ public class PropertySchedulerService {
 		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
-			Integer days = 30; // need to change if needed
+			Integer days = 365; // need to change if needed
 
 			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, days);
 

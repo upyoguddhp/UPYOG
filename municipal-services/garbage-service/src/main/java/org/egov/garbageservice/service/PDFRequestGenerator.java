@@ -158,6 +158,25 @@ public class PDFRequestGenerator {
 		BigDecimal totalTax = allGrbgTaxPlusArrear.stream().map(BigDecimal::new).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		grbg.put("totalTax", totalTax);
+		
+		BigDecimal totalPaid = BigDecimal.ZERO;
+		BigDecimal totalDue = BigDecimal.ZERO;
+
+		for (Bill billObj : bill) {
+
+		    BigDecimal amount = billObj.getTotalAmount() != null 
+		            ? billObj.getTotalAmount() 
+		            : BigDecimal.ZERO;
+
+		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
+		        totalPaid = totalPaid.add(amount);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		        totalDue = totalDue.add(amount);
+		    }
+		}
+
+		grbg.put("amountPaid", totalPaid);
+		grbg.put("amountDue", totalDue);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
@@ -210,6 +229,10 @@ public class PDFRequestGenerator {
 		grbg.put("ownerOrOccupier",
 				AdditionalDetail.has("propertyOwnerName") && !AdditionalDetail.get("propertyOwnerName").isNull()
 						? AdditionalDetail.get("propertyOwnerName").asText()
+						: "N/A");
+		grbg.put("fatherOrHusbandName",
+				AdditionalDetail.has("ownerFatherName") && !AdditionalDetail.get("ownerFatherName").isNull()
+						? AdditionalDetail.get("ownerFatherName").asText()
 						: "N/A");
 
 		StringBuilder uri = new StringBuilder(applicationPropertiesAndConstant.getFrontEndBaseUri());

@@ -387,10 +387,9 @@ public class EnrichmentService {
                     property.getWorkflow().setAssignes(assignes);
             }
     }
-    
 	public PtTaxCalculatorTrackerRequest enrichTaxCalculatorTrackerCreateRequest(Property property,
 			CalculateTaxRequest calculateTaxRequest, BigDecimal finalPropertyTax, JsonNode additionalDetails,
-			List<Bill> bills, BigDecimal rebateAmount, BigDecimal propertyTaxWithoutRebate) {
+			List<Bill> bills, BigDecimal rebateAmount, BigDecimal propertyTaxWithoutRebate, String demandId) {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		AuditDetails createAuditDetails = propertyutil
@@ -405,7 +404,9 @@ public class EnrichmentService {
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
 				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
 				.type(calculateTaxRequest.getType())
-				.propertyTaxWithoutRebate(propertyTaxWithoutRebate).billStatus(BillStatus.ACTIVE).build();
+				.propertyTaxWithoutRebate(propertyTaxWithoutRebate).billStatus(BillStatus.ACTIVE)
+				.demandId(demandId)
+				.build();
 
 		return PtTaxCalculatorTrackerRequest.builder().requestInfo(calculateTaxRequest.getRequestInfo())
 				.ptTaxCalculatorTracker(ptTaxCalculatorTracker).build();
