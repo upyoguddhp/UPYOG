@@ -194,17 +194,21 @@ public class ReceiptServiceV2 {
 			Boolean isRecieptCancellation, String advanceTaxHead) {
 
 		BigDecimal oldCollectedAmount = currentDetail.getCollectionAmount();
-		BigDecimal newAmount = billAccDetail.getAdjustedAmount();
+		BigDecimal newTotalAdjusted = billAccDetail.getAdjustedAmount();
 
 		if (advanceTaxHead != null && billAccDetail.getTaxHeadCode().equalsIgnoreCase(advanceTaxHead)) {
 			currentDetail.setTaxAmount(billAccDetail.getAmount().add(oldCollectedAmount));
 		}
 
 		if (isRecieptCancellation) {
-			currentDetail.setCollectionAmount(oldCollectedAmount.subtract(newAmount));
+			currentDetail.setCollectionAmount(oldCollectedAmount.subtract(newTotalAdjusted));
 		} else {
 
-			BigDecimal updatedCollection = oldCollectedAmount.add(newAmount);
+			BigDecimal delta = newTotalAdjusted.subtract(oldCollectedAmount);
+			if (delta.compareTo(BigDecimal.ZERO) <= 0)
+				return;
+
+			BigDecimal updatedCollection = oldCollectedAmount.add(delta);
 
 			if (updatedCollection.compareTo(currentDetail.getTaxAmount()) > 0) {
 				updatedCollection = currentDetail.getTaxAmount();
