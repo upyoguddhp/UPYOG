@@ -126,7 +126,7 @@ public class DemandQueryBuilder {
 	        + "WHERE bad.demanddetailid = ?\r\n"
 	        + "AND bad.billdetail = bd.id\r\n"
 	        + "AND bd.billid = b.id\r\n"
-	        + "AND b.status = 'EXPIRED';";
+	        + "AND b.status = 'ACTIVE';";
 	
 	public static final String SYNC_ALL_ADJUSTED_AMOUNT_QUERY = "UPDATE egbs_billaccountdetail_v1 " +
             "SET adjustedamount = amount " +
