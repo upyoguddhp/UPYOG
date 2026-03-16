@@ -16,7 +16,7 @@ public class GrbgBillTrackerSearchCriteria {
 
 	private String tenantId;
 	
-	private String type;
+	private Set<String> type;
 	
 	private String month;
 	
@@ -29,6 +29,8 @@ public class GrbgBillTrackerSearchCriteria {
 	private Set<String> grbgApplicationIds;
 
 	private Set<String> billIds;
+	
+	private Set<String> demandIds;
 	
 	private Integer limit;
 

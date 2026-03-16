@@ -163,16 +163,16 @@ public class PDFRequestGenerator {
 		BigDecimal totalDue = BigDecimal.ZERO;
 
 		for (Bill billObj : bill) {
-		    BigDecimal paid = billObj.getAmountPaid() != null 
-		            ? billObj.getAmountPaid() 
+
+		    BigDecimal amount = billObj.getTotalAmount() != null 
+		            ? billObj.getTotalAmount() 
 		            : BigDecimal.ZERO;
 
-		    BigDecimal total = billObj.getTotalAmount() != null
-		            ? billObj.getTotalAmount()
-		            : BigDecimal.ZERO;
-
-		    totalPaid = totalPaid.add(paid);
-		    totalDue = totalDue.add(total.subtract(paid));
+		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
+		        totalPaid = totalPaid.add(amount);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		        totalDue = totalDue.add(amount);
+		    }
 		}
 
 		grbg.put("amountPaid", totalPaid);
@@ -202,16 +202,16 @@ public class PDFRequestGenerator {
 		grbg.put("to", grbgBillTracker.get(0).getToDate());
 
 		
-
-		if(!grbgBillTracker.get(0).getType().equals("ARREAR"))
-		{
-			int year = Integer.parseInt(grbgBillTracker.get(0).getYear());
-			grbg.put("finYear", year + "-" + (year + 1));
-			grbg.put("finYear", grbgBillTracker.get(0).getYear() + "-" + (year + 1));
+		Long fromPeriod = bill.get(0).getBillDetails().get(0).getFromPeriod();
+		int year = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getYear();
+		int month = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getMonthValue();
+		int startYear;
+		if (month <= 3) {
+				startYear = year - 1;
+		} else {
+				startYear = year;
 		}
-		else {
-			grbg.put("finYear", grbgBillTracker.get(0).getYear());
-		}
+		grbg.put("finYear", startYear + "-" + (startYear + 1));
 		grbg.put("district", "district");
 		grbg.put("wardNumber", grbgAccount.getAddresses().get(0).getWardName());
 		grbg.put("unitCategory", escapeHtml(grbgAccount.getGrbgCollectionUnits().get(0).getCategory()));
@@ -230,7 +230,6 @@ public class PDFRequestGenerator {
 				AdditionalDetail.has("propertyOwnerName") && !AdditionalDetail.get("propertyOwnerName").isNull()
 						? AdditionalDetail.get("propertyOwnerName").asText()
 						: "N/A");
-		
 		grbg.put("fatherOrHusbandName",
 				AdditionalDetail.has("ownerFatherName") && !AdditionalDetail.get("ownerFatherName").isNull()
 						? AdditionalDetail.get("ownerFatherName").asText()
