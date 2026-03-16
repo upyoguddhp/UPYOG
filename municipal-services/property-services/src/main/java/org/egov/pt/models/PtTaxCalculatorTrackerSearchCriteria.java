@@ -31,6 +31,8 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 	private Set<String> propertyIds;
 	
 	private String billId;
+	
+	private Set<String> demandIds;
 
 	private Set<String> financialYears;
 

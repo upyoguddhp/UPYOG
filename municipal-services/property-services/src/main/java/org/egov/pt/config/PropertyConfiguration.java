@@ -306,7 +306,10 @@ public class PropertyConfiguration {
 	public String demandSearchEndpoint;
 
 	@Value("${egov.demand.update.endpoint}")
-	public String demandUpdateEndpoint;    
+	public String demandUpdateEndpoint;  
+	
+	@Value("${egov.cancel.bill.endpoint}")
+	public String cancleBillEndpoint;
     	
     // Registry 
     

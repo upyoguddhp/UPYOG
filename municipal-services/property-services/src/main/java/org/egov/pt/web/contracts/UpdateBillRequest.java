@@ -1,7 +1,6 @@
 package org.egov.pt.web.contracts;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,29 +16,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-public class CancelPropertyBillRequest {
+public class UpdateBillRequest {
 	
 	@NotNull
-	private RequestInfo requestInfo;
+	private RequestInfo RequestInfo;
 	
 	@NotNull
-	private Set<String> consumerCode;
-	
-	@NotNull
-	private String businessService;
-
-	@NotNull
-	private String tenantId;
-	
-	@NotNull
-	private String reason;
-	
-	@NotNull
-	private String billId;
-	
-	@NotNull
-	private Set<String> demandId;
+	@Valid
+	private UpdatePropertyBillCriteria UpdateBillCriteria;
 
 }

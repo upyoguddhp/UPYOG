@@ -95,6 +95,9 @@ import org.egov.common.contract.request.RequestInfo;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper; 
 import org.egov.pt.web.contracts.UpdatePropertyBillCriteria;
+import org.egov.pt.models.AuditDetails;
+import org.egov.pt.util.CommonUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 
 
@@ -179,6 +182,10 @@ public class PropertyService {
 
 	@Autowired
 	private RequestInfoUtils requestInfoUtils;
+	
+	@Autowired
+	@Qualifier("propertyUtil")
+	private CommonUtils commonUtils;
 
 	/**
 	 * Enriches the Request and pushes to the Queue
@@ -1059,6 +1066,31 @@ public class PropertyService {
 	}
 
 	public Boolean cancelPropertyBill(CancelPropertyBillRequest cancelRequest) {
+		
+		if (CollectionUtils.isEmpty(cancelRequest.getDemandId())) {
+		    throw new CustomException("INVALID_REQUEST", "DemandId is required");
+		}
+		
+		String demandId = cancelRequest.getDemandId().iterator().next();
+		
+		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
+		        PtTaxCalculatorTrackerSearchCriteria.builder()
+		        .demandIds(Collections.singleton(demandId))
+		        .billStatus(Collections.singleton(BillStatus.ACTIVE))
+				.build();
+
+		List<PtTaxCalculatorTracker> trackers = repository.getTaxCalculatedProperties(trackerSearchCriteria);
+		
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NO_TRACKER", "No active tracker found for the demand id");
+		}
+
+		PtTaxCalculatorTracker tracker = trackers.get(0);
+
+		if (trackers.size() > 1) {
+			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
+		}
+		
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
 				.tenantId(cancelRequest.getTenantId())
 				.billId(Collections.singleton(cancelRequest.getBillId()))
@@ -1074,59 +1106,146 @@ public class PropertyService {
 		}
 
 		Bill bill = billResponse.getBill().get(0);
-
-		// Only single demand allowed
-		if (bill.getBillDetails() == null || bill.getBillDetails().size() != 1) {
-			throw new CustomException("INVALID UPDATE", "Multiple demand cancellation is not allowed");
-		}
-
-		//Cancel demand
-		bill.getBillDetails().forEach(bd -> {
-			demandService.cancelDemand(bd.getTenantId(), Collections.singleton(bd.getDemandId()),
+		
+			demandService.cancelDemand(bill.getTenantId(), Collections.singleton(tracker.getDemandId()),
 					cancelRequest.getRequestInfo(), bill.getBusinessService());
-		});
+		
+		JsonNode additionalDetailsNode = buildCancelAdditionalDetails(cancelRequest.getReason());
 
-		//Add cancellation reason
-		Map<String, Object> additionalDetails = new HashMap<>();
-		additionalDetails.put("reason", cancelRequest.getReason());
-		additionalDetails.put("reasonMessage", cancelRequest.getReason());
-
-		JsonNode addDetailsNode = objectMapper.valueToTree(additionalDetails);
-
-		// Update bill status
 		UpdatePropertyBillCriteria updateBillCriteria = UpdatePropertyBillCriteria.builder().tenantId(bill.getTenantId())
 				.consumerCodes(Collections.singleton(bill.getConsumerCode()))
 				.billIds(Collections.singleton(bill.getId()))
 				.statusToBeUpdated(StatusEnum.CANCELLED)
-				.businessService(bill.getBusinessService()).additionalDetails(addDetailsNode).build();
-		billService.updateBillStatus(updateBillCriteria, cancelRequest.getRequestInfo());
+				.businessService(bill.getBusinessService())
+				.additionalDetails(additionalDetailsNode)
+				.build();
+		billService.cancelBill(updateBillCriteria, cancelRequest.getRequestInfo());
 		
-		// UPDATE PT TRACKER STATUS
-		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
-		        PtTaxCalculatorTrackerSearchCriteria.builder()
-		                .tenantId(bill.getTenantId())
-		                .billId(bill.getId())
-		                .limit(1)
-		                .build();
+		AuditDetails audit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 
-		List<PtTaxCalculatorTracker> trackers =
-				repository.getTaxCalculatedProperties(trackerSearchCriteria);
+		PtTaxCalculatorTracker ptBilltracker =
+			PtTaxCalculatorTracker.builder()
+			.uuid(tracker.getUuid())
+			.propertyId(tracker.getPropertyId())
+			.tenantId(tracker.getTenantId())
+			.demandId(tracker.getDemandId())
+			.billStatus(BillStatus.CANCELLED)
+			.billId(bill.getId())
+			.auditDetails(audit)
+			.rebateAmount(tracker.getRebateAmount())
+			.penaltyAmount(tracker.getPenaltyAmount())
+			.propertyTax(tracker.getPropertyTax())
+			.build();
 
-		if (!CollectionUtils.isEmpty(trackers)) {
-		    PtTaxCalculatorTracker tracker = trackers.get(0);
-		    tracker.setBillStatus(BillStatus.CANCELLED);
+		PtTaxCalculatorTrackerRequest trackerRequest =
+		        PtTaxCalculatorTrackerRequest.builder()
+		        .ptTaxCalculatorTracker(ptBilltracker)
+		        .requestInfo(cancelRequest.getRequestInfo())
+		        .build();
 
-		    PtTaxCalculatorTrackerRequest trackerRequest =
-		            PtTaxCalculatorTrackerRequest.builder()
-		                    .requestInfo(cancelRequest.getRequestInfo())
-		                    .ptTaxCalculatorTracker(tracker)
-		                    .build();
+		propertyService.updatePtTaxCalculatorTracker(trackerRequest);
 
-		    propertyService.updatePtTaxCalculatorTracker(trackerRequest);
+		PtTaxCalculatorTracker previousTracker = getPreviousTracker(tracker);
+		
+		if (previousTracker != null) {
+			AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
+			PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
+				.uuid(previousTracker.getUuid())
+				.propertyId(previousTracker.getPropertyId())
+				.tenantId(previousTracker.getTenantId())
+				.demandId(previousTracker.getDemandId())
+				.billStatus(BillStatus.ACTIVE)
+				.rebateAmount(previousTracker.getRebateAmount())
+				.penaltyAmount(previousTracker.getPenaltyAmount())
+				.propertyTax(previousTracker.getPropertyTax())
+				.billId(previousTracker.getBillId())
+				.auditDetails(prevAudit)
+				.build();
+
+			PtTaxCalculatorTrackerRequest prevTrackerRequest = PtTaxCalculatorTrackerRequest.builder()
+				.ptTaxCalculatorTracker(prevTrackerToUpdate)
+				.requestInfo(cancelRequest.getRequestInfo())
+				.build();
+
+			propertyService.updatePtTaxCalculatorTracker(prevTrackerRequest);
+
+			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
+					.billId(Collections.singleton(previousTracker.getBillId()))
+					.tenantId(cancelRequest.getTenantId())
+					.build();
+			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
+			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
+				Bill prevBill = prevBillResponse.getBill().get(0);
+					BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+						.tenantId(cancelRequest.getTenantId())
+						.consumerCode(Collections.singleton(prevBill.getConsumerCode()))
+						.service(PTConstants.MODULE_PROPERTY)
+						.isActive(true)
+						.build();
+				BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+				if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+					for (Bill other : otherActiveResponse.getBill()) {
+						if (!Objects.equals(other.getId(), prevBill.getId())
+								&& other.getStatus() == Bill.StatusEnum.ACTIVE) {
+							other.setStatus(Bill.StatusEnum.CANCELLED);
+					        other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
+							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+						}
+					}
+				}
+				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
+			}
 		} else {
-		    log.warn("PT tracker not found for billId {}", bill.getId());
+		    BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+		            .tenantId(cancelRequest.getTenantId())
+		            .consumerCode(Collections.singleton(bill.getConsumerCode()))
+		            .service(PTConstants.MODULE_PROPERTY)
+		            .isActive(true)
+		            .build();
+
+		    BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+
+		    if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+		        for (Bill other : otherActiveResponse.getBill()) {
+		            if (other.getStatus() == Bill.StatusEnum.ACTIVE) {
+		                other.setStatus(Bill.StatusEnum.CANCELLED);
+		                other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
+		                billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+		            }
+		        }
+		    }
 		}
 		 return true;  
+	}
+	
+	private PtTaxCalculatorTracker getPreviousTracker(PtTaxCalculatorTracker ptBillTracker) {
+		
+		PtTaxCalculatorTrackerSearchCriteria ptBillTrackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(Collections.singleton(ptBillTracker.getPropertyId()))
+				.build();
+
+		List<PtTaxCalculatorTracker> trackers = getTaxCalculatedProperties(ptBillTrackerSearchCriteria);
+    	trackers.sort((a, b) -> Long.compare(b.getAuditDetails().getCreatedTime(), a.getAuditDetails().getCreatedTime()));
+
+    	int index = -1;
+		for (int i = 0; i < trackers.size(); i++) {
+			if (trackers.get(i).getUuid().equals(ptBillTracker.getUuid())) {
+				index = i;
+				break;
+			}
+		}
+		if (index >= 0 && index + 1 < trackers.size()) {
+			return trackers.get(index + 1);
+		}
+		return null;
+	}
+	
+	private JsonNode buildCancelAdditionalDetails(String reason) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("reason", reason);
+	    map.put("reasonMessage", reason);
+	    return objectMapper.valueToTree(map);
 	}
 
 	public Map<String, Integer> getUlbDaysMap(MdmsResponse mdmsResponse) {
