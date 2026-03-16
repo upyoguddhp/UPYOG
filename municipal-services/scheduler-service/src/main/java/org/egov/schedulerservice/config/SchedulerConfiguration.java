@@ -102,4 +102,9 @@ public class SchedulerConfiguration {
 	@Value("${egov.garbage.endpoint.reverse-rebate-amount}")
 	private String garbageReverseRebateAmountEndpoint;
 	
+	@Value("${egov.property.endpoint.bulk-uploads}")
+	private String PropertyBulkBillUploads;
+
+	
+	
 }
