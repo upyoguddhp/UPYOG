@@ -221,9 +221,9 @@ public class BillRepositoryV2 {
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!status.equals(BillStatus.ACTIVE)) {
-			if (status.equals(BillStatus.PAID) || status.equals(BillStatus.PARTIALLY_PAID)) {
-				return -1;
+		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
+			if (status.equals(BillStatus.PAID)) {
+			    return -1;
 			}
 			else {
 				if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated()) && status.equals(BillStatus.EXPIRED)) {
