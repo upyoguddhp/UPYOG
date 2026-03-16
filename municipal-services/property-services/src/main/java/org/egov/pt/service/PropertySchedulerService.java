@@ -68,6 +68,15 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.egov.pt.service.AlfrescoService;
+import org.egov.pt.web.contracts.alfresco.DmsResponse;
+import org.egov.pt.web.contracts.alfresco.DmsRequest;
+import org.egov.pt.util.PTConstants;
+import org.egov.common.contract.request.RequestInfo;
+
+
 
 import java.io.*;
 
@@ -103,6 +112,10 @@ public class PropertySchedulerService {
 
 	@Autowired
 	private RestCallRepository restCallRepository;
+	
+	@Autowired
+	private AlfrescoService alfrescoService;
+
 
 	@Value("${egov.sms.host}")
 private String smsHost;
@@ -1326,41 +1339,181 @@ public Object updatePenaltyAmount(RequestInfoWrapper requestInfoWrapper) {
 //		            .body(finalResource);
 //	}
 
-public byte[] uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+//public byte[] uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+//
+//     String[] arr = {"hp.Shimla", "hp.Solan"};	
+//	
+//     
+//     for (String value : arr) {
+//    	 
+//    	    List<Map<String, Object>> bills =
+//    	            repository.getActiveBills("ACTIVE",value);
+//
+//    	 
+//     }
+//
+//    PDFMergerUtility merger = new PDFMergerUtility();
+//    ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
+//
+//    for (Map<String, Object> bill : bills) {
+//
+//        String propertyId = String.valueOf(bill.get("propertyid"));
+//        String billID = String.valueOf(bill.get("bill_id"));
+//        String status = String.valueOf(bill.get("bill_status"));
+//
+//        ResponseEntity<Resource> billResponse =
+//                propertyService.generatePropertyTaxBillReceipt(
+//                        requestInfoWrapper,
+//                        propertyId,
+//                        billID,
+//                        status
+//                );
+//
+//        if (billResponse != null && billResponse.getBody() != null) {
+//            InputStream inputStream =
+//                    billResponse.getBody().getInputStream();
+//            merger.addSource(inputStream);
+//        }
+//    }
+//
+//    merger.setDestinationStream(mergedOutput);
+//    merger.mergeDocuments(
+//            MemoryUsageSetting.setupMainMemoryOnly()
+//    );
+//    
+//    
+//
+//    return mergedOutput.toByteArray();   
+//}
 
-    List<Map<String, Object>> bills =
-            repository.getActiveBills("ACTIVE");
+public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
 
-    PDFMergerUtility merger = new PDFMergerUtility();
-    ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
+    String[] tenants = {"hp.Shimla", "hp.Solan"};
 
-    for (Map<String, Object> bill : bills) {
+    // 1️⃣ All bills collect
+    List<Map<String, Object>> bills = new ArrayList<>();
 
-        String propertyId = String.valueOf(bill.get("propertyid"));
-        String billID = String.valueOf(bill.get("bill_id"));
-        String status = String.valueOf(bill.get("bill_status"));
+    for (String tenant : tenants) {
 
-        ResponseEntity<Resource> billResponse =
-                propertyService.generatePropertyTaxBillReceipt(
-                        requestInfoWrapper,
-                        propertyId,
-                        billID,
-                        status
-                );
+        List<Map<String, Object>> result =
+                repository.getActiveBills("ACTIVE", tenant);
 
-        if (billResponse != null && billResponse.getBody() != null) {
-            InputStream inputStream =
-                    billResponse.getBody().getInputStream();
-            merger.addSource(inputStream);
+        if (result != null && !result.isEmpty()) {
+            bills.addAll(result);
         }
     }
 
-    merger.setDestinationStream(mergedOutput);
-    merger.mergeDocuments(
-            MemoryUsageSetting.setupMainMemoryOnly()
-    );
+    if (bills.isEmpty()) {
+        return false;
+    }
 
-    return mergedOutput.toByteArray();   
+    // 2️⃣ Group bills by ULB
+    Map<String, List<Map<String, Object>>> billsByUlb = new HashMap<>();
+
+    for (Map<String, Object> bill : bills) {
+
+        String wardName = String.valueOf(bill.get("ward"));
+
+        billsByUlb
+                .computeIfAbsent(wardName, k -> new ArrayList<>())
+                .add(bill);
+    }
+
+    // 3️⃣ Process each ULB
+    for (Map.Entry<String, List<Map<String, Object>>> entry : billsByUlb.entrySet()) {
+
+        String wardName = entry.getKey();
+        List<Map<String, Object>> ulbBills = entry.getValue();
+
+        PDFMergerUtility merger = new PDFMergerUtility();
+        ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
+
+        // 4️⃣ Generate PDF for each bill
+        for (Map<String, Object> bill : ulbBills) {
+
+            String propertyId = String.valueOf(bill.get("propertyid"));
+            String billId = String.valueOf(bill.get("bill_id"));
+            String status = String.valueOf(bill.get("bill_status"));
+
+            ResponseEntity<Resource> billResponse =
+                    propertyService.generatePropertyTaxBillReceipt(
+                            requestInfoWrapper,
+                            propertyId,
+                            billId,
+                            status
+                    );
+
+            if (billResponse != null && billResponse.getBody() != null) {
+
+                InputStream inputStream =
+                        billResponse.getBody().getInputStream();
+
+                merger.addSource(inputStream);
+            }
+        }
+
+        // 5️⃣ Merge PDFs of that ULB
+        merger.setDestinationStream(mergedOutput);
+        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+
+        byte[] finalPdf = mergedOutput.toByteArray();
+
+        // 6️⃣ Convert to resource
+        ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+            @Override
+            public String getFilename() {
+                return wardName + "_Bills.pdf";
+            }
+        };
+
+        // 7️⃣ Prepare DMS request
+        DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(
+                resource,
+                wardName,
+                requestInfoWrapper.getRequestInfo()
+        );
+
+        // 8️⃣ Upload to Alfresco
+        try {
+
+            alfrescoService.uploadAttachment(
+                    dmsRequest,
+                    requestInfoWrapper.getRequestInfo()
+            );
+
+        } catch (IOException e) {
+
+            throw new CustomException(
+                    "UPLOAD_ATTACHMENT_FAILED",
+                    "Upload Attachment failed " + e.getMessage()
+            );
+        }
+    }
+
+    return true;
+}
+   
+
+
+private DmsRequest generateDmsRequestFromBulkBillUpload(
+        Resource resource, String wardName,
+        RequestInfo requestInfo) {
+    return DmsRequest.builder()
+            .userId(requestInfo.getUserInfo().getId().toString())
+            .objectId(UUID.randomUUID().toString())
+            .description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+            .id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID)
+            .type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+            .objectName(PTConstants.BUSINESS_SERVICE)
+            .comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
+            .status(PTConstants.APPLICATION_STATUS_APPROVED)
+            .file(resource)
+            .servicetype(PTConstants.BUSINESS_SERVICE)
+            .documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
+            .documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID)
+            .wardName(wardName)
+            .build();
+    
 }
 
 }
