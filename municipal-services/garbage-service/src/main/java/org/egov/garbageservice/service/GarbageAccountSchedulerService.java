@@ -125,16 +125,18 @@ public class GarbageAccountSchedulerService {
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
 
 		garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
-
 		// create demand and bill for every account
 		if (null != garbageAccounts && !CollectionUtils.isEmpty(garbageAccounts)) {
 			garbageAccounts.stream().forEach(garbageAccount -> {
 				List<String> errorList = new ArrayList<>();
-				ObjectNode  calculationBreakdown = objectMapper.createObjectNode();
-				  calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
+				ObjectNode calculationBreakdown = objectMapper.createObjectNode();
+				int numberOfMonths = 0;
+				if (!Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+				    calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
 				    calculationBreakdown.put("month",
-				            generateBillRequest.getMonths()
-				                               .get(generateBillRequest.getMonths().size() - 1));
+				        generateBillRequest.getMonths()
+				            .get(generateBillRequest.getMonths().size() - 1));
+				}
 				    
 				if(null != garbageAccount.getUserUuid()) {
 					Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
@@ -145,10 +147,25 @@ public class GarbageAccountSchedulerService {
 						        mdmsResponse, garbageAccount, errorList, calculationBreakdown
 						    );
 
-					int numberOfMonths = generateBillRequest.getMonths().size();
+					if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+					    Long from = generateBillRequest.getFromDateTimestamp();
+					    Long to = generateBillRequest.getToDateTimestamp();
+
+					    if (from != null && to != null) {
+					        LocalDate fromDate = Instant.ofEpochMilli(from).atZone(ZoneId.systemDefault()).toLocalDate();
+					        LocalDate toDate = Instant.ofEpochMilli(to).atZone(ZoneId.systemDefault()).toLocalDate();
+					        
+					        numberOfMonths = (int) ChronoUnit.MONTHS.between(
+					                fromDate.withDayOfMonth(1),
+					                toDate.withDayOfMonth(1)
+					        ) + 1;
+					    }
+					} else {
+					    numberOfMonths = generateBillRequest.getMonths().size();
+					}
+					calculationBreakdown.put("monthCount", numberOfMonths);
 	
 					BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
-					
 					BigDecimal rebatePercentage = BigDecimal.ZERO;
 					BigDecimal rebateAmount = BigDecimal.ZERO;
 					BigDecimal finalBillAmount = billAmount;
@@ -178,14 +195,15 @@ public class GarbageAccountSchedulerService {
 					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
 					
 						String billType =
-						        generateBillRequest.getMonths().size() > 1
+								Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth()) ||
+								generateBillRequest.getMonths().size() > 1
 						        ? "MULTI_MONTH"
 						        : "MONTHLY";
 						        
 						        AtomicReference<String> demandId = new AtomicReference<>(null);
 						        
 						        BillResponse billResponse =
-						                generateDemandAndBill(generateBillRequest, garbageAccount, finalBillAmount, billType, demandId);
+						                generateDemandAndBill(generateBillRequest, garbageAccount, finalBillAmount, billType, demandId, numberOfMonths);
 
 	
 						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
@@ -232,9 +250,13 @@ public class GarbageAccountSchedulerService {
 							smsTrackerRequest.put("applicationNo", garbageAccount.getGrbgApplicationNumber());
 							smsTrackerRequest.put("tenantId", garbageAccount.getTenantId());
 							smsTrackerRequest.put("service", "GARBAGE");
-							smsTrackerRequest.put("months", generateBillRequest.getMonths());
-							smsTrackerRequest.put("monthCount", generateBillRequest.getMonths().size());
-
+							if (generateBillRequest.getMonths() != null) {
+							    smsTrackerRequest.put("months", generateBillRequest.getMonths());
+							}
+							smsTrackerRequest.put("monthCount",Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
+								        ? numberOfMonths
+								        : generateBillRequest.getMonths().size()
+								);
 							smsTrackerRequest.put("year", generateBillRequest.getYear());
 //							smsTrackerRequest.put("financialYear", generateBillRequest.getFinancialYear());
 							smsTrackerRequest.put("fromDate", fromDateStr);
@@ -344,10 +366,19 @@ public class GarbageAccountSchedulerService {
 
 	private void setFromDateToDate(GenerateBillRequest request) {
 	
-	    if (CollectionUtils.isEmpty(request.getMonths()) || StringUtils.isEmpty(request.getYear())) {
-	        throw new CustomException("INVALID_BILL_PERIOD", "Months and year are mandatory");
-	    }
-	
+		if (Boolean.TRUE.equals(request.getIsMultiMonth())) {
+		    if (request.getFromDateTimestamp() == null || request.getToDateTimestamp() == null) {
+		        throw new CustomException("INVALID_BILL_PERIOD", "fromDateTimestamp and toDateTimestamp are mandatory");
+		    }
+		    request.setFromDate(new Date(request.getFromDateTimestamp()));
+		    request.setToDate(new Date(request.getToDateTimestamp()));
+		    return;
+		}
+		
+		if (CollectionUtils.isEmpty(request.getMonths()) || StringUtils.isEmpty(request.getYear())) {
+		    throw new CustomException("INVALID_BILL_PERIOD", "Months and year are mandatory");
+		}
+		
 	    int year = Integer.parseInt(request.getYear());
 	
 	    List<Month> months = request.getMonths().stream()
@@ -425,7 +456,7 @@ public class GarbageAccountSchedulerService {
 	}
 
 	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
-			BigDecimal billAmount,String Type,AtomicReference<String> demandId) {
+			BigDecimal billAmount,String Type,AtomicReference<String> demandId, int numberOfMonths) {
 		try {
 			if(!checkUuidNumber(garbageAccount))
 				return null;
@@ -446,8 +477,6 @@ public class GarbageAccountSchedulerService {
 		    additionalDetails.put("category", garbageAccount.getGrbgCollectionUnits().get(0).getCategory());
 		    additionalDetails.put("SubCategoryType", garbageAccount.getGrbgCollectionUnits().get(0).getSubCategoryType());
 		    additionalDetails.put("application_no", garbageAccount.getGrbgApplicationNumber());
-		    additionalDetails.put("MONTHS", generateBillRequest.getMonths());
-		    additionalDetails.put("MONTH_COUNT", generateBillRequest.getMonths().size());
 		    additionalDetails.put("bulkType","MULTI_MONTH".equals(Type) ? "MONTH_RANGE" : "SINGLE_MONTH");
 		    additionalDetails.put("BILLING_PERIOD",generateBillRequest.getFromDate() + " - " + generateBillRequest.getToDate());
 		    additionalDetails.put("type", Type);
@@ -456,6 +485,13 @@ public class GarbageAccountSchedulerService {
 		    	        ? garbageAccount.getGrbgOldDetails().getOldGarbageId() 
 		    	        : null
 		    	);
+		    if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+		        additionalDetails.put("MONTH_COUNT", numberOfMonths);
+		    } else {
+		    	if (generateBillRequest.getMonths() != null) {
+		    	    additionalDetails.put("MONTHS", generateBillRequest.getMonths());
+		    	}
+		    }
 			generateBillRequest.setAdditionalDetail(additionalDetails);
 			String service = Type.equals("MONTHLY")?"GB":"GB_BULK";
 			savedDemands = demandService.generateDemand(generateBillRequest.getRequestInfo(), garbageAccount,service, billAmount, generateBillRequest);
@@ -558,7 +594,8 @@ public class GarbageAccountSchedulerService {
 			if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0) {
 				
 				AtomicReference<String> demandId = new AtomicReference<>(null);
-				BillResponse billResponse = generateDemandAndBill(onDemandBillRequest.getGenerateBillRequest(), garbageAccount, billAmount,"ON-DEMAND",demandId);				ObjectMapper mapper = new ObjectMapper();
+				BillResponse billResponse = generateDemandAndBill(onDemandBillRequest.getGenerateBillRequest(), garbageAccount, billAmount,"ON-DEMAND",demandId, 1);				
+				ObjectMapper mapper = new ObjectMapper();
 		        ObjectNode additionalDetails = mapper.convertValue(onDemandBillRequest.getGenerateBillRequest().getAdditionalDetail(), ObjectNode.class);
 				if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 					GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService.enrichGrbgBillTrackerCreateRequest(garbageAccount, onDemandBillRequest.getGenerateBillRequest(), billAmount,billResponse.getBill().get(0),additionalDetails);
