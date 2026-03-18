@@ -493,7 +493,7 @@ public class GarbageAccountSchedulerService {
 		    	}
 		    }
 			generateBillRequest.setAdditionalDetail(additionalDetails);
-			String service = Type.equals("MONTHLY")?"GB":"GB_BULK";
+			String service = Type.equals("ON-DEMAND")?"GB_BULK":"GB";
 			savedDemands = demandService.generateDemand(generateBillRequest.getRequestInfo(), garbageAccount,service, billAmount, generateBillRequest);
 
 			if (CollectionUtils.isEmpty(savedDemands)) {
