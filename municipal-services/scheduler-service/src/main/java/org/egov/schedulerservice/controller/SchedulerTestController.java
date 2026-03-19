@@ -46,9 +46,12 @@ public class SchedulerTestController {
 				log.error(message, e);
 
 			} catch (Exception e) {
-				// Handle other
-				message = "Error: Unknown exception occured for the Method '" + methodName + "'.";
-				log.error(message, e);
+
+			    Throwable rootCause = e.getCause(); // 🔥 THIS IS THE REAL ERROR
+
+			    message = "Error: Exception occured for the Method '" + methodName + "'.";
+
+			    log.error("SCHEDULER ERROR ↓↓↓", rootCause); // ✅ real error
 			}
 		}
 

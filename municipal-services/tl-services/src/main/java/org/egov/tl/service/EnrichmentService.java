@@ -28,19 +28,23 @@ import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.IdGenRepository;
 import org.egov.tl.util.TLConstants;
 import org.egov.tl.util.TradeUtil;
+import org.egov.tl.web.models.Address;
 import org.egov.tl.web.models.AuditDetails;
 import org.egov.tl.web.models.OwnerInfo;
 import org.egov.tl.web.models.OwnerInfo.RelationshipEnum;
 import org.egov.tl.web.models.TradeLicense;
 import org.egov.tl.web.models.TradeLicense.ApplicationTypeEnum;
 import org.egov.tl.web.models.TradeLicense.LicenseTypeEnum;
+import org.egov.tl.web.models.TradeLicenseDetail;
 import org.egov.tl.web.models.TradeLicenseRequest;
 import org.egov.tl.web.models.TradeLicenseSearchCriteria;
+import org.egov.tl.web.models.TradeUnit;
 import org.egov.tl.web.models.Idgen.IdResponse;
 import org.egov.tl.web.models.contract.BusinessService;
 import org.egov.tl.web.models.user.UserDetailResponse;
 import org.egov.tl.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -228,7 +232,53 @@ public class EnrichmentService {
 		}
 	}
 
+    
+	//-------------------------TL-RENEWAL
+	public TradeLicense enrichRenewalLicense(
+	        TradeLicenseRequest request,
+	        TradeLicense oldLicense) {
 
+	    TradeLicense renewal = new TradeLicense();
+	    BeanUtils.copyProperties(oldLicense, renewal);
+
+	    // NEW ROW
+	    renewal.setId(UUID.randomUUID().toString());
+
+	    renewal.setApplicationType(TLConstants.APPLICATION_TYPE_RENEWAL);
+	    renewal.setStatus(TLConstants.STATUS_INITIATED);
+	    renewal.setAction(TLConstants.ACTION_INITIATE);
+
+	    // SAME numbers 
+	    renewal.setLicenseNumber(oldLicense.getLicenseNumber());
+	    renewal.setApplicationNumber(oldLicense.getApplicationNumber());
+
+	    renewal.setAuditDetails(
+	            AuditDetails.builder()
+	                    .createdBy(request.getRequestInfo().getUserInfo().getUuid())
+	                    .createdTime(System.currentTimeMillis())
+	                    .build()
+	    );
+
+	    // ---- Detail ----
+	    TradeLicenseDetail newDetail = new TradeLicenseDetail();
+	    BeanUtils.copyProperties(oldLicense.getTradeLicenseDetail(), newDetail);
+
+	    newDetail.setId(UUID.randomUUID().toString());
+	    newDetail.setAuditDetails(renewal.getAuditDetails());
+	    // ---- Trade Units ----
+	    if (newDetail.getTradeUnits() != null) {
+	        newDetail.getTradeUnits().forEach(u ->
+	                u.setId(UUID.randomUUID().toString())
+	        );
+	    }
+	    // ---- Address ----
+	    if (newDetail.getAddress() != null) {
+	        newDetail.getAddress().setId(UUID.randomUUID().toString());
+	    }
+	    renewal.setTradeLicenseDetail(newDetail);
+	    return renewal;
+	}
+	//--------
     /**
      * Returns a list of numbers generated from idgen
      *
