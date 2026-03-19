@@ -49,7 +49,7 @@ public class UmeedDashboardService {
 		if (null != umeedDashboardDataMatrics
 				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
 			UmeedDashboardRequest umeedDashboardRequest = UmeedDashboardRequest.builder()
-					.requestInfo(umeedDashboardRequestInfo)
+					.RequestInfo(umeedDashboardRequestInfo)
 					.data(objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")).build();
 
 			log.info("Request Payload {}", umeedDashboardRequest);
@@ -81,7 +81,7 @@ public class UmeedDashboardService {
 		if (null != umeedDashboardDataMatrics
 				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
 			UmeedDashboardRequest umeedDashboardRequest = UmeedDashboardRequest.builder()
-					.requestInfo(umeedDashboardRequestInfo)
+					.RequestInfo(umeedDashboardRequestInfo)
 					.data(objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")).build();
 
 			log.info("Request Payload {}", umeedDashboardRequest);
