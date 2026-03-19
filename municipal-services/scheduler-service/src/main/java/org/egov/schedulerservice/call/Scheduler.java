@@ -159,11 +159,12 @@ public class Scheduler {
 		log.info("pushUmeedDashboardMetricsForTL CRON JOB Ends");
 	}
 	
-	//@Scheduled(cron = "${cron.job.default.umeed.dashboard.tl.data.matrics.sender}", zone = "IST")
+	//PGR
+	@Scheduled(cron = "${cron.job.default.umeed.dashboard.pgr.data.matrics.sender}", zone = "IST")
 	public void pushUmeedDashboardMetricsForPGR() {
 		log.info("pushUmeedDashboardMetricsForPGR CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
-//		umeedDashboardService.pushUmeedDashboardMetricsForPGR(requestInfo);
+		umeedDashboardService.pushUmeedDashboardMetricsForPGR(requestInfo);
 		log.info("pushUmeedDashboardMetricsForPGR CRON JOB Ends");
 	}
 	

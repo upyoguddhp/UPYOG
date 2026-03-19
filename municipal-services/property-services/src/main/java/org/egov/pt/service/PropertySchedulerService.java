@@ -1358,6 +1358,7 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
     String[] tenants = {"hp.Shimla", "hp.Solan"};
 
     // 1️⃣ All bills collect
+    String ulbName = null; 
     List<Map<String, Object>> bills = new ArrayList<>();
 
     for (String tenant : tenants) {
@@ -1380,7 +1381,10 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
     for (Map<String, Object> bill : bills) {
 
         String wardName = String.valueOf(bill.get("ward"));
-
+        ulbName  =  String.valueOf(bill.get("tenantid"));
+        if (ulbName != null && ulbName.contains(".")) {
+        	ulbName = ulbName.split("\\.")[1];
+        }
         billsByUlb
                 .computeIfAbsent(wardName, k -> new ArrayList<>())
                 .add(bill);
@@ -1401,7 +1405,10 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
             String propertyId = String.valueOf(bill.get("propertyid"));
             String billId = String.valueOf(bill.get("bill_id"));
             String status = String.valueOf(bill.get("bill_status"));
-
+            String UlbNames = String.valueOf(bill.get("tenantId"));
+            if (UlbNames != null && UlbNames.contains(".")) {
+                UlbNames = UlbNames.split("\\.")[1];
+            }
             ResponseEntity<Resource> billResponse =
                     propertyService.generatePropertyTaxBillReceipt(
                             requestInfoWrapper,
@@ -1436,7 +1443,7 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
         // 7️⃣ Prepare DMS request
         DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(
                 resource,
-                wardName,
+                wardName,ulbName,
                 requestInfoWrapper.getRequestInfo()
         );
 
@@ -1463,7 +1470,7 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
 
 
 private DmsRequest generateDmsRequestFromBulkBillUpload(
-        Resource resource, String wardName,
+        Resource resource, String wardName,String ulbName,
         RequestInfo requestInfo) {
     return DmsRequest.builder()
             .userId(requestInfo.getUserInfo().getId().toString())
@@ -1478,7 +1485,8 @@ private DmsRequest generateDmsRequestFromBulkBillUpload(
             .servicetype(PTConstants.BUSINESS_SERVICE)
             .documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
             .documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID)
-            .wardName(wardName)
+            .ward_name(wardName)
+            .ulb_name(ulbName)
             .build();
     
 }

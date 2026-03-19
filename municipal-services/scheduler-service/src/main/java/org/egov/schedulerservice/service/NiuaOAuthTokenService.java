@@ -52,8 +52,8 @@ public class NiuaOAuthTokenService {
 			// Headers
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			headers.setAccept(MediaType.parseMediaTypes(acceptHeader));
-			headers.set("authorization", authorizationHeader);
+			headers.setAccept(MediaType.parseMediaTypes(acceptHeader));		
+			headers.set("Authorization", authorizationHeader);
 
 			// Body
 			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
