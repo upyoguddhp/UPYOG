@@ -28,7 +28,7 @@ public class DmsRequest {
 	private String servicetype;
 	private String documentType;
 	private Long documentId;
-	private String ulbname;
-	private String  wardName;
+	private String ulb_name;
+	private String  ward_name;
 	
 }
