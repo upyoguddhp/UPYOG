@@ -11,7 +11,7 @@ import lombok.Data;
 @Builder
 public class UmeedDashboardRequest {
 
-	private RequestInfo RequestInfo;
+	private RequestInfo requestInfo;
 	@JsonProperty("Data")
 	private Object data;
 
