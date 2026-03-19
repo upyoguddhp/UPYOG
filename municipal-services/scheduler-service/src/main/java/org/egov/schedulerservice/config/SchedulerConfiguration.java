@@ -101,6 +101,16 @@ public class SchedulerConfiguration {
 
 	@Value("${egov.notification.sms.endpoint.send-notification-sms}")
 	private String sendNotificationSmsEndpoint;
+
+	@Value("${egov.garbage.endpoint.update-penalty-amount}")
+	private String garbageUpdatePenaltyAmountEndpoint;
+	
+	@Value("${egov.garbage.endpoint.reverse-rebate-amount}")
+	private String garbageReverseRebateAmountEndpoint;
+	
+	@Value("${egov.property.endpoint.bulk-uploads}")
+	private String PropertyBulkBillUploads;
+
 	
 	
 }

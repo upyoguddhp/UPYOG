@@ -79,6 +79,20 @@ public class DemandService {
 		return savedDemands;
 	}
 	
+	public void addPenaltyTaxHead(
+	        Demand demand,
+	        String taxHeadCode,
+	        BigDecimal amount) {
+
+	    DemandDetail penaltyDetail = DemandDetail.builder()
+	        .taxHeadMasterCode(taxHeadCode)
+	        .taxAmount(amount)
+	        .collectionAmount(BigDecimal.ZERO)
+	        .build();
+
+	    demand.getDemandDetails().add(penaltyDetail);
+	}
+	
 	private String getConsumerCodeBulk(String consumerCode, String bulkType) {
 	    // generate random 2-digit number (10–99)
 	    int randomNum = new Random().nextInt(90) + 10;  
@@ -161,5 +175,10 @@ public class DemandService {
 //        }
          return demandRepository.updateDemand(requestInfo,demands);
     }
+    
+    public void updateDemand(RequestInfo requestInfo, List<Demand> demands) {
+        demandRepository.updateDemand(requestInfo, demands);
+    }
+
 
 }

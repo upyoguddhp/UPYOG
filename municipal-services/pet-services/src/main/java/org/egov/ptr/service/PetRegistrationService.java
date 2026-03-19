@@ -250,38 +250,38 @@ public class PetRegistrationService {
 
 	private void createAndUploadPDF(PetRegistrationRequest petRegistrationRequest) {
 		
-//		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
-//			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
-//
-////				Thread pdfGenerationThread = new Thread(() -> {
-//
-//					// for NEW TL
-//					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
-//
-//						// validate trade license
-//						validatePetCertificateGeneration(petApplication);
-//
-//						// create pdf
-//						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
-//
-//						//upload pdf
-//						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
-//								petRegistrationRequest.getRequestInfo());
-//						try {
-//							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
-//									petRegistrationRequest.getRequestInfo());
-//						} catch (IOException e) {
-//							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
-//									"Upload Attachment failed." + e.getMessage());
-//						}
-//					}
-//
-////				});
-//
-////				pdfGenerationThread.start();
-//
-//			});
-//		}
+		if (!CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications())) {
+			petRegistrationRequest.getPetRegistrationApplications().stream().forEach(petApplication -> {
+
+//				Thread pdfGenerationThread = new Thread(() -> {
+
+					// for NEW TL
+					if (StringUtils.equalsIgnoreCase(petApplication.getWorkflow().getAction(), PTRConstants.WORKFLOW_ACTION_APPROVE)) {
+
+						// validate trade license
+						validatePetCertificateGeneration(petApplication);
+
+						// create pdf
+						Resource resource = createNoSavePDF(petApplication, petRegistrationRequest.getRequestInfo());
+
+						//upload pdf
+						DmsRequest dmsRequest = generateDmsRequestByPetApplication(resource, petApplication,
+								petRegistrationRequest.getRequestInfo());
+						try {
+							DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest,
+									petRegistrationRequest.getRequestInfo());
+						} catch (IOException e) {
+							throw new CustomException("UPLOAD_ATTACHMENT_FAILED",
+									"Upload Attachment failed." + e.getMessage());
+						}
+					}
+
+//				});
+
+//				pdfGenerationThread.start();
+
+			});
+		}
 		
 		
 	}
@@ -635,7 +635,23 @@ public class PetRegistrationService {
 			
 			mdmsrequest.setPetRegistrationApplications(petApplications);			
 
-			BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			//BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			
+			BigDecimal taxAmount;
+
+			String applicationType = petRegistrationApplication.getApplicationType();
+
+			if (PTRConstants.APPLICATION_TYPE_RENEWAL
+			        .equalsIgnoreCase(applicationType)) {
+
+			    //  Renewal → MDMS v2
+			    taxAmount = getFeesFromMdmsv2(mdmsrequest);
+
+			} else {
+
+			    //  NEW or null MDMS v1
+			    taxAmount = getFeesFromMdms(mdmsrequest);
+			}
 	        
 			ApplicationDetail applicationDetail = getApplicationBillUserDetail(petRegistrationApplication, ptradeLicenseActionRequest.getRequestInfo());
 			

@@ -1,5 +1,6 @@
 package org.egov.pt.repository.builder;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -883,6 +884,12 @@ public class PropertyQueryBuilder {
 			builder.append(" eptct.bill_id=? ");
 			preparedStmtList.add(criteria.getBillId());
 		}
+		
+		if (!CollectionUtils.isEmpty(criteria.getDemandIds())) {
+		    andClauseIfRequired(preparedStmtList, builder);
+		    builder.append(" eptct.demand_id IN (").append(createQuery(criteria.getDemandIds())).append(")");
+		    addToPreparedStatement(preparedStmtList, criteria.getDemandIds());
+		}
 
 		if (!CollectionUtils.isEmpty(criteria.getTenantIds())) {
 			andClauseIfRequired(preparedStmtList, builder);
@@ -918,6 +925,17 @@ public class PropertyQueryBuilder {
 			builder.append(" eptct.bill_status NOT IN (").append(createQuery(notInBillStatus)).append(")");
 			addToPreparedStatement(preparedStmtList, notInBillStatus);
 		}
+		if (criteria.getType() == "CYCLIC") {
+			andClauseIfRequired(preparedStmtList, builder);
+			builder.append(" eptct.type=? ");
+			preparedStmtList.add(criteria.getType());
+		}
+		
+//		if (criteria.getRebateamount() != BigDecimal.ZERO) {
+//			andClauseIfRequired(preparedStmtList, builder);
+//			builder.append(" eptct.rebateamount > 0.00 ");
+//			preparedStmtList.add(criteria.getType());
+//		}
 
 		return builder.toString();
 	}
@@ -1059,5 +1077,39 @@ public class PropertyQueryBuilder {
 
 		return builder.toString();
 	}
+
+
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName) {
+
+    StringBuilder builder = new StringBuilder();
+    boolean isFirstCondition = true;
+
+    builder.append("SELECT * FROM eg_pt_tax_calculator_tracker  WHERE ");
+   //builder.append("WHERE bill_status = ? ");
+    if (status != null && !status.isEmpty()) {
+        builder.append(" bill_status = ? ");
+        preparedStmtList.add(status);
+        isFirstCondition = false;
+
+     }
+    
+    if(ulbName !=null && !ulbName.isEmpty()) {
+        if (!isFirstCondition) {
+            builder.append(" AND ");
+        }
+
+    	
+        builder.append(" tenantid = ? ");
+        preparedStmtList.add(ulbName);
+
+    }
+    
+
+    builder.append("ORDER BY uuid DESC");
+
+    return builder.toString();
+}
+
+
 
 }

@@ -120,7 +120,13 @@ public class TransactionValidator {
 	}
 
 	public boolean skipGateway(Transaction transaction) {
-		return new BigDecimal(transaction.getTxnAmount()).compareTo(BigDecimal.ZERO) == 0;
+		if (new BigDecimal(transaction.getTxnAmount()).compareTo(BigDecimal.ZERO) == 0) {
+	        return true;
+	    }
+		if ("OFFLINE".equalsIgnoreCase(transaction.getGateway())) {
+	        return true;
+	    }
+		return false;
 	}
 
 	public boolean shouldGenerateReceipt(Transaction prevStatus, Transaction newStatus) {
@@ -171,9 +177,9 @@ public class TransactionValidator {
 						"A transaction for this bill has been abruptly discarded, please retry after "
 								+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
 			}
-			if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.SUCCESS)) {
-				errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
-			}
+			// if (curr.getTxnStatus().equals(Transaction.TxnStatusEnum.SUCCESS)) {
+			// 	errorMap.put("TXN_CREATE_BILL_ALREADY_PAID", "Bill has already been paid or is in pending state");
+			// }
 		}
 
 	}

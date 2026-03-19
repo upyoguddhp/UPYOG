@@ -21,12 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Scheduler {
 
 	@Autowired
-	private RequestInfoUtils requestInfoUtils;
-
-	@Autowired
-	private GarbageService garbageService;
-
-	@Autowired
 	private BillService billService;
 
 	@Autowired
@@ -46,6 +40,12 @@ public class Scheduler {
 	
 	@Autowired
 	private NotificationSmsService notificationSmsService;
+	
+	@Autowired
+    private GarbageService garbageService;
+
+    @Autowired
+    private RequestInfoUtils requestInfoUtils;
 
 	@Scheduled(cron = "${cron.job.default.garbage.bill.generator}", zone = "IST")
 	public void generateGarbageBills() {
@@ -69,6 +69,14 @@ public class Scheduler {
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
 		propertyService.generatePropertyTax(requestInfo);
 		log.info("generatePropertyTax CRON JOB Ends");
+	}
+	
+//	@scheduled(cron = "${cron.job.default.property.tax.generator}", zone="IST")testing
+	public void generatePropertyBulkBills() {
+		log.info("bill generating");	
+		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+		propertyService.generatePropertyBulkBill(requestInfo);
+		log.info("bill generated");
 	}
 
 	@Scheduled(cron = "${cron.job.default.pgr.request.escalator}", zone = "IST")
@@ -168,5 +176,24 @@ public class Scheduler {
 		notificationSmsService.sendSmsNotification(requestInfo);
 		log.info("sendSmsNotification CRON JOB Ends");
 	}
+	
+
+	@Scheduled(cron = "${cron.job.default.garbage.tracker.penalty.amount.updater}", zone = "IST")
+    public void updateGarbagePenaltyAmount() {
+        log.info("Garbage updatePenaltyAmount CRON JOB Starts");
+        RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+        garbageService.updatePenaltyAmount(requestInfo);
+        log.info("Garbage updatePenaltyAmount CRON JOB Ends");
+    }
+	
+//	@Scheduled(cron = "${cron.job.default.garbage.tracker.rebate.amount.reverser}", zone = "IST")
+	public void reverseGarbageRebateAmount() {
+		log.info("reverseRebateAmount CRON JOB Starts");
+		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+		garbageService.reverseRebateAmount(requestInfo);
+		log.info("reverseRebateAmount CRON JOB Ends");
+	}
+
+	
 
 }

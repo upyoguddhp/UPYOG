@@ -748,4 +748,11 @@ public class PropertyRepository {
 			return result;
 		});
 	}	
-}
+	
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName) { 
+		List<Object> preparedStmtList = new ArrayList<>();
+		//preparedStmtList.add(status); 
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName );
+		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
+		}
+	}
