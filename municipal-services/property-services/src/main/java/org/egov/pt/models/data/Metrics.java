@@ -29,7 +29,7 @@ public class Metrics {
 	private List<GroupedData> propertiesRegistered;
 	private List<GroupedData> assessedProperties;
 	private List<GroupedData> transactions;
-	private List<GroupedData> todaysCollection;
+	private List<GroupedData> todayCollection;
 	private List<GroupedData> propertyTax;
 	private List<GroupedData> cess;
 	private List<GroupedData> rebate;

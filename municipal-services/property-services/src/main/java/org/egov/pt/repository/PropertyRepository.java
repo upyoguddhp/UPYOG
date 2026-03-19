@@ -417,10 +417,10 @@ public class PropertyRepository {
 	
 	
 	
-	public Metrics getDataMetrics(String date, String wardName, int slaDays) {
+	public Metrics getDataMetrics(long epochStart,long epochEnd, String wardName, int slaDays) {
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getDataMetricsSearchQuery(date, wardName, slaDays, preparedStmtList);
+		String query = queryBuilder.getDataMetricsSearchQuery(epochStart,epochEnd, wardName, slaDays, preparedStmtList);
 
 		return jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), (rs, rowNum) -> {
 			Metrics metrics = new Metrics();
@@ -430,7 +430,10 @@ public class PropertyRepository {
 		    metrics.setTodaysApprovedApplications(rs.getInt("todaysApprovedApplications"));
 			metrics.setTodaysApprovedApplicationsWithinSLA(rs.getInt("todaysApprovedApplicationsWithinSLA"));
 			metrics.setPendingApplicationsBeyondTimeline(rs.getInt("pendingApplicationsBeyondTimeline"));
-			metrics.setAvgDaysForApplicationApproval(rs.getDouble("avgDaysForApplicationApproval"));
+			
+			double value = rs.getDouble("avgDaysForApplicationApproval");
+			BigDecimal rounded = BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
+			metrics.setAvgDaysForApplicationApproval(rounded.doubleValue());
 			metrics.setStipulatedDays(rs.getInt("StipulatedDays"));
 			return metrics;
 		});
@@ -504,6 +507,27 @@ public class PropertyRepository {
 
 		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
 	}
+	
+	
+	public List<String> getAllPaymentMode() {
+
+		String query = "SELECT DISTINCT paymentmode FROM egcl_payment ORDER BY paymentmode;";
+
+		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentmode"));
+	}
+	
+	
+	
+	
+	
+//	public List<String> getAllusagecategory() {
+//
+//	    String query = "SELECT DISTINCT additional_details->>'useOfBuilding' AS usagecategory " +
+//	                   "FROM eg_pt_unit " +
+//	                   "WHERE additional_details->>'useOfBuilding' IS NOT NULL";
+//
+//	    return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
+//	}
 
 	public List<String> getAllChannelsSource() {
 
@@ -558,11 +582,11 @@ public class PropertyRepository {
 //		});
 //	}
 
-	public Map<String, Long> getTodayMovedApplication(String date, String wardName) {
+	public Map<String, Long> getTodayMovedApplication(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTodaysMovedApplicationQuery(date, wardName, preparedStmtList);
+		String query = queryBuilder.getTodaysMovedApplicationQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, Long> result = new HashMap<>();
@@ -572,59 +596,6 @@ public class PropertyRepository {
 			return result;
 		});
 	}
-	
-	public Map<String, Long> getAssessedProperties(String date, String wardName) {
-
-		List<Object> preparedStmtList = new ArrayList<>();
-
-		String query = queryBuilder.getTodaysMovedApplicationQuery(date, wardName, preparedStmtList);
-
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("status"), rs.getLong("value"));
-			}
-			return result;
-		});
-	}
-	
-//	public List<Bucket> getPropertiesRegisteredByFinancialYear(String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getPropertiesRegisteredFYQuery(
-//	            wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(),
-//	            (rs, rowNum) -> {
-//
-//	                Bucket bucket = new Bucket();
-//	                bucket.setName(rs.getString("name"));
-//	                bucket.setValue(rs.getBigDecimal("value"));
-//
-//	                return bucket;
-//	    
-//	            });
-//	}
-//	
-//	
-//	public List<Bucket> getPropertiesRegisteredByFinancialYear(String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getPropertiesRegisteredFYQuery(
-//	            wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(),
-//	            (rs, rowNum) -> {
-//
-//	                Bucket bucket = new Bucket();
-//	                bucket.setName(rs.getString("name"));
-//	                bucket.setValue(rs.getBigDecimal("value"));
-//
-//	                return bucket;
-//	            });
-//	}
 	
 	
 	public Map<String, Long> getPropertiesRegisteredByFinancialYear( String wardName) {
@@ -642,210 +613,139 @@ public class PropertyRepository {
 		});
 	}
 	
-	
-	public Map<String, Long> getAssessedProperties( String wardName) {
+	public Map<String, Long> getAssessedProperties(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getPropertiesRegisteredFYQuery(wardName, preparedStmtList);
+		String query = queryBuilder.getAssessedPropertiesQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, Long> result = new HashMap<>();
 			while (rs.next()) {
-				result.put(rs.getString("FYear"), rs.getLong("value"));
+				result.put(rs.getString("name"), rs.getLong("value"));
+			}
+			return result;
+		});
+	}
+	
+	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTransactionsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("value"));
+			}
+			return result;
+		});
+	}
+	
+	public Map<String, Long> getTodayCollection(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("value"));
+			}
+			return result;
+		});
+	}
+	public Map<String, Long> getPaymentChannel(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("value"));
+			}
+			return result;
+		});
+	}
+	
+	public Map<String, Long> getPropertyTax(long epochStart, long epochEnd, String wardName
+            ) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("propertyTax"));
+			}
+			return result;
+		});
+	}
+	
+	public Map<String, Long> getCess(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("cess"));
 			}
 			return result;
 		});
 	}
 	
 	
-//	public Map<String, Long> getTodaysComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("todays_complaints"));
-//			}
-//			return result;
-//		});
-//	}
+	public Map<String, Long> getRebate(long epochStart, long epochEnd, String wardName) {
 
-//	// status
-//	public Map<String, Long> getStatus(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getStatusQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("status"), rs.getLong("value"));
-//			}
-//			return result;
-//		});
-//	}
+		List<Object> preparedStmtList = new ArrayList<>();
 
-	// need to change query
-	// channel
-//	public Map<String, Long> getChannel(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getChannelQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("channel"), rs.getLong("value"));
-//			}
-//			return result;
-//		});
-//	}
+		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-	// need to change query
-	// category
-//	public Map<String, Long> getCategory(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getCategoryQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("category"), rs.getLong("value"));
-//			}
-//			return result;
-//		});
-//	}
-
-	// Today Open Complaints
-//	public Map<String, Long> getTodayOpenComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysOpenComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("todays_complaints"));
-//			}
-//			return result;
-//		});
-//	}
-//
-//	public Map<String, Long> getTodayAssisgnedComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysAssisgnedComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("todays_complaints"));
-//			}
-//			return result;
-//		});
-//	}
-
-//	public Map<String, BigDecimal> getAverageSolutionTime(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getAverageSolutionTimeQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, BigDecimal> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"),
-//						rs.getBigDecimal("value") == null ? BigDecimal.ZERO : rs.getBigDecimal("value"));
-//			}
-//			return result;
-//		});
-//	}
-//
-//	public Map<String, Long> getTodaysRejectedComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodayRejectedCompalaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("count"));
-//			}
-//			return result;
-//		});
-//	}
-//
-//	public Map<String, Long> getTodaysReassignComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysReassignComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("count"));
-//			}
-//			return result;
-//		});
-//	}
-
-//	public Map<String, Long> getTodaysReassignrequestComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysReassignrequestComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("value"));
-//			}
-//			return result;
-//		});
-//	}
-
-//	public Map<String, Long> getTodaysClosedComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysClosedComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("value"));
-//			}
-//			return result;
-//		});
-//	}
-
-//	public Map<String, Long> getTodaysResolvedComplaints(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTodaysResolvedComplaintsQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("count"));
-//			}
-//			return result;
-//		});
-//	}
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("rebate"));
+			}
+			return result;
+		});
+	}
 	
+	public Map<String, Long> getPenalty(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("penalty"));
+			}
+			return result;
+		});
+	}
 	
-	
+	public Map<String, Long> getInterest(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("interest"));
+			}
+			return result;
+		});
+	}	
 }

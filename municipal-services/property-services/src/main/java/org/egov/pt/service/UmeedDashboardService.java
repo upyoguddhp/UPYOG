@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.egov.pt.config.PropertyConfiguration;
@@ -36,6 +37,24 @@ public class UmeedDashboardService {
 	@Autowired
 	private PropertyRepository PropertyRepository;
 
+	//epoch conversion
+	private long[] getEpochRange(String date) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		LocalDate localDate = LocalDate.parse(date, formatter);
+
+		long startEpoch = localDate.atStartOfDay().atZone(java.time.ZoneId.of("Asia/Kolkata")).toInstant()
+				.toEpochMilli();
+
+		long endEpoch = localDate.plusDays(1).atStartOfDay().atZone(java.time.ZoneId.of("Asia/Kolkata")).toInstant()
+				.toEpochMilli();
+
+		return new long[] { startEpoch, endEpoch };
+	}
+	
+	
+	
 	public UmeedDashboardResponse prepareDataMetrics(RequestInfoWrapper requestInfoWrapper) {
 
 		int slaDays = Optional.ofNullable(propertyConfiguration.getUmeedDashboardSlaDays()).orElse(7);
@@ -67,7 +86,11 @@ public class UmeedDashboardService {
 				continue;
 			}
 
-			List<DataItem> processedItems = dataItems.stream()
+//			List<DataItem> processedItems = dataItems.stream()
+//					.map(dataItem -> buildDataItemMetrics(dataItem, formattedDate, slaDays))
+//					.collect(Collectors.toList());
+
+			List<DataItem> processedItems = dataItems.parallelStream()
 					.map(dataItem -> buildDataItemMetrics(dataItem, formattedDate, slaDays))
 					.collect(Collectors.toList());
 
@@ -81,58 +104,107 @@ public class UmeedDashboardService {
 		return UmeedDashboardResponse.builder().data(allProcessedItems).build();
 	}
 
+	private final Map<String, Metrics> metricsCache = new ConcurrentHashMap<>();
+
+//	private DataItem buildDataItemMetrics(DataItem dataItem, String date, int slaDays) {
+//
+//		DataItem returnObj = DataItem.builder().date(date).module("PT").state("Himachal Pradesh")
+//				// .ward(dataItem.getWard())
+//				.ward(dataItem.getWard().matches("^\\d+$") ? "Ward" + dataItem.getWard() : dataItem.getWard())
+//				.region(dataItem.getRegion()).ulb(ULBMappings.getCode(dataItem.getUlb())).ulbCode("123456").build();
+//
+//		// Metrics metrics = PropertyRepository.getDataMetrics(date,
+//		// returnObj.getWard(), slaDays);
+//		String cacheKey = date + "_" + returnObj.getWard();
+//		
+//		
+//
+//		Metrics metrics = metricsCache.get(cacheKey);
+//
+//			if (metrics == null) {
+//				metrics = PropertyRepository.getDataMetrics(date, returnObj.getWard(), slaDays);
+//				metricsCache.put(cacheKey, metrics);
+//			}
+//		// Today Moved Application
+//		metrics.setTodaysMovedApplications(buildTodaysMovedApplication(date, returnObj.getWard()));
+//
+//		// PropertyRegistered
+//		metrics.setPropertiesRegistered(buildPropertyRegistered(returnObj.getWard()));
+//
+//		// Assessed Properties
+//		metrics.setAssessedProperties(buildAssessedProperties(date, returnObj.getWard()));
+//
+//		// Transactions
+//		metrics.setTransactions(buildTransaction(date, returnObj.getWard()));
+//
+//		// Today Collection
+//		metrics.setTodayCollection(buildTodayCollection(date, returnObj.getWard()));
+//
+//		// Property Tax
+//		metrics.setPropertyTax(buildPropertyTax(date, returnObj.getWard()));
+////		metrics.setPropertyTax(buildPropertyTax(date, returnObj.getWard(), returnObj.getUlb(), returnObj.getRegion()));
+//
+//		// Cess
+//		metrics.setCess(buildCess(date, returnObj.getWard()));
+//
+//		//rebate
+//		metrics.setRebate(buildRebate(date, returnObj.getWard()));
+//
+//		//Penalty
+//		metrics.setPenalty(buildPenalty(date, returnObj.getWard()));
+//
+//		// Today Reassign Requested Complaints
+//		metrics.setInterest(buildInterest(date, returnObj.getWard()));
+//
+//		returnObj.setMetrics(metrics);
+//		return returnObj;
+//
+//		// Departments Data
+//	}
+	
 	private DataItem buildDataItemMetrics(DataItem dataItem, String date, int slaDays) {
 
 		DataItem returnObj = DataItem.builder().date(date).module("PT").state("Himachal Pradesh")
-				// .ward(dataItem.getWard())
 				.ward(dataItem.getWard().matches("^\\d+$") ? "Ward" + dataItem.getWard() : dataItem.getWard())
 				.region(dataItem.getRegion()).ulb(ULBMappings.getCode(dataItem.getUlb())).ulbCode("123456").build();
 
+		long[] epochRange = getEpochRange(date);
+		long startEpoch = epochRange[0];
+		long endEpoch = epochRange[1];
+
+		String cacheKey = date + "_" + returnObj.getWard();
+
+		Metrics metrics = metricsCache.get(cacheKey);
+
+		if (metrics == null) {
+			metrics = PropertyRepository.getDataMetrics(startEpoch, endEpoch, returnObj.getWard(), slaDays);
+			metricsCache.put(cacheKey, metrics);
+		}
+
+		metrics.setTodaysMovedApplications(buildTodaysMovedApplication(startEpoch, endEpoch, returnObj.getWard()));
+
+		metrics.setPropertiesRegistered(buildPropertyRegistered(returnObj.getWard()));
+
+		metrics.setAssessedProperties(buildAssessedProperties(startEpoch, endEpoch, returnObj.getWard()));
+
+		metrics.setTransactions(buildTransaction(startEpoch, endEpoch, returnObj.getWard()));
+
+		metrics.setTodayCollection(buildTodayCollection(startEpoch, endEpoch, returnObj.getWard()));
+
+		metrics.setPropertyTax(buildPropertyTax(startEpoch, endEpoch, returnObj.getWard()));
 		
-		Metrics metrics = PropertyRepository.getDataMetrics(date, returnObj.getWard(), slaDays);
+		metrics.setCess(buildCess(startEpoch, endEpoch, returnObj.getWard()));
+		
+		metrics.setRebate(buildRebate(startEpoch, endEpoch, returnObj.getWard()));
+		
+		metrics.setPenalty(buildPenalty(startEpoch, endEpoch, returnObj.getWard()));
+		
+		metrics.setInterest(buildInterest(startEpoch, endEpoch, returnObj.getWard()));
 
-		//Today Moved Application
-		metrics.setTodaysMovedApplications(buildTodaysMovedApplication(date,returnObj.getWard()));
-//
-//		// PropertyRegistered
-		//metrics.setPropertiesRegistered(buildPropertyRegistered( returnObj.getWard()));
-//
-//		// Assessed Properties
-		metrics.setAssessedProperties(buildAssessedProperties(date, returnObj.getWard()));
-//
-//		// Transactions
-		metrics.setTransactions(buildTransaction(date, returnObj.getWard()));
-//
-//		// Today Open Complaints
-//		metrics.setTodaysOpenComplaints(buildTodayOpenComplaints(date, returnObj.getWard()));
-//
-//		// Today Assigned Complaints
-//		metrics.setTodaysAssisgnedComaplaints(buildTodaysAssignedComaplaints(date, returnObj.getWard()));
-//
-//		// Average Solution Time
-//		metrics.setAverageSolutionTime(buildAverageSolutionTime(date, returnObj.getWard()));
-//
-//		// Today Rejected Complaints
-//		metrics.setTodaysRejectedComplaints(buildTodayRejectedComplaints(date, returnObj.getWard()));
-//
-//		// Today Reassign Complaints
-//		metrics.setTodaysReassignComplaints(buildTodayReassingComplaints(date, returnObj.getWard()));
-//
-//		// Today Reassign Requested Complaints
-//		metrics.setTodaysReassignRequestedComplaints(buildTodayReassingRequestedComplaints(date, returnObj.getWard()));
-//
-//		// Today Closed Complaints
-//		metrics.setTodaysClosedComplaints(buildTodayClosedComplaints(date, returnObj.getWard()));
-//
-//		// Today Resolved Complaints
-//		metrics.setTodaysResolvedComplaints(buildTodayResolvedComplaints(date, returnObj.getWard()));
 		returnObj.setMetrics(metrics);
+
 		return returnObj;
-
-		// Departments Data
 	}
-	
-
 	// All Application Status
 	private List<GroupedData> buildApplicationStatusMetrics(Map<String, Long> deptWiseData, String groupBy) {
 
@@ -149,8 +221,17 @@ public class UmeedDashboardService {
 		return Collections.singletonList(groupedData);
 	}
 	
-	
-	
+	private GroupedData buildGenericMetrics(Map<String, Long> data, String groupBy, List<String> masterList) {
+
+		final Map<String, Long> safeData = Optional.ofNullable(data).orElse(Collections.emptyMap());
+
+		List<Bucket> buckets = masterList.stream().map(
+				item -> Bucket.builder().name(item).value(BigDecimal.valueOf(safeData.getOrDefault(item, 0L))).build())
+				.collect(Collectors.toList());
+
+		return GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
+	}
+
 	private List<GroupedData> buildFYMetrics(Map<String, Long> FYData, String groupBy) {
 
 		final Map<String, Long> safeData = Optional.ofNullable(FYData).orElse(Collections.emptyMap());
@@ -165,8 +246,7 @@ public class UmeedDashboardService {
 
 		return Collections.singletonList(groupedData);
 	}
-	
-	
+
 	private List<GroupedData> buildAssessedPropertiesMetrics(Map<String, Long> deptWiseData, String groupBy) {
 
 		final Map<String, Long> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
@@ -181,241 +261,89 @@ public class UmeedDashboardService {
 
 		return Collections.singletonList(groupedData);
 	}
-	
-	
-//	private List<GroupedData> buildAssessedProperties(Map<String, Long> categoryData, String groupBy) {
-//
-//		final Map<String, Long> safeData = Optional.ofNullable(categoryData).orElse(Collections.emptyMap());
-//
-//		List<String> allCategories = PropertyRepository.getAllusagecategory();
-//
-//		List<Bucket> buckets = allCategories.stream().map(
-//				dept -> Bucket.builder().name(dept).value(BigDecimal.valueOf(safeData.getOrDefault(dept, 0L))).build())
-//				.collect(Collectors.toList());
-//
-//		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
-//
-//		return Collections.singletonList(groupedData);
-//	}
-//	private List<GroupedData> buildPropertyRegisteredMetrics(Map<String, Long> deptWiseData, String groupBy) {
-//
-//		final Map<String, Long> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
-//
-//		List<String> allStatus = PropertyRepository.getAllStatuses();
-//
-//		List<Bucket> buckets = allStatus.stream().map(
-//				dept -> Bucket.builder().name(dept).value(BigDecimal.valueOf(safeData.getOrDefault(dept, 0L))).build())
-//				.collect(Collectors.toList());
-//
-//		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
-//
-//		return Collections.singletonList(groupedData);
-//	}
-	
-	
-//	private List<GroupedData> buildPropertyRegisteredMetrics(
-//	        Map<String, Long> financialYearData,
-//	        String groupBy) {
-//
-//	    final Map<String, Long> safeData =
-//	            Optional.ofNullable(financialYearData)
-//	                    .orElse(Collections.emptyMap());
-//
-//	    List<Bucket> buckets = safeData.entrySet()
-//	            .stream()
-//	            .sorted(Map.Entry.comparingByKey())   // Sort FY ascending
-//	            .map(entry -> Bucket.builder()
-//	                    .name(entry.getKey())
-//	                    .value(BigDecimal.valueOf(entry.getValue()))
-//	                    .build())
-//	            .collect(Collectors.toList());
-//
-//	    GroupedData groupedData = GroupedData.builder()
-//	            .groupBy(groupBy)      // should be "financialYear"
-//	            .buckets(buckets)
-//	            .build();
-//
-//	    return Collections.singletonList(groupedData);
-//	}
-	
-	
 
-//// GenericMetrics
-//	private GroupedData buildGenericMetrics(Map<String, Long> data, String groupBy, List<String> masterList) {
-//
-//		final Map<String, Long> safeData = Optional.ofNullable(data).orElse(Collections.emptyMap());
-//
-//		List<Bucket> buckets = masterList.stream().map(
-//				item -> Bucket.builder().name(item).value(BigDecimal.valueOf(safeData.getOrDefault(item, 0L))).build())
-//				.collect(Collectors.toList());
-//
-//		return GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
-//	}
-
-//	// Decimal Data
-//	private List<GroupedData> buildDepartmentWiseDecimalMetrics(Map<String, BigDecimal> deptWiseData, String groupBy) {
-//
-//		final Map<String, BigDecimal> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
-//
-//		List<String> allDepartments = PropertyRepository.getAllDepartments();
-//
-//		List<Bucket> buckets = allDepartments.stream()
-//				.map(dept -> Bucket.builder().name(dept).value(safeData.getOrDefault(dept, BigDecimal.ZERO)).build())
-//				.collect(Collectors.toList());
-//
-//		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
-//
-//		return Collections.singletonList(groupedData);
-//	}
 //--------------------Group data-------------------------------------
-	// Today Moved Applications 
-	private List<GroupedData> buildTodaysMovedApplication(String date, String wardName) {
+	// Today Moved Applications
+	private List<GroupedData> buildTodaysMovedApplication(long epochStart, long epochEnd, String wardName) {
 
-		Map<String, Long> data = PropertyRepository.getTodayMovedApplication(date, wardName);
+		Map<String, Long> data = PropertyRepository.getTodayMovedApplication(epochStart, epochEnd, wardName);
 
 		return buildApplicationStatusMetrics(data, "ApplicationStatus");
 	}
-	
-	private List<GroupedData> buildPropertyRegistered( String wardName) {
 
-		Map<String, Long> data = PropertyRepository.getPropertiesRegisteredByFinancialYear( wardName);
+	private List<GroupedData> buildPropertyRegistered(String wardName) {
+
+		Map<String, Long> data = PropertyRepository.getPropertiesRegisteredByFinancialYear(wardName);
 
 		return buildFYMetrics(data, "FinancialYear");
 	}
-	
-	
-	private List<GroupedData>buildAssessedProperties(String date, String wardName) {
 
-		Map<String, Long> data = PropertyRepository.getAssessedProperties(date, wardName);
+	private List<GroupedData> buildAssessedProperties(long epochStart, long epochEnd, String wardName) {
 
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-	//Transaction
-	private List<GroupedData>buildTransaction(String date, String wardName) {
-
-		Map<String, Long> data = PropertyRepository.getAssessedProperties(date, wardName);
+		Map<String, Long> data = PropertyRepository.getAssessedProperties(epochStart, epochEnd, wardName);
 
 		return buildAssessedPropertiesMetrics(data, "usageCategory");
 	}
-	
 
-//	 Completion Rate
-//		private List<GroupedData> buildPropertyRegisteredMetrics( String wardName) {
-//
-//			Map<String, BigDecimal> data = PropertyRepository.getPropertiesRegisteredByFinancialYear(wardName);
-//
-//			return buildDepartmentWiseDecimalMetrics(data, "department");
-//		}
+	
+	private List<GroupedData> buildTransaction(long epochStart, long epochEnd, String wardName) {
+
+	    Map<String, Long> data = PropertyRepository.getTransactions(epochStart, epochEnd, wardName);
+
+	    return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
+	 
+	//Today Collection
+	private List<GroupedData> buildTodayCollection(long epochStart, long epochEnd, String wardName) {
+List<GroupedData> response = new ArrayList<>();
+	
+		Map<String, Long> data = PropertyRepository.getTodayCollection(epochStart, epochEnd, wardName);
+	response.add(buildGenericMetrics(data, "usageCategory", PropertyRepository.getAllusagecategory()));
 		
-//		
-//		private List<GroupedData> buildPropertyRegisteredMetrics(String wardName) {
-//
-//		    List<Bucket> buckets =
-//		            PropertyRepository.getPropertiesRegisteredByFinancialYear(wardName);
-//
-//		    GroupedData groupedData = GroupedData.builder()
-//		            .groupBy("financialYear")
-//		            .buckets(buckets)
-//		            .build();
-//
-//		    return Collections.singletonList(groupedData);
-//		}
+		Map<String, Long> channelData = PropertyRepository.getPaymentChannel(epochStart, epochEnd, wardName);
+		response.add(buildGenericMetrics(channelData, "PaymentChannelType", PropertyRepository.getAllPaymentMode()));
+		
+		return  response;
+	}
 
-	// Today complaints
-//	private List<GroupedData> buildTodayComplaint(String date, String wardName) {
-//
-//		List<GroupedData> response = new ArrayList<>();
-//
-//		// Status Wise
-//		Map<String, Long> statusData = PropertyRepository.getStatus(date, wardName);
-//		response.add(buildGenericMetrics(statusData, "status", PropertyRepository.getAllStatuses()));
-//
-//		// Channel Wise
-//		Map<String, Long> channelData = PropertyRepository.getChannel(date, wardName);
-//		response.add(buildGenericMetrics(channelData, "channel", PropertyRepository.getAllChannelsSource()));
-//
-//		// Department Wise
-//		Map<String, Long> deptData = PropertyRepository.getTodaysComplaints(date, wardName);
-//		response.add(buildGenericMetrics(deptData, "department", PropertyRepository.getAllDepartments()));
-//
-//		// Category Wise
-//		Map<String, Long> categoryData = PropertyRepository.getCategory(date, wardName);
-//		response.add(buildGenericMetrics(categoryData, "category", PropertyRepository.getAllCategories()));
-//
-//		return response;
-//	}
+	//Property Tax
+	private List<GroupedData> buildPropertyTax(long epochStart, long epochEnd, String wardName) {
 
-//	// Today Reopened Complaints
-//	private List<GroupedData> buildTodayReopenedComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysReopenedComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
+		Map<String, Long> data = PropertyRepository.getPropertyTax(epochStart, epochEnd, wardName);
 
-//	// Today Open Complaints
-//	private List<GroupedData> buildTodayOpenComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodayOpenComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
-
-//	// Today Assigned Complaints
-//	private List<GroupedData> buildTodaysAssignedComaplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodayAssisgnedComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
-
-	// Average Solution Time
-//	private List<GroupedData> buildAverageSolutionTime(String date, String wardName) {
-//
-//		Map<String, BigDecimal> data = PropertyRepository.getAverageSolutionTime(date, wardName);
-//
-//		return buildDepartmentWiseDecimalMetrics(data, "department");
-//	}
-
-//	// Today Reject Complaints
-//	private List<GroupedData> buildTodayRejectedComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysRejectedComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-	//}
-
-	// Today Reassign Complaints
-//	private List<GroupedData> buildTodayReassingComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysReassignComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
-
-	// Today Reassign Request Complaints
-//	private List<GroupedData> buildTodayReassingRequestedComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysReassignrequestComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
-
-	// Today Closed Complaints
-//	private List<GroupedData> buildTodayClosedComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysClosedComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
-
-	// Today Resolved Complaints
-//	private List<GroupedData> buildTodayResolvedComplaints(String date, String wardName) {
-//
-//		Map<String, Long> data = PropertyRepository.getTodaysResolvedComplaints(date, wardName);
-//
-//		return buildDepartmentWiseMetrics(data, "department");
-//	}
+		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
 	
+	//Cess
+	private List<GroupedData> buildCess(long epochStart, long epochEnd, String wardName) {
+
+		Map<String, Long> data = PropertyRepository.getCess(epochStart, epochEnd, wardName);
+
+		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
+	
+	//Rebate
+	private List<GroupedData> buildRebate(long epochStart, long epochEnd, String wardName) {
+
+		Map<String, Long> data = PropertyRepository.getRebate(epochStart, epochEnd, wardName);
+
+		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
+	
+	//Penalty
+	private List<GroupedData> buildPenalty(long epochStart, long epochEnd, String wardName) {
+
+		Map<String, Long> data = PropertyRepository.getPenalty(epochStart, epochEnd, wardName);
+
+		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
+	
+	//Interest
+	private List<GroupedData> buildInterest(long epochStart, long epochEnd, String wardName) {
+
+		Map<String, Long> data = PropertyRepository.getInterest(epochStart, epochEnd, wardName);
+
+		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	}
+
 }
-//------------------------

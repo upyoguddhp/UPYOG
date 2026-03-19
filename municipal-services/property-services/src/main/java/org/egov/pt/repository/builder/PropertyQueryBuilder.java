@@ -208,161 +208,67 @@ public class PropertyQueryBuilder {
 			+ "  'ULBS.BuildingUse', " + "  'ULBS.OverAllRebate', " + "  'ULBS.PenaltyRate', "
 			+ "  'ULBS.EarlyPaymentRebate', " + "  'PropertyTaxRate.PropertyTaxRate' " + ") ";
 
-//	private static final String DATA_METRICS_SEARCH_QUERY =
-//
-//		    "SELECT COUNT(*) AS todaysTotalApplications " +
-//		    "FROM eg_pt_property p " +
-//		    "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-//		    "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = " +
-//		    "TO_DATE(?,'DD-MM-YYYY') " +
-//		    "AND addr.additionaldetails->>'wardNumber' = ? ";
-//	
-//	
-//
-//	
-//	public String getDataMetricsSearchQuery(String date, String wardName, int slaDays, List<Object> preparedStmtList) {
-//		StringBuilder builder = new StringBuilder(DATA_METRICS_SEARCH_QUERY);
-//		// sequence should be same for preparedStmtList.add
-//		preparedStmtList.add(date);
-//		
-//
-//		return builder.toString();
-//	}
-//	
+	// --------------------------
+	private static final String DATA_METRICS_SEARCH_QUERY = "SELECT " +
 
-//	private static final String DATA_METRICS_SEARCH_QUERY =
-//
-//			"SELECT COUNT(*) AS todaysTotalApplications "
-//					+ "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = " + "TO_DATE(?,'DD-MM-YYYY') "
-//					
-//					
-//					
-//					+ "FROM eg_pt_property p "
-//					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-//					+ "AND addr.additionaldetails->>'wardNumber' = ? ";
+	// 1️ Total Applications Created Today
+			"COUNT(CASE WHEN p.createdtime BETWEEN ? AND ? THEN 1 END) AS todaysTotalApplications, " +
 
-//	
-//	private static final String DATA_METRICS_SEARCH_QUERY =
-//		    "SELECT COUNT(*) AS todaysTotalApplications "
-//		    + "FROM eg_pt_property p "
-//		    + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-//		    + "WHERE TO_TIMESTAMP(p.createdtime/1000)::date = "
-//		    + "TO_DATE(?,'DD-MM-YYYY') "
-//		    + "AND addr.additionaldetails->>'wardNumber' = ? ";
+			// 2️ Total Closed Today
+			"COUNT(CASE WHEN p.status IN ('APPROVED') AND p.lastmodifiedtime BETWEEN ? AND ? THEN 1 END) AS todaysClosedApplications, "
+			+
 
-//	private static final String DATA_METRICS_SEARCH_QUERY = "SELECT "
-//			// total Application
-//			+ "COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
-//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, "
-//
-//			// total close
-//			+ "COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications "
-//			
-//			//Total Approved
-//			+ "COUNT(CASE WHEN p.status = 'APPROVED' "
-//			+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-//			+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications"
-//			
-//			
-//			+ "FROM eg_pt_property p "
-//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-//
-//			+ "WHERE addr.additionaldetails->>'wardNumber' = ? ";
+			// 3️ Total Approved Today
+			"COUNT(CASE WHEN p.status = 'APPROVED' "
+			+ "AND p.lastmodifiedtime BETWEEN ? AND ? THEN 1 END) AS todaysApprovedApplications, " +
 
-//	private static final String DATA_METRICS_SEARCH_QUERY =
-//
-//			"SELECT " +
-//
-//					// 1️ Total Applications Created Today
-//					"COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
-//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, " +
-//
-//					// 2️ Total Closed Today
-//					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications, " +
-//
-//					// 3️ Total Approved Today
-//					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-//					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications " +
-//
-//					// 4 Approved Today Within SLA
-//					"COUNT(CASE WHEN p.status = 'APPROVED' "
-//					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) >= TO_DATE(?,'DD-MM-YYYY') "
-//					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) < TO_DATE(?,'DD-MM-YYYY') + INTERVAL '1 day' "
-//					+ "AND ((p.lastmodifiedtime - p.createdtime) / 86400000) <= ? "
-//					+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
-//
-//					// 5 Pending Beyond Timeline
-//					"COUNT(CASE WHEN p.status NOT IN ('APPROVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') "
-//					+ "AND ((EXTRACT(EPOCH FROM NOW())*1000 - p.createdtime) / 86400000) > ? "
-//					+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
-//
-//					// 6 Average Approval Days
-//					"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
-//					+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END),0) "
-//					+ "AS avgDaysForApplicationApproval, " +
-//
-//					"FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-//
-//					"WHERE addr.additionaldetails->>'wardNumber' = ? ";
+			// 4️ Approved Today Within SLA
+			"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND p.lastmodifiedtime BETWEEN ? AND ? "
+			+ "AND ((p.lastmodifiedtime - p.createdtime) / 86400000) <= ? "
+			+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
 
-	private static final String DATA_METRICS_SEARCH_QUERY =
+			// 5️ Pending Beyond Timeline
+			"COUNT(CASE WHEN p.status NOT IN ('APPROVED','PENDINGFORAPPROVAL') "
+			+ "AND ((EXTRACT(EPOCH FROM NOW())*1000 - p.createdtime) / 86400000) > ? "
+			+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
 
-			"SELECT " +
+			// 6️ Average Approval Days
+			
+			"AVG(TO_TIMESTAMP(p.lastmodifiedtime/1000)::DATE - TO_TIMESTAMP(p.createdtime/1000)::DATE) AS avgDaysForApplicationApproval, "
+//			"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
+//			+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000) END),2) AS avgDaysForApplicationApproval, "
 
-			// 1 Total Applications Created Today
-					"COUNT(CASE WHEN TO_TIMESTAMP(p.createdtime/1000)::date = "
-					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysTotalApplications, " +
-
-					// 2 Total Closed Today
-					"COUNT(CASE WHEN p.status IN ('APPROVED') " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysClosedApplications, " +
-
-					// 3 Total Approved Today
-					"COUNT(CASE WHEN p.status = 'APPROVED' " + "AND TO_TIMESTAMP(p.lastmodifiedtime/1000)::date = "
-					+ "TO_DATE(?,'DD-MM-YYYY') THEN 1 END) AS todaysApprovedApplications, " +
-
-					// 4 Approved Today Within SLA
-					"COUNT(CASE WHEN p.status = 'APPROVED' "
-					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) >= TO_DATE(?,'DD-MM-YYYY') "
-					+ "AND TO_TIMESTAMP(p.lastmodifiedtime/1000) < TO_DATE(?,'DD-MM-YYYY') + INTERVAL '1 day' "
-					+ "AND ((p.lastmodifiedtime - p.createdtime) / 86400000) <= ? "
-					+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
-
-					// 5 Pending Beyond Timeline
-					"COUNT(CASE WHEN p.status NOT IN ('APPROVED','PENDINGFORAPPROVAL') "
-					+ "AND ((EXTRACT(EPOCH FROM NOW())*1000 - p.createdtime) / 86400000) > ? "
-					+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
-
-					// 6 Average Approval Days
-					"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
-					+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END),0) "
-					+ "AS avgDaysForApplicationApproval, " +
-
-					// 7
-					"? AS StipulatedDays " +
-
-					"FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE addr.additionaldetails->>'wardNumber' = ? ";
+			// 7️ SLA Days
+			+ "? AS StipulatedDays " 
+			+"FROM eg_pt_property p "
+			+"JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+"WHERE addr.additionaldetails->>'wardNumber' = ? ";
 
 	private static final String TODAYS_MOVED_APPLICATION_QUERY = "SELECT p.status AS status, COUNT(*) AS value "
-			+ "FROM eg_pt_property p " 
-			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-			+ "WHERE p.lastmodifiedtime >= ? " 
-			+ "AND p.lastmodifiedtime < ? "
-			+ "AND addr.additionaldetails->>'wardNumber' = ? " + "GROUP BY p.status " + "ORDER BY p.status";
+			+ "FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE p.lastmodifiedtime BETWEEN ? AND ? " + "AND addr.additionaldetails->>'wardNumber' = ? "
+			+ "GROUP BY p.status " + "ORDER BY p.status";
+
+	public String getTodaysMovedApplicationQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return TODAYS_MOVED_APPLICATION_QUERY;
+	}
 
 	private static final String PROPERTIES_REGISTERED_FY_QUERY =
 
-			"SELECT " + "CASE " + " WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(p.createdtime/1000)) >= 4 " + " THEN CONCAT( "
+			"SELECT CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(p.createdtime/1000)) >= 4 THEN CONCAT( "
 					+ "      EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)), '-', "
-					+ "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) + 1)::text, 2) " + " ) "
-					+ " ELSE CONCAT( " + "      EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) - 1, '-', "
-					+ "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2) " + " ) "
-					+ "END AS FYear, " + "COUNT(*) AS value " + "FROM eg_pt_property p "
+					+ "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) + 1)::text, 2)) "
+					+ " ELSE CONCAT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) - 1, '-', "
+					+ "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2)) "
+					+ "END AS FYear,COUNT(*) AS value FROM eg_pt_property p "
 					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE addr.additionaldetails->>'wardNumber' = ? " + "GROUP BY FYear " + "ORDER BY FYear";
+					+ "WHERE addr.additionaldetails->>'wardNumber' = ? GROUP BY FYear ORDER BY FYear";
 
 	public String getPropertiesRegisteredFYQuery(String wardName, List<Object> preparedStmtList) {
 
@@ -371,59 +277,31 @@ public class PropertyQueryBuilder {
 		return PROPERTIES_REGISTERED_FY_QUERY;
 	}
 
-	public String getTodaysMovedApplicationQuery(String date, String wardName, List<Object> preparedStmtList) {
-
-		LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-		long startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-		long endOfDay = localDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-		preparedStmtList.add(startOfDay);
-		preparedStmtList.add(endOfDay);
-		preparedStmtList.add(wardName);
-
-		return TODAYS_MOVED_APPLICATION_QUERY;
-	}
-
-	public String getDataMetricsSearchQuery(String date, String wardName, int slaDays, List<Object> preparedStmtList) {
+	public String getDataMetricsSearchQuery(long startEpoch, long endEpoch, String wardName, int slaDays,
+			List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(DATA_METRICS_SEARCH_QUERY);
 
-		preparedStmtList.add(date); // created
-		preparedStmtList.add(date); // closed
-		preparedStmtList.add(date); // approved
+		preparedStmtList.add(startEpoch);// created
+		preparedStmtList.add(endEpoch);
 
-		preparedStmtList.add(date); // within SLA start
-		preparedStmtList.add(date); // within SLA end
+		preparedStmtList.add(startEpoch);// closed
+		preparedStmtList.add(endEpoch);
+
+		preparedStmtList.add(startEpoch);// approved
+		preparedStmtList.add(endEpoch);
+
+		preparedStmtList.add(startEpoch);// approved within SLA
+		preparedStmtList.add(endEpoch);
 
 		preparedStmtList.add(slaDays); // SLA for within
 		preparedStmtList.add(slaDays); // SLA for pending
 
-		preparedStmtList.add(slaDays); // SLA for pending
+		preparedStmtList.add(slaDays); // Stipulated days
 		preparedStmtList.add(wardName); // ward
 
 		return builder.toString();
 	}
-
-//	public String getTodayMovedApplicationQuery(String date, String wardName, List<Object> preparedStmtList) {
-//
-//		StringBuilder query = new StringBuilder();
-//
-//		query.append(" SELECT svc.servicecode AS department, ");
-//		query.append(" COUNT(*) AS todays_complaints ");
-//		query.append(" FROM eg_pgr_service_v2 svc ");
-//		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
-//		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
-//		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
-//		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
-//		query.append(" GROUP BY svc.servicecode ");
-//
-//		preparedStmtList.add(wardName);
-//		preparedStmtList.add(date);
-//
-//		return query.toString();
-//	}
 
 	private static final String UNIQUE_WARDS_SEARCH_QUERY = "SELECT DISTINCT "
 
@@ -436,6 +314,108 @@ public class PropertyQueryBuilder {
 		preparedStmtList.add(stringDate);
 
 		return builder.toString();
+	}
+
+	private static final String ASSESSED_PROPERTIES_QUERY = "SELECT p.usagecategory AS name, COUNT(*) AS value "
+			+ "FROM eg_pt_property p JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE p.status = 'APPROVED' AND addr.additionaldetails->>'wardNumber' = ? "
+			+ "AND p.createdtime BETWEEN ? AND ? GROUP BY p.usagecategory";
+
+	public String getAssessedPropertiesQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+
+		return ASSESSED_PROPERTIES_QUERY;
+	}
+
+	private static final String TRANSACTION_QUERY = "SELECT p.usagecategory AS name, COUNT(pay.id) AS value "
+			+ "FROM egcl_payment pay JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
+			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "AND pay.createdtime BETWEEN ? AND ? AND addr.additionaldetails->>'wardNumber' = ? "
+			+ "GROUP BY p.usagecategory ORDER BY p.usagecategory";
+
+	public String getTransactionsQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return TRANSACTION_QUERY;
+	}
+
+	private static final String TODAY_COLLECTION_QUERY = "SELECT p.usagecategory AS name, "
+			+ "SUM(pay.totalamountpaid) AS value FROM egcl_payment pay "
+			+ "JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
+			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY p.usagecategory " + "ORDER BY p.usagecategory";
+
+	public String getTodayCollectionQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return TODAY_COLLECTION_QUERY;
+	}
+
+	private static final String PROPERTY_TAX_QUERY = "SELECT p.usagecategory AS name, SUM(t.propertytax) AS value "
+			+ "FROM eg_pt_tax_calculator_tracker t JOIN eg_pt_property p ON p.propertyid = t.propertyid "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.createdtime >= ? "
+			+ "AND t.createdtime < ? AND addr.additionaldetails->>'wardNumber' = ? GROUP BY p.usagecategory "
+			+ "ORDER BY p.usagecategory";
+
+	public String getPropertyTaxQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return PROPERTY_TAX_QUERY;
+	}
+
+	private static final String TAX_METRICS_QUERY = "SELECT p.usagecategory AS name, "
+			+ "SUM(COALESCE(t.propertytax,0)) AS propertyTax, "
+			+ "SUM(COALESCE((t.additionaldetails->>'cessAmount')::numeric,0)) AS cess, "
+			+ "SUM(COALESCE(t.penaltyamount,0)) AS penalty, "
+			+ "SUM(COALESCE((t.additionaldetails->>'interestAmount')::numeric,0)) AS interest, "
+			+ "SUM(COALESCE(t.rebateamount,0)) AS rebate FROM eg_pt_tax_calculator_tracker t "
+			+ "JOIN eg_pt_property p ON p.propertyid = t.propertyid "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.createdtime >= ? "
+			+ "AND t.createdtime < ? AND addr.additionaldetails->>'wardNumber' = ? GROUP BY p.usagecategory "
+			+ "ORDER BY p.usagecategory";
+
+	public String getTaxMetricsQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return TAX_METRICS_QUERY;
+	}
+
+	private static final String PAYMENT_CHANNEL_TYPE_QUERY = "SELECT pay.paymentmode AS name, "
+			+ "SUM(pay.totalamountpaid) AS value FROM egcl_payment pay "
+			+ "JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
+			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
+
+	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return PAYMENT_CHANNEL_TYPE_QUERY;
 	}
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
