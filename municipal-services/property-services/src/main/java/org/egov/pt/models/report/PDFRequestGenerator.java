@@ -23,6 +23,8 @@ import org.egov.pt.models.collection.Bill.StatusEnum;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.egov.pt.models.collection.BillDetail;
+import org.egov.pt.models.collection.BillAccountDetail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -205,15 +207,39 @@ public class PDFRequestGenerator {
 		ptbr.put("totalTax", String.valueOf(bill.getTotalAmount()));
 
 		BigDecimal amountPaid = BigDecimal.ZERO;
+		BigDecimal amountDue = BigDecimal.ZERO;
 		String paymentStatus = "";
 		String paymentDate = "";
-		if (bill.getStatus().equals(StatusEnum.PAID)) {
-			amountPaid = bill.getTotalAmount();
-			paymentStatus = "Success";
-			
-			paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime()).atZone(ZoneId.systemDefault())
-					.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		if (bill.getBillDetails() != null) {
+			for (BillDetail billDetail : bill.getBillDetails()) {
+				if (billDetail.getBillAccountDetails() != null) {
+					for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+						BigDecimal adjusted = accDetail.getAdjustedAmount() != null ? accDetail.getAdjustedAmount()
+								: BigDecimal.ZERO;
+						amountPaid = amountPaid.add(adjusted);
+					}
+				}
+			}
 		}
+		BigDecimal totalAmount = bill.getTotalAmount() != null
+		        ? bill.getTotalAmount()
+		        : BigDecimal.ZERO;
+		amountDue = totalAmount.subtract(amountPaid);
+
+		if (bill.getStatus().equals(StatusEnum.PAID)) {
+		    paymentStatus = "Success";
+		} else if (bill.getStatus().equals(StatusEnum.PARTIALLY_PAID)) {
+		    paymentStatus = "Partially Paid";
+		} else {
+		    paymentStatus = "Pending";
+		}
+		if (amountPaid.compareTo(BigDecimal.ZERO) > 0) {
+		    paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime())
+		            .atZone(ZoneId.systemDefault())
+		            .toLocalDateTime()
+		            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		}
+		ptbr.put("amountDue", String.valueOf(amountDue));
 		ptbr.put("amountPaid", String.valueOf(amountPaid));
 		ptbr.put("paymentStatus", paymentStatus);
 		ptbr.put("billGeneratedDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
