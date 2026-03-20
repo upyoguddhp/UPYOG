@@ -28,6 +28,8 @@ import org.egov.pt.models.collection.BillAccountDetail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -156,9 +158,7 @@ public class PDFRequestGenerator {
 				taxCalculated.add(matchedNode.get("propertyTaxCalculated").asText());
 				floorNos.add(escapeHtml(unit.getFloorNo().toString()));
 			}
-		}
-			
-
+		}	
 		Map<String, Object> ptDetailsTableRow = new HashMap<>();
 
 		ptDetailsTableRow.put("slNo", slNos);
@@ -176,18 +176,59 @@ public class PDFRequestGenerator {
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "PROPERTY_TAX_BILL_TABLE_ROW");
 		tableRow.put("values", ptDetailsTableRow);
+		
+		int arrearCount = 1;
+		List<String> arrearSlNos = new ArrayList<>();
+		List<String> financialYears = new ArrayList<>();
+		List<String> arrearTotals = new ArrayList<>();
+
+		if (bill.getBillDetails() != null) {
+
+		    for (BillDetail billDetail : bill.getBillDetails()) {
+		        arrearSlNos.add(String.valueOf(arrearCount++));
+		        LocalDate fromDate = Instant.ofEpochMilli(billDetail.getFromPeriod())
+		                .atZone(ZoneId.systemDefault())
+		                .toLocalDate();
+
+		        LocalDate toDate = Instant.ofEpochMilli(billDetail.getToPeriod())
+		                .atZone(ZoneId.systemDefault())
+		                .toLocalDate();
+
+		        String financialYear = fromDate.getYear() + "-" + toDate.getYear();
+		        financialYears.add(financialYear);
+		        BigDecimal total = BigDecimal.ZERO;
+		        if (billDetail.getBillAccountDetails() != null) {
+		            for (BillAccountDetail acc : billDetail.getBillAccountDetails()) {
+		                BigDecimal amt = acc.getAmount() != null ? acc.getAmount() : BigDecimal.ZERO;
+		                total = total.add(amt);
+		            }
+		        }
+		        arrearTotals.add(total.toString());
+		    }
+		}
+		
+		// Make arrear values a map of column -> list to match the expected table shape
+		Map<String, Object> arrearValuesMap = new HashMap<>();
+		arrearValuesMap.put("slNo", arrearSlNos);
+		arrearValuesMap.put("financialYear", financialYears);
+		arrearValuesMap.put("totalTax", arrearTotals);
+
+		Map<String, Object> arrearRowWrapper = new HashMap<>();
+		arrearRowWrapper.put("tag", "ARREAR_BILL_TABLE_ROW");
+		arrearRowWrapper.put("values", arrearValuesMap);
 
 		List<Map<String, Object>> tableRows = new ArrayList<>();
-		tableRows.add(tableRow);
-
+		if (ptTaxCalculatorTracker.getType().equals("ARREAR")) {
+		    tableRows.add(arrearRowWrapper);
+		} else {
+		    tableRows.add(tableRow);
+		}
+		
 		Map<String, Object> tableRowMap = new HashMap<>();
 		tableRowMap.put("TABLE_ROW", tableRows);
-
 		ptbr.put("plinthAreaTotal", String.valueOf(plinthAreaTotal));
-
 		BigDecimal propertyTax = ptTaxCalculatorTracker.getPropertyTaxWithoutRebate();
 		ptbr.put("propertyTax", String.valueOf(propertyTax));
-
 		BigDecimal penalty = null != ptTaxCalculatorTracker.getPenaltyAmount()
 				? ptTaxCalculatorTracker.getPenaltyAmount()
 				: new BigDecimal("0.00");
