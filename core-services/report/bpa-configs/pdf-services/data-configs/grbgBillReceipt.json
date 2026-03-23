@@ -131,6 +131,11 @@
 				  		}
 					},
 					{
+						"variable": "totalAmount",
+						"value": { "path": "$.totalAmount" 
+						}
+					},
+					{
 						"variable": "qrCodeText",
 						"value": {
 							"path": "$.qrCodeText"
