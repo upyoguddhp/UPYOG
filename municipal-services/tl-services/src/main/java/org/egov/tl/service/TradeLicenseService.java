@@ -1629,13 +1629,7 @@ public class TradeLicenseService {
 
 		return applicationDetail;
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	//-------
 
 	private ApplicationDetail getApplicationBillUserDetailForNewTL(ApplicationDetail applicationDetail,
@@ -1663,55 +1657,69 @@ public class TradeLicenseService {
 			throw new CustomException("EMPTY_VALUES", "Tax can't be calculated for empty values.");
 		}
 
-//		// mdms call
-//		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
-//				periodOfLicense, zone, tradeCategory);
+		// mdms call
+		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
+				periodOfLicense, zone, tradeCategory);
 
 
 		
-		MdmsResponse mdmsDataResponse;
+//		MdmsResponse mdmsDataResponse;
+//
+//		if (TLConstants.APPLICATION_TYPE_RENEWAL
+//		        .equalsIgnoreCase(license.getApplicationType())) {
+//
+//		    BigDecimal renewalFee = getRenewalFeeFromMdmsV2(requestInfo, license);
+//
+//		    applicationDetail.setTotalPayableAmount(renewalFee);
+//
+//		    applicationDetail.setFeeCalculationFormula(
+//		            "Renewal Fee : <b>" + renewalFee + "</b>"
+//		    );
+//
+//		    // Skip old bill overwrite logic
+//		    Map<Object, Object> billDetailsMap = new HashMap<>();
+//		    applicationDetail.setBillDetails(billDetailsMap);
+//
+//		    return applicationDetail;
+//		}else {
+//
+//		    mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(
+//		            requestInfo, license, scaleOfBusiness,
+//		            periodOfLicense, zone, tradeCategory);
+//		}
 
-		if (TLConstants.APPLICATION_TYPE_RENEWAL
-		        .equalsIgnoreCase(license.getApplicationType())) {
-
-		    BigDecimal renewalFee = getRenewalFeeFromMdmsV2(requestInfo, license);
-
-		    applicationDetail.setTotalPayableAmount(renewalFee);
-
-		    applicationDetail.setFeeCalculationFormula(
-		            "Renewal Fee : <b>" + renewalFee + "</b>"
-		    );
-
-		    // Skip old bill overwrite logic
-		    Map<Object, Object> billDetailsMap = new HashMap<>();
-		    applicationDetail.setBillDetails(billDetailsMap);
-
-		    return applicationDetail;
-		}else {
-
-		    mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(
-		            requestInfo, license, scaleOfBusiness,
-		            periodOfLicense, zone, tradeCategory);
-		}
-
-		if (mdmsDataResponse == null
-		        || mdmsDataResponse.getMdmsRes() == null
-		        || mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE) == null) {
-
-		    throw new CustomException("MDMS_ERROR", "Invalid MDMS response");
-		}
-
-		Map<String, JSONArray> tradeLicenseModule =
-		        mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE);
+//		if (mdmsDataResponse == null
+//		        || mdmsDataResponse.getMdmsRes() == null
+//		        || mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE) == null) {
+//
+//		    throw new CustomException("MDMS_ERROR", "Invalid MDMS response");
+//		}
+//
+//		Map<String, JSONArray> tradeLicenseModule =
+//		        mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE);
 
 		//List<Object> feeStructure;
-		List<Object> feeStructure =
-		        (List<Object>) tradeLicenseModule.get(TLConstants.FEE_STRUCTURE);
+//		List<Object> feeStructure =
+//		        (List<Object>) tradeLicenseModule.get(TLConstants.FEE_STRUCTURE);
+//
+//		if (CollectionUtils.isEmpty(feeStructure)) {
+//		    throw new CustomException("FEE_STRUCTURE_NOT_FOUND",
+//		            "Fee structure missing in MDMS");
+//		}
+		
+//		List<Object> feeStructure = mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE)
+//				.get(TLConstants.FEE_STRUCTURE);
 
-		if (CollectionUtils.isEmpty(feeStructure)) {
-		    throw new CustomException("FEE_STRUCTURE_NOT_FOUND",
-		            "Fee structure missing in MDMS");
-		}
+		String masterName = TLConstants.APPLICATION_TYPE_RENEWAL
+		        .equalsIgnoreCase(license.getApplicationType())
+		        ? TLConstants.RENEWAL_FEE_STRUCTURE
+		        : TLConstants.FEE_STRUCTURE;
+
+		List<Object> feeStructure = mdmsDataResponse.getMdmsRes()
+		        .get(TLConstants.TRADE_LICENSE)
+		        .get(masterName);
+		
+		
 		Double scaleOfBusinessToLicensePeriodPrice = 0.00;
 		Double tradeCategoryPrice = 0.00;
 		Double zonePrice = 0.00;

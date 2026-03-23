@@ -16,6 +16,8 @@ import org.egov.garbageservice.model.contract.PDFRequest;
 import org.egov.garbageservice.contract.bill.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.egov.garbageservice.contract.bill.BillDetail;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -161,6 +163,7 @@ public class PDFRequestGenerator {
 		
 		BigDecimal totalPaid = BigDecimal.ZERO;
 		BigDecimal totalDue = BigDecimal.ZERO;
+		BigDecimal totalAmount = BigDecimal.ZERO;
 
 		for (Bill billObj : bill) {
 
@@ -170,13 +173,31 @@ public class PDFRequestGenerator {
 
 		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
 		        totalPaid = totalPaid.add(amount);
+		        totalAmount = amount;
 		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
 		        totalDue = totalDue.add(amount);
+		        totalAmount = amount;
+		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
+		        BigDecimal billPaid = BigDecimal.ZERO;
+		        for (BillDetail billDetail : billObj.getBillDetails()) {
+		            if (billDetail.getBillAccountDetails() != null) {
+		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
+		                            ? accDetail.getAdjustedAmount()
+		                            : BigDecimal.ZERO;
+		                    billPaid = billPaid.add(adjusted);
+		                }
+		            }
+		        }
+		        totalPaid = totalPaid.add(billPaid);
+		        totalDue = totalDue.add(amount.subtract(billPaid));
+		        totalAmount = amount;
 		    }
 		}
 
 		grbg.put("amountPaid", totalPaid);
 		grbg.put("amountDue", totalDue);
+		grbg.put("totalAmount", totalAmount);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
