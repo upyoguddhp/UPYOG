@@ -432,8 +432,13 @@ public class TradeUtil {
     	List<MasterDetail> masterDetails = new ArrayList<>();
     	
     	// add criteria FeeStructure
+    	String masterName = TLConstants.APPLICATION_TYPE_RENEWAL
+                .equalsIgnoreCase(tradeLicense.getApplicationType())
+                ? TLConstants.RENEWAL_FEE_STRUCTURE
+                : TLConstants.FEE_STRUCTURE;
+    	
     	MasterDetail masterDetail = MasterDetail.builder()
-    			.name(TLConstants.FEE_STRUCTURE)
+    			.name(masterName)
     			.filter("[?((@."+STRUCTURE_OF+" =~ /.*"+SCALE_OF_BUSINESS+".*?/ && @."+TYPE+" == \""+scaleOfBusiness+"\" && @."+PERIOD_OF_LICENSE+" == "+periodOfLicense.toString()+" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+ZONE+".*?/ && @.type == \""+zone+"\" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+TRADE_CATEGORY+".*?/ && @."+TYPE+" == \""+tradeCategory+"\" && @."+TENANT_ID+" == \""+tenantId+"\") )]")
     			.build();
     	masterDetails.add(masterDetail);
@@ -462,4 +467,5 @@ public class TradeUtil {
         MdmsResponse mdmsResponse = objectMapper.convertValue(result, MdmsResponse.class);
         return mdmsResponse;
     }
+    
 }
