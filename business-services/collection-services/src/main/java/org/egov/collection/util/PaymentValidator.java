@@ -203,10 +203,10 @@ public class PaymentValidator {
 
     private void validateNEFTAndRTGS(Payment payment, Map<String, String> errorMap){
 
-        DateTime instrumentDate = new DateTime(payment.getInstrumentDate());
-        if (instrumentDate.isAfter(System.currentTimeMillis())) {
-            errorMap.put(RECEIPT_NEFT_OR_RTGS_DATE, RECEIPT_NEFT_OR_RTGS_DATE_MESSAGE);
-        }
+//        DateTime instrumentDate = new DateTime(payment.getInstrumentDate());
+//        if (instrumentDate.isAfter(System.currentTimeMillis())) {
+//            errorMap.put(RECEIPT_NEFT_OR_RTGS_DATE, RECEIPT_NEFT_OR_RTGS_DATE_MESSAGE);
+//        }
     }
 
 
