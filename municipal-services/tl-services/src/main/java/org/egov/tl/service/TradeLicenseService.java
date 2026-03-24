@@ -143,11 +143,11 @@ public class TradeLicenseService {
 	@Autowired
 	private ReportService reportService;
 
-	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-	private Boolean pickWFServiceNameFromTradeTypeOnly;
-
-	@Autowired
-	TradeLicenseConsumer tradeLicenseConsumer;
+    @Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
+    private Boolean pickWFServiceNameFromTradeTypeOnly;
+    
+    @Autowired
+    TradeLicenseConsumer tradeLicenseConsumer;
 
 	@Autowired
 	private AlfrescoService alfrescoService;
@@ -172,6 +172,7 @@ public class TradeLicenseService {
 
 	@Autowired
 	private Producer producer;
+
 
 	@Autowired
 	public TradeLicenseService(WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService,
@@ -740,7 +741,7 @@ public class TradeLicenseService {
 	public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath) {
 		tradeLicenseRequest = enrichPreUpdateNewTLValues(tradeLicenseRequest, businessServicefromPath);
 		TradeLicense licence = tradeLicenseRequest.getLicenses().get(0);
-		TradeLicense.ApplicationTypeEnum applicationType =ApplicationTypeEnum.valueOf(licence.getApplicationType());
+		TradeLicense.ApplicationTypeEnum applicationType =ApplicationTypeEnum.valueOf(licence.getApplicationType()) ;
 		List<TradeLicense> licenceResponse = null;
 //        if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
 //        		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
@@ -865,9 +866,9 @@ public class TradeLicenseService {
 				}
 
 				// fetch/create bill
-				GenerateBillCriteria billCriteria = GenerateBillCriteria.builder().tenantId(license.getTenantId())
-						.businessService(license.getBusinessService()).consumerCode(license.getApplicationNumber())
-						.build();
+				GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
+						.tenantId(license.getTenantId()).businessService(license.getBusinessService())
+						.consumerCode(license.getApplicationNumber()).build();
 				BillResponse billResponse = billService.generateBill(tradeLicenseRequest.getRequestInfo(),
 						billCriteria);
 
@@ -941,7 +942,7 @@ public class TradeLicenseService {
 			TradeLicense license = tradeLicenseRequest.getLicenses().get(i);
 			String action = license.getAction();
 			String comment = license.getComment();
-
+			
 			ApplicationTypeEnum applicationType = ApplicationTypeEnum.valueOf(license.getApplicationType());
 
 			if (null == license.getTradeLicenseDetail()
@@ -969,7 +970,7 @@ public class TradeLicenseService {
 				licenses.get(0).setComment(comment);
 				//licenses.get(0).setApplicationType(applicationType.toString());
 				// created date of application will be whenever it went to verifier
-				if (StringUtils.equalsIgnoreCase(license.getAction(), TLConstants.ACTION_FORWARD_TO_VERIFIER)) {
+				if(StringUtils.equalsIgnoreCase(license.getAction(), TLConstants.ACTION_FORWARD_TO_VERIFIER)){
 					licenses.get(0).getAuditDetails().setCreatedTime(new Date().getTime());
 				}
 
@@ -989,6 +990,7 @@ public class TradeLicenseService {
 						licenses.get(0).getAuditDetails().setCreatedTime(new Date().getTime());
 					}
 				}
+				
 				
 				// calculate passed dates from creation date
 				enrichPassedDates(licenses);
@@ -1081,16 +1083,18 @@ public class TradeLicenseService {
 
 				// for NEW TL
 				if (StringUtils.equalsIgnoreCase(license.getBusinessService(), TLConstants.businessService_NewTL)
-						&& StringUtils.equalsIgnoreCase(license.getAction(), TLConstants.ACTION_APPROVE)) {
+						&& StringUtils.equalsIgnoreCase(license.getAction(), TLConstants.ACTION_APPROVE)
+					) {
 
 					TradeLicenseRequest tradeLicenseRequest1 = TradeLicenseRequest.builder()
 							.requestInfo(tradeLicenseRequest.getRequestInfo())
-							.licenses(Collections.singletonList(license)).build();
-
-			//		tradeLicenseConsumer.saveTlCertificate(tradeLicenseRequest1);
-					// producer.push("save-tl-certificate", tradeLicenseRequest1);
-
-					// .licenses(Collections.singletonList(license)).build();
+							.licenses(Collections.singletonList(license))
+							.build();
+					
+					tradeLicenseConsumer.saveTlCertificate(tradeLicenseRequest1);
+					//producer.push("save-tl-certificate", tradeLicenseRequest1);
+					
+						//	.licenses(Collections.singletonList(license)).build();
 
 					// producer.push("save-tl-certificate", tradeLicenseRequest1);
 
@@ -1299,13 +1303,14 @@ public class TradeLicenseService {
 		if (!CollectionUtils.isEmpty(response.getLicenses())) {
 			response.setApplicationInitiated((int) response.getLicenses().stream()
 					.filter(license -> StringUtils.equalsIgnoreCase(STATUS_INITIATED, license.getStatus())).count());
-			response.setApplicationApplied(
-					(int) response.getLicenses().stream()
-							.filter(license -> StringUtils.equalsAnyIgnoreCase(license.getStatus(),
-									TLConstants.STATUS_PENDINGFORVERIFICATION, TLConstants.STATUS_PENDINGFORAPPROVAL))
-							.count());
-			response.setApplicationReverted((int) response.getLicenses().stream().filter(license -> StringUtils
-					.equalsAnyIgnoreCase(license.getStatus(), TLConstants.STATUS_PENDINGFORMODIFICATION)).count());
+			response.setApplicationApplied((int) response.getLicenses().stream()
+					.filter(license -> StringUtils.equalsAnyIgnoreCase(license.getStatus(),
+							TLConstants.STATUS_PENDINGFORVERIFICATION, TLConstants.STATUS_PENDINGFORAPPROVAL))
+					.count());
+			response.setApplicationReverted((int) response.getLicenses().stream()
+					.filter(license -> StringUtils.equalsAnyIgnoreCase(license.getStatus(),
+							 TLConstants.STATUS_PENDINGFORMODIFICATION))
+					.count());
 			response.setApplicationPendingForPayment((int) response.getLicenses().stream().filter(
 					license -> StringUtils.equalsIgnoreCase(TLConstants.STATUS_PENDINGFORPAYMENT, license.getStatus()))
 					.count());
@@ -1387,8 +1392,8 @@ public class TradeLicenseService {
 
 		map.put("tl", map2);
 
-		PDFRequest pdfRequest = PDFRequest.builder().RequestInfo(requestInfo).key("TradeLicense2")
-				.tenantId(tradeLicense.getTenantId()).data(map).build();
+		PDFRequest pdfRequest = PDFRequest.builder().RequestInfo(requestInfo).key("TradeLicense2").tenantId(tradeLicense.getTenantId())
+				.data(map).build();
 
 		return pdfRequest;
 	}
@@ -1458,7 +1463,7 @@ public class TradeLicenseService {
 		tlObject.put("approverName",
 				null != requestInfo.getUserInfo() ? requestInfo.getUserInfo().getUserName() : null);// Approver Name
 		tlObject.put("userName",
-				null != requestInfo.getUserInfo() ? requestInfo.getUserInfo().getName() : null);// User	Name																									// Name
+				null != requestInfo.getUserInfo() ? requestInfo.getUserInfo().getName() : null);// User Name
 		tlObject.put("approvalTime", approvalTime);// Approval Time
 		tlObject.put("ownerName",
 				!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getOwners())
@@ -1475,7 +1480,7 @@ public class TradeLicenseService {
 
 	private void getQRCodeForPdfCreate(Map<String, Object> tlObject, StringBuilder qr) {
 		tlObject.entrySet().stream()
-				.filter(entry1 -> Arrays.asList("tradeLicenseNo", /* "tradeRegistrationNo", */ "tradeName",
+				.filter(entry1 -> Arrays.asList("tradeLicenseNo", /*"tradeRegistrationNo",*/ "tradeName",
 						"tradePremisesAddress", "licenseIssueDate", "licenseValidity", "licenseCategory",
 						"licenseApplicantName", "applicantContactNo", "applicantAddress").contains(entry1.getKey()))
 				.forEach(entry -> {
@@ -1624,13 +1629,7 @@ public class TradeLicenseService {
 
 		return applicationDetail;
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	//-------
 
 	private ApplicationDetail getApplicationBillUserDetailForNewTL(ApplicationDetail applicationDetail,
@@ -1658,55 +1657,69 @@ public class TradeLicenseService {
 			throw new CustomException("EMPTY_VALUES", "Tax can't be calculated for empty values.");
 		}
 
-//		// mdms call
-//		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
-//				periodOfLicense, zone, tradeCategory);
+		// mdms call
+		MdmsResponse mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(requestInfo, license, scaleOfBusiness,
+				periodOfLicense, zone, tradeCategory);
 
 
 		
-		MdmsResponse mdmsDataResponse;
+//		MdmsResponse mdmsDataResponse;
+//
+//		if (TLConstants.APPLICATION_TYPE_RENEWAL
+//		        .equalsIgnoreCase(license.getApplicationType())) {
+//
+//		    BigDecimal renewalFee = getRenewalFeeFromMdmsV2(requestInfo, license);
+//
+//		    applicationDetail.setTotalPayableAmount(renewalFee);
+//
+//		    applicationDetail.setFeeCalculationFormula(
+//		            "Renewal Fee : <b>" + renewalFee + "</b>"
+//		    );
+//
+//		    // Skip old bill overwrite logic
+//		    Map<Object, Object> billDetailsMap = new HashMap<>();
+//		    applicationDetail.setBillDetails(billDetailsMap);
+//
+//		    return applicationDetail;
+//		}else {
+//
+//		    mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(
+//		            requestInfo, license, scaleOfBusiness,
+//		            periodOfLicense, zone, tradeCategory);
+//		}
 
-		if (TLConstants.APPLICATION_TYPE_RENEWAL
-		        .equalsIgnoreCase(license.getApplicationType())) {
-
-		    BigDecimal renewalFee = getRenewalFeeFromMdmsV2(requestInfo, license);
-
-		    applicationDetail.setTotalPayableAmount(renewalFee);
-
-		    applicationDetail.setFeeCalculationFormula(
-		            "Renewal Fee : <b>" + renewalFee + "</b>"
-		    );
-
-		    // Skip old bill overwrite logic
-		    Map<Object, Object> billDetailsMap = new HashMap<>();
-		    applicationDetail.setBillDetails(billDetailsMap);
-
-		    return applicationDetail;
-		}else {
-
-		    mdmsDataResponse = tradeUtil.mDMSCallCalculateFee(
-		            requestInfo, license, scaleOfBusiness,
-		            periodOfLicense, zone, tradeCategory);
-		}
-
-		if (mdmsDataResponse == null
-		        || mdmsDataResponse.getMdmsRes() == null
-		        || mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE) == null) {
-
-		    throw new CustomException("MDMS_ERROR", "Invalid MDMS response");
-		}
-
-		Map<String, JSONArray> tradeLicenseModule =
-		        mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE);
+//		if (mdmsDataResponse == null
+//		        || mdmsDataResponse.getMdmsRes() == null
+//		        || mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE) == null) {
+//
+//		    throw new CustomException("MDMS_ERROR", "Invalid MDMS response");
+//		}
+//
+//		Map<String, JSONArray> tradeLicenseModule =
+//		        mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE);
 
 		//List<Object> feeStructure;
-		List<Object> feeStructure =
-		        (List<Object>) tradeLicenseModule.get(TLConstants.FEE_STRUCTURE);
+//		List<Object> feeStructure =
+//		        (List<Object>) tradeLicenseModule.get(TLConstants.FEE_STRUCTURE);
+//
+//		if (CollectionUtils.isEmpty(feeStructure)) {
+//		    throw new CustomException("FEE_STRUCTURE_NOT_FOUND",
+//		            "Fee structure missing in MDMS");
+//		}
+		
+//		List<Object> feeStructure = mdmsDataResponse.getMdmsRes().get(TLConstants.TRADE_LICENSE)
+//				.get(TLConstants.FEE_STRUCTURE);
 
-		if (CollectionUtils.isEmpty(feeStructure)) {
-		    throw new CustomException("FEE_STRUCTURE_NOT_FOUND",
-		            "Fee structure missing in MDMS");
-		}
+		String masterName = TLConstants.APPLICATION_TYPE_RENEWAL
+		        .equalsIgnoreCase(license.getApplicationType())
+		        ? TLConstants.RENEWAL_FEE_STRUCTURE
+		        : TLConstants.FEE_STRUCTURE;
+
+		List<Object> feeStructure = mdmsDataResponse.getMdmsRes()
+		        .get(TLConstants.TRADE_LICENSE)
+		        .get(masterName);
+		
+		
 		Double scaleOfBusinessToLicensePeriodPrice = 0.00;
 		Double tradeCategoryPrice = 0.00;
 		Double zonePrice = 0.00;
@@ -1801,20 +1814,20 @@ public class TradeLicenseService {
 						tradeLicenseActionRequest.getTenantId());
 			}
 			if (!CollectionUtils.isEmpty(statusList)) {
-				tradeLicenseActionResponse.setStatusList(statusList.stream().filter(Objects::nonNull) // Ensure no null
-																										// entries
-						.filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
-						.collect(Collectors.toList())); // Collect the filtered list
-
-				if (statusList.get(0).containsKey("total_applications")) {
-					Object totalApplicationsObj = statusList.get(0).get("total_applications");
-					if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
-						tradeLicenseActionResponse
-								.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());
-					} else {
-						throw new IllegalArgumentException("total_applications is not a valid number");
-					}
-				}
+				  tradeLicenseActionResponse.setStatusList(
+			                statusList.stream()
+			                        .filter(Objects::nonNull) // Ensure no null entries
+			                        .filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
+			                        .collect(Collectors.toList())); // Collect the filtered list
+				  
+				  if (statusList.get(0).containsKey("total_applications")) {
+			            Object totalApplicationsObj = statusList.get(0).get("total_applications");
+			            if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
+			                tradeLicenseActionResponse.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());
+			            } else {
+			                throw new IllegalArgumentException("total_applications is not a valid number");
+			            }
+			        }
 			}
 		} catch (Exception e) {
 			throw new CustomException("FAILED_TO_FETCH", "Failed to fetch Application types.");
