@@ -23,6 +23,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.pt.config.PropertyConfiguration;
@@ -59,6 +61,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.pt.repository.RestCallRepository;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Comparator;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.egov.pt.repository.PropertyRepository;
+
+//pdf
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.egov.pt.service.AlfrescoService;
+import org.egov.pt.web.contracts.alfresco.DmsResponse;
+import org.egov.pt.web.contracts.alfresco.DmsRequest;
+import org.egov.pt.util.PTConstants;
+import org.egov.common.contract.request.RequestInfo;
+
+import java.io.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,11 +113,18 @@ public class PropertySchedulerService {
 	@Autowired
 	private RestCallRepository restCallRepository;
 
+	@Autowired
+	private AlfrescoService alfrescoService;
+
 	@Value("${egov.sms.host}")
 	private String smsHost;
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
+
+//add new
+	@Autowired
+	private PropertyRepository repository;
 
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
@@ -365,12 +392,13 @@ public class PropertySchedulerService {
 						String ward = null;
 
 						if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
-						    JsonNode addrDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
-						    JsonNode wardNode = addrDetails.get("wardNumber");
+							JsonNode addrDetails = objectMapper
+									.valueToTree(property.getAddress().getAdditionalDetails());
+							JsonNode wardNode = addrDetails.get("wardNumber");
 
-						    if (wardNode != null && !wardNode.isNull()) {
-						        ward = wardNode.asText();
-						    }
+							if (wardNode != null && !wardNode.isNull()) {
+								ward = wardNode.asText();
+							}
 						}
 						Bill parentBill = billResponse.getBill().stream()
 								.filter(b -> b.getBillDetails().contains(billDetail)).findFirst().orElse(null);
@@ -415,7 +443,8 @@ public class PropertySchedulerService {
 								}
 							}
 						} catch (Exception ex) {
-							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(), ex);
+							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(),
+									ex);
 						}
 
 						// Notification
@@ -800,8 +829,8 @@ public class PropertySchedulerService {
 			LocalDate currentDate = LocalDate.now();
 			// Calculate the current financial year
 			int currentYear = currentDate.getYear();
-//			int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear
-//					: currentYear - 1;
+//                                          int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear
+//                                                                        : currentYear - 1;
 			int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear - 1
 					: currentYear;
 
@@ -1079,24 +1108,13 @@ public class PropertySchedulerService {
 				.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
-				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId)
-				.type("CYCLIC")
-				.rebateamount(BigDecimal.ZERO)
-				.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
+				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId).type("CYCLIC")
+				.rebateamount(BigDecimal.ZERO).billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
 		return propertyService.getTaxCalculatedProperties(criteria);
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days) {
-//		long startDateTimes = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
-//				.toEpochMilli();
-//
-//		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
-//				.startDateTime(startDateTimes).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
-//				.build();
-		// return propertyService.getTaxCalculatedProperties(criteria);//comment
-		// previous code
-
 		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
 				.toEpochMilli();
 
@@ -1148,7 +1166,7 @@ public class PropertySchedulerService {
 						demandIdToTenantMap.put(billDetail.getDemandId(), bill.getTenantId());
 					}
 				}
-				
+
 			}
 		}
 		return demandIdToTenantMap;
@@ -1194,18 +1212,17 @@ public class PropertySchedulerService {
 				continue;
 			}
 
-			
 			Map<String, Bill> demandIdBillMap = new HashMap<>();
 
 			billIdBillMap.values().forEach(bill -> {
-			    if (bill.getBillDetails() != null) {
-			        bill.getBillDetails().forEach(detail -> {
-			            demandIdBillMap.put(detail.getDemandId(), bill);
-			        });
-			    }
+				if (bill.getBillDetails() != null) {
+					bill.getBillDetails().forEach(detail -> {
+						demandIdBillMap.put(detail.getDemandId(), bill);
+					});
+				}
 			});
 			Bill bill = billIdBillMap.get(tracker.getBillId());
-			
+
 			if (bill == null || CollectionUtils.isEmpty(bill.getBillDetails())) {
 				log.warn("No bill or bill details found for billId [{}]. Skipping tracker [{}].", tracker.getBillId(),
 						tracker.getUuid());
@@ -1225,12 +1242,12 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-//				tracker.setRebateAmount(BigDecimal.ZERO);
+//                                                         tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
 				try {
-					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper,tracker);
+					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper, tracker);
 
 					tracker.setPropertyTax(newAmount);
 					tracker.setRebateAmount(BigDecimal.ZERO);
@@ -1272,24 +1289,20 @@ public class PropertySchedulerService {
 
 		for (BillDetail billDetail : bill.getBillDetails()) {
 			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand.getId().equals(tracker.getDemandId())) {
-				if (demand != null) {
-					demand.setMinimumAmountPayable(newAmount);
-					if (demand.getDemandDetails() != null) {
-						demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
-					}
-					demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
+			if (demand != null) {
+				demand.setMinimumAmountPayable(newAmount);
+				if (demand.getDemandDetails() != null) {
+					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
 				}
-
-				if (billDetail.getBillAccountDetails() != null) {
-					billDetail.getBillAccountDetails()
-							.forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-				}
-
-				billDetail.setAmount(newAmount);
+				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
 			}
-		}
 
+			if (billDetail.getBillAccountDetails() != null) {
+				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+			}
+
+			billDetail.setAmount(newAmount);
+		}
 		bill.setTotalAmount(newAmount);
 		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
 	}
@@ -1326,6 +1339,106 @@ public class PropertySchedulerService {
 		}
 
 		return latestTaxCalculatorTrackers;
+	}
+
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+
+		String[] tenants = { "hp.Shimla", "hp.Solan" };
+
+		String ulbName = null;
+		List<Map<String, Object>> bills = new ArrayList<>();
+
+		for (String tenant : tenants) {
+
+			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant);
+
+			if (result != null && !result.isEmpty()) {
+				bills.addAll(result);
+			}
+		}
+
+		if (bills.isEmpty()) {
+			return false;
+		}
+
+		Map<String, List<Map<String, Object>>> billsByUlb = new HashMap<>();
+
+		for (Map<String, Object> bill : bills) {
+
+			String wardName = String.valueOf(bill.get("ward"));
+			ulbName = String.valueOf(bill.get("tenantid"));
+			if (ulbName != null && ulbName.contains(".")) {
+				ulbName = ulbName.split("\\.")[1];
+			}
+			billsByUlb.computeIfAbsent(wardName, k -> new ArrayList<>()).add(bill);
+		}
+
+		for (Map.Entry<String, List<Map<String, Object>>> entry : billsByUlb.entrySet()) {
+
+			String wardName = entry.getKey();
+			List<Map<String, Object>> ulbBills = entry.getValue();
+
+			PDFMergerUtility merger = new PDFMergerUtility();
+			ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
+
+			for (Map<String, Object> bill : ulbBills) {
+
+				String propertyId = String.valueOf(bill.get("propertyid"));
+				String billId = String.valueOf(bill.get("bill_id"));
+				String status = String.valueOf(bill.get("bill_status"));
+				String UlbNames = String.valueOf(bill.get("tenantId"));
+				if (UlbNames != null && UlbNames.contains(".")) {
+					UlbNames = UlbNames.split("\\.")[1];
+				}
+				ResponseEntity<Resource> billResponse = propertyService
+						.generatePropertyTaxBillReceipt(requestInfoWrapper, propertyId, billId, status);
+
+				if (billResponse != null && billResponse.getBody() != null) {
+
+					InputStream inputStream = billResponse.getBody().getInputStream();
+
+					merger.addSource(inputStream);
+				}
+			}
+
+			merger.setDestinationStream(mergedOutput);
+			merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+
+			byte[] finalPdf = mergedOutput.toByteArray();
+
+			ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+				@Override
+				public String getFilename() {
+					return wardName + "_Bills.pdf";
+				}
+			};
+
+			DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(resource, wardName, ulbName,
+					requestInfoWrapper.getRequestInfo());
+
+			try {
+
+				alfrescoService.uploadAttachment(dmsRequest, requestInfoWrapper.getRequestInfo());
+
+			} catch (IOException e) {
+
+				throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed " + e.getMessage());
+			}
+		}
+
+		return true;
+	}
+
+	private DmsRequest generateDmsRequestFromBulkBillUpload(Resource resource, String wardName, String ulbName,
+			RequestInfo requestInfo) {
+		return DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+				.objectId(UUID.randomUUID().toString()).description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+				.id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID).type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+				.objectName(PTConstants.BUSINESS_SERVICE).comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
+				.status(PTConstants.APPLICATION_STATUS_APPROVED).file(resource)
+				.servicetype(PTConstants.BUSINESS_SERVICE).documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
+				.documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).ward_name(wardName).ulb_name(ulbName).build();
+
 	}
 
 }

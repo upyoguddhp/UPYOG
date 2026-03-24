@@ -419,5 +419,8 @@ public class PropertyConfiguration {
     
 	@Value("${egov.report.pdf.create.endpoint}")
 	private String reportCreateEndPoint;
+	
+	 @Value("${umeed.dashboard.sla.days}")
+	 private int umeedDashboardSlaDays;
 
 }

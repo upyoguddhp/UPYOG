@@ -116,7 +116,9 @@ public class Bill {
 
 	  PAID("PAID"),
 
-	  EXPIRED("EXPIRED");
+	  EXPIRED("EXPIRED"),
+		
+	  PARTIALLY_PAID("PARTIALLY_PAID");
 
 	  private String value;
 

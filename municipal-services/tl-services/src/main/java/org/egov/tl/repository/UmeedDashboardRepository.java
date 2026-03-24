@@ -128,4 +128,26 @@ public class UmeedDashboardRepository {
 		return result;
 	}
 
+	// public GroupedData getDepartmentWiseComplaintCount() {
+
+	//     List<Object> preparedStmtList = new ArrayList<>();
+
+	//     String query = queryBuilder.getDepartmentWiseComplaintCountQuery(preparedStmtList);
+
+	//     List<Bucket> buckets = jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
+	//         Bucket bucket = new Bucket();
+	//         bucket.setName(rs.getString("department"));
+	//         bucket.setValue(rs.getBigDecimal("value"));
+	//         return bucket;
+	//     });
+
+	//     GroupedData groupedData = new GroupedData();
+	//     groupedData.setGroupBy("department");
+	//     groupedData.setBuckets(buckets);
+
+	//     return groupedData;
+	// }
+
+
+
 }
