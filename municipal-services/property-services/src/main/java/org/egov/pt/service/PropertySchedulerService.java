@@ -76,6 +76,8 @@ import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
 
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 
 import java.io.*;
@@ -1386,12 +1388,35 @@ public Object updatePenaltyAmount(RequestInfoWrapper requestInfoWrapper) {
 //    return mergedOutput.toByteArray();   
 //}
 
-public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {    
+	MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(
+	        requestInfoWrapper.getRequestInfo(), null);
+	Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
+	String[] tenants = {};
+   
+	if (mdmsRes != null) {
+		Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+	    if (moduleData != null) {
+	        List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
 
-    String[] tenants = {"hp.Shimla", "hp.Solan"};
+	        if (masterList != null) {
+	            List<String> tenantList = new ArrayList<>();
 
-    // 1️⃣ All bills collect
-    String ulbName = null; 
+	            for (Object obj : masterList) {
+
+	                Map<String, Object> map = (Map<String, Object>) obj;
+
+	                String getulbName = map.get("ulbName").toString();
+	                String tenantId = "hp." + getulbName;
+
+	                tenantList.add(tenantId);
+	            }
+
+	             tenants = tenantList.toArray(new String[0]);	        }
+	    }
+	}
+	
+	String ulbName = null; 
     List<Map<String, Object>> bills = new ArrayList<>();
 
     for (String tenant : tenants) {
@@ -1432,7 +1457,7 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
         PDFMergerUtility merger = new PDFMergerUtility();
         ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
 
-        // 4️⃣ Generate PDF for each bill
+        // 4 Generate PDF for each bill
         for (Map<String, Object> bill : ulbBills) {
 
             String propertyId = String.valueOf(bill.get("propertyid"));
@@ -1459,13 +1484,13 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
             }
         }
 
-        // 5️⃣ Merge PDFs of that ULB
+        // Merge PDFs of that ULB
         merger.setDestinationStream(mergedOutput);
         merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 
         byte[] finalPdf = mergedOutput.toByteArray();
 
-        // 6️⃣ Convert to resource
+        // 6️ Convert to resource
         ByteArrayResource resource = new ByteArrayResource(finalPdf) {
             @Override
             public String getFilename() {
@@ -1473,14 +1498,14 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
             }
         };
 
-        // 7️⃣ Prepare DMS request
+        // 7️ Prepare DMS request
         DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(
                 resource,
                 wardName,ulbName,
                 requestInfoWrapper.getRequestInfo()
         );
 
-        // 8️⃣ Upload to Alfresco
+        // 8️ Upload to Alfresco
         try {
 
             alfrescoService.uploadAttachment(
@@ -1523,5 +1548,8 @@ private DmsRequest generateDmsRequestFromBulkBillUpload(
             .build();
     
 }
+
+
+
 
 }
