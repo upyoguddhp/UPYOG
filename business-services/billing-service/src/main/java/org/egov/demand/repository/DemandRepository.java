@@ -290,6 +290,38 @@ public class DemandRepository {
 				return oldDemandDetails.size();
 			}
 		});
+		
+		syncBillAdjustedAmounts(oldDemands, oldDemandDetails);
+	}
+	
+	private void syncBillAdjustedAmounts(List<Demand> demands, List<DemandDetail> demandDetails) {
+
+	    if (demandDetails == null || demandDetails.isEmpty()) return;
+	    
+	    for (Demand demand : demands) {
+
+	        if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
+
+	            jdbcTemplate.update(DemandQueryBuilder.SYNC_ALL_ADJUSTED_AMOUNT_QUERY,demand.getId());
+	        }
+	    }
+
+	    jdbcTemplate.batchUpdate(DemandQueryBuilder.SYNC_ADJUSTED_AMOUNT_QUERY, new BatchPreparedStatementSetter() {
+
+	            @Override
+	            public void setValues(PreparedStatement ps, int i) throws SQLException {
+	                DemandDetail dd = demandDetails.get(i);
+
+	                ps.setBigDecimal(1, dd.getCollectionAmount());
+	                ps.setString(2, dd.getId());
+	            }
+
+	            @Override
+	            public int getBatchSize() {
+	                return demandDetails.size();
+	            }
+	        }
+	    );
 	}
 	
 	

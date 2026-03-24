@@ -192,19 +192,31 @@ public class ReceiptServiceV2 {
 	 */
 	private void updateSingleDemandDetail(DemandDetail currentDetail, BillAccountDetailV2 billAccDetail,
 			Boolean isRecieptCancellation, String advanceTaxHead) {
-		
+
 		BigDecimal oldCollectedAmount = currentDetail.getCollectionAmount();
-		BigDecimal newAmount = billAccDetail.getAdjustedAmount();
+		BigDecimal newTotalAdjusted = billAccDetail.getAdjustedAmount();
 
-		if(advanceTaxHead!=null && billAccDetail.getTaxHeadCode().equalsIgnoreCase(advanceTaxHead))
+		if (advanceTaxHead != null && billAccDetail.getTaxHeadCode().equalsIgnoreCase(advanceTaxHead)) {
 			currentDetail.setTaxAmount(billAccDetail.getAmount().add(oldCollectedAmount));
+		}
 
-		if (isRecieptCancellation)
-			currentDetail.setCollectionAmount(oldCollectedAmount.subtract(newAmount));
-		else
-			currentDetail.setCollectionAmount(oldCollectedAmount.add(newAmount));
+		if (isRecieptCancellation) {
+			currentDetail.setCollectionAmount(oldCollectedAmount.subtract(newTotalAdjusted));
+		} else {
+
+			BigDecimal delta = newTotalAdjusted.subtract(oldCollectedAmount);
+			if (delta.compareTo(BigDecimal.ZERO) <= 0)
+				return;
+
+			BigDecimal updatedCollection = oldCollectedAmount.add(delta);
+
+			if (updatedCollection.compareTo(currentDetail.getTaxAmount()) > 0) {
+				updatedCollection = currentDetail.getTaxAmount();
+			}
+
+			currentDetail.setCollectionAmount(updatedCollection);
+		}
 	}
-	
 	
 	/**
 	 * Method to handle update if multiple demand details are present for a single Bill account detail

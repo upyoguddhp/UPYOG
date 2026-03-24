@@ -171,6 +171,14 @@ public class PaymentEnricher {
 					paymentDetail.getBusinessService(), paymentDetail.getTenantId());
 			paymentDetail.setReceiptNumber(receiptNumber);
 			paymentDetail.getBill().setAmountPaid(paymentDetail.getTotalAmountPaid());
+			
+			Bill bill = paymentDetail.getBill();
+
+			if (bill.getAmountPaid().compareTo(bill.getTotalAmount()) >= 0) {
+				bill.setStatus(Bill.StatusEnum.PAID);
+			} else {
+			    bill.setStatus(Bill.StatusEnum.ACTIVE);
+			}
 
 		}
 		enrichInstrument(paymentRequest);

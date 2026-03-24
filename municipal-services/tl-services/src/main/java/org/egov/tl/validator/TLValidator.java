@@ -229,88 +229,140 @@ public class TLValidator {
      *  Validates the fromDate and toDate of the request
      * @param request The input TradeLicenseRequest Object
      */
-    public void validateRenewal(TradeLicenseRequest request){
-            
-        TradeLicenseSearchCriteria criteria = new TradeLicenseSearchCriteria();
-        List<String> licenseNumbers = new LinkedList<>();
-        request.getLicenses().forEach(license -> {
-            if(license.getLicenseNumber() != null){
-                licenseNumbers.add(license.getLicenseNumber());
-            } else{
-                throw new CustomException("INVALID LICENSE","Please select the existing licence for renewal");  
-                
-            }
-        });
-        
-        request.getLicenses().forEach(license->{
-        	if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_CANCELLED)) {
-        		throw new CustomException("LICENSE CANCELLED", "Licenses which are cancelled cannot be renewed");
-        	}
-        }       		        		
-        	);
-        
-        request.getLicenses().forEach(license->{
-        	if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_MANUALLYEXPIRED) && license.getValidTo()>System.currentTimeMillis()) {
-        		throw new CustomException("LICENSE MANUALLY EXPIRED", "Licenses which are manually expired cannot be renewed");
-        	}
-        }       		        		
-        	);
-        
-        criteria.setTenantId(request.getLicenses().get(0).getTenantId());
-        
-        List<String> statuses = new ArrayList<String>();
-        statuses.add(TLConstants.STATUS_APPROVED);
-        statuses.add(TLConstants.STATUS_MANUALLYEXPIRED);
-        statuses.add(TLConstants.STATUS_EXPIRED);
-        statuses.addAll(Arrays.asList(TLConstants.STATUS_PENDINGFORMODIFICATION,TLConstants.STATUS_PENDINGFORVERIFICATION
-        				,TLConstants.STATUS_PENDINGFORAPPROVAL,TLConstants.STATUS_PENDINGFORPAYMENT));
+//    public void validateRenewal(TradeLicenseRequest request){
+//            
+//        TradeLicenseSearchCriteria criteria = new TradeLicenseSearchCriteria();
+//        List<String> licenseNumbers = new LinkedList<>();
+//        request.getLicenses().forEach(license -> {
+//            if(license.getLicenseNumber() != null){
+//                licenseNumbers.add(license.getLicenseNumber());
+//            } else{
+//                throw new CustomException("INVALID LICENSE","Please select the existing licence for renewal");  
+//                
+//            }
+//        });
+//        
+//        request.getLicenses().forEach(license->{
+//        	if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_CANCELLED)) {
+//        		throw new CustomException("LICENSE CANCELLED", "Licenses which are cancelled cannot be renewed");
+//        	}
+//        }       		        		
+//        	);
+//        
+//        request.getLicenses().forEach(license->{
+//        	if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_MANUALLYEXPIRED) && license.getValidTo()>System.currentTimeMillis()) {
+//        		throw new CustomException("LICENSE MANUALLY EXPIRED", "Licenses which are manually expired cannot be renewed");
+//        	}
+//        }       		        		
+//        	);
+//        
+//        criteria.setTenantId(request.getLicenses().get(0).getTenantId());
+//        
+//        List<String> statuses = new ArrayList<String>();
+//        statuses.add(TLConstants.STATUS_APPROVED);
+//        statuses.add(TLConstants.STATUS_MANUALLYEXPIRED);
+//        statuses.add(TLConstants.STATUS_EXPIRED);
+//        statuses.addAll(Arrays.asList(TLConstants.STATUS_PENDINGFORMODIFICATION,TLConstants.STATUS_PENDINGFORVERIFICATION
+//        				,TLConstants.STATUS_PENDINGFORAPPROVAL,TLConstants.STATUS_PENDINGFORPAYMENT));
+//
+//        criteria.setStatus(statuses);
+//        criteria.setBusinessService(request.getLicenses().get(0).getBusinessService());
+//        criteria.setLicenseNumbers(licenseNumbers);
+//        List<TradeLicense> searchResult = tlRepository.getLicenses(criteria);
+//
+//        Map<String , TradeLicense> licenseMap = new HashMap<>();
+//        searchResult.forEach(license -> {
+//            licenseMap.put(license.getLicenseNumber() , license);
+//        });
+//        
+//        request.getLicenses().forEach(license -> {
+//            if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
+//
+//                if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_APPROVED)
+//                        && licenseMap.containsKey(license.getLicenseNumber())
+//                        && licenseMap.get(license.getLicenseNumber()).getId().equalsIgnoreCase(license.getId())){
+//                    return;
+//                }
+//                else if(licenseMap.containsKey(license.getLicenseNumber())){
+//                    TradeLicense searchObj = licenseMap.get(license.getLicenseNumber());
+//                    Long currentFromDate = license.getValidFrom();
+//                    Long currentToDate = license.getValidTo();
+//                    
+//                    // HPUDD is using existing application for RENEWAL
+//                    /*Long existingFromDate = searchObj.getValidFrom();
+//                    Long existingToDate = searchObj.getValidTo();
+//                    if(currentFromDate < existingToDate){
+//                        throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the previous applications ValidTo Date");
+//                    }
+//                    if(currentFromDate  <= existingFromDate){
+//                        throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the applications ValidFrom Date");
+//                    }
+//                    if(currentToDate <= existingToDate) {
+//                        throw new CustomException("INVALID TO DATE", "ValidTo should be greater than the applications ValidTo Date");
+//                    }
+//                    if(currentFromDate > currentToDate){
+//                        throw new CustomException("INVALID FROM DATE","ValidFrom cannot be greater than ValidTo Date");
+//                    }*/          
+//                   
+//                }else{
+//                    throw new CustomException("RENEWAL ERROR","The license applied for renewal is not present in the repository");
+//                }
+//            }
+//        });
+//    }
+    //----new 
+    public void validateRenewal(TradeLicenseRequest request) {
 
-        criteria.setStatus(statuses);
-        criteria.setBusinessService(request.getLicenses().get(0).getBusinessService());
-        criteria.setLicenseNumbers(licenseNumbers);
-        List<TradeLicense> searchResult = tlRepository.getLicenses(criteria);
+        TradeLicense renewalLicense = request.getLicenses().get(0);
 
-        Map<String , TradeLicense> licenseMap = new HashMap<>();
-        searchResult.forEach(license -> {
-            licenseMap.put(license.getLicenseNumber() , license);
-        });
-        
-        request.getLicenses().forEach(license -> {
-            if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
+        if (renewalLicense.getLicenseNumber() == null) {
+            throw new CustomException(
+                    "INVALID_LICENSE",
+                    "License number is mandatory for renewal"
+            );
+        }
 
-                if(license.getStatus().equalsIgnoreCase(TLConstants.STATUS_APPROVED)
-                        && licenseMap.containsKey(license.getLicenseNumber())
-                        && licenseMap.get(license.getLicenseNumber()).getId().equalsIgnoreCase(license.getId())){
-                    return;
-                }
-                else if(licenseMap.containsKey(license.getLicenseNumber())){
-                    TradeLicense searchObj = licenseMap.get(license.getLicenseNumber());
-                    Long currentFromDate = license.getValidFrom();
-                    Long currentToDate = license.getValidTo();
-                    
-                    // HPUDD is using existing application for RENEWAL
-                    /*Long existingFromDate = searchObj.getValidFrom();
-                    Long existingToDate = searchObj.getValidTo();
-                    if(currentFromDate < existingToDate){
-                        throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the previous applications ValidTo Date");
-                    }
-                    if(currentFromDate  <= existingFromDate){
-                        throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the applications ValidFrom Date");
-                    }
-                    if(currentToDate <= existingToDate) {
-                        throw new CustomException("INVALID TO DATE", "ValidTo should be greater than the applications ValidTo Date");
-                    }
-                    if(currentFromDate > currentToDate){
-                        throw new CustomException("INVALID FROM DATE","ValidFrom cannot be greater than ValidTo Date");
-                    }*/          
-                   
-                }else{
-                    throw new CustomException("RENEWAL ERROR","The license applied for renewal is not present in the repository");
-                }
-            }
-        });
+        TradeLicenseSearchCriteria criteria = TradeLicenseSearchCriteria.builder()
+                .tenantId(renewalLicense.getTenantId())
+                .licenseNumbers(Collections.singletonList(renewalLicense.getLicenseNumber()))
+                .businessService(renewalLicense.getBusinessService())
+                .build();
+
+        List<TradeLicense> dbLicenses = tlRepository.getLicenses(criteria);
+
+        if (dbLicenses.isEmpty()) {
+            throw new CustomException(
+                    "LICENSE_NOT_FOUND",
+                    "No existing license found for renewal"
+            );
+        }
+
+        TradeLicense existingLicense = dbLicenses.get(0);
+
+        if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(existingLicense.getStatus())) {
+            throw new CustomException(
+                    "RENEWAL_NOT_ALLOWED",
+                    "Renewal is allowed only for APPROVED licenses. Current status: "
+                            + existingLicense.getStatus()
+            );
+        }
+
+        // Optional extra checks
+        if (TLConstants.STATUS_CANCELLED.equalsIgnoreCase(existingLicense.getStatus())) {
+            throw new CustomException(
+                    "LICENSE_CANCELLED",
+                    "Cancelled licenses cannot be renewed"
+            );
+        }
+
+        if (TLConstants.STATUS_MANUALLYEXPIRED.equalsIgnoreCase(existingLicense.getStatus())) {
+            throw new CustomException(
+                    "LICENSE_MANUALLY_EXPIRED",
+                    "Manually expired licenses cannot be renewed"
+            );
+        }
     }
-
+//---
 
 	/**
      *  Validates the update request
@@ -323,9 +375,9 @@ public class TLValidator {
         validateAllIds(searchResult, licenses);
         validateApplicationTypeAndAction(licenses);
         String businessService = request.getLicenses().isEmpty()?null:licenses.get(0).getBusinessService();
-        if(licenses.get(0).getApplicationType() != null && licenses.get(0).getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
-            validateRenewal(request);
-        }        
+//        if(licenses.get(0).getApplicationType() != null && licenses.get(0).getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
+//            validateRenewal(request);
+//        }
         if (businessService == null)
             businessService = businessService_TL;
         switch (businessService) {
@@ -703,12 +755,4 @@ public class TLValidator {
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }
-
-
-
-
-
-
 }
-
-

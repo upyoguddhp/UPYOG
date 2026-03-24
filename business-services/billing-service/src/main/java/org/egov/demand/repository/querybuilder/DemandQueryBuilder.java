@@ -120,6 +120,17 @@ public class DemandQueryBuilder {
 	public static final String DEMAND_UPDATE_CONSUMERCODE_QUERY="UPDATE egbs_demand_v1 SET consumercode=?, lastmodifiedby=?, lastmodifiedtime=? "
 			+ " WHERE tenantid=? AND id IN (";
 	
+    public static final String SYNC_ADJUSTED_AMOUNT_QUERY = "UPDATE egbs_billaccountdetail_v1 bad\r\n"
+	        + "SET adjustedamount = ?\r\n"
+	        + "FROM egbs_billdetail_v1 bd, egbs_bill_v1 b\r\n"
+	        + "WHERE bad.demanddetailid = ?\r\n"
+	        + "AND bad.billdetail = bd.id\r\n"
+	        + "AND bd.billid = b.id;";
+	
+	public static final String SYNC_ALL_ADJUSTED_AMOUNT_QUERY = "UPDATE egbs_billaccountdetail_v1 " +
+            "SET adjustedamount = amount " +
+            "WHERE demanddetailid IN (" +
+            "SELECT id FROM egbs_demanddetail_v1 WHERE demandid = ?)";
 
 	public String getDemandQueryForConsumerCodes(Map<String,Set<String>> businessConsumercodeMap,List<Object> preparedStmtList, String tenantId){
 		
