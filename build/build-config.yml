@@ -863,7 +863,7 @@ config:
         dockerfile: build/maven/Dockerfile
 
   - name: builds/rdf-monitoring
-    repo: https://upyoguddhp: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@github.com/upyoguddhp/RDFMonitoring.git
+    repo: https://github.com/upyoguddhp/RDFMonitoring.git
     build:
       - work-dir: .
         image-name: rdf-monitoring
