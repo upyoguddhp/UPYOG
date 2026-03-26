@@ -862,12 +862,4 @@ config:
         image-name: requester-services-dx
         dockerfile: build/maven/Dockerfile
 
-  - name: builds/upyog/rdf-monitoring
-    buildConfigs:
-      - workDir: .
-        dockerFile: Dockerfile
-        context: .
-        imageName: rdf-monitoring
-  
-
    
