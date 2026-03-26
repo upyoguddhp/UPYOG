@@ -864,3 +864,7 @@ config:
 
   - name: builds/rdf-monitoring
     repo: https://github.com/upyoguddhp/RDFMonitoring.git
+    build:
+      - work-dir: .
+        image-name: rdf-monitoring
+        dockerfile: Dockerfile
