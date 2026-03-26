@@ -868,3 +868,17 @@ config:
       - work-dir: .
         image-name: rdf-monitoring
         dockerfile: Dockerfile
+  - name: builds/upyog-frontend
+    repo: https://github.com/upyoguddhp/upyog-frontend.git
+    build:
+      - work-dir: .
+        image-name: hp-udd
+        dockerfile: Dockerfile
+        
+  - name: builds/upyog-frontend-vite
+    repo: https://github.com/upyoguddhp/upyog-frontend.git
+    build:
+      - work-dir: .
+        image-name: hp-udd-vite
+        dockerfile: Dockerfile
+
