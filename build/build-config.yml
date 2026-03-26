@@ -862,4 +862,5 @@ config:
         image-name: requester-services-dx
         dockerfile: build/maven/Dockerfile
 
-   
+  - name: builds/rdf-monitoring
+    repo: https://github.com/upyoguddhp/RDFMonitoring.git
