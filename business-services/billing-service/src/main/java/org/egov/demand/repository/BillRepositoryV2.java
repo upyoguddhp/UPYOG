@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.egov.demand.web.contract.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -413,4 +414,11 @@ public class BillRepositoryV2 {
 		});
 	}
 	
+	public void updateCustomBillAmount(CustomAmountUpdateRequest request) {	
+		String BillId = request.getBillId();
+		BigDecimal CustomAmount = request.getCustomAmount();
+		
+		
+		
+	}
 }

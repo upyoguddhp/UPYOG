@@ -86,6 +86,7 @@ import org.egov.demand.model.UpdateBillCriteria;
 import org.egov.demand.model.UpdateBillRequest;
 import org.egov.demand.producer.Producer;
 import org.egov.demand.repository.BillRepositoryV2;
+import org.egov.demand.repository.DemandRepository;
 import org.egov.demand.repository.IdGenRepo;
 import org.egov.demand.repository.ServiceRequestRepository;
 import org.egov.demand.util.Util;
@@ -107,6 +108,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.egov.demand.web.contract.CustomAmountUpdateRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -130,6 +132,9 @@ public class BillServicev2 {
 
 	@Autowired
 	private DemandService demandService;
+	
+	@Autowired 
+	private DemandRepository demandRepository;
 
 	@Autowired
 	private BusinessServDetailService businessServDetailService;
@@ -774,4 +779,12 @@ public class BillServicev2 {
 		return getBillResponse(billRequest.getBills());
 	}
 	
+	public void updateCustomAmount(CustomAmountUpdateRequest request) {
+		if(request != null) {
+			demandRepository.updateCustomDemandAmount(request);
+//			billRepository.updateCustomBillAmount(request);
+		}else {
+			throw new CustomException("EG_BS_UPDATE_ERROR","Error updating custom amount in bills !");
+		}
+	}
 }

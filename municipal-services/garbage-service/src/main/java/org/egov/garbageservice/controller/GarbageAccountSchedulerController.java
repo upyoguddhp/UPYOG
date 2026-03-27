@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.garbageservice.model.CustomAmountUpdateResponse;
 
 
 
@@ -55,6 +57,13 @@ public class GarbageAccountSchedulerController {
 
 		return ResponseEntity.ok("Rebate amount reversed successfully!!!");
 //		return ResponseEntity.ok(service.reverseRebateAmount(requestInfoWrapper));
+	}
+	
+	@PostMapping("/_updateCustomAmount")
+	public ResponseEntity<CustomAmountUpdateResponse> updateCustomAmount(@RequestBody CustomAmountUpdateRequest request) {
+
+	    CustomAmountUpdateResponse response = service.updateCustomAmount(request);
+	    return ResponseEntity.ok(response);
 	}
 
 }

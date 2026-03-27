@@ -67,6 +67,9 @@ import org.egov.garbageservice.model.contract.User;
 import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.contract.bill.BillAccountDetail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.garbageservice.model.CustomAmountUpdateResponse;
+import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +119,13 @@ public class GarbageAccountSchedulerService {
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
-
+	
+	@Value("${egov.bill.context.host}")
+	private String billHost;
+	
+	@Value("${egov.bill.endpoint.search}")
+	private String billSearchEndpoint;
+	
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
@@ -849,6 +858,41 @@ public class GarbageAccountSchedulerService {
 	    }
 	
 	    return trackers;
+	}
+	
+	public CustomAmountUpdateResponse updateCustomAmount(CustomAmountUpdateRequest request) {
+
+	    StringBuilder uri = new StringBuilder();
+	    uri.append(billHost)
+	       .append(billSearchEndpoint)
+	       .append("?tenantId=").append(request.getTenantId())
+	       .append("&billId=").append(request.getBillId());
+
+	    RequestInfoWrapper wrapper = new RequestInfoWrapper();
+	    wrapper.setRequestInfo(request.getRequestInfo());
+
+	    Object response = restCallRepository.fetchResult(uri, wrapper);
+
+	    BillResponse billResponse = objectMapper.convertValue(response, BillResponse.class);
+
+	    if (CollectionUtils.isEmpty(billResponse.getBill())) {
+	        throw new CustomException("BILL_NOT_FOUND", "No bill found for given ID");
+	    }
+
+	    Bill bill = billResponse.getBill().get(0);
+
+	    if (Bill.StatusEnum.PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update paid bill");
+	    }
+	    
+	    if (bill.getAmountPaid() != null && bill.getAmountPaid().compareTo(BigDecimal.ZERO) > 0) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
+	    }
+	    String DemandId =  bill.getBillDetails().get(0).getDemandId();   
+	    request.setDemandId(DemandId);
+	    garbageBillTrackerRepository.updateCustomTrackerAmount(request);
+	    
+	    return null;
 	}
 
 }
