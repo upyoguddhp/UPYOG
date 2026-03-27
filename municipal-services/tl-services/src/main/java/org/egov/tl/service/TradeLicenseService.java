@@ -1591,6 +1591,7 @@ public class TradeLicenseService {
 
 			// search application number
 			TradeLicenseSearchCriteria criteria = TradeLicenseSearchCriteria.builder()
+			        .ids(Collections.singletonList(tradeLicenseActionRequest.getUuids().get(0)))
 					.applicationNumber(applicationNumber).build();
 			List<TradeLicense> licenses = repository.getLicenses(criteria);
 			licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria,
@@ -1639,16 +1640,9 @@ public class TradeLicenseService {
 					.asText();
 			tradeCategory = license.getTradeLicenseDetail().getAdditionalDetail().get(TLConstants.TRADE_CATEGORY)
 					.asText();
-//			periodOfLicense = license.getTradeLicenseDetail().getAdditionalDetail().get(TLConstants.PERIOD_OF_LICENSE)
-//					.asInt();
+			periodOfLicense = license.getTradeLicenseDetail().getAdditionalDetail().get(TLConstants.PERIOD_OF_LICENSE)
+					.asInt();
 			
-			boolean isRenewal = TLConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(license.getApplicationType());
-
-			if (isRenewal) {
-				periodOfLicense = 1;
-			} else {
-				periodOfLicense = 5;
-			}
 			zone = license.getTradeLicenseDetail().getAddress().getAdditionalDetail().get(TLConstants.ZONE).asText();
 		} catch (Exception e) {
 			throw new CustomException("FETCH_LICENSE_FAILED",
