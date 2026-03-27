@@ -63,6 +63,7 @@ import org.egov.tl.web.models.TradeLicenseResponse;
 import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.tl.web.models.TradeUnit;
 import org.egov.tl.web.models.UpdateTLStatusCriteriaRequest;
+import org.egov.tl.web.models.collection.Bill.StatusEnum;
 import org.egov.tl.web.models.contract.BillResponse;
 import org.egov.tl.web.models.contract.BillSearchCriteria;
 import org.egov.tl.web.models.contract.BusinessService;
@@ -1760,6 +1761,7 @@ public class TradeLicenseService {
 		// search bill Details
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(TLConstants.STATE_LEVEL_TENANT_ID)
 				.consumerCode(Collections.singleton(applicationDetail.getApplicationNumber()))
+				.status(StatusEnum.ACTIVE)
 				.service(license.getBusinessService()).build();
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfo);
 		Map<Object, Object> billDetailsMap = new HashMap<>();
