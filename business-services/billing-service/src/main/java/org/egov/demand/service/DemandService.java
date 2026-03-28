@@ -237,6 +237,15 @@ public class DemandService {
 
 		RequestInfo requestInfo = demandRequest.getRequestInfo();
 		List<Demand> demands = demandRequest.getDemands();
+		
+		Set<String> billIds = demands.stream().map(d -> {
+			if (d.getAdditionalDetails() instanceof Map) {
+				Object val = ((Map<?, ?>) d.getAdditionalDetails()).get("billId");
+				return val != null ? val.toString() : null;
+			}
+			return null;
+		}).filter(Objects::nonNull).collect(Collectors.toSet());
+		
 		AuditDetails auditDetail = util.getAuditDetail(requestInfo);
 
 		List<Demand> newDemands = new ArrayList<>();
@@ -280,6 +289,7 @@ public class DemandService {
 				.consumerCodes(demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet()))
 				.businessService(businessService)
 				.tenantId(tenantId)
+				.billIds(billIds)
 				.build();
 		
 		if(org.apache.commons.lang3.StringUtils.equalsIgnoreCase(businessService, Constants.NEWTL_BUSINESS_SERVICE)

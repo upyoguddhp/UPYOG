@@ -163,6 +163,11 @@ public class BillQueryBuilder {
 			selectQuery.append(" AND b.status != ?");
 			preparedStatementValues.add(BillStatus.CANCELLED.toString());
 		}
+		
+		if (searchBill.getIsCancelled() != null) {
+		    selectQuery.append(" AND b.iscancelled = ?");
+		    preparedStatementValues.add(searchBill.getIsCancelled());
+		}
 
 		if (searchBill.getEmail() != null) {
 			selectQuery.append(" AND b.payeremail = ?");
