@@ -2277,7 +2277,9 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		}
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType())).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+				.grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.year(grbgTaxCalculatorMonthTracker.getYear())
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
