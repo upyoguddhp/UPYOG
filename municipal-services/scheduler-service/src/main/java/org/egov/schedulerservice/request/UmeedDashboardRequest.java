@@ -16,5 +16,4 @@ public class UmeedDashboardRequest {
 	
 	@JsonProperty("data")
 	private Object data;
-
 }

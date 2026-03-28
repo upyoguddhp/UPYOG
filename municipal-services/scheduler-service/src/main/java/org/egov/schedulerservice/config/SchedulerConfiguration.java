@@ -47,13 +47,19 @@ public class SchedulerConfiguration {
 
 	@Value("${egov.property.endpoint.reverse-rebate-amount}")
 	private String propertyReverseRebateAmountEndpoint;
+	
+	@Value("${egov.property.endpoint.reverse-rebate-amount}")
+	private String propertyServiceEndpoint;
 
 	@Value("${egov.property.endpoint.update-penalty-amount}")
 	private String propertyUpdatePenaltyAmountEndpoint;
 
 	@Value("${egov.pgr.context.host}")
 	private String pgrServiceHostUrl;
-
+	
+	@Value("${egov.pgr.endpoint.data-metrics}")
+	private String pgrDataMetricsEndpoint;
+	
 	@Value("${egov.pgr.endpoint.request-escalator}")
 	private String pgrRequestEscalatorEndpoint;
 
@@ -95,6 +101,16 @@ public class SchedulerConfiguration {
 
 	@Value("${egov.notification.sms.endpoint.send-notification-sms}")
 	private String sendNotificationSmsEndpoint;
+
+	@Value("${egov.garbage.endpoint.update-penalty-amount}")
+	private String garbageUpdatePenaltyAmountEndpoint;
+	
+	@Value("${egov.garbage.endpoint.reverse-rebate-amount}")
+	private String garbageReverseRebateAmountEndpoint;
+	
+	@Value("${egov.property.endpoint.bulk-uploads}")
+	private String PropertyBulkBillUploads;
+
 	
 	
 }

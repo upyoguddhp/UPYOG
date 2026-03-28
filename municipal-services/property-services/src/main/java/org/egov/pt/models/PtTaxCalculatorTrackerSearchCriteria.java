@@ -31,6 +31,8 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 	private Set<String> propertyIds;
 	
 	private String billId;
+	
+	private Set<String> demandIds;
 
 	private Set<String> financialYears;
 
@@ -45,6 +47,8 @@ public class PtTaxCalculatorTrackerSearchCriteria {
 	private  BigDecimal rebateamount;
 
 	private Integer limit;
+	
+	private String ward;
 
 	@JsonIgnore
 	private Long startDateTime;
