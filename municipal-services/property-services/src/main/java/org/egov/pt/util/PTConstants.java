@@ -523,6 +523,10 @@ public class PTConstants {
     public static final String ALFRESCO_DOCUMENT_TYPE = "PDF";
     public static final String ALFRESCO_TL_CERTIFICATE_COMMENT = "ward wise bills";
     
+	public static final String DOWNLOADPDF = "downloadPdf";
+
+    
+    
     @Value("${egov.alfresco.host}")
     private String alfrescoHost;
     

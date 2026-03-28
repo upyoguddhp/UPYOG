@@ -78,6 +78,10 @@ import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
 
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+
+
 import java.io.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -1341,12 +1345,37 @@ public class PropertySchedulerService {
 		return latestTaxCalculatorTrackers;
 	}
 
-	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {    
+	
+	MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(
+	        requestInfoWrapper.getRequestInfo(), null);
+	Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
+	String[] tenants = {};
+   
+	if (mdmsRes != null) {
+		Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+	    if (moduleData != null) {
+	        List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
 
-		String[] tenants = { "hp.Shimla", "hp.Solan" };
+	        if (masterList != null) {
+	            List<String> tenantList = new ArrayList<>();
 
-		String ulbName = null;
-		List<Map<String, Object>> bills = new ArrayList<>();
+	            for (Object obj : masterList) {
+
+	                Map<String, Object> map = (Map<String, Object>) obj;
+
+	                String getulbName = map.get("ulbName").toString();
+	                String tenantId = "hp." + getulbName;
+
+	                tenantList.add(tenantId);
+	            }
+
+	             tenants = tenantList.toArray(new String[0]);	        }
+	    }
+	}
+	
+	String ulbName = null; 
+    List<Map<String, Object>> bills = new ArrayList<>();
 
 		for (String tenant : tenants) {
 
@@ -1381,7 +1410,8 @@ public class PropertySchedulerService {
 			PDFMergerUtility merger = new PDFMergerUtility();
 			ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
 
-			for (Map<String, Object> bill : ulbBills) {
+        // 4 Generate PDF for each bill
+        for (Map<String, Object> bill : ulbBills) {
 
 				String propertyId = String.valueOf(bill.get("propertyid"));
 				String billId = String.valueOf(bill.get("bill_id"));
@@ -1401,22 +1431,29 @@ public class PropertySchedulerService {
 				}
 			}
 
-			merger.setDestinationStream(mergedOutput);
-			merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+        // Merge PDFs of that ULB
+        merger.setDestinationStream(mergedOutput);
+        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 
 			byte[] finalPdf = mergedOutput.toByteArray();
 
-			ByteArrayResource resource = new ByteArrayResource(finalPdf) {
-				@Override
-				public String getFilename() {
-					return wardName + "_Bills.pdf";
-				}
-			};
+        // 6️ Convert to resource
+        ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+            @Override
+            public String getFilename() {
+                return wardName + "_Bills.pdf";
+            }
+        };
 
-			DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(resource, wardName, ulbName,
-					requestInfoWrapper.getRequestInfo());
+        // 7️ Prepare DMS request
+        DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(
+                resource,
+                wardName,ulbName,
+                requestInfoWrapper.getRequestInfo()
+        );
 
-			try {
+        // 8️ Upload to Alfresco
+        try {
 
 				alfrescoService.uploadAttachment(dmsRequest, requestInfoWrapper.getRequestInfo());
 
@@ -1426,19 +1463,34 @@ public class PropertySchedulerService {
 			}
 		}
 
-		return true;
-	}
+    return true;
+}
+   
 
-	private DmsRequest generateDmsRequestFromBulkBillUpload(Resource resource, String wardName, String ulbName,
-			RequestInfo requestInfo) {
-		return DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
-				.objectId(UUID.randomUUID().toString()).description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
-				.id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID).type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
-				.objectName(PTConstants.BUSINESS_SERVICE).comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
-				.status(PTConstants.APPLICATION_STATUS_APPROVED).file(resource)
-				.servicetype(PTConstants.BUSINESS_SERVICE).documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
-				.documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).ward_name(wardName).ulb_name(ulbName).build();
 
-	}
+private DmsRequest generateDmsRequestFromBulkBillUpload(
+        Resource resource, String wardName,String ulbName,
+        RequestInfo requestInfo) {
+    return DmsRequest.builder()
+            .userId(requestInfo.getUserInfo().getId().toString())
+            .objectId(UUID.randomUUID().toString())
+            .description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+            .id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID)
+            .type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+            .objectName(PTConstants.BUSINESS_SERVICE)
+            .comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
+            .status(PTConstants.APPLICATION_STATUS_APPROVED)
+            .file(resource)
+            .servicetype(PTConstants.BUSINESS_SERVICE)
+            .documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
+            .documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID)
+            .ward_name(wardName)
+            .ulb_name(ulbName)
+            .build();
+    
+}
+
+
+
 
 }
