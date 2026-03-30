@@ -46,8 +46,5 @@ public class PetApplicationSearchCriteria {
 
 	@JsonProperty("isBannedPet")
 	private Boolean isBannedPet;
-	
-	@JsonProperty("applicationType")
-	private List<String> applicationType;
 
 }
