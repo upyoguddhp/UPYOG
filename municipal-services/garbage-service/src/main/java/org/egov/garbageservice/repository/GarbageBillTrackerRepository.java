@@ -278,6 +278,13 @@ public class GarbageBillTrackerRepository {
 			builder.append(" egbt.month =?");
 			preparedStmtList.add(criteria.getMonth());
 		}
+		
+		if (!StringUtils.isEmpty(criteria.getYear())) {
+		    andClauseIfRequired(preparedStmtList, builder);
+		    builder.append(" egbt.year = ?");
+		    preparedStmtList.add(criteria.getYear());
+		}
+		
 		if (!CollectionUtils.isEmpty(criteria.getType())) {
 			andClauseIfRequired(preparedStmtList, builder);
 			builder.append(" egbt.type IN (").append(createQuery(criteria.getType()))

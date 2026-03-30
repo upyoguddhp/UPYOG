@@ -146,6 +146,13 @@ public class GarbageAccountSchedulerService {
 						    mdmsService.fetchGarbageAmountFromMDMSResponse(
 						        mdmsResponse, garbageAccount, errorList, calculationBreakdown
 						    );
+					
+					if (monthlyAmount == null) {
+					    log.warn("Monthly amount is null for account {}", garbageAccount.getGrbgApplicationNumber());
+					    errorList.add("Monthly amount not found from MDMS");
+					    createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+					    return;
+					}
 
 					if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
 					    Long from = generateBillRequest.getFromDateTimestamp();
@@ -451,7 +458,7 @@ public class GarbageAccountSchedulerService {
 				return false;
 			}
 		}else {
-			return false;
+			return false; 
 		}
 	}
 

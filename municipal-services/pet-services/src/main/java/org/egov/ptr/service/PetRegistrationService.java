@@ -118,23 +118,6 @@ public class PetRegistrationService {
 
 		return petRegistrationRequest.getPetRegistrationApplications();
 	}
-	
-
-	public List<PetRegistrationApplication> registerPtrRequestRenewal(
-	        PetRegistrationRequest request) {
-
-	    validator.validatePetApplication(request);
-
-	    // Renewal-specific enrichment
-	    enrichmentService.enrichPetApplicationForRenewal(request);
-
-	    // Workflow (INITIATE only)
-	    wfService.updateWorkflowStatus(request);
-
-	    producer.push(config.getCreatePtrTopic(), request);
-
-	    return request.getPetRegistrationApplications();
-	}
 
 	public List<PetRegistrationApplication> searchPtrApplications(RequestInfo requestInfo,
 			PetApplicationSearchCriteria petApplicationSearchCriteria) {
@@ -197,13 +180,13 @@ public class PetRegistrationService {
 			}else if(StringUtils.equalsAnyIgnoreCase(role, PTRConstants.USER_ROLE_SUPERVISOR, PTRConstants.USER_ROLE_SECRETARY)) {
 				statusWithRoles.addAll(Arrays.asList(
 						PTRConstants.APPLICATION_STATUS_INITIATED,
-						PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
-						PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
-						PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
-						PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
-						PTRConstants.APPLICATION_STATUS_APPROVED,
-						PTRConstants.APPLICATION_STATUS_REJECTED
-					));
+					    PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
+					    PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
+					    PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
+					    PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
+					    PTRConstants.APPLICATION_STATUS_APPROVED,
+					    PTRConstants.APPLICATION_STATUS_REJECTED
+		            ));
 				if(StringUtils.equalsIgnoreCase(petApplicationSearchCriteria.getTenantId()
 						, PTRConstants.STATE_LEVEL_TENANT_ID)) {
 					tempTenantId.set(null);
@@ -339,19 +322,19 @@ public class PetRegistrationService {
 
 		try {
 			if (lastVaccineDateStr != null) {
-				SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
+			    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			    Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
 
-				SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-				lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
+			    SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			    lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
 			} 
 //			else {
 //			    lastVaccineDate = null; // or assign a default value if needed
 //			}
 
 		} catch (Exception e) {
-			System.err.println("Error parsing last vaccine date: " + e.getMessage());
-			e.printStackTrace();
+		    System.err.println("Error parsing last vaccine date: " + e.getMessage());
+		    e.printStackTrace();
 		}
 
 //		String lastVaccineDate = dateFormat.format(petRegistrationApplication.getPetDetails().getLastVaccineDate().toString());
@@ -447,50 +430,32 @@ public class PetRegistrationService {
 			}
 	}
 
-	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest) {
+	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest ) {
+		if (petRegistrationRequest.getPetRegistrationApplications().get(0).getWorkflow().getAction()
+				.equals(PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT)) {
+			
+			// fetch fees from MDMS
+			
+			
+			BigDecimal taxAmount = getFeesFromMdms(petRegistrationRequest);
+//			taxAmount = ;
+			// create demands
+			List<Demand> savedDemands = demandService.createDemand(petRegistrationRequest, taxAmount);
 
-	    if (!PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT.equals(
-	            petRegistrationRequest.getPetRegistrationApplications()
-	                    .get(0).getWorkflow().getAction())) {
-	        return;
-	    }
+	        if(CollectionUtils.isEmpty(savedDemands)) {
+	            throw new CustomException("INVALID_CONSUMERCODE","Bill not generated due to no Demand found for the given consumerCode");
+	        }
 
-	    PetRegistrationApplication application =
-	            petRegistrationRequest.getPetRegistrationApplications().get(0);
-
-	    BigDecimal taxAmount;
-
-	    // Renewal
-	    if (PTRConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(application.getApplicationType())) {
-	        taxAmount = getFeesFromMdmsv2(petRegistrationRequest);
-	    } else {
-	        taxAmount = getFeesFromMdms(petRegistrationRequest);
-	    }
-
-	    // create demand
-	    List<Demand> savedDemands =
-	            demandService.createDemand(petRegistrationRequest, taxAmount);
-
-	    if (CollectionUtils.isEmpty(savedDemands)) {
-	        throw new CustomException(
-	                "INVALID_CONSUMERCODE",
-	                "Bill not generated due to no Demand found for the given consumerCode"
-	        );
-	    }
-
-	    // generate bill
-	    GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
-	            .tenantId(application.getTenantId())
-	            .businessService("pet-services")
-	            .consumerCode(application.getApplicationNumber())
-	            .build();
-
-	    billingService.generateBill(
-	            petRegistrationRequest.getRequestInfo(),
-	            billCriteria
-	    );
+			// fetch/create bill
+            GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
+            									.tenantId(petRegistrationRequest.getPetRegistrationApplications().get(0).getTenantId())
+            									.businessService("pet-services")
+            									.consumerCode(petRegistrationRequest.getPetRegistrationApplications().get(0).getApplicationNumber()).build();
+            BillResponse billResponse = billingService.generateBill(petRegistrationRequest.getRequestInfo(),billCriteria);
+            
+		}
 	}
-
+	
 
 	private BigDecimal getFeesFromMdms(PetRegistrationRequest petRegistrationRequest) {
 
@@ -517,76 +482,6 @@ public class PetRegistrationService {
 
 	}
 
-	private BigDecimal getFeesFromMdmsv2(PetRegistrationRequest request) {
-
-	    PetRegistrationApplication app =
-	            request.getPetRegistrationApplications().get(0);
-
-	    String tenantId = app.getTenantId();
-
-	    boolean isRenewal =
-	            PTRConstants.APPLICATION_TYPE_RENEWAL
-	                    .equalsIgnoreCase(app.getApplicationType());
-
-	    try {
-	        Optional<Object> response = commonUtils.getAttributeValuesv2(
-	                PTRConstants.STATE_LEVEL_TENANT_ID,
-	                PTRConstants.MODULE_NAME_PET_SERVICE,
-	                Arrays.asList(PTRConstants.MASTER_NAME_FEE_STRUCTURE),
-	                request
-	        );
-
-	        if (!response.isPresent()) {
-	            throw new CustomException("MDMS_EMPTY_RESPONSE", "MDMS v2 returned empty response");
-	        }
-
-	        List<LinkedHashMap<String, Object>> mdmsList =
-	                JsonPath.read(response.get(), "$.mdms");
-
-	        return mdmsList.stream()
-	                .filter(entry ->
-	                        "ULBS.PetRenewal"
-	                                .equalsIgnoreCase((String) entry.get("schemaCode")))
-	                .filter(entry -> {
-	                    String mdmsTenant = (String) entry.get("tenantId");
-	                    return tenantId.equalsIgnoreCase(mdmsTenant)
-	                            || tenantId.startsWith(mdmsTenant);
-	                })
-	                
-	                
-	                .map(entry -> {
-	                    Map<String, Object> data =
-	                            (Map<String, Object>) entry.get("data");
-
-	                    Object fee = isRenewal
-	                            ? data.get("renewalFees")
-	                            : data.get("newFee");
-
-	                    if (fee == null) {
-	                        throw new CustomException(
-	                                "FEE_NOT_CONFIGURED",
-	                                (isRenewal ? "Renewal" : "New")
-	                                        + " fee not configured for tenantId=" + tenantId
-	                        );
-	                    }
-
-	                    return new BigDecimal(fee.toString());
-	                })
-	                .findFirst()
-	                .orElseThrow(() -> new CustomException(
-	                        "FEE_NOT_CONFIGURED",
-	                        "No matching fee found for tenantId=" + tenantId
-	                ));
-
-	    } catch (CustomException e) {
-	        throw e;
-	    } catch (Exception e) {
-	        throw new CustomException(
-	                "FETCH_FEES_FAILED",
-	                "Failed to fetch fees from MDMS v2 for tenant id: " + tenantId
-	        );
-	    }
-	}
 	public Object enrichResponseDetail(List<PetRegistrationApplication> applications) {
 		
 		Map<String, Object> responseDetail = new HashMap<>();
@@ -635,23 +530,7 @@ public class PetRegistrationService {
 			
 			mdmsrequest.setPetRegistrationApplications(petApplications);			
 
-			//BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
-			
-			BigDecimal taxAmount;
-
-			String applicationType = petRegistrationApplication.getApplicationType();
-
-			if (PTRConstants.APPLICATION_TYPE_RENEWAL
-			        .equalsIgnoreCase(applicationType)) {
-
-			    //  Renewal → MDMS v2
-			    taxAmount = getFeesFromMdmsv2(mdmsrequest);
-
-			} else {
-
-			    //  NEW or null MDMS v1
-			    taxAmount = getFeesFromMdms(mdmsrequest);
-			}
+			BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
 	        
 			ApplicationDetail applicationDetail = getApplicationBillUserDetail(petRegistrationApplication, ptradeLicenseActionRequest.getRequestInfo());
 			
@@ -806,8 +685,8 @@ public class PetRegistrationService {
 		                        .filter(Objects::nonNull) // Ensure no null entries
 		                        .filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
 		                        .collect(Collectors.toList())); // Collect the filtered list
-
-				if (statusList.get(0).containsKey("total_applications")) {
+			  
+			  if (statusList.get(0).containsKey("total_applications")) {
 		            Object totalApplicationsObj = statusList.get(0).get("total_applications");
 		            if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
 		            	response.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());
