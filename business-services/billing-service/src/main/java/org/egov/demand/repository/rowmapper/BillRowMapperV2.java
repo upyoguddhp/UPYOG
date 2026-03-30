@@ -31,6 +31,7 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 
 		Map<String, BillV2> billMap = new LinkedHashMap<>();
 		Map<String, BillDetailV2> billDetailMap = new HashMap<>();
+		Map<String, BillDetailV2> selectedDetailPerBill = new HashMap<>();
 
 		while (rs.next()) {
 
@@ -51,6 +52,7 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 					.totalAmount(BigDecimal.ZERO)
 					.tenantId(rs.getString("b_tenantid"))
 					.userId(rs.getString("b_payerid"))
+					.payerId(rs.getString("b_payerid"))
 					.payerName(rs.getString("b_payername"))
 					.payerAddress(rs.getString("b_payeraddress"))
 					.payerEmail(rs.getString("b_payeremail"))
@@ -88,13 +90,17 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 					.build();
 
 				billDetailMap.put(billDetail.getId(), billDetail);
-
 				if (bill.getId().equals(billDetail.getBillId())) {
-					bill.addBillDetailsItem(billDetail);
-					bill.setTotalAmount(bill.getTotalAmount().add(billDetail.getAmount()));
-					bill.setMaxExpiryDate(null != bill.getMaxExpiryDate()
-							? Math.max(bill.getMaxExpiryDate(), billDetail.getExpiryDate())
-							: billDetail.getExpiryDate());
+				    bill.addBillDetailsItem(billDetail);
+				    BillDetailV2 existing = selectedDetailPerBill.get(bill.getId());
+				    if (existing == null || billDetail.getToPeriod() > existing.getToPeriod()) {
+				        selectedDetailPerBill.put(bill.getId(), billDetail);
+				        bill.setDemandId(billDetail.getDemandId());
+				    }
+				    bill.setTotalAmount(bill.getTotalAmount().add(billDetail.getAmount()));
+				    bill.setMaxExpiryDate(null != bill.getMaxExpiryDate()
+				            ? Math.max(bill.getMaxExpiryDate(), billDetail.getExpiryDate())
+				            : billDetail.getExpiryDate());
 				}
 			}
 			
