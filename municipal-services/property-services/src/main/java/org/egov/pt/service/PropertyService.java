@@ -1172,6 +1172,7 @@ public class PropertyService {
 			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
 					.billId(Collections.singleton(previousTracker.getBillId()))
 					.tenantId(cancelRequest.getTenantId())
+					.status(StatusEnum.EXPIRED)
 					.build();
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
@@ -1191,10 +1192,10 @@ public class PropertyService {
 					        other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
 							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
 						}
-					}
 				}
 				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
-				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
+				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));			
+				}
 			}
 		} else {
 		    BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
