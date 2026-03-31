@@ -1147,7 +1147,7 @@ public class PropertyService {
 
 		PtTaxCalculatorTracker previousTracker = getPreviousTracker(tracker);
 		
-		if (previousTracker != null) {
+		if (previousTracker != null && BillStatus.CANCELLED != previousTracker.getBillStatus()) {
 			AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 			PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
 				.uuid(previousTracker.getUuid())
