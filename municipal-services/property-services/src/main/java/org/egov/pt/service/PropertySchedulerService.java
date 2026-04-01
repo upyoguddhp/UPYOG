@@ -1142,6 +1142,7 @@ public class PropertySchedulerService {
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 				.startDateTime(startDateTime).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
+		        .type("CYCLIC") 
 				.build();
 
 		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
