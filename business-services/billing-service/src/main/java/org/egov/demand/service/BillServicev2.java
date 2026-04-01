@@ -287,15 +287,14 @@ public class BillServicev2 {
 				}
 			}
 
-			if (!isBillExpired)
+			Set<String> demandIds = consumerToDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
+			Set<String> billedDemandIds = consumerToBilledDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
+			boolean hasNewDemand = !demandIds.isEmpty() && !billedDemandIds.containsAll(demandIds);
+			if (!isBillExpired && !hasNewDemand)
 				billsToBeReturned.add(bill);
 			else
 				cosnumerCodesToBeExpired.add(consumerCode);
-
-			Set<String> demandIds = consumerToDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
-			Set<String> billedDemandIds = consumerToBilledDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
-
-			if (!demandIds.isEmpty() && !billedDemandIds.containsAll(demandIds)) {
+			if (hasNewDemand) {
 				cosnumerCodesNotFoundInBill.add(consumerCode);
 			}
 
@@ -327,15 +326,17 @@ public class BillServicev2 {
 			        .tenantId(billCriteria.getTenantId())
 			        .build()
 			);
+			
+			billRepository.updateBillStatusToExpiredByConsumerCodes(
+				    consumerCodesForNewBill,
+				    billCriteria.getTenantId(),
+				    requestInfo
+				);
 
 			billCriteria.setConsumerCode(consumerCodesForNewBill);
 
 			updateDemandsForexpiredBillDetails(billCriteria.getBusinessService(), billCriteria.getConsumerCode(),
 					billCriteria.getTenantId(), requestInfoWrapper);
-
-			billRepository.updateBillStatus(UpdateBillCriteria.builder().statusToBeUpdated(BillStatus.EXPIRED)
-					.businessService(billCriteria.getBusinessService()).consumerCodes(cosnumerCodesToBeExpired)
-					.tenantId(billCriteria.getTenantId()).build());
 
 			BillResponseV2 finalResponse = generateBill(billCriteria, requestInfo);
 

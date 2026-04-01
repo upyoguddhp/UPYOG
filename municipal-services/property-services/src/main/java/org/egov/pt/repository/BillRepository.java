@@ -67,6 +67,13 @@ public class BillRepository {
 			uriBuilder.append(hasQueryParam ? "&" : "?").append("service=").append(billCriteria.getService());
 			hasQueryParam = true;
 		}
+		
+		if (billCriteria.getStatus() != null) {
+		    uriBuilder.append(hasQueryParam ? "&" : "?")
+		        .append("status=")
+		        .append(billCriteria.getStatus().name());
+		    hasQueryParam = true;
+		}
 
 		if (!CollectionUtils.isEmpty(billCriteria.getConsumerCode())) {
 			uriBuilder.append(hasQueryParam ? "&" : "?").append("consumerCode=")

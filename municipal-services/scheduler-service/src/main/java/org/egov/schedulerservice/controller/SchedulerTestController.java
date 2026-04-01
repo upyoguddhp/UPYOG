@@ -47,11 +47,9 @@ public class SchedulerTestController {
 
 			} catch (Exception e) {
 
-			    Throwable rootCause = e.getCause(); // 🔥 THIS IS THE REAL ERROR
+				Throwable rootCause = e.getCause();
 
-			    message = "Error: Exception occured for the Method '" + methodName + "'.";
-
-			    log.error("SCHEDULER ERROR ↓↓↓", rootCause); // ✅ real error
+				message = "Error: Exception occured for the Method '" + methodName + "'.";
 			}
 		}
 

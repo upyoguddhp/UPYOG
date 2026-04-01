@@ -63,6 +63,7 @@ import org.egov.tl.web.models.TradeLicenseResponse;
 import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.tl.web.models.TradeUnit;
 import org.egov.tl.web.models.UpdateTLStatusCriteriaRequest;
+import org.egov.tl.web.models.collection.Bill.StatusEnum;
 import org.egov.tl.web.models.contract.BillResponse;
 import org.egov.tl.web.models.contract.BillSearchCriteria;
 import org.egov.tl.web.models.contract.BusinessService;
@@ -1596,6 +1597,7 @@ public class TradeLicenseService {
 
 			// search application number
 			TradeLicenseSearchCriteria criteria = TradeLicenseSearchCriteria.builder()
+			        .ids(Collections.singletonList(tradeLicenseActionRequest.getUuids().get(0)))
 					.applicationNumber(applicationNumber).build();
 			List<TradeLicense> licenses = repository.getLicenses(criteria);
 			licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria,
@@ -1646,6 +1648,7 @@ public class TradeLicenseService {
 					.asText();
 			periodOfLicense = license.getTradeLicenseDetail().getAdditionalDetail().get(TLConstants.PERIOD_OF_LICENSE)
 					.asInt();
+			
 			zone = license.getTradeLicenseDetail().getAddress().getAdditionalDetail().get(TLConstants.ZONE).asText();
 		} catch (Exception e) {
 			throw new CustomException("FETCH_LICENSE_FAILED",
@@ -1763,6 +1766,7 @@ public class TradeLicenseService {
 		// search bill Details
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(TLConstants.STATE_LEVEL_TENANT_ID)
 				.consumerCode(Collections.singleton(applicationDetail.getApplicationNumber()))
+				.status(StatusEnum.ACTIVE)
 				.service(license.getBusinessService()).build();
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfo);
 		Map<Object, Object> billDetailsMap = new HashMap<>();

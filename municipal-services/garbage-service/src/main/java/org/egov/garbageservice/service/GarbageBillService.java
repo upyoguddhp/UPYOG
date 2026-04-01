@@ -295,6 +295,7 @@ public class GarbageBillService {
 			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
 					.billId(Collections.singleton(previousTracker.getBillId()))
 					.tenantId(cancleBillRequest.getTenantId())
+					.status(StatusEnum.EXPIRED)
 					.consumerCode(cancleBillRequest.getConsumerCode())
 					.build();
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancleBillRequest.getRequestInfo());
