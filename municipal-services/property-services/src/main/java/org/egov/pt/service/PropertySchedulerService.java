@@ -1352,7 +1352,7 @@ public class PropertySchedulerService {
 	        billDetail.setAmount(newAmount);
 	    }
 
-	    // IMPORTANT: totalAmount recompute karo (not overwrite)
+	    // IMPORTANT: totalAmount recompute 
 	    BigDecimal total = bill.getBillDetails().stream()
 	            .map(BillDetail::getAmount)
 	            .reduce(BigDecimal.ZERO, BigDecimal::add);
