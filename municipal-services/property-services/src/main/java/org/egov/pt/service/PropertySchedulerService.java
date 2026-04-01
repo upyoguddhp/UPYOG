@@ -1551,7 +1551,8 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
         ByteArrayResource resource = new ByteArrayResource(finalPdf) {
             @Override
             public String getFilename() {
-                return wardName + "_Bills.pdf";
+				String timestamp = String.valueOf(System.currentTimeMillis());
+        		return timestamp + "_" + wardName + "_Bills.pdf"; 
             }
         };
 
