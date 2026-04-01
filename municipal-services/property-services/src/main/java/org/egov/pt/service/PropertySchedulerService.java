@@ -1246,7 +1246,7 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-//                                                         tracker.setRebateAmount(BigDecimal.ZERO);
+//                                                tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
@@ -1287,28 +1287,82 @@ public class PropertySchedulerService {
 		}
 		return true;
 	}
+//
+//	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
+//			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
+//
+//		for (BillDetail billDetail : bill.getBillDetails()) {
+//			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
+//			if (demand != null) {
+//				demand.setMinimumAmountPayable(newAmount);
+//				if (demand.getDemandDetails() != null) {
+//					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+//				}
+//				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
+//			}
+//
+//			if (billDetail.getBillAccountDetails() != null) {
+//				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+//			}
+//
+//			billDetail.setAmount(newAmount);
+//		}
+//		bill.setTotalAmount(newAmount);
+//		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+//	}
+	
+	private void updateBillAndDemandAmounts(
+	        Bill bill,
+	        Map<String, Demand> demandIdToDemandMap,
+	        BigDecimal newAmount,
+	        RequestInfoWrapper requestInfoWrapper,
+	        PtTaxCalculatorTracker tracker) {
 
-	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
-			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
+	    for (BillDetail billDetail : bill.getBillDetails()) {
 
-		for (BillDetail billDetail : bill.getBillDetails()) {
-			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand != null) {
-				demand.setMinimumAmountPayable(newAmount);
-				if (demand.getDemandDetails() != null) {
-					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
-				}
-				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
-			}
+	        //ONLY update matching demand
+	        if (!billDetail.getDemandId().equals(tracker.getDemandId())) {
+	            continue;
+	        }
 
-			if (billDetail.getBillAccountDetails() != null) {
-				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-			}
+	        Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
 
-			billDetail.setAmount(newAmount);
-		}
-		bill.setTotalAmount(newAmount);
-		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+	        if (demand != null) {
+
+	            // Update ONLY this demand
+	            demand.setMinimumAmountPayable(newAmount);
+
+	            if (demand.getDemandDetails() != null) {
+	                demand.getDemandDetails().forEach(demandDetail ->
+	                        demandDetail.setTaxAmount(newAmount));
+	            }
+
+	            demandService.updateDemand(
+	                    requestInfoWrapper.getRequestInfo(),
+	                    Collections.singletonList(demand)
+	            );
+	        }
+
+	        // Update ONLY this billDetail
+	        if (billDetail.getBillAccountDetails() != null) {
+	            billDetail.getBillAccountDetails().forEach(billAccountDetail ->
+	                    billAccountDetail.setAmount(newAmount));
+	        }
+
+	        billDetail.setAmount(newAmount);
+	    }
+
+	    // IMPORTANT: totalAmount recompute karo (not overwrite)
+	    BigDecimal total = bill.getBillDetails().stream()
+	            .map(BillDetail::getAmount)
+	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+	    bill.setTotalAmount(total);
+
+	    billService.updateBill(
+	            requestInfoWrapper.getRequestInfo(),
+	            Collections.singletonList(bill)
+	    );
 	}
 
 	public Object updatePenaltyAmount(RequestInfoWrapper requestInfoWrapper) {
@@ -1423,12 +1477,34 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
 				ResponseEntity<Resource> billResponse = propertyService
 						.generatePropertyTaxBillReceipt(requestInfoWrapper, propertyId, billId, status);
 
-				if (billResponse != null && billResponse.getBody() != null) {
+//				if (billResponse != null && billResponse.getBody() != null) {
+//
+//					InputStream inputStream = billResponse.getBody().getInputStream();
+//
+//					merger.addSource(inputStream);
+//				}
+				Resource resource = billResponse.getBody();
 
-					InputStream inputStream = billResponse.getBody().getInputStream();
+				if (resource != null) {
+				    InputStream is = resource.getInputStream();
+				    
+				    byte[] pdfBytes = convertInputStreamToByteArray(is);
+				    
+				    is.close();   
 
-					merger.addSource(inputStream);
+				    if (pdfBytes.length > 4 &&
+				        pdfBytes[0] == '%' &&
+				        pdfBytes[1] == 'P' &&
+				        pdfBytes[2] == 'D' &&
+				        pdfBytes[3] == 'F') {
+
+				        merger.addSource(new ByteArrayInputStream(pdfBytes));
+				    } else {
+				        System.out.println("❌ Skipping invalid PDF for billId: " + billId);
+				    }
 				}
+				
+				
 			}
 
         // Merge PDFs of that ULB
@@ -1488,6 +1564,20 @@ private DmsRequest generateDmsRequestFromBulkBillUpload(
             .ulb_name(ulbName)
             .build();
     
+}
+
+
+private byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    int nRead;
+    byte[] data = new byte[4096];
+
+    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+    }
+
+    buffer.flush();
+    return buffer.toByteArray();
 }
 
 
