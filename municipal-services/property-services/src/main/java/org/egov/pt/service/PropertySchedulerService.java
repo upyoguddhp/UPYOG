@@ -1345,37 +1345,37 @@ public class PropertySchedulerService {
 		return latestTaxCalculatorTrackers;
 	}
 
-public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {    
-	
-	MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(
-	        requestInfoWrapper.getRequestInfo(), null);
-	Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
-	String[] tenants = {};
-   
-	if (mdmsRes != null) {
-		Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
-	    if (moduleData != null) {
-	        List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
 
-	        if (masterList != null) {
-	            List<String> tenantList = new ArrayList<>();
+		MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(requestInfoWrapper.getRequestInfo(), null);
+		Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
+		String[] tenants = {};
 
-	            for (Object obj : masterList) {
+		if (mdmsRes != null) {
+			Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+			if (moduleData != null) {
+				List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
 
-	                Map<String, Object> map = (Map<String, Object>) obj;
+				if (masterList != null) {
+					List<String> tenantList = new ArrayList<>();
 
-	                String getulbName = map.get("ulbName").toString();
-	                String tenantId = "hp." + getulbName;
+					for (Object obj : masterList) {
 
-	                tenantList.add(tenantId);
-	            }
+						Map<String, Object> map = (Map<String, Object>) obj;
 
-	             tenants = tenantList.toArray(new String[0]);	        }
-	    }
-	}
-	
-	String ulbName = null; 
-    List<Map<String, Object>> bills = new ArrayList<>();
+						String getulbName = map.get("ulbName").toString();
+						String tenantId = "hp." + getulbName;
+
+						tenantList.add(tenantId);
+					}
+
+					tenants = tenantList.toArray(new String[0]);
+				}
+			}
+		}
+
+		String ulbName = null;
+		List<Map<String, Object>> bills = new ArrayList<>();
 
 		for (String tenant : tenants) {
 
@@ -1410,8 +1410,8 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
 			PDFMergerUtility merger = new PDFMergerUtility();
 			ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
 
-        // 4 Generate PDF for each bill
-        for (Map<String, Object> bill : ulbBills) {
+			// 4 Generate PDF for each bill
+			for (Map<String, Object> bill : ulbBills) {
 
 				String propertyId = String.valueOf(bill.get("propertyid"));
 				String billId = String.valueOf(bill.get("bill_id"));
@@ -1423,37 +1423,52 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
 				ResponseEntity<Resource> billResponse = propertyService
 						.generatePropertyTaxBillReceipt(requestInfoWrapper, propertyId, billId, status);
 
-				if (billResponse != null && billResponse.getBody() != null) {
+//					if (billResponse != null && billResponse.getBody() != null) {
+				//
+//						InputStream inputStream = billResponse.getBody().getInputStream();
+				//
+//						merger.addSource(inputStream);
+//					}
+				Resource resource = billResponse.getBody();
 
-					InputStream inputStream = billResponse.getBody().getInputStream();
+				if (resource != null) {
+					InputStream is = resource.getInputStream();
 
-					merger.addSource(inputStream);
+					byte[] pdfBytes = convertInputStreamToByteArray(is);
+
+					is.close();
+
+					if (pdfBytes.length > 4 && pdfBytes[0] == '%' && pdfBytes[1] == 'P' && pdfBytes[2] == 'D'
+							&& pdfBytes[3] == 'F') {
+
+						merger.addSource(new ByteArrayInputStream(pdfBytes));
+					} else {
+						System.out.println("Skipping invalid PDF for billId: " + billId);
+					}
 				}
+
 			}
 
-        // Merge PDFs of that ULB
-        merger.setDestinationStream(mergedOutput);
-        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+			// Merge PDFs of that ULB
+			merger.setDestinationStream(mergedOutput);
+			merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 
 			byte[] finalPdf = mergedOutput.toByteArray();
 
-        // 6️ Convert to resource
-        ByteArrayResource resource = new ByteArrayResource(finalPdf) {
-            @Override
-            public String getFilename() {
-                return wardName + "_Bills.pdf";
-            }
-        };
+			// 6️ Convert to resource
+			ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+				@Override
+				public String getFilename() {
+					return wardName + "_Bills.pdf";
+				}
+			};
 
-        // 7️ Prepare DMS request
-        DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(
-                resource,
-                wardName,ulbName,
-                requestInfoWrapper.getRequestInfo()
-        );
+			// 7️ Prepare DMS request
+			DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(resource, wardName, ulbName,
+					requestInfoWrapper.getRequestInfo());
 
-        // 8️ Upload to Alfresco
-        try {
+			// 8️ Upload to Alfresco
+			try {
 
 				alfrescoService.uploadAttachment(dmsRequest, requestInfoWrapper.getRequestInfo());
 
@@ -1463,32 +1478,33 @@ public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exc
 			}
 		}
 
-    return true;
-}
-   
+		return true;
+	}
 
+	private DmsRequest generateDmsRequestFromBulkBillUpload(Resource resource, String wardName, String ulbName,
+			RequestInfo requestInfo) {
+		return DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+				.objectId(UUID.randomUUID().toString()).description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+				.id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID).type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+				.objectName(PTConstants.BUSINESS_SERVICE).comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
+				.status(PTConstants.APPLICATION_STATUS_APPROVED).file(resource)
+				.servicetype(PTConstants.BUSINESS_SERVICE).documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
+				.documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).ward_name(wardName).ulb_name(ulbName).build();
 
-private DmsRequest generateDmsRequestFromBulkBillUpload(
-        Resource resource, String wardName,String ulbName,
-        RequestInfo requestInfo) {
-    return DmsRequest.builder()
-            .userId(requestInfo.getUserInfo().getId().toString())
-            .objectId(UUID.randomUUID().toString())
-            .description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
-            .id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID)
-            .type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
-            .objectName(PTConstants.BUSINESS_SERVICE)
-            .comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
-            .status(PTConstants.APPLICATION_STATUS_APPROVED)
-            .file(resource)
-            .servicetype(PTConstants.BUSINESS_SERVICE)
-            .documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
-            .documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID)
-            .ward_name(wardName)
-            .ulb_name(ulbName)
-            .build();
-    
-}
+	}
+
+	private byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		int nRead;
+		byte[] data = new byte[4096];
+
+		while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+		}
+
+		buffer.flush();
+		return buffer.toByteArray();
+	}
 
 
 

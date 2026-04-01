@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
+import org.egov.schedulerservice.constants.SchedulerConstants;
 import org.egov.schedulerservice.request.UmeedDashboardRequest;
 import org.egov.schedulerservice.request.UmeedLogRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class UmeedDashboardService {
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
 			log.info("Response Paylaod {}" ,ingestResponse);
 			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest);
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest,SchedulerConstants.NEW_TL);
 
 			 
 		} else {
@@ -91,13 +92,14 @@ public class UmeedDashboardService {
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
 			log.info("Response Paylaod {}" ,ingestResponse);
 			
-			Object umeedDashboardLog = ummedDashboardLoggerService;
+			//Object umeedDashboardLog = ummedDashboardLoggerService;
+			
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo, ingestResponse,umeedDashboardRequest,SchedulerConstants.PRG_SERVICE);
 
 			 
 		} else {
 			ingestResponse = "No Data from PGR Service";	
 		}
-
 		
 		return ingestResponse;
 	}
