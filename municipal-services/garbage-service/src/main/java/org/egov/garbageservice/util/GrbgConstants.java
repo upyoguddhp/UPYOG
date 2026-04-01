@@ -92,6 +92,9 @@ public class GrbgConstants {
 	public static final String USER_ROLE_SECRETARY = "SECRETARY";
 
 	public static final String GARBAGE_MODEL = "Garbage";
+	
+	public static final String GARBAGE_PENALTY_TAX_HEAD = "GARBAGE_PENALTY";
+
 
 	// Alfresco keys
 	public static final Long ALFRESCO_COMMON_DOCUMENT_ID = 0L;
@@ -166,6 +169,12 @@ public class GrbgConstants {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsSearchEndpoint;
+	
+	@Value("${mdms.v2.host}")
+	private String mdmsV2Host;
+
+	@Value("${mdms.v2.searchEndpoint}")
+	private String mdmsV2SearchEndpoint;
 
 	@Value("${garbage.service.host}")
 	private String grbgServiceHostUrl;
@@ -196,6 +205,9 @@ public class GrbgConstants {
 	
 	@Value("${egov.url.shortning.endpoint}")
 	private String urlShortenEndpoint;
+	
+	@Value("${egov.update.bill.endpoint}")
+	private String updateBillEndpoint;
 
 	public static String generateApplicationNumberFormat(String id, String ulbName, String district) {
 		String appNo = null;

@@ -28,6 +28,10 @@ public class BillV2 {
 	@Size(max = 256)
 	private String id;
 	
+	@JsonProperty("demandId")
+	@Size(max = 256)
+	private String demandId;
+	
 	@JsonProperty("userId")
 	private String userId;
 
@@ -38,6 +42,10 @@ public class BillV2 {
 	@JsonProperty("payerName")
 	@Size(max = 256)
 	private String payerName;
+	
+	@JsonProperty("payerId")
+	@Size(max = 256)
+	private String payerId;
 
 	@JsonProperty("payerAddress")
 	@Size(max = 1024)

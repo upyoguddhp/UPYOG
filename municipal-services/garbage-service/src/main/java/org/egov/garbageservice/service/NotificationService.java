@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.time.LocalDate;
+
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,8 @@ public class NotificationService {
 	private static final String GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER = "{garbage_pay_now_bill_url}";
 	private static final String GARBAGE_PLACEHOLDER = "garbage";
 	private static final String LINK_PLACEHOLDER = "{link}";
+	private static final String FROM_DATE_PLACEHOLDER = "{from_date}";
+	private static final String TO_DATE_PLACEHOLDER = "{to_date}";
 
 //	private static final String SMS_BODY_GENERATE_BILL = "The bill for " + GARBAGE_PLACEHOLDER + " for the period "
 //			+ MONTH_PLACEHOLDER + "/" + YEAR_PLACEHOLDER + " against your ID " + GARBAGE_NO_PLACEHOLDER
@@ -63,7 +67,7 @@ public class NotificationService {
 	
 	 private static final String SMS_BODY_GENERATE_BILL ="Dear "+ RECIPINTS_NAME_PLACEHOLDER
 			   +", your "+GARBAGE_PLACEHOLDER+" bill vide " + GARBAGE_PLACEHOLDER +" id "+GARBAGE_NO_PLACEHOLDER+" for the period "
-			   + MONTH_PLACEHOLDER + "/" + YEAR_PLACEHOLDER +" amounting to Rs "+AMOUNT_PLACEHOLDER
+			   + FROM_DATE_PLACEHOLDER + " to " + TO_DATE_PLACEHOLDER +" amounting to Rs "+AMOUNT_PLACEHOLDER
 			   +" has been generated on CitizenSeva portal. Please pay on CitizenSeva Portal or using link "
 			   +GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER+" .  CitizenSeva H.P.";
 
@@ -192,6 +196,16 @@ public class NotificationService {
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"); // e.g., "12 Jun 2025, 10:30 AM"
 		String expiryDateStr = dateTimeExpiry.format(formatter);
+		
+		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		LocalDate fromDate = LocalDate.parse(grbgBillTracker.getFromDate(), inputFormatter);
+		LocalDate toDate = LocalDate.parse(grbgBillTracker.getToDate(), inputFormatter);
+
+		DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+		String fromDateStr = fromDate.format(outputFormatter);
+		String toDateStr = toDate.format(outputFormatter);
 
 		body = body.replace(RECIPINTS_NAME_PLACEHOLDER, garbageAccount.getName());
 		body = body.replace(MONTH_PLACEHOLDER, GrbgUtils.toCamelCase(String.valueOf(grbgBillTracker.getMonth())));
@@ -215,6 +229,8 @@ public class NotificationService {
 //		System.out.println(grbgConfig.getFrontEndBaseUri());
 
 		body = body.replace(GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER,shortUrl);
+		body = body.replace(FROM_DATE_PLACEHOLDER, fromDateStr);
+		body = body.replace(TO_DATE_PLACEHOLDER, toDateStr);
 
 //		body = body.replace(GARBAGE_PAY_NOW_BILL_URL_PLACEHOLDER,
 //				grbgConfig.getGrbgServiceHostUrl() + "" + grbgConfig.getGrbgPayNowBillEndpoint() + ""

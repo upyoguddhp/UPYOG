@@ -4,12 +4,14 @@ import java.time.LocalDate;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
+import org.egov.schedulerservice.constants.SchedulerConstants;
 import org.egov.schedulerservice.request.UmeedDashboardRequest;
 import org.egov.schedulerservice.request.UmeedLogRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +59,7 @@ public class UmeedDashboardService {
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
 			log.info("Response Paylaod {}" ,ingestResponse);
 			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest);
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest,SchedulerConstants.NEW_TL);
 
 			 
 		} else {
@@ -68,15 +70,16 @@ public class UmeedDashboardService {
 		return ingestResponse;
 	}
 
+	//------------------------PGR 
 	public Object pushUmeedDashboardMetricsForPGR(RequestInfo requestInfo) {
 
 		String ingestResponse = "";
 
-		// Step 1: Build request info for Umeed Dashboard
+		// Step 1: Build request info for Umeed Dashboard	
 		RequestInfo umeedDashboardRequestInfo = buildRequestInfo();
 
-		// Step 2: Fetch Trade License dashboard metrics
-		Object umeedDashboardDataMatrics = tlService.getUmeedDashbaordDataMatrics(requestInfo);
+		// Step 2: Fetch  dashboard metrics
+		Object umeedDashboardDataMatrics = pgrService.getUmeedDashbaordDataMatrics(requestInfo);
 
 		if (null != umeedDashboardDataMatrics
 				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
@@ -89,40 +92,49 @@ public class UmeedDashboardService {
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
 			log.info("Response Paylaod {}" ,ingestResponse);
 			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest);
+			//Object umeedDashboardLog = ummedDashboardLoggerService;
+			
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo, ingestResponse,umeedDashboardRequest,SchedulerConstants.PRG_SERVICE);
 
 			 
 		} else {
-			ingestResponse = "No Data from PGR Service";
+			ingestResponse = "No Data from PGR Service";	
 		}
-
 		
 		return ingestResponse;
 	}
-	
-	
 	private RequestInfo buildRequestInfo() {
 		RequestInfo requestInfo = RequestInfo.builder().build();
 
-		Object niuaOAuthTokenResponse = niuaOAuthTokenService.requestNiuaOAuthToken();
+		Object tokenResponse = niuaOAuthTokenService.requestNiuaOAuthToken();
 
-		if (null != niuaOAuthTokenResponse && null != objectMapper.valueToTree(niuaOAuthTokenResponse)
-				&& !objectMapper.valueToTree(niuaOAuthTokenResponse).isNull()) {
-			if (null != objectMapper.valueToTree(niuaOAuthTokenResponse).get("access_token")) {
-				requestInfo.setAuthToken(objectMapper.valueToTree(niuaOAuthTokenResponse).get("access_token").asText());
+		if (tokenResponse != null) {
+			JsonNode jsonNode = objectMapper.valueToTree(tokenResponse);
+
+			// Extract token safely
+			if (jsonNode.has("access_token") && !jsonNode.get("access_token").isNull()) {
+
+				String token = jsonNode.get("access_token").asText();
+
+				requestInfo.setAuthToken(token);
 			}
-			if (null != objectMapper.valueToTree(niuaOAuthTokenResponse).get("UserRequest")
-					&& !objectMapper.valueToTree(niuaOAuthTokenResponse).get("UserRequest").isNull()) {
+
+			// Extract user info
+			if (jsonNode.has("UserRequest") && !jsonNode.get("UserRequest").isNull()) {
 				try {
-					requestInfo.setUserInfo(objectMapper.treeToValue(
-							objectMapper.valueToTree(niuaOAuthTokenResponse).get("UserRequest"), User.class));
+
+					User user = objectMapper.treeToValue(jsonNode.get("UserRequest"), User.class);
+
+					user.setTenantId("pg");
+
+					requestInfo.setUserInfo(user);
+
 				} catch (JsonProcessingException e) {
-					// Log and handle the mapping failure
-					log.error("Error mapping UserRequest to User object: " + e.getMessage());
+					log.error("Error mapping UserRequest: {}", e.getMessage());
 				}
 			}
 		}
-		return requestInfo;
+		return requestInfo;	
 	}
 
 }

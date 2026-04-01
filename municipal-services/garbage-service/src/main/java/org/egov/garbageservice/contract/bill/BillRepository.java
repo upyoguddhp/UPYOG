@@ -22,6 +22,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.egov.garbageservice.model.BillV2;
+import org.egov.garbageservice.model.BillRequestV2;
+import org.egov.garbageservice.model.BillRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -106,6 +109,23 @@ public class BillRepository {
 			log.error("Exception while fetching user: ", e);
 		}
 	}
+	
+	public List<Bill> updateBill(RequestInfo requestInfo, List<Bill> bills) {
+		StringBuilder url = new StringBuilder(config.getBillHost());
+		url.append(config.getUpdateBillEndpoint());
+		BillRequest request = new BillRequest(requestInfo, bills);
+		Object result = restCallRepository.fetchResult(url, request);
+		BillResponse response = null;
+		try {
+			response = objectMapper.convertValue(result, BillResponse.class);
+
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response of update bill");
+		}
+
+		return response.getBill();
+	}
+
 	
 	
 }

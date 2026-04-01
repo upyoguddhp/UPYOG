@@ -103,6 +103,12 @@
 						}
 					},
 					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+						   "path": "$.fatherOrHusbandName"
+						}
+					},
+					{
 						"variable": "totalTax",
 						"value": {
 							"path": "$.totalTax"
@@ -125,6 +131,11 @@
 				  		}
 					},
 					{
+						"variable": "totalAmount",
+						"value": { "path": "$.totalAmount" 
+						}
+					},
+					{
 						"variable": "qrCodeText",
 						"value": {
 							"path": "$.qrCodeText"
@@ -140,6 +151,12 @@
 						"variable": "oldGarbageId",
 						"value": {
 							"path": "$.oldGarbageId"
+						}
+					},
+					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+								"path": "$.fatherOrHusbandName"
 						}
 					}
 				]
