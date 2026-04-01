@@ -1458,9 +1458,11 @@ public class PropertySchedulerService {
 			// 6️ Convert to resource
 			ByteArrayResource resource = new ByteArrayResource(finalPdf) {
 				@Override
-				public String getFilename() {
-					return wardName + "_Bills.pdf";
-				}
+				  public String getFilename() {
+	                String timestamp = String.valueOf(System.currentTimeMillis());
+	                return timestamp + "_" + wardName + "_Bills.pdf";
+	            }
+	 
 			};
 
 			// 7️ Prepare DMS request
