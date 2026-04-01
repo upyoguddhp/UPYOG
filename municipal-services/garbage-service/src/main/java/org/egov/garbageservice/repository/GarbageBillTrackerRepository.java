@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.postgresql.util.PGobject;
 import java.sql.SQLException;
 import org.egov.tracer.model.CustomException;
+import org.egov.garbageservice.model.AuditDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,7 +98,10 @@ public class GarbageBillTrackerRepository {
 		    "WHERE egbt.status = 'ACTIVE' " +
 		    "AND egbt.rebate_amount > 0 " +
 		    "AND egbt.bill_id IS NOT NULL";
-
+	
+	private static final String ACTIVATE_PREVIOUS_TRACKER = "UPDATE eg_grbg_bill_tracker "
+			+ "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime "
+			+ "WHERE bill_id = :billId AND status = 'EXPIRED'";
 
 	public int updatePenalty(GrbgBillTracker tracker) {
 	    Map<String, Object> params = new HashMap<>();
@@ -228,6 +232,19 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
+	}
+	
+	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {
+
+		String query = ACTIVATE_PREVIOUS_TRACKER;
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("status", "ACTIVE");
+		params.put("billId", billId);
+		params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
+		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
+
+		return namedParameterJdbcTemplate.update(query, params);
 	}
 	
 	private String getBillTrackerSearchQuery(GrbgBillTrackerSearchCriteria criteria, List<Object> preparedStmtList) {

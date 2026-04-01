@@ -40,6 +40,7 @@ public class GrbgBillTrackerRowMapper implements RowMapper<GrbgBillTracker> {
 				.billId(rs.getString("bill_id"))
 				.demandId(rs.getString("demand_id"))
 				.type(rs.getString("type"))
+				.status(rs.getString("status"))
 				.auditDetails(auditDetails)
 				.rebateAmount(rs.getBigDecimal("rebate_amount"))
 				.garbageBillWithoutRebate(rs.getBigDecimal("garbage_bill_without_rebate"))
