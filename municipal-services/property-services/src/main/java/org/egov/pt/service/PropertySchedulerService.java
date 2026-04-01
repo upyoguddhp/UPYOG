@@ -1104,6 +1104,24 @@ public class PropertySchedulerService {
 								+ node.get("ulbName").asText(), node -> node.get("rate").asInt())))
 				.orElseGet(HashMap::new);
 	}
+	
+	public Map<String, Integer> getPenaltyDaysMap(MdmsResponse mdmsResponse) {
+	    return Optional.ofNullable(mdmsResponse)
+	            .map(MdmsResponse::getMdmsRes)
+	            .map(mdmsRes -> mdmsRes.get(PTConstants.MDMS_MODULE_ULBS))
+	            .map(objectMapper::valueToTree)
+	            .map(ulbsNode -> {
+	                JsonNode jsonNode = (JsonNode) ulbsNode;
+	                return jsonNode.get(PTConstants.MDMS_MASTER_DETAILS_PENALTYDAYS);
+	            })
+	            .filter(JsonNode::isArray)
+	            .map(penaltyDaysNode -> StreamSupport.stream(penaltyDaysNode.spliterator(), false)
+	                    .collect(Collectors.toMap(
+	                            node -> propertyConfiguration.getStateLevelTenantId() + "." + node.get("ulbName").asText(),
+	                            node -> node.get("days").asInt()
+	                    )))
+	            .orElseGet(HashMap::new);
+	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndDays(String tenantId, int days) {
 		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
@@ -1118,7 +1136,7 @@ public class PropertySchedulerService {
 		return propertyService.getTaxCalculatedProperties(criteria);
 	}
 
-	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days) {
+	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days, int penaltyCycleDays) {
 		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
 				.toEpochMilli();
 
@@ -1131,11 +1149,21 @@ public class PropertySchedulerService {
 		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
 		return trackers.stream().filter(tracker -> {
-			long createdTime = tracker.getAuditDetails().getCreatedTime(); // confirm field name
+			long createdTime = tracker.getAuditDetails().getCreatedTime();
 			long diffDays = ChronoUnit.DAYS.between(
 					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),
 					Instant.ofEpochMilli(todayStart).atZone(ZoneId.systemDefault()).toLocalDate());
-			return diffDays > 0 && diffDays % 30 == 0;
+			
+			int baseCycle = 30;
+	        int buffer = penaltyCycleDays - baseCycle;
+	        if (buffer <= 0) {
+	            return diffDays >= baseCycle && diffDays % baseCycle == 0;
+	        }
+
+	        int firstPenaltyDay = baseCycle + buffer;
+
+	        return diffDays >= firstPenaltyDay &&
+	               (diffDays - firstPenaltyDay) % baseCycle == 0;
 		}).collect(Collectors.toList());
 
 	}
@@ -1375,13 +1403,18 @@ public class PropertySchedulerService {
 		}
 
 		MdmsResponse mdmsResponse = mdmsService.getPenaltyRateMdmsData(requestInfoWrapper.getRequestInfo(), null);
+		MdmsResponse mdmsPenaltyDaysResponse = mdmsService.getPenaltyDaysMdmsData(requestInfoWrapper.getRequestInfo(), null);
 
 		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
+		Map<String, Integer> tenantIdPenaltyDaysMap = getPenaltyDaysMap(mdmsPenaltyDaysResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
-			Integer days = 365; // need to change if needed
+			Integer penaltyDays = tenantIdPenaltyDaysMap.get(tenantId);
+			if (penaltyDays == null || penaltyDays == 0) {
+			    penaltyDays = 30;
+			}
 
-			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, days);
+			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, 365, penaltyDays);
 
 			Set<String> billIds = ptTaxCalculatorTrackers.stream().map(PtTaxCalculatorTracker::getBillId)
 					.filter(Objects::nonNull).collect(Collectors.toSet());
