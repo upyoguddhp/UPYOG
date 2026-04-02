@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.egov.demand.model.GrbgBillTracker;
+import org.egov.demand.model.PtTaxCalculatorTracker;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -109,6 +110,18 @@ public class Util {
 		} catch (Exception e) {
 			log.error("Error while fetching Garbage Tracker", e);
 			throw new CustomException(GARBAGE_TRACKER_FETCH_EXCEPTION, GARBAGE_TRACKER_FETCH_EXCEPTION_MSG);
+		}
+	}
+	
+	public PtTaxCalculatorTracker getPropertyTracker(BillIdRequest request) {
+		StringBuilder uri = new StringBuilder(appProps.getPropertyHost()).append(appProps.getExtractPropertyTracker());
+		try {
+			Object response = serviceRequestRepository.fetchResult(uri.toString(), request);
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.convertValue(response, PtTaxCalculatorTracker.class);
+		} catch (Exception e) {
+			log.error("Error while fetching Property Tracker", e);
+			throw new CustomException(PROPERTY_TRACKER_FETCH_EXCEPTION, PROPERTY_TRACKER_FETCH_EXCEPTION_MSG);
 		}
 	}
 

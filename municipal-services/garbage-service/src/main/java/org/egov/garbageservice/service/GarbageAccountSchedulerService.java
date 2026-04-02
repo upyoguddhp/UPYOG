@@ -885,7 +885,8 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("INVALID_REQUEST", "billId is required");
 		}
 		GrbgBillTrackerSearchCriteria criteria = GrbgBillTrackerSearchCriteria.builder()
-				.billIds(Collections.singleton(request.getBillId())).status(Collections.singleton("ACTIVE")).build();
+				.billIds(Collections.singleton(request.getBillId()))
+				.build();
 
 		List<GrbgBillTracker> trackers = garbageBillTrackerRepository.extractTrackers(criteria);
 

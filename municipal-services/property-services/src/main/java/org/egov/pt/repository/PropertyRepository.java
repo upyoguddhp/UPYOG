@@ -755,4 +755,10 @@ public class PropertyRepository {
 	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName );
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
 		}
+	
+		public List<PtTaxCalculatorTracker> extractTrackers(PtTaxCalculatorTrackerSearchCriteria criteria) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
+			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
+		}
 	}

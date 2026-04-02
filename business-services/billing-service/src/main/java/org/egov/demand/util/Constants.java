@@ -39,6 +39,9 @@ public class Constants {
     public static final String GARBAGE_TRACKER_FETCH_EXCEPTION = "TRACKER_FETCH_EXCEPTION";
     public static final String GARBAGE_TRACKER_FETCH_EXCEPTION_MSG = "Failed to get Trackers from garbage";
     
+    public static final String PROPERTY_TRACKER_FETCH_EXCEPTION = "TRACKER_FETCH_EXCEPTION";
+    public static final String PROPERTY_TRACKER_FETCH_EXCEPTION_MSG = "Failed to get Trackers from property";
+    
     
     /* 
      * ERROR CONSTANTS 
