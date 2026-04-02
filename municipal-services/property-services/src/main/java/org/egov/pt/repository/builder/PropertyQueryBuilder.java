@@ -1096,7 +1096,7 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
             .toInstant()
             .toEpochMilli();
 
-
+    
     builder.append("SELECT * FROM eg_pt_tax_calculator_tracker  WHERE ");
    //builder.append("WHERE bill_status = ? ");
     if (status != null && !status.isEmpty()) {
