@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import org.egov.common.contract.request.RequestInfo;
 import javax.validation.Valid;
 
 import org.egov.demand.model.AuditDetails;
@@ -55,6 +55,36 @@ public class BillRepositoryV2 {
 		String queryStr = billQueryBuilder.getBillQuery(billCriteria, preparedStatementValues);
 		log.debug("query:::"+queryStr+"  preparedStatementValues::"+preparedStatementValues);
 		return jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), searchBillRowMapper);
+	}
+	
+	public void updateBillStatusToExpiredByConsumerCodes(Set<String> consumerCodes, String tenantId,
+			RequestInfo requestInfo) {
+
+		if (CollectionUtils.isEmpty(consumerCodes)) {
+			return;
+		}
+
+		List<String> consumerCodeList = new ArrayList<>(consumerCodes);
+
+		jdbcTemplate.batchUpdate(BillQueryBuilder.UPDATE_BILL_STATUS_TO_EXPIRED_BY_CONSUMERCODE,
+				new BatchPreparedStatementSetter() {
+
+					@Override
+					public void setValues(PreparedStatement ps, int index) throws SQLException {
+						String consumerCode = consumerCodeList.get(index);
+						ps.setString(1, BillStatus.EXPIRED.name());
+						ps.setString(2, requestInfo.getUserInfo().getUuid());
+						ps.setLong(3, System.currentTimeMillis());
+						ps.setString(4, tenantId);
+						ps.setString(5, consumerCode);
+						ps.setString(6, BillStatus.ACTIVE.name());
+					}
+
+					@Override
+					public int getBatchSize() {
+						return consumerCodeList.size();
+					}
+				});
 	}
 	
 	@Transactional

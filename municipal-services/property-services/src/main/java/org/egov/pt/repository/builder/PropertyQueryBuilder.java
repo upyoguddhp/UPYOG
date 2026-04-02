@@ -1083,7 +1083,20 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
+    
+    LocalDate yesterday = LocalDate.now().minusDays(1);
 
+    long startOfDay = yesterday
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
+
+    long endOfDay = yesterday.plusDays(1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
+
+    
     builder.append("SELECT * FROM eg_pt_tax_calculator_tracker  WHERE ");
    //builder.append("WHERE bill_status = ? ");
     if (status != null && !status.isEmpty()) {
@@ -1103,6 +1116,14 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
         preparedStmtList.add(ulbName);
 
     }
+    
+    if (!isFirstCondition) {
+        builder.append(" AND ");
+    }
+
+    builder.append(" createdtime BETWEEN ? AND ? ");
+    preparedStmtList.add(startOfDay);
+    preparedStmtList.add(endOfDay);
     
 
     builder.append("ORDER BY uuid DESC");

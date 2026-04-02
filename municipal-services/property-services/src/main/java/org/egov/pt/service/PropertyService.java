@@ -1147,7 +1147,7 @@ public class PropertyService {
 
 		PtTaxCalculatorTracker previousTracker = getPreviousTracker(tracker);
 		
-		if (previousTracker != null) {
+		if (previousTracker != null && BillStatus.CANCELLED != previousTracker.getBillStatus()) {
 			AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 			PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
 				.uuid(previousTracker.getUuid())
@@ -1172,6 +1172,7 @@ public class PropertyService {
 			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
 					.billId(Collections.singleton(previousTracker.getBillId()))
 					.tenantId(cancelRequest.getTenantId())
+					.status(StatusEnum.EXPIRED)
 					.build();
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
@@ -1191,10 +1192,10 @@ public class PropertyService {
 					        other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
 							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
 						}
-					}
 				}
 				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
-				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
+				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));			
+				}
 			}
 		} else {
 		    BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
@@ -1235,8 +1236,14 @@ public class PropertyService {
 				break;
 			}
 		}
-		if (index >= 0 && index + 1 < trackers.size()) {
-			return trackers.get(index + 1);
+		if (index >= 0) {
+		    for (int i = index + 1; i < trackers.size(); i++) {
+		        PtTaxCalculatorTracker candidate = trackers.get(i);
+
+		        if (candidate.getBillStatus() != BillStatus.CANCELLED) {
+		            return candidate;
+		        }
+		    }
 		}
 		return null;
 	}
