@@ -195,4 +195,10 @@ public class ApplicationProperties {
 
 	@Value("${statelevel.rolecode.excluded.list}")
 	private List<String> statelevelRolecodeExclusionList;
+	
+	@Value("${egov.garbage.context.host}")
+	private String garbageHost;
+	
+	@Value("${egov.garbage.endpoint.extract.tracker}")
+	private String extractGarbageTracker;
 }
