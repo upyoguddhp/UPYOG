@@ -1236,8 +1236,14 @@ public class PropertyService {
 				break;
 			}
 		}
-		if (index >= 0 && index + 1 < trackers.size()) {
-			return trackers.get(index + 1);
+		if (index >= 0) {
+		    for (int i = index + 1; i < trackers.size(); i++) {
+		        PtTaxCalculatorTracker candidate = trackers.get(i);
+
+		        if (candidate.getBillStatus() != BillStatus.CANCELLED) {
+		            return candidate;
+		        }
+		    }
 		}
 		return null;
 	}
