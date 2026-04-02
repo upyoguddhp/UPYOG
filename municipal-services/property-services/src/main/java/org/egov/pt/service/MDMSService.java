@@ -83,6 +83,14 @@ public class MDMSService {
 		MdmsResponse mdmsResponse = getMdmsMasterData(requestInfo, moduleDetails);
 		return mdmsResponse;
 	}
+	
+	public MdmsResponse getPenaltyDaysMdmsData(RequestInfo requestInfo, String filter) {
+		List<ModuleDetail> moduleDetails = new ArrayList<>();
+
+		moduleDetails.addAll(getModuleDetails(getULBSPenaltyDaysMdmsModuleDetails(), filter));
+		MdmsResponse mdmsResponse = getMdmsMasterData(requestInfo, moduleDetails);
+		return mdmsResponse;
+	}
 
 	public List<ModuleDetail> getModuleDetails(Map<String, List<String>> mapOfModulesAndMasters, String filter) {
 		List<ModuleDetail> moduleDetails = new ArrayList<>();
@@ -125,6 +133,14 @@ public class MDMSService {
 
 		return mapOfModulesAndMasters;
 	}
+	
+	private Map<String, List<String>> getULBSPenaltyDaysMdmsModuleDetails() {
+		Map<String, List<String>> mapOfModulesAndMasters = new HashMap<>();
+
+		mapOfModulesAndMasters.put(PTConstants.MDMS_MODULE_ULBS, getULBSPenaltyDaysMdmsMasterDetails());
+
+		return mapOfModulesAndMasters;
+	}
 
 	private List<String> getULBSMdmsMasterDetails() {
 		return Arrays.asList(PTConstants.MDMS_MASTER_DETAILS_ZONES, PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE,
@@ -139,6 +155,10 @@ public class MDMSService {
 
 	private List<String> getULBSPenaltyRateMdmsMasterDetails() {
 		return Arrays.asList(PTConstants.MDMS_MASTER_DETAILS_PENALTYRATE);
+	}
+	
+	private List<String> getULBSPenaltyDaysMdmsMasterDetails() {
+		return Arrays.asList(PTConstants.MDMS_MASTER_DETAILS_PENALTYDAYS);
 	}
 
 	private Map<String, List<String>> getPTTaxRateMdmsModuleDetails() {
