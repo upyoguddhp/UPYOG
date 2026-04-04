@@ -168,6 +168,14 @@ public class Scheduler {
 		log.info("pushUmeedDashboardMetricsForPGR CRON JOB Ends");
 	}
 	
+	//Property
+		@Scheduled(cron = "${cron.job.default.umeed.dashboard.property.data.matrics.sender}", zone = "IST")
+		public void pushUmeedDashboardMetricsForPropertyService() {
+			log.info("pushUmeedDashboardMetricsForProperty CRON JOB Starts");
+			RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+			umeedDashboardService.pushUmeedDashboardMetricsForProperty(requestInfo);
+			log.info("pushUmeedDashboardMetricsForProperty CRON JOB Ends");
+		}
 	
 	@Scheduled(cron = "${cron.job.default.send.sms.notification}", zone = "IST")
 	public void sendSmsNotification() {
