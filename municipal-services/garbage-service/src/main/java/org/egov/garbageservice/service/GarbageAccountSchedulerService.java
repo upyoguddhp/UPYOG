@@ -227,6 +227,26 @@ public class GarbageAccountSchedulerService {
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
 							
+							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
+								    .grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
+								    .status(Collections.singleton("ACTIVE"))
+								    .type(Collections.singleton("MONTHLY"))
+								    .tenantId(garbageAccount.getTenantId())
+								    .build();
+
+							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository.getBillTracker(prevCriteria);
+
+							if (!CollectionUtils.isEmpty(prevTrackers)) {
+							    for (GrbgBillTracker prev : prevTrackers) {
+							        if (prev.getUuid().equals(grbgBillTracker.getUuid()) || 
+							            "PAID".equals(prev.getStatus())) {
+							            continue;
+							        }
+							        
+							        prev.setStatus("EXPIRED");
+							        garbageBillTrackerRepository.updateStatusBillTracker(prev);					        
+							    }
+							}
 							//remove bill if failure exists
 //							GrbgBillFailure grbgBillFailure	= garbageAccountService.enrichGrbgBillFailure(garbageAccount, generateBillRequest,billResponse,errorList);
 //							garbageAccountService.removeGarbageBillFailure(grbgBillFailure);

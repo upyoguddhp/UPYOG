@@ -89,6 +89,9 @@ public class PetRegistrationApplication {
 
 	@JsonProperty("isBannedPet")
 	private Boolean isBannedPet = false;
+	
+	@JsonProperty("applicationType")
+	private String applicationType;
 
 	public PetRegistrationApplication addDocumentsItem(Document documentsItem) {
 		if (this.documents == null) {

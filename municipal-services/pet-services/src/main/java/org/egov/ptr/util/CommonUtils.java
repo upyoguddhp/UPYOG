@@ -117,6 +117,16 @@ public class CommonUtils {
 
 		return response;
 	}
+	//mdmsV2 
+	public Optional<Object> getAttributeValuesv2(String stateTenantId, String moduleName, List<String> names,
+			PetRegistrationRequest petRegistrationRequest) {
+
+		StringBuilder uri = new StringBuilder(configs.getMdmsHostv2()).append(configs.getMdmsEndpointv2());
+		MdmsCriteriaReq criteriaReq = prepareMdMsRequest(stateTenantId, moduleName, names, null, petRegistrationRequest.getRequestInfo());
+		Optional<Object> response = restRepo.fetchResult(uri, criteriaReq);
+
+		return response;
+	}
 
 	public MdmsCriteriaReq prepareMdMsRequest(String tenantId, String moduleName, List<String> names, String filter,
 			RequestInfo requestInfo) {

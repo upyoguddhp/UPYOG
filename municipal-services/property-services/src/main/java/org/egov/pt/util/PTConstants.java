@@ -501,6 +501,8 @@ public class PTConstants {
 	
 	public static final String MDMS_MASTER_DETAILS_PENALTYRATE = "PenaltyRate";
 	
+	public static final String MDMS_MASTER_DETAILS_PENALTYDAYS = "PropertyPenaltyDays";
+	
 	public static final String MDMS_MASTER_DETAILS_PROPERTYTAXRATE = "PropertyTaxRate";
 
 	public static final String MDMS_MODULE_ACTIVE_FILTER = "[?(@.active == true)]";

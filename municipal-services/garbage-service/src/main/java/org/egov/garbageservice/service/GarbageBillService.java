@@ -243,7 +243,10 @@ public class GarbageBillService {
 			throw new CustomException("NO_TRACKER", "No active tracker found for the demand id");
 		}
 
-		GrbgBillTracker tracker = trackers.get(0);
+		GrbgBillTracker tracker = trackers.stream()
+			    .filter(t -> t.getDemandId().equals(demandId))
+			    .findFirst()
+			    .orElseThrow(() -> new CustomException("NO_TRACKER", "Tracker not found"));
 
 		if (trackers.size() > 1) {
 			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
@@ -295,6 +298,7 @@ public class GarbageBillService {
 			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
 					.billId(Collections.singleton(previousTracker.getBillId()))
 					.tenantId(cancleBillRequest.getTenantId())
+					.status(StatusEnum.EXPIRED)
 					.consumerCode(cancleBillRequest.getConsumerCode())
 					.build();
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancleBillRequest.getRequestInfo());
@@ -314,6 +318,17 @@ public class GarbageBillService {
 
 				billService.updateBill(cancleBillRequest.getRequestInfo(), Collections.singletonList(prevBill));
 			}
+			
+			GrbgBillTracker updatedPrevTracker = GrbgBillTracker.builder()
+					.billId(previousTracker.getBillId())
+		            .status("ACTIVE")
+		            .auditDetails(grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo()))
+		            .build();
+
+			trackerRepository.activatePreviousTrackerByBillId(
+			        previousTracker.getBillId(),
+			        grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo())
+			);
 		}
 
 		return true;
@@ -339,8 +354,14 @@ public class GarbageBillService {
 			}
 		}
 		
-		if (index >= 0 && index + 1 < trackers.size()) {
-			return trackers.get(index + 1);
+		if (index >= 0) {
+		    for (int i = index + 1; i < trackers.size(); i++) {
+		        GrbgBillTracker candidate = trackers.get(i);
+
+		        if (!"CANCELLED".equalsIgnoreCase(candidate.getStatus())) {
+		            return candidate;
+		        }
+		    }
 		}
 		return null;
 	}
