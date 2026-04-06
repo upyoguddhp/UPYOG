@@ -107,6 +107,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.egov.demand.model.BillIdRequest;
+import org.egov.demand.model.GrbgBillTracker;
+import org.egov.demand.model.PtTaxCalculatorTracker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -385,9 +388,22 @@ public class BillServicev2 {
 	 * @return
 	 */
 	public BillResponseV2 searchBill(BillSearchCriteria billCriteria, RequestInfo requestInfo) {
-
 		List<BillV2> bills = billRepository.findBill(billCriteria);
-
+		
+		for (BillV2 bill : bills) {
+			BillIdRequest request = BillIdRequest.builder().billId(bill.getId()).requestInfo(requestInfo).build();
+			if ("GB".equalsIgnoreCase(bill.getBusinessService())) {
+				GrbgBillTracker tracker = util.getGarbageTracker(request);
+				if (tracker != null) {
+					bill.setDemandId(tracker.getDemandId());
+				}
+			} else if ("PROPERTY".equalsIgnoreCase(bill.getBusinessService())) {
+				PtTaxCalculatorTracker tracker = util.getPropertyTracker(request);
+				if (tracker != null) {
+					bill.setDemandId(tracker.getDemandId());
+				}
+			}
+		}
 		return BillResponseV2.builder().resposneInfo(responseFactory.getResponseInfo(requestInfo, HttpStatus.OK))
 				.bill(bills).build();
 	}

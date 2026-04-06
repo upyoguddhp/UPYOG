@@ -1,0 +1,43 @@
+package org.egov.demand.model;
+
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GrbgBillTracker {
+
+	private String uuid;
+	private String grbgApplicationId;
+	private String tenantId;
+	private String month;
+	private String year;
+	private String fromDate;
+	private String toDate;
+	private String ward;
+	private String billId;
+	private String demandId;
+	private String consumerCode;
+	private String status = "ACTIVE";
+	@Builder.Default
+	private String type = "GENERAL";
+	private BigDecimal grbgBillAmount;
+	private AuditDetails auditDetails;
+	@JsonProperty("additionaldetail")
+	private JsonNode additionaldetail;
+	private Long expiryDate;                  
+	private BigDecimal grbgBillWithoutPenalty;
+	private BigDecimal penaltyAmount;
+	private BigDecimal rebateAmount;
+	private BigDecimal garbageBillWithoutRebate;
+
+}
