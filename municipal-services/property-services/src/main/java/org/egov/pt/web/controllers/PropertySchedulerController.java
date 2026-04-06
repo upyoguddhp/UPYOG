@@ -31,7 +31,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.egov.pt.service.AlfrescoService;
-
+import org.springframework.web.bind.annotation.RequestParam;
 //import org.egov.ptr.web.contracts.alfresco.DMSResponse;
 //import org.egov.ptr.web.contracts.alfresco.DmsRequest;
 
@@ -224,13 +224,16 @@ public class PropertySchedulerController {
 //					.documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE).documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).build();
 //	
 //			return dmsRequest;
+	
+	
 //		}
+	
 
 	@PostMapping("/bulk-uploads")
 	public ResponseEntity<Map<String, Object>> bulkBillUploads(
-	        @RequestBody RequestInfoWrapper requestInfoWrapper) throws Exception {
+	        @RequestBody RequestInfoWrapper requestInfoWrapper,@RequestParam(value = "isforce", required = false) String isforce,@RequestParam(value = "ulbName", required = false) String ulbName,@RequestParam(value = "wardName", required = false) String wardName) throws Exception {
 
-	    boolean status = service.uploadBulkBills(requestInfoWrapper);
+	    boolean status = service.uploadBulkBills(requestInfoWrapper, isforce, ulbName, wardName);
 
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("status", status);
