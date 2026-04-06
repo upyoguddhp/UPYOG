@@ -31,7 +31,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.egov.pt.service.AlfrescoService;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.egov.pt.models.BillIdRequest;
+
 //import org.egov.ptr.web.contracts.alfresco.DMSResponse;
 //import org.egov.ptr.web.contracts.alfresco.DmsRequest;
 
@@ -240,4 +241,9 @@ public class PropertySchedulerController {
 
 	    return ResponseEntity.ok(response);
 	}	
+	
+	@PostMapping("/extract-tracker")
+	public ResponseEntity<?> getTrackerByBillId(@RequestBody BillIdRequest request) {
+	    return ResponseEntity.ok(service.getTrackerByBillId(request));
+	}
 }

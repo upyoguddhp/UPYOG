@@ -77,6 +77,7 @@ import org.egov.pt.web.contracts.alfresco.DmsResponse;
 import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.BillIdRequest;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -1603,6 +1604,20 @@ public class PropertySchedulerService {
 
 		buffer.flush();
 		return buffer.toByteArray();
+	}
+	
+	public PtTaxCalculatorTracker getTrackerByBillId(BillIdRequest request) {
+		if (request.getBillId() == null) {
+			throw new CustomException("INVALID_REQUEST", "billId is required");
+		}
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.billId(request.getBillId())
+				.build();
+		List<PtTaxCalculatorTracker> trackers = repository.extractTrackers(criteria);
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
+		}
+		return trackers.get(0);
 	}
 
 
