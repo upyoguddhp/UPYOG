@@ -102,6 +102,8 @@ public class GarbageBillTrackerRepository {
 	private static final String ACTIVATE_PREVIOUS_TRACKER = "UPDATE eg_grbg_bill_tracker "
 			+ "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime "
 			+ "WHERE bill_id = :billId AND status = 'EXPIRED'";
+	
+	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
 	public int updatePenalty(GrbgBillTracker tracker) {
 	    Map<String, Object> params = new HashMap<>();
@@ -408,6 +410,18 @@ public class GarbageBillTrackerRepository {
 	        grbgBillTrackerRowMapper
 	    );
 	}
+	
+	public List<GrbgBillTracker> extractTrackers(GrbgBillTrackerSearchCriteria criteria) {
 
+		StringBuilder query = new StringBuilder(EXTRACT_TRACKER_QUERY);
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		if (!CollectionUtils.isEmpty(criteria.getBillIds())) {
+			query.append(" AND egbt.bill_id = ? ");
+			preparedStmtList.add(criteria.getBillIds().iterator().next());
+		}
+
+		return jdbcTemplate.query(query.toString(), preparedStmtList.toArray(), grbgBillTrackerRowMapper);
+		}
 
 }
