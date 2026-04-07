@@ -1118,7 +1118,7 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
     }
     
     if(isforce != null) {
-    	isFirstCondition = true;
+    	isFirstCondition = false;
     	 builder.append(" AND ");
          builder.append(" ward = ? ");
          preparedStmtList.add(ward);
