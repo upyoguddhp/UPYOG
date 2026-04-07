@@ -749,10 +749,10 @@ public class PropertyRepository {
 		});
 	}	
 	
-	public List<Map<String, Object>> getActiveBills(String status, String ulbName) { 
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward) { 
 		List<Object> preparedStmtList = new ArrayList<>();
-		//preparedStmtList.add(status); 
-	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName );
+		//preparedStmtList.add(status);   
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward );
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
 		}
 	
