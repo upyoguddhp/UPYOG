@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.contract.bill.BillAccountDetail;
-
+import java.time.LocalDate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -218,20 +218,59 @@ public class PDFRequestGenerator {
 
 		grbg.put("billPeriod", grbgBillTracker.get(0).getYear());
 
-		grbg.put("from", grbgBillTracker.get(0).getFromDate());
+		Long minFromPeriod = Long.MAX_VALUE;
+		Long maxToPeriod = Long.MIN_VALUE;
+		for (Bill billObj : bill) {
+		    if (billObj.getBillDetails() != null) {
+		        for (BillDetail detail : billObj.getBillDetails()) {
 
-		grbg.put("to", grbgBillTracker.get(0).getToDate());
+		            if (detail.getFromPeriod() != null) {
+		                minFromPeriod = Math.min(minFromPeriod, detail.getFromPeriod());
+		            }
 
+		            if (detail.getToPeriod() != null) {
+		                maxToPeriod = Math.max(maxToPeriod, detail.getToPeriod());
+		            }
+		        }
+		    }
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		String fromDate = Instant.ofEpochMilli(minFromPeriod)
+		        .atZone(ZoneId.systemDefault())
+		        .toLocalDate()
+		        .format(formatter);
+
+		String toDate = Instant.ofEpochMilli(maxToPeriod)
+		        .atZone(ZoneId.systemDefault())
+		        .toLocalDate()
+		        .format(formatter);
 		
-		Long fromPeriod = bill.get(0).getBillDetails().get(0).getFromPeriod();
-		int year = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getYear();
-		int month = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getMonthValue();
+		grbg.put("from", fromDate);
+		grbg.put("to", toDate);
+		
+		//CODE to set from date according to from date from bills GOT
+		
+//		Long fromPeriod = bill.get(0).getBillDetails().get(0).getFromPeriod();
+//		int year = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getYear();
+//		int month = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getMonthValue();
+//		int startYear;
+//		if (month <= 3) {
+//				startYear = year - 1;
+//		} else {
+//				startYear = year;
+//		}
+		
+		LocalDate today = LocalDate.now();
+		int year = today.getYear();
+		int month = today.getMonthValue();
 		int startYear;
 		if (month <= 3) {
-				startYear = year - 1;
+			startYear = year - 1;
 		} else {
-				startYear = year;
+			startYear = year;
 		}
+		
 		grbg.put("finYear", startYear + "-" + (startYear + 1));
 		grbg.put("district", "district");
 		grbg.put("wardNumber", grbgAccount.getAddresses().get(0).getWardName());
