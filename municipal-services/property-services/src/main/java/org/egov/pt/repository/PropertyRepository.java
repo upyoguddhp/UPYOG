@@ -753,6 +753,10 @@ public class PropertyRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		//preparedStmtList.add(status);   
 	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward );
+        log.info("propertyLog {}", query );
+        log.info("params {}",preparedStmtList );
+
+
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
 		}
 	
