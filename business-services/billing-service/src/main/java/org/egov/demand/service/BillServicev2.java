@@ -812,7 +812,7 @@ public class BillServicev2 {
 	public void updateCustomAmount(CustomAmountUpdateRequest request) {
 		if(request != null) {
 			demandRepository.updateCustomDemandAmount(request);
-//			billRepository.updateCustomBillAmount(request);
+			billRepository.updateCustomBillAmount(request);
 		}else {
 			throw new CustomException("EG_BS_UPDATE_ERROR","Error updating custom amount in bills !");
 		}

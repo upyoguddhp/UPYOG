@@ -115,7 +115,6 @@ public class GarbageBillTrackerRepository {
 	private static final String UPDATE_CUSTOM_TRACKER_AMOUNT = 
 			"UPDATE eg_grbg_bill_tracker " +
 		    "SET grbg_bill_amount = :amount, " +
-		    "garbage_bill_without_rebate = :amount, " +
 		    "last_modified_by = :modifiedBy, " +
 		    "last_modified_time = :modifiedTime, " +
 		    "additionaldetail = jsonb_set( " +
@@ -463,6 +462,7 @@ public class GarbageBillTrackerRepository {
 	    body.put("RequestInfo", request.getRequestInfo());
 	    body.put("tenantId", request.getTenantId());
 	    body.put("billId", request.getBillId());
+	    body.put("demandId",request.getDemandId());
 	    body.put("customAmount", request.getCustomAmount());
 	    body.put("reason", request.getReason());
 

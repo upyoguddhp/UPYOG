@@ -444,11 +444,27 @@ public class BillRepositoryV2 {
 		});
 	}
 	
-	public void updateCustomBillAmount(CustomAmountUpdateRequest request) {	
-		String BillId = request.getBillId();
-		BigDecimal CustomAmount = request.getCustomAmount();
-		
-		
-		
+	public void updateCustomBillAmount(CustomAmountUpdateRequest request) {    
+
+	    String billId = request.getBillId();
+	    BigDecimal customAmount = request.getCustomAmount();
+	    String tenantId = request.getTenantId();
+	    String userId = request.getRequestInfo().getUserInfo().getUuid();
+	    Long currentTime = System.currentTimeMillis();
+
+	    jdbcTemplate.update(
+		        BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
+		        customAmount, userId, currentTime, billId, tenantId
+		    );
+	    
+	    jdbcTemplate.update(
+	        BillQueryBuilder.BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
+	        customAmount, userId, currentTime, billId, tenantId
+	    );
+	    
+	    jdbcTemplate.update(
+	        BillQueryBuilder.BILL_UPDATE_AUDIT_QUERY,
+	        userId, currentTime, billId, tenantId
+	    );
 	}
 }
