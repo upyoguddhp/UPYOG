@@ -34,7 +34,7 @@ public class UmmedDashboardLoggerService {
 	private final ObjectMapper objectMapper;
 
 
-	public Object saveUmeedDashbaordLog(RequestInfo requestInfo ,String ingestResponse , UmeedDashboardRequest umeedDashboardRequest) {
+	public Object saveUmeedDashbaordLog(RequestInfo requestInfo ,String ingestResponse , UmeedDashboardRequest umeedDashboardRequest, String serviceType) {
 
 		try {
 			StringBuilder url = new StringBuilder(applicationConfig.getHpudLandingServiceHostUrl());
@@ -44,7 +44,7 @@ public class UmmedDashboardLoggerService {
 			 UmeedLogRequest createLog = UmeedLogRequest.builder()
 					 	.requestInfo(requestInfo)
 	                    .date(LocalDate.now().toString())
-	                    .serviceType("NewTL")
+	                    .serviceType(serviceType)
 	                    .requestPayload(objectMapper.valueToTree(umeedDashboardRequest))
 	                    .responsePayload(objectMapper.valueToTree(ingestResponse))
 	                    .build();

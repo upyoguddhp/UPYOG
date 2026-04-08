@@ -99,6 +99,13 @@ public class BillQueryBuilder {
 	public static final String UPDATE_BILLACCOUNTDETAILS_QUERY = "UPDATE egbs_billaccountdetail_v1 SET "
 			+ "tenantid = ?, billdetail = ?, demanddetailid = ?, orderno = ?, amount = ?, adjustedamount = ?, taxheadcode = ?, "
 			+ "additionaldetails = ?, lastmodifiedby = ?, lastmodifieddate = ? " + "WHERE id = ?";
+	
+	public static final String UPDATE_BILL_STATUS_TO_EXPIRED_BY_CONSUMERCODE = 
+	        "UPDATE egbs_bill_v1 SET " +
+	        "status = ?, lastmodifiedby = ?, lastmodifieddate = ? " +
+	        "WHERE tenantid = ? " +
+	        "AND consumercode = ? " +
+	        "AND status = ?";
 
 	public String getBillQuery(BillSearchCriteria billSearchCriteria, List<Object> preparedStatementValues){
 		
