@@ -161,6 +161,12 @@ public class PDFRequestGenerator {
 				BigDecimal::add);
 		grbg.put("totalTax", totalTax);
 		
+		BigDecimal totalArrear = allArrears.stream()
+		        .map(BigDecimal::new)
+		        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		grbg.put("arrearAmount", totalArrear);
+		
 		BigDecimal totalPaid = BigDecimal.ZERO;
 		BigDecimal totalDue = BigDecimal.ZERO;
 		BigDecimal totalAmount = BigDecimal.ZERO;
@@ -195,9 +201,24 @@ public class PDFRequestGenerator {
 		    }
 		}
 
+		BigDecimal totalRebate = BigDecimal.ZERO;
+		BigDecimal totalWithoutRebate = BigDecimal.ZERO;
+
+		for (GrbgBillTracker tracker : grbgBillTracker) {
+			if (tracker.getRebateAmount() != null) {
+				totalRebate = totalRebate.add(tracker.getRebateAmount());
+			}
+
+			if (tracker.getGarbageBillWithoutRebate() != null) {
+				totalWithoutRebate = totalWithoutRebate.add(tracker.getGarbageBillWithoutRebate());
+			}
+		}
+		
 		grbg.put("amountPaid", totalPaid);
 		grbg.put("amountDue", totalDue);
 		grbg.put("totalAmount", totalAmount);
+		grbg.put("rebateAmount", totalRebate);
+		grbg.put("amountWithoutRebate", totalWithoutRebate);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
