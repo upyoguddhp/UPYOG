@@ -1083,7 +1083,7 @@ public class PropertyQueryBuilder {
 	}
 
 
-public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName) {
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward) {
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
@@ -1121,13 +1121,28 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     }
     
+//    if(isforce != null) {
+//    	isFirstCondition = false;
+//    	 builder.append(" AND ");
+//         builder.append(" ward = ? ");
+//         preparedStmtList.add(ward);
+//
+//    }
+    
+    if(ward != null && isforce != null) {
+    	isFirstCondition = true;
+
+    }
+    
+    
     if (!isFirstCondition) {
         builder.append(" AND ");
+        builder.append(" createdtime BETWEEN ? AND ? ");
+        preparedStmtList.add(startOfDay);
+        preparedStmtList.add(endOfDay);
+
     }
 
-    builder.append(" createdtime BETWEEN ? AND ? ");
-    preparedStmtList.add(startOfDay);
-    preparedStmtList.add(endOfDay);
     
 
     builder.append("ORDER BY uuid DESC");
