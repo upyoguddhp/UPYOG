@@ -341,6 +341,7 @@ public class PetRegistrationService {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		String createdTime = dateFormat.format(new Date(petRegistrationApplication.getAuditDetails().getCreatedTime()));
+		String lastModifiedTime = dateFormat.format(new Date(System.currentTimeMillis()));
 		
 		String lastVaccineDateStr = petRegistrationApplication.getPetDetails().getLastVaccineDate().toString();
 		String lastVaccineDate = null; // Declare outside the try block
@@ -372,6 +373,7 @@ public class PetRegistrationService {
 			.concat(petRegistrationApplication.getAdditionalDetail().get("ulbName").toString().concat(", ")
 			.concat(petRegistrationApplication.getAddress().getPincode())));// Trade Premises Address
 		tlObject.put("createdTime", createdTime);// License Issue Date
+		tlObject.put("modifiedTime", lastModifiedTime);// License Issue Date
 		tlObject.put("lastVaccineDate", lastVaccineDate);//License Validity
 		tlObject.put("applicantName", petRegistrationApplication.getApplicantName());
 		tlObject.put("ulbName", petRegistrationApplication.getAdditionalDetail().get("ulbName").asText());

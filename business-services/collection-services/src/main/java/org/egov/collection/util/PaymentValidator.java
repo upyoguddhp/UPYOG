@@ -263,9 +263,9 @@ public class PaymentValidator {
             if (daysDiff.getDays() > Integer.valueOf(INSTRUMENT_DATE_DAYS)) {
                 errorMap.put("CHEQUE_DD_DATE_WITH_RECEIPT_DATE", CHEQUE_DD_DATE_WITH_RECEIPT_DATE_MESSAGE);
             }
-            if (instrumentDate.isAfter(new DateTime().getMillis())) {
-                errorMap.put("CHEQUE_DD_DATE_WITH_FUTURE_DATE", CHEQUE_DD_DATE_WITH_FUTURE_DATE_MESSAGE);
-            }
+//            if (instrumentDate.isAfter(new DateTime().getMillis())) {
+//                errorMap.put("CHEQUE_DD_DATE_WITH_FUTURE_DATE", CHEQUE_DD_DATE_WITH_FUTURE_DATE_MESSAGE);
+//            }
         }
 
     }
