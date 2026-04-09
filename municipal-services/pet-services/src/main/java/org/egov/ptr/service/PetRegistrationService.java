@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
+import org.egov.mdms.model.MdmsResponse;
 import org.egov.ptr.config.PetConfiguration;
 import org.egov.ptr.models.ApplicationDetail;
 import org.egov.ptr.models.Demand;
@@ -54,6 +55,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
@@ -101,6 +103,14 @@ public class PetRegistrationService {
 
 	@Autowired
 	private CommonUtils commonUtils;
+	
+	@Autowired
+	private MdmsService mdmsService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	
 
 	/**
 	 * Enriches the Request and pushes to the Queue
@@ -518,73 +528,37 @@ public class PetRegistrationService {
 
 	private BigDecimal getFeesFromMdmsv2(PetRegistrationRequest request) {
 
-	    PetRegistrationApplication app =
-	            request.getPetRegistrationApplications().get(0);
+		PetRegistrationApplication app = request.getPetRegistrationApplications().get(0);
+		String tenantId = app.getTenantId();
 
-	    String tenantId = app.getTenantId();
+		MdmsResponse mdmsResponse = mdmsService.fetchPetRenewalData(request.getRequestInfo(),
+				tenantId);
 
-	    boolean isRenewal =
-	            PTRConstants.APPLICATION_TYPE_RENEWAL
-	                    .equalsIgnoreCase(app.getApplicationType());
+		JsonNode mdmsRes = objectMapper.valueToTree(mdmsResponse.getMdmsRes());
 
-	    try {
-	        Optional<Object> response = commonUtils.getAttributeValuesv2(
-	                PTRConstants.STATE_LEVEL_TENANT_ID,
-	                PTRConstants.MODULE_NAME_PET_SERVICE,
-	                Arrays.asList(PTRConstants.MASTER_NAME_FEE_STRUCTURE),
-	                request
-	        );
+		JsonNode feeArray = mdmsRes.path("ULBS").path("PetRenewal");
 
-	        if (!response.isPresent()) {
-	            throw new CustomException("MDMS_EMPTY_RESPONSE", "MDMS v2 returned empty response");
-	        }
+		if (!feeArray.isArray() || feeArray.isEmpty()) {
+			throw new CustomException("MDMS_EMPTY_RESPONSE", "No renewal fee data found in MDMS");
+		}
+		for (JsonNode node : feeArray) {
 
-	        List<LinkedHashMap<String, Object>> mdmsList =
-	                JsonPath.read(response.get(), "$.mdms");
+			String mdmsTenant = node.path("tenantId").asText();
 
-	        return mdmsList.stream()
-	                .filter(entry ->
-	                        "ULBS.PetRenewal"
-	                                .equalsIgnoreCase((String) entry.get("schemaCode")))
-	                .filter(entry -> {
-	                    String mdmsTenant = (String) entry.get("tenantId");
-	                    return tenantId.equalsIgnoreCase(mdmsTenant)
-	                            || tenantId.startsWith(mdmsTenant);
-	                })
-	                
-	                
-	                .map(entry -> {
-	                    Map<String, Object> data =
-	                            (Map<String, Object>) entry.get("data");
+			if (tenantId.equalsIgnoreCase(mdmsTenant) || tenantId.startsWith(mdmsTenant)) {
 
-	                    Object fee = isRenewal
-	                            ? data.get("renewalFees")
-	                            : data.get("newFee");
+				JsonNode feeNode = node.path("renewalFees");
 
-	                    if (fee == null) {
-	                        throw new CustomException(
-	                                "FEE_NOT_CONFIGURED",
-	                                (isRenewal ? "Renewal" : "New")
-	                                        + " fee not configured for tenantId=" + tenantId
-	                        );
-	                    }
+				if (feeNode.isMissingNode() || feeNode.isNull()) {
+					throw new CustomException("RENEWAL_FEE_NOT_CONFIGURED",
+							"Renewal fee not configured for tenant " + tenantId);
+				}
 
-	                    return new BigDecimal(fee.toString());
-	                })
-	                .findFirst()
-	                .orElseThrow(() -> new CustomException(
-	                        "FEE_NOT_CONFIGURED",
-	                        "No matching fee found for tenantId=" + tenantId
-	                ));
+				return feeNode.decimalValue();
+			}
+		}
 
-	    } catch (CustomException e) {
-	        throw e;
-	    } catch (Exception e) {
-	        throw new CustomException(
-	                "FETCH_FEES_FAILED",
-	                "Failed to fetch fees from MDMS v2 for tenant id: " + tenantId
-	        );
-	    }
+		throw new CustomException("RENEWAL_FEE_NOT_FOUND", "No renewal fee configured for tenant " + tenantId);
 	}
 	public Object enrichResponseDetail(List<PetRegistrationApplication> applications) {
 		

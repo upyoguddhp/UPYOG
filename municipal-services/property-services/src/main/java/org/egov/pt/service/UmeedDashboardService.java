@@ -53,8 +53,6 @@ public class UmeedDashboardService {
 		return new long[] { startEpoch, endEpoch };
 	}
 	
-	
-	
 	public UmeedDashboardResponse prepareDataMetrics(RequestInfoWrapper requestInfoWrapper) {
 
 		int slaDays = Optional.ofNullable(propertyConfiguration.getUmeedDashboardSlaDays()).orElse(7);
@@ -183,7 +181,7 @@ public class UmeedDashboardService {
 
 		metrics.setTodaysMovedApplications(buildTodaysMovedApplication(startEpoch, endEpoch, returnObj.getWard()));
 
-		metrics.setPropertiesRegistered(buildPropertyRegistered(returnObj.getWard()));
+		metrics.setPropertiesRegistered(buildPropertyRegistered(startEpoch, endEpoch,returnObj.getWard()));
 
 		metrics.setAssessedProperties(buildAssessedProperties(startEpoch, endEpoch, returnObj.getWard()));
 
@@ -271,9 +269,9 @@ public class UmeedDashboardService {
 		return buildApplicationStatusMetrics(data, "ApplicationStatus");
 	}
 
-	private List<GroupedData> buildPropertyRegistered(String wardName) {
+	private List<GroupedData> buildPropertyRegistered(long epochStart, long epochEnd,String wardName) {
 
-		Map<String, Long> data = PropertyRepository.getPropertiesRegisteredByFinancialYear(wardName);
+		Map<String, Long> data = PropertyRepository.getPropertiesRegisteredByFinancialYear(epochStart, epochEnd,wardName);
 
 		return buildFYMetrics(data, "FinancialYear");
 	}
