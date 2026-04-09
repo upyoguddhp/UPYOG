@@ -35,10 +35,8 @@ public class MdmsService {
 
 		String moduleName = "ULBS";
 		String masterName = "PetRenewal";
-
-		String filter = "$.[?(@.active==true)]";
-
-		MasterDetail masterDetail = MasterDetail.builder().name(masterName).filter(filter).build();
+		
+		MasterDetail masterDetail = MasterDetail.builder().name(masterName).build();
 
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(moduleName)
 				.masterDetails(Collections.singletonList(masterDetail)).build();
