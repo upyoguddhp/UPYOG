@@ -27,6 +27,7 @@ import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.egov.pt.models.PtTaxCalculatorTracker;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -408,6 +409,9 @@ public class PropertyQueryBuilder {
 			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
 			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
 			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
+	
+	private static final String PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY =
+	        "UPDATE eg_pt_tax_calculator_tracker eptct";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1131,6 +1135,24 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
     return builder.toString();
 }
 
-
+	public String getUpdateStatusQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+	
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+	
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+	
+		preparedStmtList.add(tracker.getBillStatus().name());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+	
+		if (tracker.getDemandId() != null) {
+			builder.append(" AND eptct.demand_id = ? ");
+			preparedStmtList.add(tracker.getDemandId());
+		}
+	
+		return builder.toString();
+	}
 
 }

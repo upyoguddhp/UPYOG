@@ -761,4 +761,10 @@ public class PropertyRepository {
 			String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
 		}
+		
+		public int updateStatus(PtTaxCalculatorTracker tracker) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
+			return jdbcTemplate.update(query, preparedStmtList.toArray());
+		}
 	}
