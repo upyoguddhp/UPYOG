@@ -61,39 +61,28 @@ public class BillTrackerStatusUpdateConsumer {
 //
 //	}
     @KafkaListener(topics = {"garbage-bill-tracker-status-update"})
-    public void listen(HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic){
-        try{
-    		Bill bill = objectMapper.convertValue(record.get("bill"), Bill.class);
-    		RequestInfo reqInfo = objectMapper.convertValue(record.get("requestInfo"), RequestInfo.class);
+   public void listen(HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic){
+    try{
+        RequestInfo reqInfo = objectMapper.convertValue(record.get("requestInfo"), RequestInfo.class);
+        AuditDetails audit = grbgUtils.buildCreateAuditDetails(reqInfo);
 
-			AuditDetails audit = grbgUtils.buildCreateAuditDetails(reqInfo);
-			bill.getBillDetails().stream().forEach(detail->{
-				GrbgBillTracker grbgBillTracker = null;
-				if(detail.getDemandId() != null) {
-					 grbgBillTracker = GrbgBillTracker.builder().status(bill.getStatus().toString()).grbgApplicationId(bill.getConsumerCode())
-							 .demandId(detail.getDemandId()).auditDetails(audit).build();					
-				}else {
-					if(detail.getAdditionalDetails().get("type").asText().equals("ARREAR")) {
-			    		String year = detail.getAdditionalDetails().get("financialYear").asText();
-				        String[] parts = year.split("-");
-				        String startYear = parts[0];
-				        String endYear = parts[1];
-				        String endShort = endYear.substring(2);
+        String demandId = (String) record.get("demandId");
+        String status = (String) record.get("status");
+        String consumerCode = (String) record.get("consumerCode");
 
-				        String yearConvert =  startYear + "-" + endShort;
-						 grbgBillTracker = GrbgBillTracker.builder().status(bill.getStatus().toString()).grbgApplicationId(bill.getConsumerCode())
-								.type(detail.getAdditionalDetails().get("type").asText()).auditDetails(audit).year(yearConvert).build();
-						
-					}else {
-						 grbgBillTracker = GrbgBillTracker.builder().status(bill.getStatus().toString()).grbgApplicationId(bill.getConsumerCode())
-								.month(detail.getAdditionalDetails().get("MONTH").asText()).type(detail.getAdditionalDetails().get("type").asText()).auditDetails(audit).build();
-					}
-				}
-				
-				trackerRepository.updateStatusBillTracker(grbgBillTracker);
-			});
-        }catch(Exception e){
-            log.error("Exception while reading from the queue: ", e);
+        if (demandId != null) {
+            GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
+                    .status(status)
+                    .grbgApplicationId(consumerCode)
+                    .demandId(demandId)
+                    .auditDetails(audit)
+                    .build();
+
+            trackerRepository.updateStatusBillTracker(grbgBillTracker);
         }
-    }	
+
+    }catch(Exception e){
+        log.error("Exception while reading from the queue: ", e);
+    }
+}
 }
