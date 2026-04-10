@@ -749,10 +749,10 @@ public class PropertyRepository {
 		});
 	}	
 	
-	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward) { 
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward, String created_at) { 
 		List<Object> preparedStmtList = new ArrayList<>();
 		//preparedStmtList.add(status);   
-	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward );
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward, created_at );
         log.info("propertyLog {}", query );
         log.info("params {}",preparedStmtList );
 
