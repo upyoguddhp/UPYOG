@@ -1093,7 +1093,7 @@ public class PropertySchedulerService {
 				.orElseGet(HashMap::new);
 	}
 
-	public Map<String, Integer> getPenaltyRateMap(MdmsResponse mdmsResponse) {
+	public Map<String, Double> getPenaltyRateMap(MdmsResponse mdmsResponse) {
 		return Optional.ofNullable(mdmsResponse).map(MdmsResponse::getMdmsRes)
 				.map(mdmsRes -> mdmsRes.get(PTConstants.MDMS_MODULE_ULBS)).map(objectMapper::valueToTree)
 				.map(ulbsNode -> {
@@ -1102,7 +1102,7 @@ public class PropertySchedulerService {
 				}).filter(JsonNode::isArray)
 				.map(rebateDaysNode -> StreamSupport.stream(rebateDaysNode.spliterator(), false)
 						.collect(Collectors.toMap(node -> propertyConfiguration.getStateLevelTenantId() + "."
-								+ node.get("ulbName").asText(), node -> node.get("rate").asInt())))
+								+ node.get("ulbName").asText(), node -> node.get("rate").asDouble())))
 				.orElseGet(HashMap::new);
 	}
 	
@@ -1238,7 +1238,7 @@ public class PropertySchedulerService {
 
 	private List<PtTaxCalculatorTracker> processTrackers(String constantValue, List<PtTaxCalculatorTracker> trackers,
 			Map<String, Bill> billIdBillMap, Map<String, Demand> demandIdToDemandMap,
-			RequestInfoWrapper requestInfoWrapper, Map<String, Integer> tenantIdPenaltyRateMap) {
+			RequestInfoWrapper requestInfoWrapper, Map<String, Double> tenantIdPenaltyRateMap) {
 		List<PtTaxCalculatorTracker> updatedTrackers = new ArrayList<>();
 
 		for (PtTaxCalculatorTracker tracker : trackers) {
@@ -1262,7 +1262,6 @@ public class PropertySchedulerService {
 						tracker.getUuid());
 				continue;
 			}
-
 			BigDecimal penaltyAmount = BigDecimal.ZERO;
 			BigDecimal newAmount = BigDecimal.ZERO;
 
@@ -1301,7 +1300,7 @@ public class PropertySchedulerService {
 		return updatedTrackers;
 	}
 
-	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, int penaltyRatePercent) {
+	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
 		return tracker.getPropertyTaxWithoutRebate().multiply(BigDecimal.valueOf(penaltyRatePercent))
 				.divide(BigDecimal.valueOf(100));
 	}
@@ -1407,7 +1406,7 @@ public class PropertySchedulerService {
 		MdmsResponse mdmsResponse = mdmsService.getPenaltyRateMdmsData(requestInfoWrapper.getRequestInfo(), null);
 		MdmsResponse mdmsPenaltyDaysResponse = mdmsService.getPenaltyDaysMdmsData(requestInfoWrapper.getRequestInfo(), null);
 
-		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
+		Map<String, Double> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
 		Map<String, Integer> tenantIdPenaltyDaysMap = getPenaltyDaysMap(mdmsPenaltyDaysResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
@@ -1434,7 +1433,7 @@ public class PropertySchedulerService {
 		return latestTaxCalculatorTrackers;
 	}
 
-	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper, String isforce,String ulb,String ward) throws Exception {
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper, String isforce,String ulb,String ward , String created_at) throws Exception {
 		String[] tenants = new String[0];
 
 		if(ulb ==null && ward == null) {
@@ -1474,7 +1473,7 @@ public class PropertySchedulerService {
 
 		for (String tenant : tenants) {
 
-			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant, isforce, ward);
+			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant, isforce, ward, created_at);
 
 			if (result != null && !result.isEmpty()) {
 				bills.addAll(result);
