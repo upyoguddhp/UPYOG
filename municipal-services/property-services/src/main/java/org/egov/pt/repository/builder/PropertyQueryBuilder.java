@@ -1083,7 +1083,7 @@ public class PropertyQueryBuilder {
 	}
 
 
-public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward) {
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward, String created_at) {
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
@@ -1121,13 +1121,15 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     }
     
-//    if(isforce != null) {
-//    	isFirstCondition = false;
-//    	 builder.append(" AND ");
-//         builder.append(" ward = ? ");
-//         preparedStmtList.add(ward);
-//
-//    }
+    
+    
+    if(ward !=null && !ward.isEmpty()) {
+    	isFirstCondition = false;
+    	 builder.append(" AND ");
+         builder.append(" ward = ? ");
+         preparedStmtList.add(ward);
+
+    }
     
     if(ward != null && isforce != null) {
     	isFirstCondition = true;
@@ -1140,6 +1142,20 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
         builder.append(" createdtime BETWEEN ? AND ? ");
         preparedStmtList.add(startOfDay);
         preparedStmtList.add(endOfDay);
+
+    }
+    
+    if(created_at !=null) {
+    	
+    	ZoneId zone = ZoneId.of("Asia/Kolkata");
+
+    	LocalDate daterange = LocalDate.parse(created_at);
+
+    	long start = daterange.atStartOfDay(zone).toInstant().toEpochMilli();
+    	long end = daterange.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+    	builder.append(" AND createdtime BETWEEN ? AND ? ");
+    	preparedStmtList.add(start);
+    	preparedStmtList.add(end);
 
     }
 
