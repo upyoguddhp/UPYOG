@@ -213,7 +213,7 @@ public class PropertyQueryBuilder {
 	// --------------------------
 	private static final String DATA_METRICS_SEARCH_QUERY = "SELECT " +
 
-	// 1️ Total Applications Created Today
+			// 1️ Total Applications Created Today
 			"COUNT(CASE WHEN p.createdtime BETWEEN ? AND ? THEN 1 END) AS todaysTotalApplications, " +
 
 			// 2️ Total Closed Today
@@ -235,12 +235,12 @@ public class PropertyQueryBuilder {
 			+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
 
 			// 6️ Average Approval Days
-			
+	
 			"AVG(TO_TIMESTAMP(p.lastmodifiedtime/1000)::DATE - TO_TIMESTAMP(p.createdtime/1000)::DATE) AS avgDaysForApplicationApproval, "
 //			"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
 //			+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000) END),2) AS avgDaysForApplicationApproval, "
 
-			// 7️ SLA Days
+			// 3 SLA Days
 			+ "? AS StipulatedDays " 
 			+"FROM eg_pt_property p "
 			+"JOIN eg_pt_address addr ON addr.propertyid = p.id "
@@ -270,12 +270,16 @@ public class PropertyQueryBuilder {
 					+ "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2)) "
 					+ "END AS FYear,COUNT(*) AS value FROM eg_pt_property p "
 					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE addr.additionaldetails->>'wardNumber' = ? GROUP BY FYear ORDER BY FYear";
+					+ "WHERE addr.additionaldetails->>'wardNumber' = ? "
+					+ "AND p.createdtime BETWEEN ? AND ? " 
+					+"GROUP BY FYear ORDER BY FYear";
 
-	public String getPropertiesRegisteredFYQuery(String wardName, List<Object> preparedStmtList) {
-
+	public String getPropertiesRegisteredFYQuery(long startEpoch, long endEpoch,String wardName, List<Object> preparedStmtList) {
+		
 		preparedStmtList.add(wardName);
-
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		
 		return PROPERTIES_REGISTERED_FY_QUERY;
 	}
 
@@ -336,7 +340,7 @@ public class PropertyQueryBuilder {
 	private static final String TRANSACTION_QUERY = "SELECT p.usagecategory AS name, COUNT(pay.id) AS value "
 			+ "FROM egcl_payment pay JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
 			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
-			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'PAID' "
 			+ "AND pay.createdtime BETWEEN ? AND ? AND addr.additionaldetails->>'wardNumber' = ? "
 			+ "GROUP BY p.usagecategory ORDER BY p.usagecategory";
 
@@ -1083,7 +1087,7 @@ public class PropertyQueryBuilder {
 	}
 
 
-public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName) {
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward) {
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
@@ -1121,13 +1125,28 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     }
     
+//    if(isforce != null) {
+//    	isFirstCondition = false;
+//    	 builder.append(" AND ");
+//         builder.append(" ward = ? ");
+//         preparedStmtList.add(ward);
+//
+//    }
+    
+    if(ward != null && isforce != null) {
+    	isFirstCondition = true;
+
+    }
+    
+    
     if (!isFirstCondition) {
         builder.append(" AND ");
+        builder.append(" createdtime BETWEEN ? AND ? ");
+        preparedStmtList.add(startOfDay);
+        preparedStmtList.add(endOfDay);
+
     }
 
-    builder.append(" createdtime BETWEEN ? AND ? ");
-    preparedStmtList.add(startOfDay);
-    preparedStmtList.add(endOfDay);
     
 
     builder.append("ORDER BY uuid DESC");

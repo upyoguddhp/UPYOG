@@ -1434,41 +1434,47 @@ public class PropertySchedulerService {
 		return latestTaxCalculatorTrackers;
 	}
 
-	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper, String isforce,String ulb,String ward) throws Exception {
+		String[] tenants = new String[0];
 
-		MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(requestInfoWrapper.getRequestInfo(), null);
-		Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
-		String[] tenants = {};
+		if(ulb ==null && ward == null) {
+			MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(requestInfoWrapper.getRequestInfo(), null);
+			Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
 
-		if (mdmsRes != null) {
-			Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
-			if (moduleData != null) {
-				List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
+			if (mdmsRes != null) {
+				Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+				if (moduleData != null) {
+					List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
 
-				if (masterList != null) {
-					List<String> tenantList = new ArrayList<>();
+					if (masterList != null) {
+						List<String> tenantList = new ArrayList<>();
 
-					for (Object obj : masterList) {
+						for (Object obj : masterList) {
 
-						Map<String, Object> map = (Map<String, Object>) obj;
+							Map<String, Object> map = (Map<String, Object>) obj;
 
-						String getulbName = map.get("ulbName").toString();
-						String tenantId = "hp." + getulbName;
+							String getulbName = map.get("ulbName").toString();
+							String tenantId = "hp." + getulbName;
 
-						tenantList.add(tenantId);
+							tenantList.add(tenantId);
+						}
+
+						tenants = tenantList.toArray(new String[0]);
 					}
-
-					tenants = tenantList.toArray(new String[0]);
 				}
 			}
-		}
 
+
+		} else  {
+		    tenants = new String[]{"hp." +ulb};
+
+		}
 		String ulbName = null;
 		List<Map<String, Object>> bills = new ArrayList<>();
 
 		for (String tenant : tenants) {
 
-			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant);
+			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant, isforce, ward);
 
 			if (result != null && !result.isEmpty()) {
 				bills.addAll(result);

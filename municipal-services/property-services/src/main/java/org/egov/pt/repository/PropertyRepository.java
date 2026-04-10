@@ -516,9 +516,20 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentmode"));
 	}
 	
-	
-	
-	
+	public List<String> getAllFinancialYears() {
+
+	    String query = 
+	        "SELECT DISTINCT " +
+	        "CONCAT( " +
+	        "   EXTRACT(YEAR FROM to_timestamp(createdtime/1000) - INTERVAL '3 months'), " +
+	        "   '-', " +
+	        "   RIGHT(EXTRACT(YEAR FROM to_timestamp(createdtime/1000) + INTERVAL '9 months')::TEXT, 2) " +
+	        ") AS financial_year " +
+	        "FROM eg_pt_property " +
+	        "ORDER BY financial_year";
+
+	    return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("financial_year"));
+	}
 	
 //	public List<String> getAllusagecategory() {
 //
@@ -544,27 +555,27 @@ public class PropertyRepository {
 //		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("category"));
 //	}
 
-	public List<String> getAllFinancialYears() {
-
-	    String query =
-	        "SELECT DISTINCT " +
-	        "CASE " +
-	        " WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime/1000)) >= 4 " +
-	        " THEN CONCAT( " +
-	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)), '-', " +
-	        "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) + 1)::text, 2) " +
-	        " ) " +
-	        " ELSE CONCAT( " +
-	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) - 1, '-', " +
-	        "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000))::text, 2) " +
-	        " ) " +
-	        "END AS financial_year " +
-	        "FROM eg_pt_property " +
-	        "ORDER BY financial_year";
-
-	    return jdbcTemplate.query(query,
-	            (rs, rowNum) -> rs.getString("financial_year"));
-	}
+//	public List<String> getAllFinancialYears() {
+//
+//	    String query =
+//	        "SELECT DISTINCT " +
+//	        "CASE " +
+//	        " WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime/1000)) >= 4 " +
+//	        " THEN CONCAT( " +
+//	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)), '-', " +
+//	        "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) + 1)::text, 2) " +
+//	        " ) " +
+//	        " ELSE CONCAT( " +
+//	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) - 1, '-', " +
+//	        "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000))::text, 2) " +
+//	        " ) " +
+//	        "END AS financial_year " +
+//	        "FROM eg_pt_property " +
+//	        "ORDER BY financial_year";
+//
+//	    return jdbcTemplate.query(query,
+//	            (rs, rowNum) -> rs.getString("financial_year"));
+//	}
 
 //	public Map<String, BigDecimal> getDepartmentWiseCompletionRate(String date, String wardName) {
 //
@@ -598,11 +609,11 @@ public class PropertyRepository {
 	}
 	
 	
-	public Map<String, Long> getPropertiesRegisteredByFinancialYear( String wardName) {
+	public Map<String, Long> getPropertiesRegisteredByFinancialYear( long epochStart, long epochEnd,String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getPropertiesRegisteredFYQuery(wardName, preparedStmtList);
+		String query = queryBuilder.getPropertiesRegisteredFYQuery(epochStart, epochEnd,wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, Long> result = new HashMap<>();
@@ -749,10 +760,14 @@ public class PropertyRepository {
 		});
 	}	
 	
-	public List<Map<String, Object>> getActiveBills(String status, String ulbName) { 
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward) { 
 		List<Object> preparedStmtList = new ArrayList<>();
-		//preparedStmtList.add(status); 
-	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName );
+		//preparedStmtList.add(status);   
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward );
+        log.info("propertyLog {}", query );
+        log.info("params {}",preparedStmtList );
+
+
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
 		}
 	
