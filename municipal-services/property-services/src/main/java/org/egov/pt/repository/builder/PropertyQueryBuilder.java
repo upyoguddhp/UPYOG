@@ -416,6 +416,13 @@ public class PropertyQueryBuilder {
 	
 	private static final String PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY =
 	        "UPDATE eg_pt_tax_calculator_tracker eptct";
+	
+	private static final String PT_TRACKER_UPDATE_BY_PROPERTY_ID = "UPDATE eg_pt_tax_calculator_tracker " +
+            "SET bill_status = 'EXPIRED', " +
+            "lastmodifiedby = ?, " +
+            "lastmodifiedtime = ? " +
+            "WHERE propertyid = ? " +
+            "AND bill_status = 'ACTIVE'";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1188,6 +1195,10 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 		}
 	
 		return builder.toString();
+	}
+	
+	public String getExpireActiveTrackersByPropertyIdQuery() {
+	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
 	}
 
 }
