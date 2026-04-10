@@ -49,6 +49,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.egov.pt.models.AuditDetails;
 
 import com.google.common.collect.Sets;
 
@@ -775,5 +776,17 @@ public class PropertyRepository {
 			List<Object> preparedStmtList = new ArrayList<>();
 			String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
+		}
+		
+		public int expireActiveTrackersByPropertyId(String propertyId, AuditDetails auditDetails) {
+			String query = queryBuilder.getExpireActiveTrackersByPropertyIdQuery();
+			return jdbcTemplate.update(query, auditDetails.getLastModifiedBy(), auditDetails.getLastModifiedTime(),
+					propertyId);
+		}
+		
+		public int updateStatus(PtTaxCalculatorTracker tracker) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
+			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
 	}

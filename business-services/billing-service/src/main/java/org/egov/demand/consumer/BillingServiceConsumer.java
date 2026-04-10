@@ -11,6 +11,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.demand.config.ApplicationProperties;
 import org.egov.demand.helper.CollectionReceiptRequest;
 import org.egov.demand.model.BillDetail.StatusEnum;
+import org.egov.demand.model.BillDetailV2;
 import org.egov.demand.model.BillV2;
 import org.egov.demand.model.PaymentBackUpdateAudit;
 import org.egov.demand.producer.Producer;
@@ -32,8 +33,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-
-
+import org.egov.demand.model.BillAccountDetailV2;
+import java.util.Objects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
@@ -185,7 +186,6 @@ public class BillingServiceConsumer {
 		context = JsonPath.parse(objectMapper.writeValueAsString(consumerRecord));
 
 		String paymentId = objectMapper.convertValue(context.read("$.Payment.id"), String.class);
-		List<BigDecimal> amtPaidList = Arrays.asList(objectMapper.convertValue(context.read("$.Payment.paymentDetails.*.totalAmountPaid"), BigDecimal[].class));
 		List<BillV2> bills = Arrays.asList(objectMapper.convertValue(context.read("$.Payment.paymentDetails.*.bill"), BillV2[].class));
 		
 		RequestInfo requestInfo = objectMapper.convertValue(context.read("$.RequestInfo"), RequestInfo.class);
@@ -200,27 +200,45 @@ public class BillingServiceConsumer {
 		validatePaymentForDuplicateUpdates(isReceiptCancelled, paymentId);
 
 
-		for (int i = 0; i < bills.size(); i++) {
-			
-			BillV2 bill = bills.get(i);
+		for (BillV2 bill : bills) {
 
-			BigDecimal amtPaid = null != amtPaidList.get(i) ? amtPaidList.get(i) : BigDecimal.ZERO; 
+    if (bill.getBillDetails() == null) continue;
 
-			if (isReceiptCancelled) {
-				bill.setStatus(org.egov.demand.model.BillV2.BillStatus.CANCELLED);
+	for (BillDetailV2 detail : bill.getBillDetails()) {
 
-			} else if (bill.getTotalAmount().compareTo(amtPaid) > 0) {
-				bill.setStatus(org.egov.demand.model.BillV2.BillStatus.PARTIALLY_PAID);
+		if (detail.getBillAccountDetails() == null)
+			continue;
 
-			} else {
-				bill.setStatus(org.egov.demand.model.BillV2.BillStatus.PAID);
-				Map<String, Object> billMap = new HashMap<String, Object>();
-				billMap.put("bill",bill);
-				billMap.put("requestInfo", requestInfo);
-				if(bill.getBusinessService().equals("GB"))
-					producer.push("garbage-bill-tracker-status-update",billMap);
-			}
+		BigDecimal amtPaid = detail.getBillAccountDetails().stream().map(BillAccountDetailV2::getAdjustedAmount)
+				.filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		org.egov.demand.model.BillV2.BillStatus status;
+
+		if (isReceiptCancelled) {
+			status = org.egov.demand.model.BillV2.BillStatus.CANCELLED;
+
+		} else if (detail.getAmount().compareTo(amtPaid) > 0) {
+			status = org.egov.demand.model.BillV2.BillStatus.PARTIALLY_PAID;
+
+		} else {
+			status = org.egov.demand.model.BillV2.BillStatus.PAID;
 		}
+
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("demandId", detail.getDemandId());
+		payload.put("status", status.name());
+		payload.put("consumerCode", bill.getConsumerCode());
+		payload.put("requestInfo", requestInfo);
+
+		if ("GB".equals(bill.getBusinessService())) {
+			producer.push("garbage-bill-tracker-status-update", payload);
+		}
+
+		if ("PROPERTY".equals(bill.getBusinessService())) {
+			producer.push("property-bill-tracker-status-update", payload);
+		}
+	}
+}
 	}
 
 	/**

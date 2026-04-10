@@ -1357,6 +1357,11 @@ public class PropertyService {
 							.enrichTaxCalculatorTrackerCreateRequest(properties.get(0), calculateTaxRequest,
 									demand.getMinimumAmountPayable(), node, billResponse.getBill(), BigDecimal.ZERO,
 									demand.getMinimumAmountPayable(),demandId, ward);
+					
+					AuditDetails audit = commonUtils.buildCreateAuditDetails(genrateArrearRequest.getRequestInfo());
+
+					repository.expireActiveTrackersByPropertyId(properties.get(0).getPropertyId(), audit);
+					
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
 				} else {
