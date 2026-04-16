@@ -219,21 +219,14 @@ public class GarbageBillTrackerRepository {
 			builder.append(" AND bill_id = :billId");
 		}
 		
-		if(!StringUtils.isEmpty(grbgBillTracker.getMonth()) && !StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
-	        updateTrackerStatus.put("month",grbgBillTracker.getMonth());
-	        updateTrackerStatus.put("grbgApplicationId",grbgBillTracker.getGrbgApplicationId());
-			builder.append(" AND month = :month");
-			builder.append(" AND grbg_application_id = :grbgApplicationId");
-		}
-		
-//		if(!StringUtils.isEmpty(grbgBillTracker.getType())) {
-//	        updateTrackerStatus.put("type",grbgBillTracker.getType());
-//			builder.append(" AND type = :type");
-//		}
-		
 		if(!StringUtils.isEmpty(grbgBillTracker.getDemandId())) {
 	        updateTrackerStatus.put("demandId",grbgBillTracker.getDemandId());
 			builder.append(" AND demand_id = :demandId");
+		}
+		
+		if (!StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
+		    updateTrackerStatus.put("grbgApplicationId", grbgBillTracker.getGrbgApplicationId());
+		    builder.append(" AND grbg_application_id = :grbgApplicationId");
 		}
 
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());

@@ -70,7 +70,7 @@ public class BillTrackerStatusUpdateConsumer {
         String status = (String) record.get("status");
         String consumerCode = (String) record.get("consumerCode");
 
-        if (demandId != null) {
+        if (consumerCode != null) {
             GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
                     .status(status)
                     .grbgApplicationId(consumerCode)
