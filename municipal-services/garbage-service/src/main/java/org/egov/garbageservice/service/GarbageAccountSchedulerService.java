@@ -919,7 +919,12 @@ public class GarbageAccountSchedulerService {
 	    request.setDemandId(DemandId);
 	    garbageBillTrackerRepository.updateCustomTrackerAmount(request);
 	    
-	    return null;
+	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
+	    responseObj.setBillId(request.getBillId());
+	    responseObj.setDemandId(DemandId);
+	    responseObj.setNewAmount(request.getCustomAmount());
+	    responseObj.setMessage("Custom amount updated successfully");
+	    return responseObj;
 	}
 
 }
