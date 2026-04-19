@@ -408,6 +408,19 @@ public class PropertyQueryBuilder {
 			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
 			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
 			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
+	
+	private static final String UPDATE_CUSTOM_TRACKER_AMOUNT =
+	        "UPDATE eg_pt_tax_calculator_tracker "
+	      + "SET propertytax = :amount, "
+	      + "lastmodifiedby = :modifiedBy, "
+	      + "lastmodifiedtime = :modifiedTime, "
+	      + "additionaldetails = jsonb_set( "
+	      + "   COALESCE(additionaldetails, '{}'::jsonb), "
+	      + "   '{reason}', "
+	      + "   to_jsonb(:reason::text) "
+	      + ") "
+	      + "WHERE bill_id = :billId "
+	      + "AND tenantid = :tenantId";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1131,6 +1144,8 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
     return builder.toString();
 }
 
-
+	public String getCustomTrackerUpdateQuery() {
+		return UPDATE_CUSTOM_TRACKER_AMOUNT;
+	}
 
 }

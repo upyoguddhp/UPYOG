@@ -64,6 +64,8 @@ import java.util.Comparator;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.egov.pt.repository.PropertyRepository;
+import org.egov.pt.models.CustomAmountUpdateRequest;
+import org.egov.pt.models.CustomAmountUpdateResponse;
 
 //pdf
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -1598,7 +1600,39 @@ public class PropertySchedulerService {
 		buffer.flush();
 		return buffer.toByteArray();
 	}
+	
+	public CustomAmountUpdateResponse updateCustomAmount(CustomAmountUpdateRequest request) {
 
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(request.getBillId()))
+				.tenantId(request.getTenantId())
+				.skipValidation(true)
+				.build();
 
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
 
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for given ID");
+	    }
+
+	    Bill bill = billResponse.getBill().get(0);
+
+	    if (Bill.StatusEnum.PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update paid bill");
+	    }
+	    
+	    if (bill.getAmountPaid() != null && bill.getAmountPaid().compareTo(BigDecimal.ZERO) > 0) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
+	    }
+	    String DemandId =  bill.getBillDetails().get(0).getDemandId();   
+	    request.setDemandId(DemandId);
+	    repository.updateCustomTrackerAmount(request);
+	    
+	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
+	    responseObj.setBillId(request.getBillId());
+	    responseObj.setDemandId(DemandId);
+	    responseObj.setNewAmount(request.getCustomAmount());
+	    responseObj.setMessage("Custom amount updated successfully");
+	    return responseObj;
+	}
 }
