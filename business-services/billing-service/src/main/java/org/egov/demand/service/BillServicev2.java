@@ -293,6 +293,15 @@ public class BillServicev2 {
 			Set<String> demandIds = consumerToDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
 			Set<String> billedDemandIds = consumerToBilledDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
 			boolean hasNewDemand = !demandIds.isEmpty() && !billedDemandIds.containsAll(demandIds);
+			
+			log.info("isBillExpired {}",isBillExpired);
+			log.info("hasNewDemand {}",hasNewDemand);
+			log.info("demandIds {}",demandIds);
+			log.info("billedDemandIds {}",billedDemandIds);
+			log.info("cosnumerCodesToBeExpired",cosnumerCodesToBeExpired);
+			log.info("cosnumerCodesNotFoundInBill",cosnumerCodesNotFoundInBill);
+			
+
 			if (!isBillExpired && !hasNewDemand)
 				billsToBeReturned.add(bill);
 			else
@@ -310,8 +319,8 @@ public class BillServicev2 {
 			}
 		}
 
-		log.info("Consumer Code to be expired {}", cosnumerCodesToBeExpired);
-		log.info("Consumer code not found in bill {}", cosnumerCodesNotFoundInBill);
+		//log.info("Consumer Code to be expired {}", cosnumerCodesToBeExpired);
+		//log.info("Consumer code not found in bill {}", cosnumerCodesNotFoundInBill);
 
 		if (CollectionUtils.isEmpty(cosnumerCodesToBeExpired) && CollectionUtils.isEmpty(cosnumerCodesNotFoundInBill)) {
 			return res;
