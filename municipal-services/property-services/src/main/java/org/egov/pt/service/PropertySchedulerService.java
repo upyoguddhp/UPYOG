@@ -1633,6 +1633,14 @@ public class PropertySchedulerService {
 	    responseObj.setDemandId(DemandId);
 	    responseObj.setNewAmount(request.getCustomAmount());
 	    responseObj.setMessage("Custom amount updated successfully");
+	    responseObj.setTenantId(request.getTenantId());
+	    responseObj.setReason(request.getReason());
+	    responseObj.setIsCustomAmountApplied(true);
+	    responseObj.setConsumerCode(bill.getConsumerCode());
+	    responseObj.setStatus(bill.getStatus() != null ? bill.getStatus().toString() : null);
+	    responseObj.setOldAmount(bill.getTotalAmount());
+	    responseObj.setUpdatedTime(System.currentTimeMillis());
+	    responseObj.setUpdatedBy(request.getRequestInfo().getUserInfo().getUuid());
 	    return responseObj;
 	}
 }

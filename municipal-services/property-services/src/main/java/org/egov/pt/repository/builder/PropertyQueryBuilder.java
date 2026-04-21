@@ -410,17 +410,24 @@ public class PropertyQueryBuilder {
 			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
 	
 	private static final String UPDATE_CUSTOM_TRACKER_AMOUNT =
-	        "UPDATE eg_pt_tax_calculator_tracker "
-	      + "SET propertytax = :amount, "
-	      + "lastmodifiedby = :modifiedBy, "
-	      + "lastmodifiedtime = :modifiedTime, "
-	      + "additionaldetails = jsonb_set( "
-	      + "   COALESCE(additionaldetails, '{}'::jsonb), "
-	      + "   '{reason}', "
-	      + "   to_jsonb(:reason::text) "
-	      + ") "
-	      + "WHERE bill_id = :billId "
-	      + "AND tenantid = :tenantId";
+		    "UPDATE eg_pt_tax_calculator_tracker "
+		  + "SET propertytax = :amount, "
+		  + "lastmodifiedby = :modifiedBy, "
+		  + "lastmodifiedtime = :modifiedTime, "
+		  + "additionaldetails = jsonb_set( "
+		  + "   CASE "
+		  + "       WHEN jsonb_typeof(additionaldetails) = 'object' "
+		  + "       THEN additionaldetails "
+		  + "       WHEN jsonb_typeof(additionaldetails) = 'array' "
+		  + "       THEN jsonb_build_object('data', additionaldetails) "
+		  + "       ELSE '{}'::jsonb "
+		  + "   END, "
+		  + "   '{reason}', "
+		  + "   to_jsonb(:reason), "
+		  + "   true "
+		  + ") "
+		  + "WHERE bill_id = :billId "
+		  + "AND tenantid = :tenantId";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {

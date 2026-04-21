@@ -52,6 +52,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.egov.pt.repository.BillRepository;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.common.collect.Sets;
 
@@ -65,7 +66,8 @@ public class PropertyRepository {
 	@Autowired
 	private PropertyQueryBuilder queryBuilder;
 	
-	
+	@Autowired
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	@Autowired
 	private PropertyRowMapper rowMapper;
@@ -775,7 +777,7 @@ public class PropertyRepository {
 	    paramMap.put("billId", request.getBillId());
 	    paramMap.put("tenantId", request.getTenantId());
 
-	    jdbcTemplate.update(query, paramMap);
+	    namedParameterJdbcTemplate.update(query, paramMap);
 	    log.info("Tracker updated with custom amount");
 	    BillRepository.updateCustomBillAmount(request);
 	}
