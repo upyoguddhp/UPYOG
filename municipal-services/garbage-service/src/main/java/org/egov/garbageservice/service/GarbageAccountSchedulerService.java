@@ -924,6 +924,14 @@ public class GarbageAccountSchedulerService {
 	    responseObj.setDemandId(DemandId);
 	    responseObj.setNewAmount(request.getCustomAmount());
 	    responseObj.setMessage("Custom amount updated successfully");
+	    responseObj.setOldAmount(bill.getTotalAmount());
+	    responseObj.setUpdatedTime(System.currentTimeMillis());
+	    responseObj.setUpdatedBy(request.getRequestInfo().getUserInfo().getUuid());
+	    responseObj.setReason(request.getReason());
+	    responseObj.setIsCustomAmountApplied(true);
+	    responseObj.setStatus(bill.getStatus() != null ? bill.getStatus().toString() : null);
+	    responseObj.setConsumerCode(bill.getConsumerCode());
+	    responseObj.setTenantId(request.getTenantId());
 	    return responseObj;
 	}
 
