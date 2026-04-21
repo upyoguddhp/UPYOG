@@ -1193,6 +1193,11 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 			builder.append(" AND eptct.demand_id = ? ");
 			preparedStmtList.add(tracker.getDemandId());
 		}
+		
+		if (tracker.getPropertyId() != null) {
+		    builder.append(" AND eptct.propertyid = ? ");
+		    preparedStmtList.add(tracker.getPropertyId());
+		}
 	
 		return builder.toString();
 	}

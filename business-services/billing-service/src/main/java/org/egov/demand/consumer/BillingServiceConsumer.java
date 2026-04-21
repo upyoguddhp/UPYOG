@@ -2,7 +2,9 @@ package org.egov.demand.consumer;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,10 +37,16 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 import org.egov.demand.model.BillAccountDetailV2;
 import java.util.Objects;
+import java.util.Set;
+import org.egov.demand.model.BillV2.BillStatus;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import org.egov.demand.model.DemandCriteria;
+import org.egov.demand.model.Demand;
+import org.egov.demand.model.DemandDetail;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -155,6 +163,7 @@ public class BillingServiceConsumer {
 
 			setBillRequestFromPayment(consumerRecord, billReq, isReceiptCancellation);
 			receiptServiceV2.updateDemandFromReceipt(billReq, isReceiptCancellation);
+			updateTrackerStatusAfterDemandUpdate(billReq, isReceiptCancellation);
 			
 		} catch (JsonProcessingException | IllegalArgumentException e) {
 
@@ -198,47 +207,75 @@ public class BillingServiceConsumer {
 		 */
 		bills.get(0).setAdditionalDetails(util.setValuesAndGetAdditionalDetails(null, Constants.PAYMENT_ID_KEY, paymentId));
 		validatePaymentForDuplicateUpdates(isReceiptCancelled, paymentId);
-
-
-		for (BillV2 bill : bills) {
-
-    if (bill.getBillDetails() == null) continue;
-
-	for (BillDetailV2 detail : bill.getBillDetails()) {
-
-		if (detail.getBillAccountDetails() == null)
-			continue;
-
-		BigDecimal amtPaid = detail.getBillAccountDetails().stream().map(BillAccountDetailV2::getAdjustedAmount)
-				.filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-		org.egov.demand.model.BillV2.BillStatus status;
-
-		if (isReceiptCancelled) {
-			status = org.egov.demand.model.BillV2.BillStatus.CANCELLED;
-
-		} else if (detail.getAmount().compareTo(amtPaid) > 0) {
-			status = org.egov.demand.model.BillV2.BillStatus.PARTIALLY_PAID;
-
-		} else {
-			status = org.egov.demand.model.BillV2.BillStatus.PAID;
-		}
-
-		Map<String, Object> payload = new HashMap<>();
-		payload.put("demandId", detail.getDemandId());
-		payload.put("status", status.name());
-		payload.put("consumerCode", bill.getConsumerCode());
-		payload.put("requestInfo", requestInfo);
-
-		if ("GB".equals(bill.getBusinessService())) {
-			producer.push("garbage-bill-tracker-status-update", payload);
-		}
-
-		if ("PROPERTY".equals(bill.getBusinessService())) {
-			producer.push("property-bill-tracker-status-update", payload);
-		}
 	}
-}
+	
+	private void updateTrackerStatusAfterDemandUpdate(BillRequestV2 billReq, Boolean isReceiptCancelled) {
+
+		Set<String> processedConsumers = new HashSet<>();
+		BillStatus status;
+		
+		for (BillV2 bill : billReq.getBills()) {
+
+			if (!processedConsumers.add(bill.getConsumerCode())) {
+		        continue;
+		    }
+			
+			DemandCriteria criteria = new DemandCriteria();
+			criteria.setTenantId(bill.getTenantId());
+			criteria.setBusinessService(bill.getBusinessService());
+			criteria.setConsumerCode(Collections.singleton(bill.getConsumerCode()));
+
+			List<Demand> demands = demandService.getDemands(criteria, billReq.getRequestInfo());
+
+			BigDecimal totalDemand = BigDecimal.ZERO;
+			BigDecimal totalCollected = BigDecimal.ZERO;
+
+			for (Demand demand : demands) {
+
+				if (demand.getDemandDetails() == null)
+					continue;
+
+				if ("CANCELLED".equalsIgnoreCase(demand.getStatus().toString())) {
+					continue;
+				}
+
+				for (DemandDetail dd : demand.getDemandDetails()) {
+
+					if (dd.getTaxAmount() != null)
+						totalDemand = totalDemand.add(dd.getTaxAmount());
+
+					if (dd.getCollectionAmount() != null)
+						totalCollected = totalCollected.add(dd.getCollectionAmount());
+				}
+			}
+
+			if (isReceiptCancelled) {
+				status = org.egov.demand.model.BillV2.BillStatus.CANCELLED;
+
+			} else if (totalCollected.compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+				
+			} else if (totalCollected.compareTo(totalDemand) < 0) {
+				status = org.egov.demand.model.BillV2.BillStatus.PARTIALLY_PAID;
+				
+			} else {
+				status = org.egov.demand.model.BillV2.BillStatus.PAID;
+				
+			}
+
+			Map<String, Object> payload = new HashMap<>();
+			payload.put("consumerCode", bill.getConsumerCode());
+			payload.put("status", status.name());
+			payload.put("requestInfo", billReq.getRequestInfo());
+
+			if ("GB".equals(bill.getBusinessService())) {
+				producer.push("garbage-bill-tracker-status-update", payload);
+			}
+
+			if ("PROPERTY".equals(bill.getBusinessService())) {
+				producer.push("property-bill-tracker-status-update", payload);
+			}
+		}
 	}
 
 	/**
