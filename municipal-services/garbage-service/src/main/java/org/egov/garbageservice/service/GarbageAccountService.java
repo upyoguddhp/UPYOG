@@ -1301,6 +1301,10 @@ public class GarbageAccountService {
 	private void updateChildGarbageAccounts(GarbageAccount newGarbageAccount) {
 		if (!CollectionUtils.isEmpty(newGarbageAccount.getChildGarbageAccounts())) {
 			newGarbageAccount.getChildGarbageAccounts().stream().forEach(child -> {
+				
+				if (child.getAdditionalDetail() == null) {
+	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
+	            }
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
