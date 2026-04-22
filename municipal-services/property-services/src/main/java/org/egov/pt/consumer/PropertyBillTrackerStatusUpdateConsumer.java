@@ -33,7 +33,7 @@ public class PropertyBillTrackerStatusUpdateConsumer {
 	@KafkaListener(topics = { "property-bill-tracker-status-update" })
 	public void listen(HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
-			
+			log.info("record in property {}",record);
 			RequestInfo reqInfo = objectMapper.convertValue(record.get("requestInfo"), RequestInfo.class);
 
 			AuditDetails audit = ptUtils.buildAuditDetails(reqInfo);

@@ -63,6 +63,7 @@ public class BillTrackerStatusUpdateConsumer {
     @KafkaListener(topics = {"garbage-bill-tracker-status-update"})
    public void listen(HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic){
     try{
+    	log.info("record in garbage {}",record);
         RequestInfo reqInfo = objectMapper.convertValue(record.get("requestInfo"), RequestInfo.class);
         AuditDetails audit = grbgUtils.buildCreateAuditDetails(reqInfo);
 
