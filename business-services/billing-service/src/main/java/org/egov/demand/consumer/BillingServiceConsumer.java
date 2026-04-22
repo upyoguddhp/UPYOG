@@ -269,10 +269,12 @@ public class BillingServiceConsumer {
 			payload.put("requestInfo", billReq.getRequestInfo());
 
 			if ("GB".equals(bill.getBusinessService())) {
+				log.info("payload in garbage consumer {}",payload);
 				producer.push("garbage-bill-tracker-status-update", payload);
 			}
 
 			if ("PROPERTY".equals(bill.getBusinessService())) {
+				log.info("payload in property consumer {}",payload);
 				producer.push("property-bill-tracker-status-update", payload);
 			}
 		}
