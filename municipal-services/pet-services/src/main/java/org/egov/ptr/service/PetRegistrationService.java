@@ -532,7 +532,7 @@ public class PetRegistrationService {
 		String tenantId = app.getTenantId();
 
 		MdmsResponse mdmsResponse = mdmsService.fetchPetRenewalData(request.getRequestInfo(),
-				PTRConstants.STATE_LEVEL_TENANT_ID);
+				tenantId);
 
 		JsonNode mdmsRes = objectMapper.valueToTree(mdmsResponse.getMdmsRes());
 

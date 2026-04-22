@@ -35,9 +35,18 @@ public class MdmsService {
 
 		String moduleName = "ULBS";
 		String masterName = "PetRenewal";
+		
+		 String ulbName = null;
+			// Split by dot
+			String[] parts = tenantId.split("\\.");
 
-		String filter = "$.[?(@.active==true)]";
+			if (parts.length > 1) {
+			     ulbName = parts[1];
+			}
+			
+		final String filter = String.format("[?(@.ulbName == \"%s\")]",ulbName);
 
+		
 		MasterDetail masterDetail = MasterDetail.builder().name(masterName).filter(filter).build();
 
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(moduleName)
