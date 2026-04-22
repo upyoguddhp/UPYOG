@@ -245,7 +245,7 @@ public class PGRRepository {
 			metrics.setAvgDaysForApplicationApproval(rounded.doubleValue());
 			metrics.setStipulatedDays(rs.getInt("StipulatedDays"));
 
-			metrics.setUniqueCitizen(rs.getInt("UniqueCitizen"));
+			metrics.setUniqueCitizens(rs.getInt("UniqueCitizen"));
 
 			return metrics;
 		});

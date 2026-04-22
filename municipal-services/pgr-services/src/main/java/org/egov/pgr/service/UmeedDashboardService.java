@@ -48,7 +48,8 @@ public class UmeedDashboardService {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 		// String yesterday = "30-08-2025";
-		LocalDate startDate = LocalDate.parse("10-02-2026", formatter);
+		
+		LocalDate startDate = LocalDate.parse("01-04-2025", formatter);
 		LocalDate endDate = startDate;
 
 		// Define the month (August 2025)
@@ -115,7 +116,7 @@ public class UmeedDashboardService {
 		metrics.setTodaysOpenComplaints(buildTodayOpenComplaints(date, returnObj.getWard()));
 
 		// Today Assigned Complaints
-		metrics.setTodaysAssisgnedComaplaints(buildTodaysAssignedComaplaints(date, returnObj.getWard()));
+		metrics.setTodaysAssignedComplaints(buildTodaysAssignedComaplaints(date, returnObj.getWard()));
 
 		// Average Solution Time
 		metrics.setAverageSolutionTime(buildAverageSolutionTime(date, returnObj.getWard()));
@@ -124,7 +125,7 @@ public class UmeedDashboardService {
 		metrics.setTodaysRejectedComplaints(buildTodayRejectedComplaints(date, returnObj.getWard()));
 
 		// Today Reassign Complaints
-		metrics.setTodaysReassignComplaints(buildTodayReassingComplaints(date, returnObj.getWard()));
+		metrics.setTodaysReassignedComplaints(buildTodayReassingComplaints(date, returnObj.getWard()));
 
 		// Today Reassign Requested Complaints
 		metrics.setTodaysReassignRequestedComplaints(buildTodayReassingRequestedComplaints(date, returnObj.getWard()));

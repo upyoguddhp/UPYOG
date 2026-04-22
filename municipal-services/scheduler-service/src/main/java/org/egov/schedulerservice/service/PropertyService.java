@@ -132,11 +132,13 @@ public class PropertyService {
 					String.class);
 			return responseEntity.getBody();
 		} catch (Exception e) {
-			log.error("Error occured while update penalty amount.", e);
+			log.error("Error occured while getting umeed dashbaord data matrics.", e);
 			throw new SchedulerServiceException(ErrorConstants.ERR_PROPERTY_SERVICE_ERROR,
-					"Error occured while update penalty amount. Message: " + e.getMessage());
+					"Error occured while getting umeed dashbaord data matrics. Message: " + e.getMessage());
 		}
 	}
+	
+
 	
 
 
