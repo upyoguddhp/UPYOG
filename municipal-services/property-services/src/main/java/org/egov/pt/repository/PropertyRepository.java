@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -412,11 +413,7 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray());
 	}
 	
-	//----------
-	
-	
-	
-	
+	//DataMetrics
 	public Metrics getDataMetrics(long epochStart,long epochEnd, String wardName, int slaDays) {
 		List<Object> preparedStmtList = new ArrayList<>();
 
@@ -430,7 +427,7 @@ public class PropertyRepository {
 		    metrics.setTodaysApprovedApplications(rs.getInt("todaysApprovedApplications"));
 			metrics.setTodaysApprovedApplicationsWithinSLA(rs.getInt("todaysApprovedApplicationsWithinSLA"));
 			metrics.setPendingApplicationsBeyondTimeline(rs.getInt("pendingApplicationsBeyondTimeline"));
-			
+			metrics.setNoOfPropertiesPaidToday(rs.getInt("noOfPropertiesPaidToday"));
 			double value = rs.getDouble("avgDaysForApplicationApproval");
 			BigDecimal rounded = BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
 			metrics.setAvgDaysForApplicationApproval(rounded.doubleValue());
@@ -452,146 +449,97 @@ public class PropertyRepository {
 		});
 	}
 	
-//	public GroupedData getTodaysCollectionTradeTypeGroup(String stringDate, String wardName) {
-//		List<Object> preparedStmtList = new ArrayList<>();
-//		String query = queryBuilder.getTodaysCollectionSearchQuery(stringDate, wardName, preparedStmtList);
-//
-//		List<Bucket> buckets = jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
-//			Bucket bucket = new Bucket();
-//			bucket.setName(rs.getString("tradeType"));
-//			bucket.setValue(rs.getBigDecimal("totalTxnAmount"));
-//			return bucket;
-//
-//		});
-//
-//		GroupedData todaysCollectionTradeTypeGroup = new GroupedData();
-//		todaysCollectionTradeTypeGroup.setGroupBy("Departments");
-//		todaysCollectionTradeTypeGroup.setBuckets(buckets);
-//
-//		return todaysCollectionTradeTypeGroup;
-//	}
 
-//	public Map<String, Long> getDepartmentWiseSlaAchivement(String stringDate, String wardName, Integer slaDays) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getDepartmentWiseSlaQuery(stringDate, wardName, slaDays, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getLong("sla_percentage"));
-//			}
-//			return result;
-//		});
-//	}
-
-	public List<String> getAllDepartments() {
-
-		String query = "SELECT DISTINCT servicecode FROM eg_pgr_service_v2";
-
-		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("servicecode"));
-	}
-	
 	// All status show
-	public List<String> getAllStatuses() {
+//	public List<String> getAllStatuses() {
+//
+//		String query = "SELECT DISTINCT status FROM eg_pt_property";
+//
+//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("status"));
+//	}
+	
+	public List<String> getAllStatuses(Long epochStart, Long epochEnd, String wardNumber) {
 
-		String query = "SELECT DISTINCT status FROM eg_pt_property";
+	    String query = "SELECT DISTINCT p.status " +
+	                   "FROM eg_pt_property p " +
+	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
+	                   "WHERE p.createdtime BETWEEN ? AND ? " +
+	                   "AND p.status IS NOT NULL " +
+	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
+	                   "ORDER BY p.status";
 
-		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("status"));
+	    return jdbcTemplate.query(query,
+	            new Object[]{epochStart, epochEnd, wardNumber},
+	            (rs, rowNum) -> rs.getString("status"));
 	}
 	
-	public List<String> getAllusagecategory() {
-
-		String query = "SELECT DISTINCT usagecategory FROM eg_pt_property";
-
-		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
-	}
 	
+	
+	//usagecategory
+//	public List<String> getAllusagecategory() {
+//
+//		String query = "SELECT DISTINCT usagecategory FROM eg_pt_property";
+//
+//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
+//	}
+//	
+//	public List<String> getAllusagecategory() {
+//
+//		String query = 
+//				//"SELECT DISTINCT usagecategory FROM eg_pt_property";
+//"SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory FROM eg_pt_unit u";
+//
+//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
+//	}
+	
+	
+	
+	
+//	public List<String> getAllusagecategory(Long epochStart, Long epochEnd) {
+//
+//	    String query = "SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory " +
+//	                   "FROM eg_pt_unit u " +
+//	                   "WHERE u.createdtime BETWEEN ? AND ? " +
+//	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL";
+//
+//	    return jdbcTemplate.query(query, new Object[]{epochStart, epochEnd},
+//	            (rs, rowNum) -> rs.getString("usagecategory"));
+//	}
+	
+	public List<String> getAllusagecategory(Long epochStart, Long epochEnd, String wardName) {
+
+	    String query = "SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory " +
+	                   "FROM eg_pt_unit u " +
+	                   "JOIN eg_pt_property p ON p.id = u.propertyid " +
+	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
+	                   "WHERE u.createdtime BETWEEN ? AND ? " +
+	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL " +
+	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
+	                   "ORDER BY usagecategory";
+
+	    return jdbcTemplate.query(query,
+	            new Object[]{epochStart, epochEnd, wardName},
+	            (rs, rowNum) -> rs.getString("usagecategory"));
+	}
 	
 	public List<String> getAllPaymentMode() {
 
-		String query = "SELECT DISTINCT paymentmode FROM egcl_payment ORDER BY paymentmode;";
+		String query = "SELECT DISTINCT CASE "
+				+ "WHEN gateway IN ('RAZORPAY','PAYTMPOS') THEN 'ONLINE' "
+				+ "ELSE 'OFFLINE' END AS paymentMode FROM eg_pg_transactions ORDER BY paymentMode;";
 
-		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentmode"));
+		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentMode"));
 	}
 	
 	public List<String> getAllFinancialYears() {
 
-	    String query = 
-	        "SELECT DISTINCT " +
-	        "CONCAT( " +
-	        "   EXTRACT(YEAR FROM to_timestamp(createdtime/1000) - INTERVAL '3 months'), " +
-	        "   '-', " +
-	        "   RIGHT(EXTRACT(YEAR FROM to_timestamp(createdtime/1000) + INTERVAL '9 months')::TEXT, 2) " +
-	        ") AS financial_year " +
-	        "FROM eg_pt_property " +
-	        "ORDER BY financial_year";
+		String query = "SELECT DISTINCT " + "CONCAT( "
+				+ "   EXTRACT(YEAR FROM to_timestamp(createdtime/1000) - INTERVAL '3 months'), " + "   '-', "
+				+ "   RIGHT(EXTRACT(YEAR FROM to_timestamp(createdtime/1000) + INTERVAL '9 months')::TEXT, 2) "
+				+ ") AS financial_year " + "FROM eg_pt_property " + "ORDER BY financial_year";
 
 	    return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("financial_year"));
 	}
-	
-//	public List<String> getAllusagecategory() {
-//
-//	    String query = "SELECT DISTINCT additional_details->>'useOfBuilding' AS usagecategory " +
-//	                   "FROM eg_pt_unit " +
-//	                   "WHERE additional_details->>'useOfBuilding' IS NOT NULL";
-//
-//	    return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
-//	}
-
-	public List<String> getAllChannelsSource() {
-
-		String query = "SELECT DISTINCT source FROM eg_pgr_service_v2";
-
-		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("source"));
-	}
-
-//	public List<String> getAllCategories() {
-//
-//		String query = "SELECT DISTINCT additional_details->>'useOfBuilding' AS category " + "FROM eg_pt_unit "
-//				+ "WHERE additional_details->>'useOfBuilding' IS NOT NULL";
-//
-//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("category"));
-//	}
-
-//	public List<String> getAllFinancialYears() {
-//
-//	    String query =
-//	        "SELECT DISTINCT " +
-//	        "CASE " +
-//	        " WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime/1000)) >= 4 " +
-//	        " THEN CONCAT( " +
-//	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)), '-', " +
-//	        "      RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) + 1)::text, 2) " +
-//	        " ) " +
-//	        " ELSE CONCAT( " +
-//	        "      EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000)) - 1, '-', " +
-//	        "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(createdtime/1000))::text, 2) " +
-//	        " ) " +
-//	        "END AS financial_year " +
-//	        "FROM eg_pt_property " +
-//	        "ORDER BY financial_year";
-//
-//	    return jdbcTemplate.query(query,
-//	            (rs, rowNum) -> rs.getString("financial_year"));
-//	}
-
-//	public Map<String, BigDecimal> getDepartmentWiseCompletionRate(String date, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getDepartmentWiseCompletionRateQuery(date, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, BigDecimal> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("department"), rs.getBigDecimal("completion_rate") == null ? BigDecimal.ZERO
-//						: rs.getBigDecimal("completion_rate"));
-//			}
-//			return result;
-//		});
-//	}
 
 	public Map<String, Long> getTodayMovedApplication(long epochStart, long epochEnd, String wardName) {
 
@@ -654,110 +602,108 @@ public class PropertyRepository {
 		});
 	}
 	
-	public Map<String, Long> getTodayCollection(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
+		String query = queryBuilder. getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
+			Map<String, BigDecimal> result = new HashMap<>();
 			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("value"));
+				result.put(rs.getString("name"), rs.getBigDecimal("totalAmount"));
 			}
 			return result;
 		});
 	}
-	public Map<String, Long> getPaymentChannel(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getTodayCollectionPaymentModeQuery(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
+		String query = queryBuilder.getPaymentChannelTypeQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
+			Map<String, BigDecimal> result = new HashMap<>();
 			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("value"));
-			}
-			return result;
-		});
-	}
-	
-	public Map<String, Long> getPropertyTax(long epochStart, long epochEnd, String wardName
-            ) {
-
-		List<Object> preparedStmtList = new ArrayList<>();
-
-		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("propertyTax"));
+				result.put(rs.getString("paymentMode"), rs.getBigDecimal("totalAmount"));
 			}
 			return result;
 		});
 	}
 	
-	public Map<String, Long> getCess(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getPropertyTax(long epochStart, long epochEnd, String wardName) {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+	    List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("cess"));
-			}
-			return result;
-		});
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+	        Map<String, BigDecimal> result = new HashMap<>();
+	        while (rs.next()) {
+	            result.put(rs.getString("name"), rs.getBigDecimal("propertyTax")); 
+	        }
+	        return result;
+	    });
 	}
 	
-	
-	public Map<String, Long> getRebate(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getCess(long epochStart, long epochEnd, String wardName) {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+	    List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("rebate"));
-			}
-			return result;
-		});
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+	        Map<String, BigDecimal> result = new HashMap<>();
+	        while (rs.next()) {
+	            result.put(rs.getString("name"), rs.getBigDecimal("cess")); 
+	        }
+	        return result;
+	    });
 	}
 	
-	public Map<String, Long> getPenalty(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getRebate(long epochStart, long epochEnd, String wardName) {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+	    List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("penalty"));
-			}
-			return result;
-		});
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+	        Map<String, BigDecimal> result = new HashMap<>();
+	        while (rs.next()) {
+	            result.put(rs.getString("name"), rs.getBigDecimal("rebate")); 
+	        }
+	        return result;
+	    });
 	}
 	
-	public Map<String, Long> getInterest(long epochStart, long epochEnd, String wardName) {
+	public Map<String, BigDecimal> getPenalty(long epochStart, long epochEnd, String wardName) {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+	    List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("interest"));
-			}
-			return result;
-		});
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+	        Map<String, BigDecimal> result = new HashMap<>();
+	        while (rs.next()) {
+	            result.put(rs.getString("name"), rs.getBigDecimal("penalty")); 
+	        }
+	        return result;
+	    });
+	}
+	
+	public Map<String, BigDecimal> getInterest(long epochStart, long epochEnd, String wardName) {
+
+	    List<Object> preparedStmtList = new ArrayList<>();
+
+	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+	        Map<String, BigDecimal> result = new HashMap<>();
+	        while (rs.next()) {
+	            result.put(rs.getString("name"), rs.getBigDecimal("interest")); 
+	        }
+	        return result;
+	    });
 	}	
 	
 	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward) { 
