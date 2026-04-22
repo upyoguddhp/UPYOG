@@ -20,8 +20,7 @@ import org.hibernate.validator.constraints.SafeHtml;
 @NoArgsConstructor
 @Builder
 public class NocSearchCriteria {
-
-    @NotNull
+	
     @SafeHtml
     @JsonProperty("tenantId")
     private String tenantId;

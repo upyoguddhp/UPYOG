@@ -192,5 +192,7 @@ public class PetConfiguration {
 	
 	@Value("${egov.bill.expiry.after}")
 	private String billExpiryAfter;
-
+	
+	@Value("${egov.state.tenantId}")
+	private String stateLevelTenantId;
 }

@@ -70,6 +70,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.CustomAmountUpdateResponse;
 import org.egov.garbageservice.model.CustomAmountUpdateRequest;
+import org.egov.garbageservice.model.BillIdRequest;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -933,6 +934,23 @@ public class GarbageAccountSchedulerService {
 	    responseObj.setConsumerCode(bill.getConsumerCode());
 	    responseObj.setTenantId(request.getTenantId());
 	    return responseObj;
+	}
+
+	public GrbgBillTracker getTrackerByBillId(BillIdRequest request) {
+
+		if (request.getBillId() == null) {
+			throw new CustomException("INVALID_REQUEST", "billId is required");
+		}
+		GrbgBillTrackerSearchCriteria criteria = GrbgBillTrackerSearchCriteria.builder()
+				.billIds(Collections.singleton(request.getBillId()))
+				.build();
+
+		List<GrbgBillTracker> trackers = garbageBillTrackerRepository.extractTrackers(criteria);
+
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
+		}
+		return trackers.get(0);
 	}
 
 }

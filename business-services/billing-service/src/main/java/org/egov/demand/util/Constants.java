@@ -36,6 +36,12 @@ public class Constants {
     public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
     public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
     
+    public static final String GARBAGE_TRACKER_FETCH_EXCEPTION = "TRACKER_FETCH_EXCEPTION";
+    public static final String GARBAGE_TRACKER_FETCH_EXCEPTION_MSG = "Failed to get Trackers from garbage";
+    
+    public static final String PROPERTY_TRACKER_FETCH_EXCEPTION = "TRACKER_FETCH_EXCEPTION";
+    public static final String PROPERTY_TRACKER_FETCH_EXCEPTION_MSG = "Failed to get Trackers from property";
+    
     
     /* 
      * ERROR CONSTANTS 
