@@ -451,11 +451,12 @@ public class BillRepositoryV2 {
 	    String tenantId = request.getTenantId();
 	    String userId = request.getRequestInfo().getUserInfo().getUuid();
 	    Long currentTime = System.currentTimeMillis();
+	    String demandId = request.getDemandId();
 
 	    jdbcTemplate.update(
-		        BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
-		        customAmount, userId, currentTime, billId, tenantId
-		    );
+	    	    BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
+	    	    customAmount, userId, currentTime, demandId , tenantId
+	    	);
 	    
 	    jdbcTemplate.update(
 	        BillQueryBuilder.BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,

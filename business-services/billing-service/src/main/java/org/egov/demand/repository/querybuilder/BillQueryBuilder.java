@@ -111,10 +111,16 @@ public class BillQueryBuilder {
 			+ "SET totalamount = ?, " + "    lastmodifiedby = ?, "
 			+ "    lastmodifieddate = ? " + "WHERE billid = ? AND tenantid = ?";
 
-	public static final String BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY = "UPDATE egbs_billaccountdetail_v1 "
-			+ "SET amount = ?, " + "    lastmodifiedby = ?, "
-			+ "    lastmodifieddate = ? " + "WHERE billdetail IN ( "
-			+ "    SELECT id FROM egbs_billdetail_v1 WHERE billid = ? AND tenantid = ? " + ")";
+	public static final String BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY =
+		    "UPDATE egbs_billaccountdetail_v1 " +
+		    "SET amount = ?, " +
+		    "    lastmodifiedby = ?, " +
+		    "    lastmodifieddate = ? " +
+		    "WHERE demanddetailid IN ( " +
+		    "    SELECT id FROM egbs_demanddetail_v1 " +
+		    "    WHERE demandid = ? " +
+		    "    AND tenantid = ? " +
+		    ")";
 
 	public static final String BILL_UPDATE_AUDIT_QUERY = "UPDATE egbs_bill_v1 " + "SET lastmodifiedby = ?, "
 			+ "    lastmodifieddate = ? " + "WHERE id = ? AND tenantid = ?";
