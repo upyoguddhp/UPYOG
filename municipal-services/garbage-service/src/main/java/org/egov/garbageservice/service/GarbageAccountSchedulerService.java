@@ -913,11 +913,11 @@ public class GarbageAccountSchedulerService {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update paid bill");
 	    }
 	    
-	    if (bill.getAmountPaid() != null && bill.getAmountPaid().compareTo(BigDecimal.ZERO) > 0) {
+	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
 	    }
-	    String DemandId =  bill.getBillDetails().get(0).getDemandId();   
-	    request.setDemandId(DemandId);
+	    String DemandId =  request.getDemandId();   
+
 	    garbageBillTrackerRepository.updateCustomTrackerAmount(request);
 	    
 	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
