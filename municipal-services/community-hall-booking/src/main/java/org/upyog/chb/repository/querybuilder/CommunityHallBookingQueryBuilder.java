@@ -40,7 +40,7 @@ public class CommunityHallBookingQueryBuilder {
 	private final String paginationWrapper = "SELECT * FROM " + "(SELECT *, DENSE_RANK() OVER (ORDER BY application_date DESC) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 
-	private static final String COMMUNITY_HALL_SLOTS_AVAIALABILITY_QUERY = " SELECT ecbd.tenant_id, ecbd.community_hall_code, ecsd.capacity, ecsd.hall_code, ecsd.status,ecsd.booking_date,ecsd.booking_to_date \n"
+	private static final String COMMUNITY_HALL_SLOTS_AVAIALABILITY_QUERY = " SELECT  ecbd.tenant_id, ecbd.community_hall_code, ecsd.capacity, ecsd.hall_code, ecsd.status,ecsd.booking_date,ecsd.booking_to_date \n"
 			+ "	FROM eg_chb_booking_detail ecbd, eg_chb_slot_detail ecsd\n"
 			+ "where ecbd.booking_id = ecsd.booking_id and ecbd.tenant_id= ? and ecbd.community_hall_code = ?\n"
 			+ " and ecsd.status in ('BOOKED', 'PENDING_FOR_PAYMENT') and \n"

@@ -198,6 +198,10 @@ public class CommunityHallBookingConfiguration {
 	private String billSearchEndpoint;
 	
 	
+	//cancell route
+	@Value("${egov.bill.cancel.endpoint}")
+	private String billCancellEndpoint;
+	
 	//Module and business name
 	@Value("${chb.module.name}")
 	private String moduleName;

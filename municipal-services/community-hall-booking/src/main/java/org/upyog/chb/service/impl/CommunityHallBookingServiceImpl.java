@@ -64,7 +64,10 @@ import org.upyog.chb.web.models.RequestInfoWrapper;
 import org.upyog.chb.web.models.User;
 import org.upyog.chb.web.models.UserSearchResponse;
 import org.upyog.chb.web.models.collection.Bill;
+import org.upyog.chb.web.models.collection.Bill.StatusEnum;
 import org.upyog.chb.web.models.collection.BillSearchCriteria;
+import org.upyog.chb.web.models.collection.UpdateBillCriteria;
+
 import org.upyog.chb.web.models.collection.GenerateBillCriteria;
 import org.upyog.chb.service.ReportService;
 import org.upyog.chb.service.UserService;
@@ -75,7 +78,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import digit.models.coremodels.PaymentDetail;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+//bill cancellation 
+import java.util.Arrays;
+import org.upyog.chb.web.models.BookingSlotDetail;
 @Service
 @Slf4j
 public class CommunityHallBookingServiceImpl implements CommunityHallBookingService {
@@ -126,6 +133,9 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Override
 	public CommunityHallBookingDetail createBooking(@Valid CommunityHallBookingRequest communityHallsBookingRequest) {
@@ -273,6 +283,46 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 
 				createCertificate(communityHallsBookingRequest);
 
+			} else if (StringUtils.equalsIgnoreCase(
+			        communityHallsBookingRequest.getHallsBookingApplication().getWorkflow().getAction(),
+			        "Cancel")) {
+				//bill cancellation workd 	
+				
+				BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				        .tenantId(communityHallsBookingRequest.getHallsBookingApplication().getTenantId())
+				        .consumerCode(Collections.singleton(
+				                communityHallsBookingRequest.getHallsBookingApplication().getBookingNo()
+				         
+				        )).service("chb-services")
+				        .build();
+							
+				
+				//bill search 
+				List<Bill> bills = billingService.searchBill(billSearchCriteria, communityHallsBookingRequest.getRequestInfo());
+			    
+				if (!CollectionUtils.isEmpty(bills)) {
+
+			    
+				    Bill bill = bills.get(0);
+				    Map<String, Object> additionalDetails = new HashMap<>();
+				    additionalDetails.put("reason", "CHB_CANCEL");
+				    additionalDetails.put("reasonMessage", "Booking Cancelled");
+				    JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
+				    UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder()
+				            .tenantId(bill.getTenantId())
+				            .billIds(Collections.singleton(bill.getId()))
+				            .consumerCodes(Collections.singleton(bill.getConsumerCode()))
+				            .businessService(bill.getBusinessService())
+				            .statusToBeUpdated(StatusEnum.CANCELLED)
+				            .additionalDetails(additionalDetailsNode)
+				            .build();
+	
+				    billingService.cancelBill(updateBillCriteria,
+				            communityHallsBookingRequest.getRequestInfo());
+				  }
+				
+				
+			    updateSlotStatusToAvailable(communityHallsBookingRequest, bookingNo);
 			}
 		}
 
@@ -621,6 +671,8 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 		CommunityHallBookingRequest communityHallBookingRequest = CommunityHallBookingRequest.builder()
 				.hallsBookingApplication(bookingDetails.get(0))
 				.requestInfo(communityHallBookingUpdateStatusRequest.getRequestInfo()).build();
+		
+		//String bookingID = communityHallBookingRequest.getHallsBookingApplication().getApplicantDetail().getBookingId();
 		communityHallBookingRequest.getHallsBookingApplication()
 				.setWorkflow(communityHallBookingUpdateStatusRequest.getWorkflow());
 
@@ -755,5 +807,11 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	            .collect(Collectors.toList());
 		return dateStrings;
 	}
-
+	
+	//new method for cancel booking  
+	
+	private void updateSlotStatusToAvailable(CommunityHallBookingRequest request, String BookingCode) {
+			bookingRepository.updateSlotStatusToAvailable(request);
+	   
+	}
 }
