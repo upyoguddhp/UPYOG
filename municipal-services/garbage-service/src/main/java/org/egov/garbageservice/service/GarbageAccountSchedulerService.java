@@ -240,7 +240,6 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
 								    .grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
 								    .status(Collections.singleton("ACTIVE"))
-								    .type(Collections.singleton("MONTHLY"))
 								    .tenantId(garbageAccount.getTenantId())
 								    .build();
 
