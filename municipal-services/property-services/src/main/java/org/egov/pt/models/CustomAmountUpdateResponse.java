@@ -23,8 +23,10 @@ public class CustomAmountUpdateResponse {
     private String status;
 
     private BigDecimal oldAmount;
-
-    private BigDecimal newAmount;
+    
+    private BigDecimal customAmount;
+    
+    private BigDecimal updatedTotalAmount;
 
     private String message;
 

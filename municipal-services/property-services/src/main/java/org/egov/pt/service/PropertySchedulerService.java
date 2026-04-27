@@ -1641,24 +1641,41 @@ public class PropertySchedulerService {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update paid bill");
 	    }
 	    
-	    if (bill.getAmountPaid() != null && bill.getAmountPaid().compareTo(BigDecimal.ZERO) > 0) {
+	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
 	    }
-	    String DemandId =  bill.getBillDetails().get(0).getDemandId();   
-	    request.setDemandId(DemandId);
+	    
+	    if (request.getBillId() == null || request.getBillId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "billId is required");
+	    }
+
+	    if (request.getDemandId() == null || request.getDemandId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "demandId is required");
+	    }
+
+	    if (request.getCustomAmount() == null) {
+	        throw new CustomException("INVALID_REQUEST", "customAmount is required");
+	    }
+	    
+	    String DemandId =  request.getDemandId(); 
 	    repository.updateCustomTrackerAmount(request);
+	    
+	    Object updatedResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+	    BillResponse updatedBillResponse = objectMapper.convertValue(updatedResponse, BillResponse.class);
+	    Bill updatedBill = updatedBillResponse.getBill().get(0);
 	    
 	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
 	    responseObj.setBillId(request.getBillId());
 	    responseObj.setDemandId(DemandId);
-	    responseObj.setNewAmount(request.getCustomAmount());
+	    responseObj.setCustomAmount(request.getCustomAmount());
 	    responseObj.setMessage("Custom amount updated successfully");
+	    responseObj.setOldAmount(bill.getTotalAmount());
+	    responseObj.setUpdatedTotalAmount(updatedBill.getTotalAmount());
 	    responseObj.setTenantId(request.getTenantId());
 	    responseObj.setReason(request.getReason());
 	    responseObj.setIsCustomAmountApplied(true);
 	    responseObj.setConsumerCode(bill.getConsumerCode());
 	    responseObj.setStatus(bill.getStatus() != null ? bill.getStatus().toString() : null);
-	    responseObj.setOldAmount(bill.getTotalAmount());
 	    responseObj.setUpdatedTime(System.currentTimeMillis());
 	    responseObj.setUpdatedBy(request.getRequestInfo().getUserInfo().getUuid());
 	    return responseObj;

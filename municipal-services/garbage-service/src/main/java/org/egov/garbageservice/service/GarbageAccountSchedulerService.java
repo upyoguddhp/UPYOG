@@ -916,16 +916,34 @@ public class GarbageAccountSchedulerService {
 	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
 	    }
+	    
+	    if (request.getBillId() == null || request.getBillId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "billId is required");
+	    }
+
+	    if (request.getDemandId() == null || request.getDemandId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "demandId is required");
+	    }
+
+	    if (request.getCustomAmount() == null) {
+	        throw new CustomException("INVALID_REQUEST", "customAmount is required");
+	    }
+	    
 	    String DemandId =  request.getDemandId();   
 
 	    garbageBillTrackerRepository.updateCustomTrackerAmount(request);
 	    
+	    Object updatedResponse = restCallRepository.fetchResult(uri, wrapper);
+	    BillResponse updatedBillResponse = objectMapper.convertValue(updatedResponse, BillResponse.class);
+	    Bill updatedBill = updatedBillResponse.getBill().get(0);
+	    
 	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
 	    responseObj.setBillId(request.getBillId());
 	    responseObj.setDemandId(DemandId);
-	    responseObj.setNewAmount(request.getCustomAmount());
+	    responseObj.setCustomAmount(request.getCustomAmount());
 	    responseObj.setMessage("Custom amount updated successfully");
 	    responseObj.setOldAmount(bill.getTotalAmount());
+	    responseObj.setUpdatedTotalAmount(updatedBill.getTotalAmount());
 	    responseObj.setUpdatedTime(System.currentTimeMillis());
 	    responseObj.setUpdatedBy(request.getRequestInfo().getUserInfo().getUuid());
 	    responseObj.setReason(request.getReason());

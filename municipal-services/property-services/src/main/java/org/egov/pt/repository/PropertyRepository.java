@@ -792,6 +792,7 @@ public class PropertyRepository {
 	    paramMap.put("reason", request.getReason());
 	    paramMap.put("billId", request.getBillId());
 	    paramMap.put("tenantId", request.getTenantId());
+	    paramMap.put("demandId", request.getDemandId());
 
 	    namedParameterJdbcTemplate.update(query, paramMap);
 	    log.info("Tracker updated with custom amount");

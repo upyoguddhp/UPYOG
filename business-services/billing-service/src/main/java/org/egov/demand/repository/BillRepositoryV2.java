@@ -453,19 +453,12 @@ public class BillRepositoryV2 {
 	    Long currentTime = System.currentTimeMillis();
 	    String demandId = request.getDemandId();
 
-	    jdbcTemplate.update(
-	    	    BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
-	    	    customAmount, userId, currentTime, demandId , tenantId
-	    	);
+		jdbcTemplate.update(BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId,
+				currentTime, demandId, tenantId);
+
+		jdbcTemplate.update(BillQueryBuilder.BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId, currentTime,
+				billId, demandId, tenantId);
 	    
-	    jdbcTemplate.update(
-	        BillQueryBuilder.BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY,
-	        customAmount, userId, currentTime, billId, tenantId
-	    );
-	    
-	    jdbcTemplate.update(
-	        BillQueryBuilder.BILL_UPDATE_AUDIT_QUERY,
-	        userId, currentTime, billId, tenantId
-	    );
+		jdbcTemplate.update(BillQueryBuilder.BILL_UPDATE_AUDIT_QUERY, userId, currentTime, billId, tenantId);
 	}
 }
