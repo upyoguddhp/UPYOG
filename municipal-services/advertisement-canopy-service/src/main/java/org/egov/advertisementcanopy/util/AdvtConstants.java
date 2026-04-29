@@ -122,7 +122,11 @@ public class AdvtConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 
 	public static final String STATUS_APPROVED = "APPROVED";
-
+	
+	public static final String ACTION_CANCEL = "CANCEL";
+	
+	public static final String STATUS_CANCELLED = "CANCELLED";
+	
     public static final String WORKFLOW_SITE_BOOKING_MODULE = "ADVT";
 
 	public static final String BUSINESS_SERVICE_SITE_BOOKING = "ADVT";
@@ -153,6 +157,7 @@ public class AdvtConstants {
 		map.put(ACTION_FORWARD_TO_APPROVER, STATUS_PENDINGFORAPPROVAL);
 		map.put(ACTION_VERIFY, STATUS_PENDINGFORAPPROVAL);
 		map.put(ACTION_APPROVE,STATUS_APPROVED);
+		map.put(ACTION_CANCEL, STATUS_CANCELLED);
 
 		if (!fetchValue) {
 			// return key
