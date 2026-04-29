@@ -77,6 +77,11 @@ import org.egov.pt.web.contracts.alfresco.DmsResponse;
 import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.BillIdRequest;
+
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+
 
 import java.io.*;
 
@@ -1088,7 +1093,7 @@ public class PropertySchedulerService {
 				.orElseGet(HashMap::new);
 	}
 
-	public Map<String, Integer> getPenaltyRateMap(MdmsResponse mdmsResponse) {
+	public Map<String, Double> getPenaltyRateMap(MdmsResponse mdmsResponse) {
 		return Optional.ofNullable(mdmsResponse).map(MdmsResponse::getMdmsRes)
 				.map(mdmsRes -> mdmsRes.get(PTConstants.MDMS_MODULE_ULBS)).map(objectMapper::valueToTree)
 				.map(ulbsNode -> {
@@ -1097,7 +1102,7 @@ public class PropertySchedulerService {
 				}).filter(JsonNode::isArray)
 				.map(rebateDaysNode -> StreamSupport.stream(rebateDaysNode.spliterator(), false)
 						.collect(Collectors.toMap(node -> propertyConfiguration.getStateLevelTenantId() + "."
-								+ node.get("ulbName").asText(), node -> node.get("rate").asInt())))
+								+ node.get("ulbName").asText(), node -> node.get("rate").asDouble())))
 				.orElseGet(HashMap::new);
 	}
 	
@@ -1138,6 +1143,7 @@ public class PropertySchedulerService {
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 				.startDateTime(startDateTime).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
+		        .type("CYCLIC") 
 				.build();
 
 		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
@@ -1232,7 +1238,7 @@ public class PropertySchedulerService {
 
 	private List<PtTaxCalculatorTracker> processTrackers(String constantValue, List<PtTaxCalculatorTracker> trackers,
 			Map<String, Bill> billIdBillMap, Map<String, Demand> demandIdToDemandMap,
-			RequestInfoWrapper requestInfoWrapper, Map<String, Integer> tenantIdPenaltyRateMap) {
+			RequestInfoWrapper requestInfoWrapper, Map<String, Double> tenantIdPenaltyRateMap) {
 		List<PtTaxCalculatorTracker> updatedTrackers = new ArrayList<>();
 
 		for (PtTaxCalculatorTracker tracker : trackers) {
@@ -1256,7 +1262,6 @@ public class PropertySchedulerService {
 						tracker.getUuid());
 				continue;
 			}
-
 			BigDecimal penaltyAmount = BigDecimal.ZERO;
 			BigDecimal newAmount = BigDecimal.ZERO;
 
@@ -1270,7 +1275,7 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-//                                                         tracker.setRebateAmount(BigDecimal.ZERO);
+//                                                tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
@@ -1295,7 +1300,7 @@ public class PropertySchedulerService {
 		return updatedTrackers;
 	}
 
-	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, int penaltyRatePercent) {
+	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
 		return tracker.getPropertyTaxWithoutRebate().multiply(BigDecimal.valueOf(penaltyRatePercent))
 				.divide(BigDecimal.valueOf(100));
 	}
@@ -1311,28 +1316,82 @@ public class PropertySchedulerService {
 		}
 		return true;
 	}
+//
+//	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
+//			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
+//
+//		for (BillDetail billDetail : bill.getBillDetails()) {
+//			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
+//			if (demand != null) {
+//				demand.setMinimumAmountPayable(newAmount);
+//				if (demand.getDemandDetails() != null) {
+//					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+//				}
+//				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
+//			}
+//
+//			if (billDetail.getBillAccountDetails() != null) {
+//				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+//			}
+//
+//			billDetail.setAmount(newAmount);
+//		}
+//		bill.setTotalAmount(newAmount);
+//		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+//	}
+	
+	private void updateBillAndDemandAmounts(
+	        Bill bill,
+	        Map<String, Demand> demandIdToDemandMap,
+	        BigDecimal newAmount,
+	        RequestInfoWrapper requestInfoWrapper,
+	        PtTaxCalculatorTracker tracker) {
 
-	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
-			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
+	    for (BillDetail billDetail : bill.getBillDetails()) {
 
-		for (BillDetail billDetail : bill.getBillDetails()) {
-			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand != null) {
-				demand.setMinimumAmountPayable(newAmount);
-				if (demand.getDemandDetails() != null) {
-					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
-				}
-				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
-			}
+	        //ONLY update matching demand
+	        if (!billDetail.getDemandId().equals(tracker.getDemandId())) {
+	            continue;
+	        }
 
-			if (billDetail.getBillAccountDetails() != null) {
-				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-			}
+	        Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
 
-			billDetail.setAmount(newAmount);
-		}
-		bill.setTotalAmount(newAmount);
-		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+	        if (demand != null) {
+
+	            // Update ONLY this demand
+	            demand.setMinimumAmountPayable(newAmount);
+
+	            if (demand.getDemandDetails() != null) {
+	                demand.getDemandDetails().forEach(demandDetail ->
+	                        demandDetail.setTaxAmount(newAmount));
+	            }
+
+	            demandService.updateDemand(
+	                    requestInfoWrapper.getRequestInfo(),
+	                    Collections.singletonList(demand)
+	            );
+	        }
+
+	        // Update ONLY this billDetail
+	        if (billDetail.getBillAccountDetails() != null) {
+	            billDetail.getBillAccountDetails().forEach(billAccountDetail ->
+	                    billAccountDetail.setAmount(newAmount));
+	        }
+
+	        billDetail.setAmount(newAmount);
+	    }
+
+	    // IMPORTANT: totalAmount recompute 
+	    BigDecimal total = bill.getBillDetails().stream()
+	            .map(BillDetail::getAmount)
+	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+	    bill.setTotalAmount(total);
+
+	    billService.updateBill(
+	            requestInfoWrapper.getRequestInfo(),
+	            Collections.singletonList(bill)
+	    );
 	}
 
 	public Object updatePenaltyAmount(RequestInfoWrapper requestInfoWrapper) {
@@ -1347,7 +1406,7 @@ public class PropertySchedulerService {
 		MdmsResponse mdmsResponse = mdmsService.getPenaltyRateMdmsData(requestInfoWrapper.getRequestInfo(), null);
 		MdmsResponse mdmsPenaltyDaysResponse = mdmsService.getPenaltyDaysMdmsData(requestInfoWrapper.getRequestInfo(), null);
 
-		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
+		Map<String, Double> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
 		Map<String, Integer> tenantIdPenaltyDaysMap = getPenaltyDaysMap(mdmsPenaltyDaysResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
@@ -1374,16 +1433,47 @@ public class PropertySchedulerService {
 		return latestTaxCalculatorTrackers;
 	}
 
-	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper) throws Exception {
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper, String isforce,String ulb,String ward , String created_at) throws Exception {
+		String[] tenants = new String[0];
 
-		String[] tenants = { "hp.Shimla", "hp.Solan" };
+		if(ulb ==null && ward == null) {
+			MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(requestInfoWrapper.getRequestInfo(), null);
+			Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
 
+			if (mdmsRes != null) {
+				Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+				if (moduleData != null) {
+					List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
+
+					if (masterList != null) {
+						List<String> tenantList = new ArrayList<>();
+
+						for (Object obj : masterList) {
+
+							Map<String, Object> map = (Map<String, Object>) obj;
+
+							String getulbName = map.get("ulbName").toString();
+							String tenantId = "hp." + getulbName;
+
+							tenantList.add(tenantId);
+						}
+
+						tenants = tenantList.toArray(new String[0]);
+					}
+				}
+			}
+
+
+		} else  {
+		    tenants = new String[]{"hp." +ulb};
+
+		}
 		String ulbName = null;
 		List<Map<String, Object>> bills = new ArrayList<>();
 
 		for (String tenant : tenants) {
 
-			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant);
+			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant, isforce, ward, created_at);
 
 			if (result != null && !result.isEmpty()) {
 				bills.addAll(result);
@@ -1414,6 +1504,7 @@ public class PropertySchedulerService {
 			PDFMergerUtility merger = new PDFMergerUtility();
 			ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
 
+			// 4 Generate PDF for each bill
 			for (Map<String, Object> bill : ulbBills) {
 
 				String propertyId = String.valueOf(bill.get("propertyid"));
@@ -1426,29 +1517,56 @@ public class PropertySchedulerService {
 				ResponseEntity<Resource> billResponse = propertyService
 						.generatePropertyTaxBillReceipt(requestInfoWrapper, propertyId, billId, status);
 
-				if (billResponse != null && billResponse.getBody() != null) {
+//				if (billResponse != null && billResponse.getBody() != null) {
+//
+//					InputStream inputStream = billResponse.getBody().getInputStream();
+//
+//					merger.addSource(inputStream);
+//				}
+				Resource resource = billResponse.getBody();
 
-					InputStream inputStream = billResponse.getBody().getInputStream();
+				if (resource != null) {
+				    InputStream is = resource.getInputStream();
+				    
+				    byte[] pdfBytes = convertInputStreamToByteArray(is);
+				    
+				    is.close();   
 
-					merger.addSource(inputStream);
+				    if (pdfBytes.length > 4 &&
+				        pdfBytes[0] == '%' &&
+				        pdfBytes[1] == 'P' &&
+				        pdfBytes[2] == 'D' &&
+				        pdfBytes[3] == 'F') {
+
+				        merger.addSource(new ByteArrayInputStream(pdfBytes));
+				    } else {
+				        System.out.println("❌ Skipping invalid PDF for billId: " + billId);
+				    }
 				}
+				
+				
 			}
 
+			// Merge PDFs of that ULB
 			merger.setDestinationStream(mergedOutput);
 			merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 
 			byte[] finalPdf = mergedOutput.toByteArray();
 
-			ByteArrayResource resource = new ByteArrayResource(finalPdf) {
-				@Override
-				public String getFilename() {
-					return wardName + "_Bills.pdf";
-				}
-			};
+        // 6️ Convert to resource
+        ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+            @Override
+            public String getFilename() {
+				String timestamp = String.valueOf(System.currentTimeMillis());
+        		return timestamp + "_" + wardName + "_Bills.pdf"; 
+            }
+        };
 
+			// 7️ Prepare DMS request
 			DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(resource, wardName, ulbName,
 					requestInfoWrapper.getRequestInfo());
 
+			// 8️ Upload to Alfresco
 			try {
 
 				alfrescoService.uploadAttachment(dmsRequest, requestInfoWrapper.getRequestInfo());
@@ -1473,5 +1591,34 @@ public class PropertySchedulerService {
 				.documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).ward_name(wardName).ulb_name(ulbName).build();
 
 	}
+
+	private byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		int nRead;
+		byte[] data = new byte[4096];
+
+		while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+		}
+
+		buffer.flush();
+		return buffer.toByteArray();
+	}
+	
+	public PtTaxCalculatorTracker getTrackerByBillId(BillIdRequest request) {
+		if (request.getBillId() == null) {
+			throw new CustomException("INVALID_REQUEST", "billId is required");
+		}
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.billId(request.getBillId())
+				.build();
+		List<PtTaxCalculatorTracker> trackers = repository.extractTrackers(criteria);
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
+		}
+		return trackers.get(0);
+	}
+
+
 
 }

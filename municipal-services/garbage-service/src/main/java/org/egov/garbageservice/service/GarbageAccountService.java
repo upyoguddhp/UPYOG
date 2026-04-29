@@ -1301,6 +1301,10 @@ public class GarbageAccountService {
 	private void updateChildGarbageAccounts(GarbageAccount newGarbageAccount) {
 		if (!CollectionUtils.isEmpty(newGarbageAccount.getChildGarbageAccounts())) {
 			newGarbageAccount.getChildGarbageAccounts().stream().forEach(child -> {
+				
+				if (child.getAdditionalDetail() == null) {
+	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
+	            }
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
@@ -2277,7 +2281,9 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		}
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType())).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+				.grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.year(grbgTaxCalculatorMonthTracker.getYear())
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
@@ -2540,6 +2546,12 @@ public GarbageAccountActionResponse openSearchPayPreview(
 							generateBillRequest, demand.getMinimumAmountPayable(), billResponse.getBill().get(0),
 							calculationBreakdown);
 					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(savedDemands.get(0).getId());
+					
+					AuditDetails audit = grbgUtils.buildCreateAuditDetails(genrateArrearRequest.getRequestInfo());
+
+					garbageBillTrackerRepository
+							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
+					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",

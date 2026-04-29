@@ -27,6 +27,7 @@ import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.egov.pt.models.PtTaxCalculatorTracker;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -212,7 +213,7 @@ public class PropertyQueryBuilder {
 	// --------------------------
 	private static final String DATA_METRICS_SEARCH_QUERY = "SELECT " +
 
-	// 1️ Total Applications Created Today
+			// 1️ Total Applications Created Today
 			"COUNT(CASE WHEN p.createdtime BETWEEN ? AND ? THEN 1 END) AS todaysTotalApplications, " +
 
 			// 2️ Total Closed Today
@@ -234,12 +235,12 @@ public class PropertyQueryBuilder {
 			+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
 
 			// 6️ Average Approval Days
-			
+	
 			"AVG(TO_TIMESTAMP(p.lastmodifiedtime/1000)::DATE - TO_TIMESTAMP(p.createdtime/1000)::DATE) AS avgDaysForApplicationApproval, "
 //			"COALESCE(AVG(CASE WHEN p.status = 'APPROVED' "
 //			+ "THEN ((p.lastmodifiedtime - p.createdtime) / 86400000) END),2) AS avgDaysForApplicationApproval, "
 
-			// 7️ SLA Days
+			// 3 SLA Days
 			+ "? AS StipulatedDays " 
 			+"FROM eg_pt_property p "
 			+"JOIN eg_pt_address addr ON addr.propertyid = p.id "
@@ -269,12 +270,16 @@ public class PropertyQueryBuilder {
 					+ "      RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2)) "
 					+ "END AS FYear,COUNT(*) AS value FROM eg_pt_property p "
 					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE addr.additionaldetails->>'wardNumber' = ? GROUP BY FYear ORDER BY FYear";
+					+ "WHERE addr.additionaldetails->>'wardNumber' = ? "
+					+ "AND p.createdtime BETWEEN ? AND ? " 
+					+"GROUP BY FYear ORDER BY FYear";
 
-	public String getPropertiesRegisteredFYQuery(String wardName, List<Object> preparedStmtList) {
-
+	public String getPropertiesRegisteredFYQuery(long startEpoch, long endEpoch,String wardName, List<Object> preparedStmtList) {
+		
 		preparedStmtList.add(wardName);
-
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		
 		return PROPERTIES_REGISTERED_FY_QUERY;
 	}
 
@@ -335,7 +340,7 @@ public class PropertyQueryBuilder {
 	private static final String TRANSACTION_QUERY = "SELECT p.usagecategory AS name, COUNT(pay.id) AS value "
 			+ "FROM egcl_payment pay JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
 			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
-			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'PAID' "
 			+ "AND pay.createdtime BETWEEN ? AND ? AND addr.additionaldetails->>'wardNumber' = ? "
 			+ "GROUP BY p.usagecategory ORDER BY p.usagecategory";
 
@@ -408,6 +413,16 @@ public class PropertyQueryBuilder {
 			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
 			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
 			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
+	
+	private static final String PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY =
+	        "UPDATE eg_pt_tax_calculator_tracker eptct";
+	
+	private static final String PT_TRACKER_UPDATE_BY_PROPERTY_ID = "UPDATE eg_pt_tax_calculator_tracker " +
+            "SET bill_status = 'EXPIRED', " +
+            "lastmodifiedby = ?, " +
+            "lastmodifiedtime = ? " +
+            "WHERE propertyid = ? " +
+            "AND bill_status = 'ACTIVE'";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1079,11 +1094,24 @@ public class PropertyQueryBuilder {
 	}
 
 
-public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName) {
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward, String created_at) {
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
+    
+    LocalDate yesterday = LocalDate.now().minusDays(1);
 
+    long startOfDay = yesterday
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
+
+    long endOfDay = yesterday.plusDays(1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
+
+    
     builder.append("SELECT * FROM eg_pt_tax_calculator_tracker  WHERE ");
    //builder.append("WHERE bill_status = ? ");
     if (status != null && !status.isEmpty()) {
@@ -1104,12 +1132,78 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     }
     
+    
+    
+    if(ward !=null && !ward.isEmpty()) {
+    	isFirstCondition = false;
+    	 builder.append(" AND ");
+         builder.append(" ward = ? ");
+         preparedStmtList.add(ward);
+
+    }
+    
+    if(ward != null && isforce != null) {
+    	isFirstCondition = true;
+
+    }
+    
+    
+    if (!isFirstCondition) {
+        builder.append(" AND ");
+        builder.append(" createdtime BETWEEN ? AND ? ");
+        preparedStmtList.add(startOfDay);
+        preparedStmtList.add(endOfDay);
+
+    }
+    
+    if(created_at !=null) {
+    	
+    	ZoneId zone = ZoneId.of("Asia/Kolkata");
+
+    	LocalDate daterange = LocalDate.parse(created_at);
+
+    	long start = daterange.atStartOfDay(zone).toInstant().toEpochMilli();
+    	long end = daterange.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+    	builder.append(" AND createdtime BETWEEN ? AND ? ");
+    	preparedStmtList.add(start);
+    	preparedStmtList.add(end);
+
+    }
+
+    
 
     builder.append("ORDER BY uuid DESC");
 
     return builder.toString();
 }
 
-
+	public String getUpdateStatusQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+	
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+	
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+	
+		preparedStmtList.add(tracker.getBillStatus().name());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+	
+		if (tracker.getDemandId() != null) {
+			builder.append(" AND eptct.demand_id = ? ");
+			preparedStmtList.add(tracker.getDemandId());
+		}
+		
+		if (tracker.getPropertyId() != null) {
+		    builder.append(" AND eptct.propertyid = ? ");
+		    preparedStmtList.add(tracker.getPropertyId());
+		}
+	
+		return builder.toString();
+	}
+	
+	public String getExpireActiveTrackersByPropertyIdQuery() {
+	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
+	}
 
 }

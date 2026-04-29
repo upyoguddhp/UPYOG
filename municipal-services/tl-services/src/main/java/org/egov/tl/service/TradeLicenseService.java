@@ -63,6 +63,8 @@ import org.egov.tl.web.models.TradeLicenseResponse;
 import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.tl.web.models.TradeUnit;
 import org.egov.tl.web.models.UpdateTLStatusCriteriaRequest;
+import org.egov.tl.web.models.collection.Bill;
+import org.egov.tl.web.models.collection.Bill.StatusEnum;
 import org.egov.tl.web.models.contract.BillResponse;
 import org.egov.tl.web.models.contract.BillSearchCriteria;
 import org.egov.tl.web.models.contract.BusinessService;
@@ -836,46 +838,55 @@ public class TradeLicenseService {
 		return licenceResponse;
 
 	}
-
 	private void generateDemandAndBill(TradeLicenseRequest tradeLicenseRequest) {
-		tradeLicenseRequest.getLicenses().stream().forEach(license -> {
 
-			if (StringUtils.equalsIgnoreCase(TLConstants.businessService_NewTL, license.getBusinessService())
-					&& StringUtils.equalsIgnoreCase(TLConstants.ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT,
-							license.getAction())) {
+	    tradeLicenseRequest.getLicenses().forEach(license -> {
 
-				// search demands which are taxPeriodTo > current date
-//				List<Demand> exisitingDemands = demandService.searchDemand(TLConstants.STATE_LEVEL_TENANT_ID
-//															, Collections.singleton(license.getApplicationNumber())
-//															,tradeLicenseRequest.getRequestInfo(),license.getBusinessService());
-//				
-//				List<Demand> exisitingDemandsAfterValidTo = ;
-				List<Demand> savedDemands = new ArrayList<>();
-//				if(CollectionUtils.isEmpty(exisitingDemands)) {
-				// generate demand
-				log.info("#### create deand license: " + license);
-				savedDemands = demandService.generateDemand(tradeLicenseRequest.getRequestInfo(), license,
-						businessService_TL);
-//	            }
+	        // Allow both NEW and RENEWAL
+	    	if ((StringUtils.equalsIgnoreCase(TLConstants.APPLICATION_TYPE_NEW, license.getApplicationType())
+	    	        || StringUtils.equalsIgnoreCase(TLConstants.APPLICATION_TYPE_RENEWAL, license.getApplicationType()))
+	    	    && StringUtils.equalsIgnoreCase(TLConstants.ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT,
+	    	            license.getAction())){
 
-				if (CollectionUtils.isEmpty(savedDemands)
-//		        		&& CollectionUtils.isEmpty(exisitingDemands)
-				) {
-					throw new CustomException("INVALID CONSUMERCODE",
-							"Bill not generated due to no Demand found for the given consumerCode");
-				}
+	            List<Demand> savedDemands;
 
-				// fetch/create bill
-				GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
-						.tenantId(license.getTenantId()).businessService(license.getBusinessService())
-						.consumerCode(license.getApplicationNumber()).build();
-				BillResponse billResponse = billService.generateBill(tradeLicenseRequest.getRequestInfo(),
-						billCriteria);
 
-			}
-		});
+	            String businessService = license.getBusinessService();
+
+	            if (TLConstants.APPLICATION_TYPE_RENEWAL
+	                    .equalsIgnoreCase(license.getApplicationType())) {
+	                businessService = TLConstants.businessService_RENEWAL;
+	            }
+	            // Generate Demand
+	            log.info("#### Creating demand for license: " + license.getApplicationNumber());
+
+	            savedDemands = demandService.generateDemand(
+	                    tradeLicenseRequest.getRequestInfo(),
+	                    license,
+	                    businessService);
+
+	            if (CollectionUtils.isEmpty(savedDemands)) {
+	                throw new CustomException(
+	                        "INVALID CONSUMERCODE",
+	                        "Bill not generated due to no Demand found for the given consumerCode");
+	            }
+
+	            // Generate Bill (IMPORTANT: use same businessService)
+	            GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
+	                    .tenantId(license.getTenantId())
+	                    .businessService(businessService)
+	                    .consumerCode(license.getApplicationNumber())
+	                    .build();
+
+	            billService.generateBill(
+	                    tradeLicenseRequest.getRequestInfo(),
+	                    billCriteria);
+
+	            log.info("#### Bill generated for: " + license.getApplicationNumber());
+	        }
+	    });
 	}
-
+	
 	private BigDecimal getRenewalFeeFromMdmsV2(RequestInfo requestInfo, TradeLicense license) {
 
 	    try {
@@ -1596,6 +1607,7 @@ public class TradeLicenseService {
 
 			// search application number
 			TradeLicenseSearchCriteria criteria = TradeLicenseSearchCriteria.builder()
+			        .ids(Collections.singletonList(tradeLicenseActionRequest.getUuids().get(0)))
 					.applicationNumber(applicationNumber).build();
 			List<TradeLicense> licenses = repository.getLicenses(criteria);
 			licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria,
@@ -1610,24 +1622,43 @@ public class TradeLicenseService {
 
 		return tradeLicenseActionResponse;
 	}
+	
+	public ApplicationDetail getApplicationBillUserDetail(
+	        TradeLicense license, RequestInfo requestInfo) {
 
-	public ApplicationDetail getApplicationBillUserDetail(TradeLicense license, RequestInfo requestInfo) {
-		ApplicationDetail applicationDetail = ApplicationDetail.builder()
-				.applicationNumber(license.getApplicationNumber()).build();
-		String businessService = null;
-		String scaleOfBusiness = null;
-		String tradeCategory = null;
-		Integer periodOfLicense = 0;
-		String zone = null;
+	    ApplicationDetail applicationDetail = ApplicationDetail.builder()
+	            .applicationNumber(license.getApplicationNumber())
+	            .build();
 
-		if (StringUtils.equalsIgnoreCase(license.getBusinessService(), TLConstants.businessService_NewTL)) {
-			getApplicationBillUserDetailForNewTL(applicationDetail, license, requestInfo, businessService,
-					scaleOfBusiness, tradeCategory, periodOfLicense, zone);
-		} else if (StringUtils.equalsIgnoreCase(license.getBusinessService(), TLConstants.businessService_TL)) {
+	    String businessService = null;
+	    String scaleOfBusiness = null;
+	    String tradeCategory = null;
+	    Integer periodOfLicense = 0;
+	    String zone = null;
 
-		}
+	    // NEW LICENSE
+	    if (StringUtils.equalsIgnoreCase(
+	            license.getApplicationType(),
+	            TLConstants.APPLICATION_TYPE_NEW)) {
 
-		return applicationDetail;
+	        getApplicationBillUserDetailForNewTL(
+	                applicationDetail, license, requestInfo,
+	                businessService, scaleOfBusiness,
+	                tradeCategory, periodOfLicense, zone
+	        );
+	    }
+
+	    // RENEWAL LICENSE
+	    else if (StringUtils.equalsIgnoreCase(
+	            license.getApplicationType(),
+	            TLConstants.APPLICATION_TYPE_RENEWAL)) {
+
+	        getApplicationBillUserDetailForRenewal(
+	                applicationDetail, license, requestInfo
+	        );
+	    }
+
+	    return applicationDetail;
 	}
 
 	//-------
@@ -1646,6 +1677,7 @@ public class TradeLicenseService {
 					.asText();
 			periodOfLicense = license.getTradeLicenseDetail().getAdditionalDetail().get(TLConstants.PERIOD_OF_LICENSE)
 					.asInt();
+			
 			zone = license.getTradeLicenseDetail().getAddress().getAdditionalDetail().get(TLConstants.ZONE).asText();
 		} catch (Exception e) {
 			throw new CustomException("FETCH_LICENSE_FAILED",
@@ -1763,12 +1795,23 @@ public class TradeLicenseService {
 		// search bill Details
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(TLConstants.STATE_LEVEL_TENANT_ID)
 				.consumerCode(Collections.singleton(applicationDetail.getApplicationNumber()))
+				.status(StatusEnum.ACTIVE)
 				.service(license.getBusinessService()).build();
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfo);
 		Map<Object, Object> billDetailsMap = new HashMap<>();
 		if (!CollectionUtils.isEmpty(billResponse.getBill())) {
 			billDetailsMap.put("billId", billResponse.getBill().get(0).getId());
-			applicationDetail.setTotalPayableAmount(billResponse.getBill().get(0).getTotalAmount());
+			// applicationDetail.setTotalPayableAmount(billResponse.getBill().get(0).getTotalAmount());
+
+			if (!TLConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(license.getApplicationType())) {
+
+				if (!CollectionUtils.isEmpty(billResponse.getBill())) {
+					billDetailsMap.put("billId", billResponse.getBill().get(0).getId());
+
+					// Only for NEW
+					applicationDetail.setTotalPayableAmount(billResponse.getBill().get(0).getTotalAmount());
+				}
+			}
 		}
 		applicationDetail.setBillDetails(billDetailsMap);
 
@@ -1797,9 +1840,12 @@ public class TradeLicenseService {
 		return applicationDetail;
 	}
 	
+	private ApplicationDetail getApplicationBillUserDetailForRenewal(ApplicationDetail applicationDetail,
+			TradeLicense license, RequestInfo requestInfo) {
 
- 
-
+		getApplicationBillUserDetailForNewTL(applicationDetail, license, requestInfo, null, null, null, 0, null);
+		return applicationDetail;
+	}
 	public TradeLicenseActionResponse getCountOfAllApplicationTypes(
 			TradeLicenseActionRequest tradeLicenseActionRequest) {
 		TradeLicenseActionResponse tradeLicenseActionResponse = TradeLicenseActionResponse.builder().build();

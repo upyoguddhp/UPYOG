@@ -107,6 +107,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.egov.demand.model.BillIdRequest;
+import org.egov.demand.model.GrbgBillTracker;
+import org.egov.demand.model.PtTaxCalculatorTracker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -228,51 +231,57 @@ public class BillServicev2 {
 
 		RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();
 		billValidator.validateBillGenRequest(billCriteria, requestInfo);
+
 		if (CollectionUtils.isEmpty(billCriteria.getConsumerCode()))
 			billCriteria.setConsumerCode(new HashSet<>());
+
 		BillResponseV2 res = searchBill(billCriteria.toBillSearchCriteria(), requestInfo);
 		List<BillV2> bills = res.getBill();
 
-		/* 
-		 * If no existing bills found then Generate new bill 
-		 */
-		if (CollectionUtils.isEmpty(bills))
-		{
-			log.info( "If bills are empty" +bills.size());
-			//if(!billCriteria.getBusinessService().equalsIgnoreCase("WS") && !billCriteria.getBusinessService().equalsIgnoreCase("SW"))
-			//if(!billCriteria.getBusinessService().equalsIgnoreCase("SW"))
-			updateDemandsForexpiredBillDetails(billCriteria.getBusinessService(), billCriteria.getConsumerCode(), billCriteria.getTenantId(), requestInfoWrapper);
+		if (CollectionUtils.isEmpty(bills)) {
+			log.info("If bills are empty {}", bills.size());
+			updateDemandsForexpiredBillDetails(billCriteria.getBusinessService(), billCriteria.getConsumerCode(),
+					billCriteria.getTenantId(), requestInfoWrapper);
 			return generateBill(billCriteria, requestInfo);
 		}
-		
-		
-		/*
-		 * Adding consumer-codes of unbilled demands to generate criteria
-		 */
-		if (!(StringUtils.isEmpty(billCriteria.getMobileNumber()) && StringUtils.isEmpty(billCriteria.getEmail()))) {
 
-			List<Demand> demands = demandService.getDemands(billCriteria.toDemandCriteria(), requestInfo);
-			billCriteria.getConsumerCode().addAll(
-					demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet()));
+		DemandCriteria dc = billCriteria.toDemandCriteria();
+		dc.setDemandId(null);
+		List<Demand> demands = demandService.getDemands(dc, requestInfo);
+
+		if (!(StringUtils.isEmpty(billCriteria.getMobileNumber()) && StringUtils.isEmpty(billCriteria.getEmail()))) {
+			billCriteria.getConsumerCode()
+					.addAll(demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet()));
 		}
 
 		log.debug("fetchBill--------going to generate new bill-------------------");
-		Map<String, BillV2> consumerCodeAndBillMap = bills.stream().collect(Collectors.toMap(BillV2::getConsumerCode, Function.identity()));
+
+		Map<String, BillV2> consumerCodeAndBillMap = bills.stream()
+				.collect(Collectors.toMap(BillV2::getConsumerCode, Function.identity()));
+
 		billCriteria.getConsumerCode().addAll(consumerCodeAndBillMap.keySet());
-		/*
-		 * Collecting the businessService code and the list of consumer codes for those service codes 
-		 * whose demands needs to be updated.
-		 * 
-		 * grouping by service code and collecting the list of 
-		 * consumerCodes against the service code
-		 */
- 		List<String> cosnumerCodesNotFoundInBill = new ArrayList<>(billCriteria.getConsumerCode());
+
+		Map<String, Set<String>> consumerToDemandIdsMap = demands.stream().collect(
+				Collectors.groupingBy(Demand::getConsumerCode, Collectors.mapping(Demand::getId, Collectors.toSet())));
+
+		Map<String, Set<String>> consumerToBilledDemandIdsMap = new HashMap<>();
+
+		for (BillV2 bill : bills) {
+			Set<String> demandIds = bill.getBillDetails().stream().map(BillDetailV2::getDemandId)
+					.collect(Collectors.toSet());
+
+			consumerToBilledDemandIdsMap.put(bill.getConsumerCode(), demandIds);
+		}
+
+		Set<String> cosnumerCodesNotFoundInBill = new HashSet<>();
 		Set<String> cosnumerCodesToBeExpired = new HashSet<>();
 		List<BillV2> billsToBeReturned = new ArrayList<>();
+
 		Boolean isBillExpired = false;
-		
 		for (Entry<String, BillV2> entry : consumerCodeAndBillMap.entrySet()) {
+
 			BillV2 bill = entry.getValue();
+			String consumerCode = entry.getKey();
 
 			for (BillDetailV2 billDetail : bill.getBillDetails()) {
 				if (billDetail.getExpiryDate().compareTo(System.currentTimeMillis()) < 0) {
@@ -280,39 +289,72 @@ public class BillServicev2 {
 					break;
 				}
 			}
-			if (!isBillExpired)
+
+			Set<String> demandIds = consumerToDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
+			Set<String> billedDemandIds = consumerToBilledDemandIdsMap.getOrDefault(consumerCode, new HashSet<>());
+			boolean hasNewDemand = !demandIds.isEmpty() && !billedDemandIds.containsAll(demandIds);
+			
+			log.info("isBillExpired {}",isBillExpired);
+			log.info("hasNewDemand {}",hasNewDemand);
+			log.info("demandIds {}",demandIds);
+			log.info("billedDemandIds {}",billedDemandIds);
+			log.info("cosnumerCodesToBeExpired",cosnumerCodesToBeExpired);
+			log.info("cosnumerCodesNotFoundInBill",cosnumerCodesNotFoundInBill);
+			
+
+			if (!isBillExpired && !hasNewDemand)
 				billsToBeReturned.add(bill);
 			else
-				cosnumerCodesToBeExpired.add(bill.getConsumerCode());
-			cosnumerCodesNotFoundInBill.remove(entry.getKey());
+				cosnumerCodesToBeExpired.add(consumerCode);
+			if (hasNewDemand) {
+				cosnumerCodesNotFoundInBill.add(consumerCode);
+			}
+
 			isBillExpired = false;
 		}
-			
-		log.info("Consumer Code to be expired " + cosnumerCodesToBeExpired);
-		log.info("Consumer code not found in bill " + cosnumerCodesNotFoundInBill);
-		/*
-		 * If none of the billDetails in the bills needs to be updated then return the search result
-		 */
-		if(CollectionUtils.isEmpty(cosnumerCodesToBeExpired) && CollectionUtils.isEmpty(cosnumerCodesNotFoundInBill))
+
+		for (String consumerCode : consumerToDemandIdsMap.keySet()) {
+			if (!consumerCodeAndBillMap.containsKey(consumerCode)) {
+				cosnumerCodesNotFoundInBill.add(consumerCode);
+			}
+		}
+
+		//log.info("Consumer Code to be expired {}", cosnumerCodesToBeExpired);
+		//log.info("Consumer code not found in bill {}", cosnumerCodesNotFoundInBill);
+
+		if (CollectionUtils.isEmpty(cosnumerCodesToBeExpired) && CollectionUtils.isEmpty(cosnumerCodesNotFoundInBill)) {
 			return res;
-		else {
-			
-			billCriteria.getConsumerCode().retainAll(cosnumerCodesToBeExpired);
-			billCriteria.getConsumerCode().addAll(cosnumerCodesNotFoundInBill);
-			updateDemandsForexpiredBillDetails(billCriteria.getBusinessService(), billCriteria.getConsumerCode(), billCriteria.getTenantId(), requestInfoWrapper);
-			
+		} else {
+
+			Set<String> consumerCodesForNewBill = new HashSet<>();
+			consumerCodesForNewBill.addAll(cosnumerCodesToBeExpired);
+			consumerCodesForNewBill.addAll(cosnumerCodesNotFoundInBill);
+
 			billRepository.updateBillStatus(
-					UpdateBillCriteria.builder()
-					.statusToBeUpdated(BillStatus.EXPIRED)
-					.businessService(billCriteria.getBusinessService())
-					.consumerCodes(cosnumerCodesToBeExpired)
-					.tenantId(billCriteria.getTenantId())
-					.build()
-					);
+			    UpdateBillCriteria.builder()
+			        .statusToBeUpdated(BillStatus.EXPIRED)
+			        .businessService(billCriteria.getBusinessService())
+			        .consumerCodes(consumerCodesForNewBill) 
+			        .tenantId(billCriteria.getTenantId())
+			        .build()
+			);
+			
+			billRepository.updateBillStatusToExpiredByConsumerCodes(
+				    consumerCodesForNewBill,
+				    billCriteria.getTenantId(),
+				    requestInfo
+				);
+
+			billCriteria.setConsumerCode(consumerCodesForNewBill);
+
+			updateDemandsForexpiredBillDetails(billCriteria.getBusinessService(), billCriteria.getConsumerCode(),
+					billCriteria.getTenantId(), requestInfoWrapper);
+
 			BillResponseV2 finalResponse = generateBill(billCriteria, requestInfo);
-			// gen bill returns immutable empty list incase of zero bills
+
 			billsToBeReturned.addAll(finalResponse.getBill());
 			finalResponse.setBill(billsToBeReturned);
+
 			return finalResponse;
 		}
 	}
@@ -355,9 +397,22 @@ public class BillServicev2 {
 	 * @return
 	 */
 	public BillResponseV2 searchBill(BillSearchCriteria billCriteria, RequestInfo requestInfo) {
-
 		List<BillV2> bills = billRepository.findBill(billCriteria);
-
+		
+		for (BillV2 bill : bills) {
+			BillIdRequest request = BillIdRequest.builder().billId(bill.getId()).requestInfo(requestInfo).build();
+			if ("GB".equalsIgnoreCase(bill.getBusinessService())) {
+				GrbgBillTracker tracker = util.getGarbageTracker(request);
+				if (tracker != null) {
+					bill.setDemandId(tracker.getDemandId());
+				}
+			} else if ("PROPERTY".equalsIgnoreCase(bill.getBusinessService())) {
+				PtTaxCalculatorTracker tracker = util.getPropertyTracker(request);
+				if (tracker != null) {
+					bill.setDemandId(tracker.getDemandId());
+				}
+			}
+		}
 		return BillResponseV2.builder().resposneInfo(responseFactory.getResponseInfo(requestInfo, HttpStatus.OK))
 				.bill(bills).build();
 	}

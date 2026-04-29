@@ -95,8 +95,20 @@ public class ReceiptServiceV2 {
 		for (BillV2 bill : bills) {
 			String advanceTaxhead = getAdvanceTaxhead(bill.getBusinessService(), mdmsData);
 			mapOfBillIdAndStatus.put(bill.getId(), bill.getStatus().toString());
-			for (BillDetailV2 billDetail : bill.getBillDetails())
-				updateDemandFromBillDetail(billDetail, demandIdMap.get(billDetail.getDemandId()), isReceiptCancellation,advanceTaxhead);
+			for (BillDetailV2 billDetail : bill.getBillDetails()) {
+				Demand demand = demandIdMap.get(billDetail.getDemandId());
+				Map<String, Object> additionalDetails;
+
+				if (demand.getAdditionalDetails() instanceof Map) {
+					additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
+				} else {
+					additionalDetails = new HashMap<>();
+				}
+				additionalDetails.put("billId", bill.getId());
+				demand.setAdditionalDetails(additionalDetails);
+				updateDemandFromBillDetail(billDetail, demand, isReceiptCancellation, advanceTaxhead);
+			}
+
 		}
 
 		String paymentId = util.getValueFromAdditionalDetailsForKey(bills.get(0).getAdditionalDetails(),

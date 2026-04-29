@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.postgresql.util.PGobject;
 import java.sql.SQLException;
 import org.egov.tracer.model.CustomException;
+import org.egov.garbageservice.model.AuditDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,7 +98,19 @@ public class GarbageBillTrackerRepository {
 		    "WHERE egbt.status = 'ACTIVE' " +
 		    "AND egbt.rebate_amount > 0 " +
 		    "AND egbt.bill_id IS NOT NULL";
-
+	
+	private static final String ACTIVATE_PREVIOUS_TRACKER = "UPDATE eg_grbg_bill_tracker "
+			+ "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime "
+			+ "WHERE bill_id = :billId AND status = 'EXPIRED'";
+	
+	private static final String EXPIRE_ACTIVE_TRACKER = "UPDATE eg_grbg_bill_tracker " +
+            "SET status = 'EXPIRED', " +
+            "last_modified_by = :lastModifiedBy, " +
+            "last_modified_time = :lastModifiedTime " +
+            "WHERE grbg_application_id = :grbgApplicationId " +
+            "AND status = 'ACTIVE'";
+	
+	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
 	public int updatePenalty(GrbgBillTracker tracker) {
 	    Map<String, Object> params = new HashMap<>();
@@ -197,7 +210,7 @@ public class GarbageBillTrackerRepository {
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
 		StringBuilder builder = new StringBuilder(UPDATE_BILL_TRACKER_STATUS);
-		builder.append(" WHERE status = 'ACTIVE' ");
+		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID') ");
 
         Map<String, Object> updateTrackerStatus = new HashMap<>();
 
@@ -206,21 +219,14 @@ public class GarbageBillTrackerRepository {
 			builder.append(" AND bill_id = :billId");
 		}
 		
-		if(!StringUtils.isEmpty(grbgBillTracker.getMonth()) && !StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
-	        updateTrackerStatus.put("month",grbgBillTracker.getMonth());
-	        updateTrackerStatus.put("grbgApplicationId",grbgBillTracker.getGrbgApplicationId());
-			builder.append(" AND month = :month");
-			builder.append(" AND grbg_application_id = :grbgApplicationId");
-		}
-		
-//		if(!StringUtils.isEmpty(grbgBillTracker.getType())) {
-//	        updateTrackerStatus.put("type",grbgBillTracker.getType());
-//			builder.append(" AND type = :type");
-//		}
-		
 		if(!StringUtils.isEmpty(grbgBillTracker.getDemandId())) {
 	        updateTrackerStatus.put("demandId",grbgBillTracker.getDemandId());
 			builder.append(" AND demand_id = :demandId");
+		}
+		
+		if (!StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
+		    updateTrackerStatus.put("grbgApplicationId", grbgBillTracker.getGrbgApplicationId());
+		    builder.append(" AND grbg_application_id = :grbgApplicationId");
 		}
 
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
@@ -228,6 +234,31 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
+	}
+	
+	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {
+
+		String query = ACTIVATE_PREVIOUS_TRACKER;
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("status", "ACTIVE");
+		params.put("billId", billId);
+		params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
+		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
+
+		return namedParameterJdbcTemplate.update(query, params);
+	}
+	
+	public int expireActiveTrackersByApplicationId(String grbgApplicationId, AuditDetails auditDetails) {
+
+	    String query = EXPIRE_ACTIVE_TRACKER;
+
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("grbgApplicationId", grbgApplicationId);
+	    params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
+	    params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(query, params);
 	}
 	
 	private String getBillTrackerSearchQuery(GrbgBillTrackerSearchCriteria criteria, List<Object> preparedStmtList) {
@@ -278,6 +309,13 @@ public class GarbageBillTrackerRepository {
 			builder.append(" egbt.month =?");
 			preparedStmtList.add(criteria.getMonth());
 		}
+		
+		if (!StringUtils.isEmpty(criteria.getYear())) {
+		    andClauseIfRequired(preparedStmtList, builder);
+		    builder.append(" egbt.year = ?");
+		    preparedStmtList.add(criteria.getYear());
+		}
+		
 		if (!CollectionUtils.isEmpty(criteria.getType())) {
 			andClauseIfRequired(preparedStmtList, builder);
 			builder.append(" egbt.type IN (").append(createQuery(criteria.getType()))
@@ -384,6 +422,18 @@ public class GarbageBillTrackerRepository {
 	        grbgBillTrackerRowMapper
 	    );
 	}
+	
+	public List<GrbgBillTracker> extractTrackers(GrbgBillTrackerSearchCriteria criteria) {
 
+		StringBuilder query = new StringBuilder(EXTRACT_TRACKER_QUERY);
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		if (!CollectionUtils.isEmpty(criteria.getBillIds())) {
+			query.append(" AND egbt.bill_id = ? ");
+			preparedStmtList.add(criteria.getBillIds().iterator().next());
+		}
+
+		return jdbcTemplate.query(query.toString(), preparedStmtList.toArray(), grbgBillTrackerRowMapper);
+		}
 
 }

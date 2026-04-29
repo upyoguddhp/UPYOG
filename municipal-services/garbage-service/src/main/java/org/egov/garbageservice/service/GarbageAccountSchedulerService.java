@@ -67,6 +67,7 @@ import org.egov.garbageservice.model.contract.User;
 import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.contract.bill.BillAccountDetail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import org.egov.garbageservice.model.BillIdRequest;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -146,6 +147,13 @@ public class GarbageAccountSchedulerService {
 						    mdmsService.fetchGarbageAmountFromMDMSResponse(
 						        mdmsResponse, garbageAccount, errorList, calculationBreakdown
 						    );
+					
+					if (monthlyAmount == null) {
+					    log.warn("Monthly amount is null for account {}", garbageAccount.getGrbgApplicationNumber());
+					    errorList.add("Monthly amount not found from MDMS");
+					    createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+					    return;
+					}
 
 					if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
 					    Long from = generateBillRequest.getFromDateTimestamp();
@@ -220,6 +228,25 @@ public class GarbageAccountSchedulerService {
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
 							
+							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
+								    .grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
+								    .status(Collections.singleton("ACTIVE"))
+								    .tenantId(garbageAccount.getTenantId())
+								    .build();
+
+							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository.getBillTracker(prevCriteria);
+
+							if (!CollectionUtils.isEmpty(prevTrackers)) {
+							    for (GrbgBillTracker prev : prevTrackers) {
+							        if (prev.getUuid().equals(grbgBillTracker.getUuid()) || 
+							            "PAID".equals(prev.getStatus())) {
+							            continue;
+							        }
+							        
+							        prev.setStatus("EXPIRED");
+							        garbageBillTrackerRepository.updateStatusBillTracker(prev);					        
+							    }
+							}
 							//remove bill if failure exists
 //							GrbgBillFailure grbgBillFailure	= garbageAccountService.enrichGrbgBillFailure(garbageAccount, generateBillRequest,billResponse,errorList);
 //							garbageAccountService.removeGarbageBillFailure(grbgBillFailure);
@@ -451,7 +478,7 @@ public class GarbageAccountSchedulerService {
 				return false;
 			}
 		}else {
-			return false;
+			return false; 
 		}
 	}
 
@@ -849,6 +876,23 @@ public class GarbageAccountSchedulerService {
 	    }
 	
 	    return trackers;
+	}
+
+	public GrbgBillTracker getTrackerByBillId(BillIdRequest request) {
+
+		if (request.getBillId() == null) {
+			throw new CustomException("INVALID_REQUEST", "billId is required");
+		}
+		GrbgBillTrackerSearchCriteria criteria = GrbgBillTrackerSearchCriteria.builder()
+				.billIds(Collections.singleton(request.getBillId()))
+				.build();
+
+		List<GrbgBillTracker> trackers = garbageBillTrackerRepository.extractTrackers(criteria);
+
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
+		}
+		return trackers.get(0);
 	}
 
 }

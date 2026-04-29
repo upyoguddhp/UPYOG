@@ -31,6 +31,7 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 
 		Map<String, BillV2> billMap = new LinkedHashMap<>();
 		Map<String, BillDetailV2> billDetailMap = new HashMap<>();
+		Map<String, BillDetailV2> selectedDetailPerBill = new HashMap<>();
 
 		while (rs.next()) {
 
@@ -89,14 +90,12 @@ public class BillRowMapperV2 implements ResultSetExtractor<List<BillV2>>{
 					.build();
 
 				billDetailMap.put(billDetail.getId(), billDetail);
-
 				if (bill.getId().equals(billDetail.getBillId())) {
-					bill.addBillDetailsItem(billDetail);
-					bill.setDemandId(billDetail.getDemandId());
-					bill.setTotalAmount(bill.getTotalAmount().add(billDetail.getAmount()));
-					bill.setMaxExpiryDate(null != bill.getMaxExpiryDate()
-							? Math.max(bill.getMaxExpiryDate(), billDetail.getExpiryDate())
-							: billDetail.getExpiryDate());
+				    bill.addBillDetailsItem(billDetail);
+				    bill.setTotalAmount(bill.getTotalAmount().add(billDetail.getAmount()));
+				    bill.setMaxExpiryDate(null != bill.getMaxExpiryDate()
+				            ? Math.max(bill.getMaxExpiryDate(), billDetail.getExpiryDate())
+				            : billDetail.getExpiryDate());
 				}
 			}
 			

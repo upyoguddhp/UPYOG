@@ -73,6 +73,7 @@ public class BillRepository {
         uri = uri.concat("?tenantId=").concat(billCriteria.getTenantId());
         uri = uri.concat("&service=").concat(billCriteria.getService());
         uri = uri.concat("&consumerCode=").concat(StringUtils.join(billCriteria.getConsumerCode(), ","));
+        uri = uri.concat("&status=").concat(billCriteria.getStatus().name());
 
         Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
                                                              .requestInfo(requestInfo).build());

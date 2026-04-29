@@ -172,5 +172,26 @@ public class MDMSService {
 	private List<String> getPTTaxRateMdmsMasterDetails() {
 		return Arrays.asList(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE);
 	}
+	
+	//pdf
+	public MdmsResponse getDownloadPdfMdmsData(RequestInfo requestInfo, String filter) {
+		List<ModuleDetail> moduleDetails = new ArrayList<>();
 
+		moduleDetails.addAll(getModuleDetails(getULBSDownloadPDFMdmsModuleDetails(), filter));
+		MdmsResponse mdmsResponse = getMdmsMasterData(requestInfo, moduleDetails);
+		return mdmsResponse;
+	}
+	
+	private Map<String, List<String>> getULBSDownloadPDFMdmsModuleDetails() {
+		Map<String, List<String>> mapOfModulesAndMasters = new HashMap<>();
+
+		mapOfModulesAndMasters.put(PTConstants.MDMS_MODULE_ULBS, getULBSDownloadPDFMdmsMasterDetails());
+
+		return mapOfModulesAndMasters;
+	}
+	
+	private List<String> getULBSDownloadPDFMdmsMasterDetails() {
+		return Arrays.asList(PTConstants.DOWNLOADPDF); //MDMS_MASTER_DETAILS_PENALTYDAYS
+	}
+	
 }

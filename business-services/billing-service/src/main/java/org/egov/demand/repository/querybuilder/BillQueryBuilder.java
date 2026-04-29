@@ -67,7 +67,7 @@ public class BillQueryBuilder {
 			+ " ad.orderno AS ad_orderno, ad.accountdescription AS ad_accountdescription,"
 			+ " ad.amount AS ad_amount, ad.adjustedamount AS ad_adjustedamount, ad.taxheadcode AS ad_taxheadcode, ad.demanddetailid,"
 			+ " ad.isactualdemand AS ad_isactualdemand, ad.purpose AS ad_purpose,"
-			+ " b.additionaldetails as b_additionaldetails,  bd.additionaldetails as bd_additionaldetails , bd.demandid"
+			+ " b.additionaldetails as b_additionaldetails,  bd.additionaldetails as bd_additionaldetails"
 			+ " FROM egbs_bill_v1 b"
 			+ " JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid"
 			+ " JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid";
@@ -99,6 +99,13 @@ public class BillQueryBuilder {
 	public static final String UPDATE_BILLACCOUNTDETAILS_QUERY = "UPDATE egbs_billaccountdetail_v1 SET "
 			+ "tenantid = ?, billdetail = ?, demanddetailid = ?, orderno = ?, amount = ?, adjustedamount = ?, taxheadcode = ?, "
 			+ "additionaldetails = ?, lastmodifiedby = ?, lastmodifieddate = ? " + "WHERE id = ?";
+	
+	public static final String UPDATE_BILL_STATUS_TO_EXPIRED_BY_CONSUMERCODE = 
+	        "UPDATE egbs_bill_v1 SET " +
+	        "status = ?, lastmodifiedby = ?, lastmodifieddate = ? " +
+	        "WHERE tenantid = ? " +
+	        "AND consumercode = ? " +
+	        "AND status = ?";
 
 	public String getBillQuery(BillSearchCriteria billSearchCriteria, List<Object> preparedStatementValues){
 		
@@ -162,6 +169,11 @@ public class BillQueryBuilder {
 		} else {
 			selectQuery.append(" AND b.status != ?");
 			preparedStatementValues.add(BillStatus.CANCELLED.toString());
+		}
+		
+		if (searchBill.getIsCancelled() != null) {
+		    selectQuery.append(" AND b.iscancelled = ?");
+		    preparedStatementValues.add(searchBill.getIsCancelled());
 		}
 
 		if (searchBill.getEmail() != null) {

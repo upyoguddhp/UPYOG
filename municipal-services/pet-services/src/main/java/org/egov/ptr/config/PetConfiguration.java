@@ -152,6 +152,14 @@ public class PetConfiguration {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
+	
+	// ##### mdmsv2
+
+	@Value("${egov.mdmsv2.host}")
+	private String mdmsHostv2;
+
+	@Value("${egov.mdmsv2.search.endpoint}")
+	private String mdmsEndpointv2;
 
 	// Billing-Service
 
@@ -184,5 +192,7 @@ public class PetConfiguration {
 	
 	@Value("${egov.bill.expiry.after}")
 	private String billExpiryAfter;
-
+	
+	@Value("${egov.state.tenantId}")
+	private String stateLevelTenantId;
 }
