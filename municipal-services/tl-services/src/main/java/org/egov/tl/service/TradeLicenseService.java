@@ -262,8 +262,17 @@ public class TradeLicenseService {
 	        businessServicefromPath = businessService_TL;
 
 	    //  Fetch existing license
-	    TradeLicense oldLicense =
-	            getLicensesWithOwnerInfoRenewal(request).get(0);
+//	    TradeLicense oldLicense =
+//	            getLicensesWithOwnerInfoRenewal(request).get(0);
+	    
+	    List<TradeLicense> oldLicenses = getLicensesWithOwnerInfoRenewal(request);
+
+	    if (CollectionUtils.isEmpty(oldLicenses)) {
+	        throw new CustomException("LICENSE_NOT_FOUND", "No license found for renewal");
+	    }
+
+	    TradeLicense oldLicense = oldLicenses.get(0);
+	    
 
 	    //  Allow renewal ONLY if APPROVED
 	    if (!TLConstants.STATUS_APPROVED.equalsIgnoreCase(oldLicense.getStatus())) {
@@ -282,7 +291,6 @@ public class TradeLicenseService {
 	    renewalLicense.setId(UUID.randomUUID().toString());
 	    renewalLicense.setApplicationType(TLConstants.APPLICATION_TYPE_RENEWAL);
 
-	    // SAME numbers (as per your requirement)
 	    renewalLicense.setLicenseNumber(oldLicense.getLicenseNumber());
 	    renewalLicense.setApplicationNumber(oldLicense.getApplicationNumber());
 
