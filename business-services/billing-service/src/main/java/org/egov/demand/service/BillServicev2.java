@@ -110,8 +110,11 @@ import org.springframework.util.StringUtils;
 import org.egov.demand.model.BillIdRequest;
 import org.egov.demand.model.GrbgBillTracker;
 import org.egov.demand.model.PtTaxCalculatorTracker;
+import org.egov.demand.model.BillCancelRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -827,6 +830,25 @@ public class BillServicev2 {
 		if (!CollectionUtils.isEmpty(billRequest.getBills()))
 			billRepository.updateBill(billRequest);
 		return getBillResponse(billRequest.getBills());
+	}
+	
+	public Integer cancelAdvtBill(BillCancelRequest cancelRequest) {
+
+		ObjectNode additionalDetails = mapper.createObjectNode();
+		additionalDetails.put("reasonMessage", "Booking cancelled by user");
+		additionalDetails.put("reason", "BOOKING_CANCELLED");
+		
+		UpdateBillCriteria criteria = UpdateBillCriteria.builder()
+				.tenantId(cancelRequest.getTenantId())
+				.consumerCodes(Collections.singleton(cancelRequest.getConsumerCode()))
+				.businessService("ADVT")
+				.additionalDetails(additionalDetails)
+				.statusToBeUpdated(BillStatus.CANCELLED).build();
+
+		UpdateBillRequest request = UpdateBillRequest.builder().RequestInfo(cancelRequest.getRequestInfo())
+				.UpdateBillCriteria(criteria).build();
+
+		return cancelBill(request);
 	}
 	
 }

@@ -58,7 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
+import org.egov.advertisementcanopy.contract.bill.BillCancelRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -428,6 +428,22 @@ public class SiteBookingService {
 		// call workflow
 		workflowService.updateWorkflowStatus(siteBookingRequest);
 
+		// cancel bill request
+		SiteBookingRequest enrichedRequest = validateAndEnrichUpdateSiteBooking(siteBookingRequest,
+				appNoToSiteBookingMap);
+
+		enrichedRequest.getSiteBookings().forEach(booking -> {
+
+			if ("CANCEL".equalsIgnoreCase(String.valueOf(booking.getWorkflowAction()))) {
+
+				BillCancelRequest cancelRequest = BillCancelRequest.builder().tenantId(booking.getTenantId())
+						.consumerCode(booking.getApplicationNo()).bookingId(booking.getUuid())
+						.reason("BOOKING_CANCELLED").requestInfo(enrichedRequest.getRequestInfo()).build();
+
+				producer.push(AdvtConstants.BILL_CANCEL_TOPIC, cancelRequest);
+			}
+		});
+		
 		// update request
 		producer.push(AdvtConstants.SITE_BOOKING_UPDATE_KAFKA_TOPIC, siteBookingRequest);
 //		siteBookingRequest.getSiteBookings().stream().forEach(booking -> {

@@ -94,6 +94,8 @@ public class AdvtConstants {
 	public static final String SITE_BOOKING_CREATE_KAFKA_TOPIC = "create-site-booking";
 
 	public static final String SITE_BOOKING_UPDATE_KAFKA_TOPIC = "update-site-booking";
+	
+	public static final String BILL_CANCEL_TOPIC = "advt-bill-cancel-topic";
 
 	public static final String ACTION_INITIATE = "INITIATE";
 
