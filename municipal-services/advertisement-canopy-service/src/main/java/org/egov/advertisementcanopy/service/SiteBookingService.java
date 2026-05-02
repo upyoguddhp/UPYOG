@@ -441,6 +441,11 @@ public class SiteBookingService {
 						.reason("BOOKING_CANCELLED").requestInfo(enrichedRequest.getRequestInfo()).build();
 
 				producer.push(AdvtConstants.BILL_CANCEL_TOPIC, cancelRequest);
+
+				if (booking.getSiteUuid() != null) {
+					siteRepository.makeSiteAvailable(booking.getSiteUuid(),
+							enrichedRequest.getRequestInfo().getUserInfo().getUuid());
+				}
 			}
 		});
 		
