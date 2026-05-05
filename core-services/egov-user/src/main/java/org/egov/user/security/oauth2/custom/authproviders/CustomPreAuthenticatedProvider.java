@@ -74,7 +74,13 @@ public class CustomPreAuthenticatedProvider implements AuthenticationProvider {
             org.egov.common.contract.request.User userInfo = org.egov.common.contract.request.User.builder().uuid(user.getUuid())
                     .type(user.getType() != null ? user.getType().name() : null).roles(contract_roles).build();
             RequestInfo requestInfo = RequestInfo.builder().userInfo(userInfo).build();
+            
+            log.info("RequestInfo--------------{}",requestInfo);
+            log.info("user for decrytion--------------{}",user);
+            
             user = encryptionDecryptionUtil.decryptObject(user, "UserSelf", User.class, requestInfo);
+            log.info("user after decrytion--------------{}",user);
+            
         } catch (UserNotFoundException e) {
             log.error("User not found", e);
             throw new OAuth2Exception("Invalid login credentials");

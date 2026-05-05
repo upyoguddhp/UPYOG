@@ -78,9 +78,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String tenantId = details.get("tenantId");
         String userType = details.get("userType");
         
-        
-        log.info("User Details {}",details);
-        
         Boolean skipTenantCheck = false;
         
 		if (null != details.get("skipTenantCheck") && details.get("skipTenantCheck").equals("TRUE")) {
@@ -94,7 +91,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new OAuth2Exception("User Type is mandatory and has to be a valid type");
         }
 
-        log.info(" skipTenantCheck {}",skipTenantCheck);
         User user;
         RequestInfo requestInfo;
         try {
