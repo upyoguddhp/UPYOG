@@ -130,13 +130,15 @@ public class UserService {
      */
     public User getUniqueUser(String userName, String tenantId, UserType userType, Boolean skipTenantCheck) {
 
-    	   log.info(" skipTenantCheck {}",skipTenantCheck);
+    	log.info(" skipTenantCheck {}",skipTenantCheck);
         UserSearchCriteria userSearchCriteria = UserSearchCriteria.builder()
                 .userName(userName)
 //                .tenantId(getStateLevelTenantForCitizen(tenantId, userType))
                 .type(userType)
                 .build();
         if(!skipTenantCheck) {
+        	log.info(" Inside tenant check ----- {}",tenantId);
+        	log.info(" Inside tenant check ----2  {}",userType);
         	userSearchCriteria.setTenantId(getStateLevelTenantForCitizen(tenantId, userType));
         }
 
@@ -145,10 +147,12 @@ public class UserService {
             throw new UserNotFoundException(userSearchCriteria);
         }
 
-        log.info("userSearchCriteria {}", userSearchCriteria);
+        log.info("userSearchCriteria {}----", userSearchCriteria);
         /* encrypt here */
 
         userSearchCriteria = encryptionDecryptionUtil.encryptObject(userSearchCriteria, "User", UserSearchCriteria.class);
+        
+        log.info("after enc {}----");
         List<User> users = userRepository.findAll(userSearchCriteria);
 
         if (users.isEmpty())

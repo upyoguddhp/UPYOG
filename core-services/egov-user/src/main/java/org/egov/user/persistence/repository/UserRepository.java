@@ -90,9 +90,10 @@ public class UserRepository {
             }
         }
         String queryStr = userTypeQueryBuilder.getQuery(userSearch, preparedStatementValues);
-        log.debug(queryStr);
+        log.info("query for user seatrch-------------- {}",queryStr);
 
         users = jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), userResultSetExtractor);
+        log.info("user seatrch after query-------------- {}",users);
         enrichRoles(users);
 
         return users;
