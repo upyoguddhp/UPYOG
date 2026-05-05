@@ -144,6 +144,7 @@ public class UserService {
             throw new UserNotFoundException(userSearchCriteria);
         }
 
+        log.info("userSearchCriteria info--------------{}",userSearchCriteria);
         /* encrypt here */
 
         userSearchCriteria = encryptionDecryptionUtil.encryptObject(userSearchCriteria, "User", UserSearchCriteria.class);
@@ -154,6 +155,7 @@ public class UserService {
         if (users.size() > 1)
             throw new DuplicateUserNameException(userSearchCriteria);
 
+        log.info("users info--------------{}",users);
         return users.get(0);
     }
 

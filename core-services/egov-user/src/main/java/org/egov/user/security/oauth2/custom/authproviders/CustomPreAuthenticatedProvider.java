@@ -65,6 +65,8 @@ public class CustomPreAuthenticatedProvider implements AuthenticationProvider {
         User user;
         try {
             user = userService.getUniqueUser(userName, tenantId, UserType.fromValue(userType), false);
+            
+            log.info("User found--------------{}",user);
             /* decrypt here */
             Set<org.egov.user.domain.model.Role> domain_roles = user.getRoles();
             List<org.egov.common.contract.request.Role> contract_roles = new ArrayList<>();

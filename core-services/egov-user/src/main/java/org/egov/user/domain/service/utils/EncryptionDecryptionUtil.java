@@ -44,6 +44,7 @@ public class EncryptionDecryptionUtil {
 
     public <T> T encryptObject(Object objectToEncrypt, String key, Class<T> classType) {
         try {
+        	 log.info("objectToEncrypt--------------{}",objectToEncrypt);
             if (objectToEncrypt == null) {
                 return null;
             }
@@ -51,6 +52,7 @@ public class EncryptionDecryptionUtil {
             if (encryptedObject == null) {
                 throw new CustomException("ENCRYPTION_NULL_ERROR", "Null object found on performing encryption");
             }
+       	 log.info("encryptedObject--------------{}",encryptedObject);
             return encryptedObject;
         } catch (IOException | HttpClientErrorException | HttpServerErrorException | ResourceAccessException e) {
             log.error("Error occurred while encrypting", e);
