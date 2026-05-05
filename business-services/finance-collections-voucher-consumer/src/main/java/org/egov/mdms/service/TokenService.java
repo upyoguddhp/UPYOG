@@ -91,7 +91,8 @@ public class TokenService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, header);
 
         try {
-            LOGGER.debug("call: {}", propertiesManager.getTokenGenUrl());
+            LOGGER.info("call: {}", propertiesManager.getTokenGenUrl());
+            LOGGER.info("User Object: {}",request);
             Object response = restTemplate.postForObject(propertiesManager.getUserHostUrl().trim() + propertiesManager.getTokenGenUrl().trim(),
                     request, Object.class);
             if (response != null) {
