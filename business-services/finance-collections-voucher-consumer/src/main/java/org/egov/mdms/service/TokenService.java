@@ -87,7 +87,7 @@ public class TokenService {
         map.add("grant_type", propertiesManager.getSiGrantType());
         map.add("tenantId", tenantId);
         map.add("userType", propertiesManager.getSiUserType());
-
+        map.add("skipTenantCheck", "TRUE");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, header);
 
         try {
