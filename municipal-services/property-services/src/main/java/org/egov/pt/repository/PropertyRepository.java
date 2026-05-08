@@ -50,6 +50,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.egov.pt.models.data.TaxMetrics;
 
 import com.google.common.collect.Sets;
 
@@ -436,7 +437,7 @@ public class PropertyRepository {
 		});
 	}
 	
-	public List<DataItem> getUniqueWards(String stringDate) {
+	public List<DataItem> getUniqueWards(String stringDate  ) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getUniqueWardsSearchQuery(stringDate, preparedStmtList);
 
@@ -447,6 +448,41 @@ public class PropertyRepository {
 			dataItem.setRegion(rs.getString("region"));
 			return dataItem;
 		});
+	}
+	
+//	public List<DataItem> getUniqueWards(String stringDate) {
+//
+//		String query = queryBuilder.getUniqueWardsSearchQuery(stringDate);
+//
+//		return jdbcTemplate.query(query, rs -> {
+//
+//			List<DataItem> result = new ArrayList<>();
+//
+//			while (rs.next()) {
+//				result.add(DataItem.builder().ward(rs.getString("ward")).ulb(rs.getString("ulb"))
+//						.region(rs.getString("region")).build());
+//			}
+//
+//			return result;
+//		});
+//	}
+	
+
+
+	
+	public List<DataItem> getTransactionWards(long startEpoch, long endEpoch) {
+
+	    List<Object> preparedStmtList = new ArrayList<>();
+
+	    String query = queryBuilder.getTransactionWardsQuery(startEpoch, endEpoch, preparedStmtList);
+
+	    return jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
+	        DataItem dataItem = new DataItem();
+	        dataItem.setWard(rs.getString("ward"));
+	        dataItem.setUlb(rs.getString("ulb"));
+	        dataItem.setRegion(rs.getString("region"));
+	        return dataItem;
+	    });
 	}
 	
 
@@ -472,16 +508,6 @@ public class PropertyRepository {
 	            new Object[]{epochStart, epochEnd, wardNumber},
 	            (rs, rowNum) -> rs.getString("status"));
 	}
-	
-	
-	
-	//usagecategory
-//	public List<String> getAllusagecategory() {
-//
-//		String query = "SELECT DISTINCT usagecategory FROM eg_pt_property";
-//
-//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
-//	}
 //	
 //	public List<String> getAllusagecategory() {
 //
@@ -495,38 +521,43 @@ public class PropertyRepository {
 	
 	
 	
-//	public List<String> getAllusagecategory(Long epochStart, Long epochEnd) {
+public List<String> getAllUsageCategory(long epochStart, long epochEnd, String wardName) {
+
+    String query = "SELECT DISTINCT u.usagecategoryv2 AS usagecategory " +
+                   "FROM eg_pt_unit u " +
+                   "JOIN eg_pt_property p ON u.propertyid = p.id " +
+                   "JOIN eg_pt_address addr ON p.id = addr.propertyid " +
+                   "WHERE u.createdtime BETWEEN ? AND ? " +
+                   "AND addr.additionaldetails->>'wardNumber' = ?";
+
+    return jdbcTemplate.query(
+            query,
+            new Object[]{epochStart, epochEnd, wardName},
+            (rs, rowNum) -> rs.getString("usagecategory")
+    );
+}
+	
+//	public List<String> getAllusagecategory(Long epochStart, Long epochEnd, String wardName) {
 //
 //	    String query = "SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory " +
 //	                   "FROM eg_pt_unit u " +
+//	                   "JOIN eg_pt_property p ON p.id = u.propertyid " +
+//	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
 //	                   "WHERE u.createdtime BETWEEN ? AND ? " +
-//	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL";
+//	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL " +
+//	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
+//	                   "ORDER BY usagecategory";
 //
-//	    return jdbcTemplate.query(query, new Object[]{epochStart, epochEnd},
+//	    return jdbcTemplate.query(query,
+//	            new Object[]{epochStart, epochEnd, wardName},
 //	            (rs, rowNum) -> rs.getString("usagecategory"));
 //	}
-	
-	public List<String> getAllusagecategory(Long epochStart, Long epochEnd, String wardName) {
-
-	    String query = "SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory " +
-	                   "FROM eg_pt_unit u " +
-	                   "JOIN eg_pt_property p ON p.id = u.propertyid " +
-	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-	                   "WHERE u.createdtime BETWEEN ? AND ? " +
-	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL " +
-	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
-	                   "ORDER BY usagecategory";
-
-	    return jdbcTemplate.query(query,
-	            new Object[]{epochStart, epochEnd, wardName},
-	            (rs, rowNum) -> rs.getString("usagecategory"));
-	}
 	
 	public List<String> getAllPaymentMode() {
 
 		String query = "SELECT DISTINCT CASE "
-				+ "WHEN gateway IN ('RAZORPAY','PAYTMPOS') THEN 'ONLINE' "
-				+ "ELSE 'OFFLINE' END AS paymentMode FROM eg_pg_transactions ORDER BY paymentMode;";
+				+ "WHEN gateway IN ('RAZORPAY','PAYTMPOS') THEN 'Digital' "
+				+ "ELSE 'Non Digital' END AS paymentMode FROM eg_pg_transactions ORDER BY paymentMode;";
 
 		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentMode"));
 	}
@@ -587,47 +618,110 @@ public class PropertyRepository {
 		});
 	}
 	
-	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
+//	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
+//
+//		List<Object> preparedStmtList = new ArrayList<>();
+//
+//		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
+//
+//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+//			Map<String, Long> result = new HashMap<>();
+//			while (rs.next()) {
+//				result.put(rs.getString("name"), rs.getLong("transactionCount"));
+//			}
+//			return result;
+//		});
+//	}
+//	
+//	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
+//
+//		List<Object> preparedStmtList = new ArrayList<>();
+//
+//		String query = queryBuilder. getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
+//
+//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+//			Map<String, BigDecimal> result = new HashMap<>();
+//			while (rs.next()) {
+//				result.put(rs.getString("name"), rs.getBigDecimal("totalAmount"));
+//			}
+//			return result;
+//		});
+//	}
+//	public Map<String, String> getTodayCollectionPaymentModeQuery(long epochStart, long epochEnd, String wardName) {
+//
+//		List<Object> preparedStmtList = new ArrayList<>();
+//
+//		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
+//
+//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+//			Map<String, String> result = new HashMap<>();
+//			while (rs.next()) {
+//				result.put(rs.getString("name"), rs.getString("paymentMode"));
+//			}
+//			return result;
+//		});
+//	}
+	
+	//----------
+	
+	public class TransactionCollectionResponse {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+	    private String name;
+	    private String paymentMode;
+	    private Long transactionCount;
+	    private BigDecimal totalAmount;
 
-		String query = queryBuilder.getTransactionsQuery(epochStart, epochEnd, wardName, preparedStmtList);
+	    public String getName() {
+	        return name;
+	    }
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, Long> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getLong("value"));
-			}
-			return result;
-		});
+	    public void setName(String name) {
+	        this.name = name;
+	    }
+
+	    public String getPaymentMode() {
+	        return paymentMode;
+	    }
+
+	    public void setPaymentMode(String paymentMode) {
+	        this.paymentMode = paymentMode;
+	    }
+
+	    public Long getTransactionCount() {
+	        return transactionCount;
+	    }
+
+	    public void setTransactionCount(Long transactionCount) {
+	        this.transactionCount = transactionCount;
+	    }
+
+	    public BigDecimal getTotalAmount() {
+	        return totalAmount;
+	    }
+
+	    public void setTotalAmount(BigDecimal totalAmount) {
+	        this.totalAmount = totalAmount;
+	    }
 	}
 	
-	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
+	public List<TransactionCollectionResponse> getTransactionCollectionAndPayment(long epochStart, long epochEnd,
+			String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder. getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
+		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName,
+				preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, BigDecimal> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("name"), rs.getBigDecimal("totalAmount"));
-			}
-			return result;
-		});
-	}
-	public Map<String, BigDecimal> getTodayCollectionPaymentModeQuery(long epochStart, long epochEnd, String wardName) {
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+			TransactionCollectionResponse response = new TransactionCollectionResponse();
 
-		String query = queryBuilder.getPaymentChannelTypeQuery(epochStart, epochEnd, wardName, preparedStmtList);
+			response.setName(rs.getString("name"));
+			response.setPaymentMode(rs.getString("paymentMode"));
+			response.setTransactionCount(rs.getLong("transactionCount"));
+			response.setTotalAmount(rs.getBigDecimal("totalAmount"));
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-			Map<String, BigDecimal> result = new HashMap<>();
-			while (rs.next()) {
-				result.put(rs.getString("paymentMode"), rs.getBigDecimal("totalAmount"));
-			}
-			return result;
+			return response;
 		});
 	}
 	
@@ -722,4 +816,32 @@ public class PropertyRepository {
 			String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
 		}
+		
+		public Map<String, TaxMetrics> getTaxMetricsCombined(long start, long end, String ward) {
+
+		    List<Object> params = new ArrayList<>();
+		    String query = queryBuilder.getTaxMetricsQuery(start, end, ward, params);
+
+		    return jdbcTemplate.query(query, params.toArray(), rs -> {
+
+		        Map<String, TaxMetrics> result = new HashMap<>();
+
+		        while (rs.next()) {
+
+		            TaxMetrics tm = new TaxMetrics();
+
+		            tm.setPropertyTax(rs.getBigDecimal("propertyTax"));
+		            tm.setCess(rs.getBigDecimal("cess"));
+		            tm.setPenalty(rs.getBigDecimal("penalty"));
+		            tm.setInterest(rs.getBigDecimal("interest"));
+		            tm.setRebate(rs.getBigDecimal("rebate"));
+
+		            result.put(rs.getString("name"), tm);
+		        }
+
+		        return result;
+		    });
+		}
+		
+		
 	}
