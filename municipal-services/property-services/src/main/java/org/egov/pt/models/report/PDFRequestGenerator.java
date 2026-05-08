@@ -103,16 +103,24 @@ public class PDFRequestGenerator {
 			                names.add(owner.getPropertyOwnerName());
 			            }
 
-			            if (owner.getAdditionalDetails() != null &&
-			                owner.getAdditionalDetails().has("coOwnerName")) {
-			                String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
-			                if (coOwner != null && !coOwner.isEmpty()) {
-			                    names.add(coOwner);
-			                }
-			            }
+							if (owner.getAdditionalDetails() != null
+									&& owner.getAdditionalDetails().has("coOwnerName")) {
 
-			            return names.stream();
-			        })
+								String anyOtherCoWorker = owner.getAdditionalDetails().has("anyOtherCoWorker")
+										? owner.getAdditionalDetails().get("anyOtherCoWorker").asText()
+										: null;
+								
+								if (!"No".equalsIgnoreCase(anyOtherCoWorker)) {
+									String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
+									if (coOwner != null && !coOwner.isEmpty()) {
+										names.add(coOwner);
+									}
+
+								}
+							}
+
+							return names.stream();
+						})
 			        .distinct()
 			        .collect(Collectors.joining(" & "))
 			);

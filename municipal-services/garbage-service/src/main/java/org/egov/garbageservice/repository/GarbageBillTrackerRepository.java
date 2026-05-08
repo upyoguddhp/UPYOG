@@ -103,6 +103,13 @@ public class GarbageBillTrackerRepository {
 			+ "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime "
 			+ "WHERE bill_id = :billId AND status = 'EXPIRED'";
 	
+	private static final String EXPIRE_ACTIVE_TRACKER = "UPDATE eg_grbg_bill_tracker " +
+            "SET status = 'EXPIRED', " +
+            "last_modified_by = :lastModifiedBy, " +
+            "last_modified_time = :lastModifiedTime " +
+            "WHERE grbg_application_id = :grbgApplicationId " +
+            "AND status = 'ACTIVE'";
+	
 	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
 	public int updatePenalty(GrbgBillTracker tracker) {
@@ -203,7 +210,7 @@ public class GarbageBillTrackerRepository {
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
 		StringBuilder builder = new StringBuilder(UPDATE_BILL_TRACKER_STATUS);
-		builder.append(" WHERE status = 'ACTIVE' ");
+		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID') ");
 
         Map<String, Object> updateTrackerStatus = new HashMap<>();
 
@@ -212,21 +219,14 @@ public class GarbageBillTrackerRepository {
 			builder.append(" AND bill_id = :billId");
 		}
 		
-		if(!StringUtils.isEmpty(grbgBillTracker.getMonth()) && !StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
-	        updateTrackerStatus.put("month",grbgBillTracker.getMonth());
-	        updateTrackerStatus.put("grbgApplicationId",grbgBillTracker.getGrbgApplicationId());
-			builder.append(" AND month = :month");
-			builder.append(" AND grbg_application_id = :grbgApplicationId");
-		}
-		
-//		if(!StringUtils.isEmpty(grbgBillTracker.getType())) {
-//	        updateTrackerStatus.put("type",grbgBillTracker.getType());
-//			builder.append(" AND type = :type");
-//		}
-		
 		if(!StringUtils.isEmpty(grbgBillTracker.getDemandId())) {
 	        updateTrackerStatus.put("demandId",grbgBillTracker.getDemandId());
 			builder.append(" AND demand_id = :demandId");
+		}
+		
+		if (!StringUtils.isEmpty(grbgBillTracker.getGrbgApplicationId())) {
+		    updateTrackerStatus.put("grbgApplicationId", grbgBillTracker.getGrbgApplicationId());
+		    builder.append(" AND grbg_application_id = :grbgApplicationId");
 		}
 
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
@@ -247,6 +247,18 @@ public class GarbageBillTrackerRepository {
 		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
 
 		return namedParameterJdbcTemplate.update(query, params);
+	}
+	
+	public int expireActiveTrackersByApplicationId(String grbgApplicationId, AuditDetails auditDetails) {
+
+	    String query = EXPIRE_ACTIVE_TRACKER;
+
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("grbgApplicationId", grbgApplicationId);
+	    params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
+	    params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(query, params);
 	}
 	
 	private String getBillTrackerSearchQuery(GrbgBillTrackerSearchCriteria criteria, List<Object> preparedStmtList) {

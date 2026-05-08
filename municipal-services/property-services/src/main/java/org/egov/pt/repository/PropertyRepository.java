@@ -50,7 +50,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
-import org.egov.pt.models.data.TaxMetrics;
+import org.egov.pt.models.AuditDetails;
 
 import com.google.common.collect.Sets;
 
@@ -450,26 +450,6 @@ public class PropertyRepository {
 		});
 	}
 	
-//	public List<DataItem> getUniqueWards(String stringDate) {
-//
-//		String query = queryBuilder.getUniqueWardsSearchQuery(stringDate);
-//
-//		return jdbcTemplate.query(query, rs -> {
-//
-//			List<DataItem> result = new ArrayList<>();
-//
-//			while (rs.next()) {
-//				result.add(DataItem.builder().ward(rs.getString("ward")).ulb(rs.getString("ulb"))
-//						.region(rs.getString("region")).build());
-//			}
-//
-//			return result;
-//		});
-//	}
-	
-
-
-	
 	public List<DataItem> getTransactionWards(long startEpoch, long endEpoch) {
 
 	    List<Object> preparedStmtList = new ArrayList<>();
@@ -486,13 +466,7 @@ public class PropertyRepository {
 	}
 	
 
-	// All status show
-//	public List<String> getAllStatuses() {
-//
-//		String query = "SELECT DISTINCT status FROM eg_pt_property";
-//
-//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("status"));
-//	}
+
 	
 	public List<String> getAllStatuses(Long epochStart, Long epochEnd, String wardNumber) {
 
@@ -508,15 +482,7 @@ public class PropertyRepository {
 	            new Object[]{epochStart, epochEnd, wardNumber},
 	            (rs, rowNum) -> rs.getString("status"));
 	}
-//	
-//	public List<String> getAllusagecategory() {
-//
-//		String query = 
-//				//"SELECT DISTINCT usagecategory FROM eg_pt_property";
-//"SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory FROM eg_pt_unit u";
-//
-//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("usagecategory"));
-//	}
+
 	
 	
 	
@@ -800,10 +766,10 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 	    });
 	}	
 	
-	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward) { 
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward, String created_at) { 
 		List<Object> preparedStmtList = new ArrayList<>();
 		//preparedStmtList.add(status);   
-	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward );
+	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward, created_at );
         log.info("propertyLog {}", query );
         log.info("params {}",preparedStmtList );
 
@@ -817,31 +783,15 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
 		}
 		
-		public Map<String, TaxMetrics> getTaxMetricsCombined(long start, long end, String ward) {
-
-		    List<Object> params = new ArrayList<>();
-		    String query = queryBuilder.getTaxMetricsQuery(start, end, ward, params);
-
-		    return jdbcTemplate.query(query, params.toArray(), rs -> {
-
-		        Map<String, TaxMetrics> result = new HashMap<>();
-
-		        while (rs.next()) {
-
-		            TaxMetrics tm = new TaxMetrics();
-
-		            tm.setPropertyTax(rs.getBigDecimal("propertyTax"));
-		            tm.setCess(rs.getBigDecimal("cess"));
-		            tm.setPenalty(rs.getBigDecimal("penalty"));
-		            tm.setInterest(rs.getBigDecimal("interest"));
-		            tm.setRebate(rs.getBigDecimal("rebate"));
-
-		            result.put(rs.getString("name"), tm);
-		        }
-
-		        return result;
-		    });
+		public int expireActiveTrackersByPropertyId(String propertyId, AuditDetails auditDetails) {
+			String query = queryBuilder.getExpireActiveTrackersByPropertyIdQuery();
+			return jdbcTemplate.update(query, auditDetails.getLastModifiedBy(), auditDetails.getLastModifiedTime(),
+					propertyId);
 		}
 		
-		
+		public int updateStatus(PtTaxCalculatorTracker tracker) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
+			return jdbcTemplate.update(query, preparedStmtList.toArray());
+		}
 	}

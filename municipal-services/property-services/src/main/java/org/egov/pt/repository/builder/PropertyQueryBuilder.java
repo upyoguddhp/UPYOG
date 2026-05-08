@@ -27,6 +27,7 @@ import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.egov.pt.models.PtTaxCalculatorTracker;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -540,6 +541,34 @@ public class PropertyQueryBuilder {
 		preparedStmtList.add(wardName);
 
 		return TAX_METRICS_QUERY;
+	}
+
+	private static final String PAYMENT_CHANNEL_TYPE_QUERY = "SELECT pay.paymentmode AS name, "
+			+ "SUM(pay.totalamountpaid) AS value FROM egcl_payment pay "
+			+ "JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
+			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
+			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
+	
+	private static final String PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY =
+	        "UPDATE eg_pt_tax_calculator_tracker eptct";
+	
+	private static final String PT_TRACKER_UPDATE_BY_PROPERTY_ID = "UPDATE eg_pt_tax_calculator_tracker " +
+            "SET bill_status = 'EXPIRED', " +
+            "lastmodifiedby = ?, " +
+            "lastmodifiedtime = ? " +
+            "WHERE propertyid = ? " +
+            "AND bill_status = 'ACTIVE'";
+
+	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return PAYMENT_CHANNEL_TYPE_QUERY;
 	}
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
@@ -1202,7 +1231,7 @@ public class PropertyQueryBuilder {
 	}
 
 
-public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward) {
+public String getActiveBillsQuery(String status, List<Object> preparedStmtList,String ulbName, String isforce, String ward, String created_at) {
 
     StringBuilder builder = new StringBuilder();
     boolean isFirstCondition = true;
@@ -1240,13 +1269,15 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 
     }
     
-//    if(isforce != null) {
-//    	isFirstCondition = false;
-//    	 builder.append(" AND ");
-//         builder.append(" ward = ? ");
-//         preparedStmtList.add(ward);
-//
-//    }
+    
+    
+    if(ward !=null && !ward.isEmpty()) {
+    	isFirstCondition = false;
+    	 builder.append(" AND ");
+         builder.append(" ward = ? ");
+         preparedStmtList.add(ward);
+
+    }
     
     if(ward != null && isforce != null) {
     	isFirstCondition = true;
@@ -1261,9 +1292,55 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
         preparedStmtList.add(endOfDay);
 
     }
+    
+    if(created_at !=null) {
+    	
+    	ZoneId zone = ZoneId.of("Asia/Kolkata");
+
+    	LocalDate daterange = LocalDate.parse(created_at);
+
+    	long start = daterange.atStartOfDay(zone).toInstant().toEpochMilli();
+    	long end = daterange.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+    	builder.append(" AND createdtime BETWEEN ? AND ? ");
+    	preparedStmtList.add(start);
+    	preparedStmtList.add(end);
+
+    }
+
+    
+
     builder.append("ORDER BY uuid DESC");
 
     return builder.toString();
     }
+
+	public String getUpdateStatusQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+	
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+	
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+	
+		preparedStmtList.add(tracker.getBillStatus().name());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+	
+		if (tracker.getDemandId() != null) {
+			builder.append(" AND eptct.demand_id = ? ");
+			preparedStmtList.add(tracker.getDemandId());
+		}
+		
+		if (tracker.getPropertyId() != null) {
+		    builder.append(" AND eptct.propertyid = ? ");
+		    preparedStmtList.add(tracker.getPropertyId());
+		}
+	
+		return builder.toString();
+	}
+	
+	public String getExpireActiveTrackersByPropertyIdQuery() {
+	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
+	}
 
 }
