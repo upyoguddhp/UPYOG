@@ -48,32 +48,62 @@ public class UmeedDashboardService {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 		// String yesterday = "30-08-2025";
-		LocalDate startDate = LocalDate.parse("10-02-2026", formatter);
-		LocalDate endDate = startDate;
+		
+//		LocalDate startDate = LocalDate.parse("01-04-2025", formatter);
+//		LocalDate endDate = startDate;
 
 		// Define the month (August 2025)
 //    		LocalDate startDate = yesterday;
 //    		LocalDate endDate = yesterday;
 		// LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+		
+		
+		
+		LocalDate startDate = LocalDate.parse("01-04-2026", formatter);
+		LocalDate endDate   = LocalDate.parse("27-04-2026", formatter);
 
 		List<DataItem> allProcessedItems = new ArrayList<>();
-
+		
 		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-			String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-			List<DataItem> dataItems = PGRRepository.getUniqueWards(formattedDate);
+		    String formattedDate = date.format(formatter);
 
-			if (CollectionUtils.isEmpty(dataItems)) {
-				continue;
-			}
+		    List<DataItem> dataItems = PGRRepository.getUniqueWards(formattedDate);
 
-			List<DataItem> processedItems = dataItems.stream()
-					.map(dataItem -> buildDataItemMetrics(dataItem, formattedDate, slaDays))
-					.collect(Collectors.toList());
+		    if (CollectionUtils.isEmpty(dataItems)) {
+		        continue;
+		        
+		    }
 
-			allProcessedItems.addAll(processedItems);
+		    for (DataItem dataItem : dataItems) {
 
+		        try {
+		            DataItem result = buildDataItemMetrics(dataItem, formattedDate, slaDays);
+		            allProcessedItems.add(result);
+		        } catch (Exception e) {
+		            System.out.println("Error for date: " + formattedDate);
+		        }
+		    }
 		}
+
+//		List<DataItem> allProcessedItems = new ArrayList<>();
+
+//		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+//			String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+//
+//			List<DataItem> dataItems = PGRRepository.getUniqueWards(formattedDate);
+//
+//			if (CollectionUtils.isEmpty(dataItems)) {
+//				continue;
+//			}
+//
+//			List<DataItem> processedItems = dataItems.stream()
+//					.map(dataItem -> buildDataItemMetrics(dataItem, formattedDate, slaDays))
+//					.collect(Collectors.toList());
+//
+//			allProcessedItems.addAll(processedItems);
+//
+//		}	
 		// List<DataItem> processedItems = dataItems.stream()
 		// .map(dataItem -> buildDataItemMetrics(dataItem, yesterday,
 		// slaDays)).collect(Collectors.toList());
@@ -115,7 +145,7 @@ public class UmeedDashboardService {
 		metrics.setTodaysOpenComplaints(buildTodayOpenComplaints(date, returnObj.getWard()));
 
 		// Today Assigned Complaints
-		metrics.setTodaysAssisgnedComaplaints(buildTodaysAssignedComaplaints(date, returnObj.getWard()));
+		metrics.setTodaysAssignedComplaints(buildTodaysAssignedComaplaints(date, returnObj.getWard()));
 
 		// Average Solution Time
 		metrics.setAverageSolutionTime(buildAverageSolutionTime(date, returnObj.getWard()));
@@ -124,7 +154,7 @@ public class UmeedDashboardService {
 		metrics.setTodaysRejectedComplaints(buildTodayRejectedComplaints(date, returnObj.getWard()));
 
 		// Today Reassign Complaints
-		metrics.setTodaysReassignComplaints(buildTodayReassingComplaints(date, returnObj.getWard()));
+		metrics.setTodaysReassignedComplaints(buildTodayReassingComplaints(date, returnObj.getWard()));
 
 		// Today Reassign Requested Complaints
 		metrics.setTodaysReassignRequestedComplaints(buildTodayReassingRequestedComplaints(date, returnObj.getWard()));

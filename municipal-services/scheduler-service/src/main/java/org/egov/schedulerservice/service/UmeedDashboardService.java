@@ -114,11 +114,11 @@ public class UmeedDashboardService {
 		// Step 1: Build request info for Umeed Dashboard
 		RequestInfo umeedDashboardRequestInfo = buildRequestInfo();
 
-		// Step 2: Fetch Trade License dashboard metrics
+		
 		Object umeedDashboardDataMatrics = propertyService.getUmeedDashbaordDataMatrics(requestInfo);
 
 		if (null != umeedDashboardDataMatrics
-				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
+				) {
 			UmeedDashboardRequest umeedDashboardRequest = UmeedDashboardRequest.builder()
 					.requestInfo(umeedDashboardRequestInfo)
 					.data(objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")).build();

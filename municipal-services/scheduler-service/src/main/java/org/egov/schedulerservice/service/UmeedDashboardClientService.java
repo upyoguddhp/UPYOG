@@ -33,7 +33,7 @@ public class UmeedDashboardClientService {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			// Add the auth token from RequestInfo into the Authorization header
 			if (dashboardRequest.getRequestInfo() != null && dashboardRequest.getRequestInfo().getAuthToken() != null) {
-				headers.set("Authorization", dashboardRequest.getRequestInfo().getAuthToken());
+				headers.set("Authorization", "Bearer " + dashboardRequest.getRequestInfo().getAuthToken());
 			}
 
 			HttpEntity<UmeedDashboardRequest> requestEntity = new HttpEntity<>(dashboardRequest, headers);
@@ -64,4 +64,7 @@ public class UmeedDashboardClientService {
 			return ("Error sending metrics: " + e.getMessage());
 		}
 	}
+	
+
+	
 }
