@@ -3,6 +3,7 @@ package org.egov.web.notification.sms.service;
 import org.egov.web.notification.sms.consumer.contract.SMSRequest;
 import org.egov.web.notification.sms.models.OTPSentRequest;
 import org.egov.web.notification.sms.models.SMSSentRequest;
+import org.egov.web.notification.sms.models.UserSearchResponse;
 
 public interface SMSService {
 
@@ -10,7 +11,7 @@ public interface SMSService {
 
 	void sendSMS(SMSSentRequest smsSentRequest);
 	
-	void validateCitizen(OTPSentRequest smsSentRequest);
+	UserSearchResponse validateCitizen(OTPSentRequest smsSentRequest);
 
 	SMSRequest populateSMSRequest(SMSSentRequest smsSentRequest);
 

@@ -124,7 +124,7 @@ public class SMSServiceImpl implements SMSService {
 				.templateId(smsTemplate.getTemplateId()).build();
 	}
 
-	public void validateCitizen(OTPSentRequest otpSentRequest) {
+	public UserSearchResponse validateCitizen(OTPSentRequest otpSentRequest) {
 
 		if (!otpSentRequest.isNumberValid()) {
 			throw new CustomException("INVALID REQUEST", "Mobile number");
@@ -156,6 +156,8 @@ public class SMSServiceImpl implements SMSService {
 				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).smsServiceType("otpmsg")
 				.build();
 		baseSmsService.sendSMS(sms);
+		
+		return userSearchResponse;
 	}
 	
 	}
