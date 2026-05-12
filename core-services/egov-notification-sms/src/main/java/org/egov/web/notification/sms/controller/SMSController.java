@@ -51,4 +51,9 @@ public class SMSController {
 	        return ResponseEntity.ok("SMS Tracker entry created successfully");
 	    }
 	 
+		@PostMapping(value = "/validateCitizen")
+		public ResponseEntity<?> validateCitizen(@RequestBody OTPSentRequest otpSentRequest) {
+			smsService.validateCitizen(otpSentRequest);
+			return ResponseEntity.ok().body("{\"message\":\"Message sent successfully\"}");
+		}
 }

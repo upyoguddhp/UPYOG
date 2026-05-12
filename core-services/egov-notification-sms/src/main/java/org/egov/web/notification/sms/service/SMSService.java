@@ -9,6 +9,8 @@ public interface SMSService {
 	void sendOtp(OTPSentRequest smsSentRequest);
 
 	void sendSMS(SMSSentRequest smsSentRequest);
+	
+	void validateCitizen(OTPSentRequest smsSentRequest);
 
 	SMSRequest populateSMSRequest(SMSSentRequest smsSentRequest);
 
