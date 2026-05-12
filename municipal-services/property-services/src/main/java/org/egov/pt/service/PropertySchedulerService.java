@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.Arrays;
 
 import javax.validation.Valid;
 
@@ -419,7 +420,11 @@ public class PropertySchedulerService {
 						try {
 							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
 									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
-									.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
+									.billStatus(new HashSet<>(Arrays.asList(
+										    BillStatus.ACTIVE, 
+										    BillStatus.PARTIALLY_PAID
+										)))
+									.build();
 
 							List<PtTaxCalculatorTracker> prevTrackers = propertyService
 									.getTaxCalculatedProperties(prevCriteria);
