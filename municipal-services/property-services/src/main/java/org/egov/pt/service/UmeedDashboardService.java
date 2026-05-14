@@ -135,7 +135,7 @@ public class UmeedDashboardService {
 
 		metrics.setTransactions(buildTransaction(startEpoch, endEpoch, returnObj.getWard()));
 
-		metrics.setTodaysCollection(buildTransaction(startEpoch, endEpoch, returnObj.getWard()));
+		metrics.setTodaysCollection(buildTodayCollection(startEpoch, endEpoch, returnObj.getWard()));
 
 		metrics.setPropertyTax(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "propertyTax",
 				repo -> repo.getPropertyTax(startEpoch, endEpoch, returnObj.getWard())));
@@ -156,6 +156,24 @@ public class UmeedDashboardService {
 
 		return returnObj;
 	}
+	
+	private GroupedData buildGenericMetrics(Map<String, BigDecimal> data, String groupBy,
+			List<String> masterList) {
+
+		final Map<String, BigDecimal> safeData = Optional.ofNullable(data).orElse(Collections.emptyMap());
+
+		List<Bucket> buckets = masterList.stream()
+				.map(item -> Bucket.builder().name(item).value(safeData.getOrDefault(item, BigDecimal.ZERO))
+						.build())
+				.collect(Collectors.toList());
+
+		return GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
+	}
+	
+	
+
+	
+	
 	// All Application Status
 	private List<GroupedData> buildApplicationStatusMetrics(Map<String, Long> deptWiseData, String groupBy, long epochStart, long epochEnd, String wardName) {
 
@@ -216,6 +234,7 @@ public class UmeedDashboardService {
 		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
 
 		return Collections.singletonList(groupedData);
+	
 	}
 
 //--------------------Group data-------------------------------------
@@ -241,19 +260,40 @@ public class UmeedDashboardService {
 	    return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName);
 	}
 
-	private List<GroupedData> buildTransaction(long epochStart, long epochEnd, String wardName) {
-
-		List<PropertyRepository.TransactionCollectionResponse> responseList = PropertyRepository
-				.getTransactionCollectionAndPayment(epochStart, epochEnd, wardName);
-
-		Map<String, Long> data = new HashMap<>();
-
-		for (PropertyRepository.TransactionCollectionResponse response : responseList) {
-			data.put(response.getName(), response.getTransactionCount());
+	//Today Collection
+		private List<GroupedData> buildTodayCollection(long epochStart, long epochEnd, String wardName) {
+	List<GroupedData> response = new ArrayList<>();
+		
+			Map<String, BigDecimal> data = PropertyRepository.getTodayCollection(epochStart, epochEnd, wardName);
+		response.add(buildGenericMetrics(data, "usageCategory", PropertyRepository.getAllUsageCategory(epochStart, epochEnd, wardName)));
+			
+			Map<String, BigDecimal> channelData = PropertyRepository.getTodayCollectionPaymentModeQuery(epochStart, epochEnd, wardName);
+			response.add(buildGenericMetrics(channelData, "paymentChannelType", PropertyRepository.getAllPaymentMode()));
+			
+			return  response;
 		}
-		return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName);
-	}
+		
+		
+		
+		private List<GroupedData> buildTransaction(long epochStart, long epochEnd, String wardName) {
 
+		    Map<String, Long> data = PropertyRepository.getTransactions(epochStart, epochEnd, wardName);
+
+		    return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName );
+		}
+
+//	private List<GroupedData> buildTransaction(long epochStart, long epochEnd, String wardName) {
+//
+//		List<PropertyRepository.TransactionCollectionResponse> responseList = PropertyRepository
+//				.getTransactionCollectionAndPayment(epochStart, epochEnd, wardName);
+//
+//		Map<String, Long> data = new HashMap<>();
+//
+//		for (PropertyRepository.TransactionCollectionResponse response : responseList) {
+//			data.put(response.getName(), response.getTransactionCount());
+//		}
+//		return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName);
+//	}
 	private List<GroupedData> buildTaxMetric(long epochStart, long epochEnd, String wardName, String metricType,
 			Function<PropertyRepository, Map<String, BigDecimal>> extractor) {
 

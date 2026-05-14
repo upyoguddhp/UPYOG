@@ -371,7 +371,6 @@ public class PropertyRepository {
 		return encryptionCount;
 	}
 
-
 	public List<PropertyAudit> getPropertyAuditForEnc(PropertyCriteria criteria) {
 
 		String query = queryBuilder.getpropertyAuditEncQuery();
@@ -464,10 +463,7 @@ public class PropertyRepository {
 	        return dataItem;
 	    });
 	}
-	
 
-
-	
 	public List<String> getAllStatuses(Long epochStart, Long epochEnd, String wardNumber) {
 
 	    String query = "SELECT DISTINCT p.status " +
@@ -483,13 +479,9 @@ public class PropertyRepository {
 	            (rs, rowNum) -> rs.getString("status"));
 	}
 
-	
-	
-	
-	
 public List<String> getAllUsageCategory(long epochStart, long epochEnd, String wardName) {
 
-    String query = "SELECT DISTINCT u.usagecategoryv2 AS usagecategory " +
+    String query = "SELECT DISTINCT u.usagecategory AS usagecategory " +
                    "FROM eg_pt_unit u " +
                    "JOIN eg_pt_property p ON u.propertyid = p.id " +
                    "JOIN eg_pt_address addr ON p.id = addr.propertyid " +
@@ -502,22 +494,6 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
             (rs, rowNum) -> rs.getString("usagecategory")
     );
 }
-	
-//	public List<String> getAllusagecategory(Long epochStart, Long epochEnd, String wardName) {
-//
-//	    String query = "SELECT DISTINCT u.additional_details->>'useOfBuilding' AS usagecategory " +
-//	                   "FROM eg_pt_unit u " +
-//	                   "JOIN eg_pt_property p ON p.id = u.propertyid " +
-//	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-//	                   "WHERE u.createdtime BETWEEN ? AND ? " +
-//	                   "AND u.additional_details->>'useOfBuilding' IS NOT NULL " +
-//	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
-//	                   "ORDER BY usagecategory";
-//
-//	    return jdbcTemplate.query(query,
-//	            new Object[]{epochStart, epochEnd, wardName},
-//	            (rs, rowNum) -> rs.getString("usagecategory"));
-//	}
 	
 	public List<String> getAllPaymentMode() {
 
@@ -584,113 +560,55 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 		});
 	}
 	
-//	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, Long> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("name"), rs.getLong("transactionCount"));
-//			}
-//			return result;
-//		});
-//	}
-//	
-//	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder. getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, BigDecimal> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("name"), rs.getBigDecimal("totalAmount"));
-//			}
-//			return result;
-//		});
-//	}
-//	public Map<String, String> getTodayCollectionPaymentModeQuery(long epochStart, long epochEnd, String wardName) {
-//
-//		List<Object> preparedStmtList = new ArrayList<>();
-//
-//		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//			Map<String, String> result = new HashMap<>();
-//			while (rs.next()) {
-//				result.put(rs.getString("name"), rs.getString("paymentMode"));
-//			}
-//			return result;
-//		});
-//	}
-	
-	//----------
-	
-	public class TransactionCollectionResponse {
+	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
 
-	    private String name;
-	    private String paymentMode;
-	    private Long transactionCount;
-	    private BigDecimal totalAmount;
+		List<Object> preparedStmtList = new ArrayList<>();
 
-	    public String getName() {
-	        return name;
-	    }
+		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
-	    public void setName(String name) {
-	        this.name = name;
-	    }
-
-	    public String getPaymentMode() {
-	        return paymentMode;
-	    }
-
-	    public void setPaymentMode(String paymentMode) {
-	        this.paymentMode = paymentMode;
-	    }
-
-	    public Long getTransactionCount() {
-	        return transactionCount;
-	    }
-
-	    public void setTransactionCount(Long transactionCount) {
-	        this.transactionCount = transactionCount;
-	    }
-
-	    public BigDecimal getTotalAmount() {
-	        return totalAmount;
-	    }
-
-	    public void setTotalAmount(BigDecimal totalAmount) {
-	        this.totalAmount = totalAmount;
-	    }
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, Long> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getLong("transactionCount"));
+			}
+			return result;
+		});
 	}
-	
-	public List<TransactionCollectionResponse> getTransactionCollectionAndPayment(long epochStart, long epochEnd,
-			String wardName) {
+//	
+	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
 		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName,
 				preparedStmtList);
 
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
-
-			TransactionCollectionResponse response = new TransactionCollectionResponse();
-
-			response.setName(rs.getString("name"));
-			response.setPaymentMode(rs.getString("paymentMode"));
-			response.setTransactionCount(rs.getLong("transactionCount"));
-			response.setTotalAmount(rs.getBigDecimal("totalAmount"));
-
-			return response;
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+			Map<String, BigDecimal> result = new HashMap<>();
+			while (rs.next()) {
+				result.put(rs.getString("name"), rs.getBigDecimal("totalAmount"));
+			}
+			return result;
 		});
 	}
-	
+
+	public Map<String, BigDecimal> getTodayCollectionPaymentModeQuery(long epochStart, long epochEnd, String wardName) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = queryBuilder.getPaymentChannelTypeQuery(epochStart, epochEnd, wardName, preparedStmtList);
+
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
+
+			Map<String, BigDecimal> result = new HashMap<>();
+
+			while (rs.next()) {
+
+				result.put(rs.getString("paymentMode"), rs.getBigDecimal("totalAmount"));
+			}
+
+			return result;
+		});
+	}
 	public Map<String, BigDecimal> getPropertyTax(long epochStart, long epochEnd, String wardName) {
 
 	    List<Object> preparedStmtList = new ArrayList<>();
@@ -764,8 +682,26 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 	        }
 	        return result;
 	    });
-	}	
+	}
 	
+	public List<Map<String, Object>> getUsageCategoryData() {
+		
+		String query =
+		        "SELECT id, additional_details->>'useOfBuilding' AS useOfBuilding "
+		      + "FROM eg_pt_unit "
+		      + "WHERE additional_details IS NOT NULL ";
+		    //  + "AND usagecategory IS  NULL";
+		return jdbcTemplate.queryForList(query);
+	}
+	
+	public void updateUsageCategory(String category, String id) {
+
+		String query = "UPDATE eg_pt_unit " + "SET usagecategory = ? " + "WHERE id = ? ";
+		//  + "AND usagecategoryv2 IS NULL";
+		
+		jdbcTemplate.update(query, category, id);
+	}
+
 	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward, String created_at) { 
 		List<Object> preparedStmtList = new ArrayList<>();
 		//preparedStmtList.add(status);   
