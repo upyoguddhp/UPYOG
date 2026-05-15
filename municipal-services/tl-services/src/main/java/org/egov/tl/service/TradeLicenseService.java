@@ -863,7 +863,7 @@ public class TradeLicenseService {
 
 	            if (TLConstants.APPLICATION_TYPE_RENEWAL
 	                    .equalsIgnoreCase(license.getApplicationType())) {
-	                businessService = TLConstants.businessService_RENEWAL;
+	                businessService = TLConstants.businessService_NewTL;
 	            }
 	            // Generate Demand
 	            log.info("#### Creating demand for license: " + license.getApplicationNumber());
