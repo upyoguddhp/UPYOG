@@ -127,5 +127,7 @@ public class CommunityHallBookingConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 	
 	public static final String ACTION_REJECT = "REJECT";
+	public static final String ACTION_CANCEL = "CANCEL";
+
 
 }

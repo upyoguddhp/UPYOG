@@ -26,6 +26,7 @@ import org.upyog.chb.web.models.DmsRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -34,6 +35,7 @@ import org.upyog.chb.constants.CommunityHallBookingConstants;
 import org.upyog.chb.enums.BookingStatusEnum;
 import org.upyog.chb.repository.CommunityHallBookingRepository;
 import org.upyog.chb.repository.ServiceRequestRepository;
+import org.upyog.chb.repository.querybuilder.CommunityHallBookingQueryBuilder;
 import org.upyog.chb.service.BillingService;
 import org.upyog.chb.service.AlfrescoService;
 import org.upyog.chb.service.CHBEncryptionService;
@@ -79,6 +81,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.models.coremodels.PaymentDetail;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.upyog.chb.repository.rowmapper.BookingSlotDetailRowmapper;
 
 //bill cancellation 
 import java.util.Arrays;
@@ -93,6 +96,15 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	private CommunityHallBookingRepository bookingRepository;
 	@Autowired
 	private CommunityHallBookingValidator hallBookingValidator;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private CommunityHallBookingQueryBuilder queryBuilder;
+
+	@Autowired
+	private BookingSlotDetailRowmapper slotDetailRowmapper;
+	
 
 	/*
 	 * @Autowired private WorkflowService workflowService;
@@ -155,7 +167,7 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 					"Community Hall/Ground not availabel for booking. Failed to create booking  for : "
 							+ communityHallsBookingRequest.getHallsBookingApplication().getCommunityHallCode());
 		}
-//		 
+ 
 		Object mdmsData = mdmsUtil.mDMSCall(communityHallsBookingRequest.getRequestInfo(), tenantId);
 
 		// 1. Validate request master data to confirm it has only valid data in records
@@ -295,14 +307,9 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 				         
 				        )).service("chb-services")
 				        .build();
-							
-				
 				//bill search 
 				List<Bill> bills = billingService.searchBill(billSearchCriteria, communityHallsBookingRequest.getRequestInfo());
-			    
 				if (!CollectionUtils.isEmpty(bills)) {
-
-			    
 				    Bill bill = bills.get(0);
 				    Map<String, Object> additionalDetails = new HashMap<>();
 				    additionalDetails.put("reason", "CHB_CANCEL");
@@ -321,8 +328,8 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 				            communityHallsBookingRequest.getRequestInfo());
 				  }
 				
-				
-			    updateSlotStatusToAvailable(communityHallsBookingRequest, bookingNo);
+				communityHallsBookingRequest.getHallsBookingApplication().getBookingSlotDetails().get(0).setStatus("AVAILABLE");
+			   // updateSlotStatusToAvailable(communityHallsBookingRequest, bookingNo);
 			}
 		}
 
@@ -715,10 +722,8 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	public void setRelatedAsset(List<CommunityHallBookingDetail> applications, RequestInfoWrapper requestInfoWrapper) {
 		for (CommunityHallBookingDetail communityHallBookingDetail : applications) {
 			AssetSearchCriteria assetSearchCriteria = new AssetSearchCriteria();
-
 			assetSearchCriteria.setApplicationNo(communityHallBookingDetail.getCommunityHallCode());
 			assetSearchCriteria.setTenantId(communityHallBookingDetail.getTenantId());
-
 			List<Asset> relatedAssets = fetchAssets(assetSearchCriteria, requestInfoWrapper.getRequestInfo());
 
 			if (!CollectionUtils.isEmpty(relatedAssets)) {
@@ -729,14 +734,12 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	}
 
 	public void setRelatedAssetData(CommunityHallBookingRequest communityHallsBookingRequest) {
-
 		AssetSearchCriteria assetSearchCriteria = new AssetSearchCriteria();
 
 		assetSearchCriteria
 				.setApplicationNo(communityHallsBookingRequest.getHallsBookingApplication().getCommunityHallCode());
 		assetSearchCriteria.setTenantId(communityHallsBookingRequest.getHallsBookingApplication().getTenantId());
 		assetSearchCriteria.setBookingStatus(CommunityHallBookingConstants.BOOKING_AVAILABLE_STATUS);
-
 		List<Asset> relatedAssets = fetchAssets(assetSearchCriteria, communityHallsBookingRequest.getRequestInfo());
 
 		if (!CollectionUtils.isEmpty(relatedAssets)) {
@@ -809,9 +812,63 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 	}
 	
 	//new method for cancel booking  
-	
-	private void updateSlotStatusToAvailable(CommunityHallBookingRequest request, String BookingCode) {
-			bookingRepository.updateSlotStatusToAvailable(request);
+
+	private void updateSlotStatusToAvailable(CommunityHallBookingRequest CommunityHallBookingRequest, String BookingCode) {
+		List<String> bookingIds = new ArrayList<>();
+		
+		if (CommunityHallBookingRequest == null) {
+		    throw new RuntimeException("CommunityHallBookingRequest is null");
+		}
+
+		if (CommunityHallBookingRequest.getHallsBookingApplication() == null) {
+		    throw new RuntimeException("HallsBookingApplication is null");
+		}
+
+		if (CommunityHallBookingRequest.getHallsBookingApplication().getBookingId() == null) {
+		    throw new RuntimeException("BookingId is null");
+		}
+
+		bookingIds.add(
+		    CommunityHallBookingRequest
+		        .getHallsBookingApplication()
+		        .getBookingId()
+		);
+		List<BookingSlotDetail> slotDetails = jdbcTemplate.query(
+		        queryBuilder.getSlotDetailsQuery(bookingIds),
+		        bookingIds.toArray(),
+		        slotDetailRowmapper
+		);
+
+		if (slotDetails != null) {
+		    System.out.println("slotDetails size : " + slotDetails.size());
+
+		    slotDetails.forEach(slotDetail -> {
+		        System.out.println("slotDetail object : " + slotDetail);
+
+		        if (slotDetail != null) {
+		            slotDetail.setStatus("AVAILABLE");
+		        }
+		    });
+			
+		}
+		
+		CommunityHallBookingRequest.getHallsBookingApplication().setBookingSlotDetails(slotDetails);
+		log.info("CommunityHallBookingRequest {}",CommunityHallBookingRequest);
+		
+//		bookingIds.add(CommunityHallBookingRequest.getHallsBookingApplication().getBookingId());
+//	    
+//	    List<BookingSlotDetail> slotDetails = jdbcTemplate.query(
+//	            queryBuilder.getSlotDetailsQuery(bookingIds),
+//	            bookingIds.toArray(),
+//	            slotDetailRowmapper
+//	    );
+//	    slotDetails.forEach(slotDetail -> {
+//	        slotDetail.setStatus("AVAILABLE");
+//	     });
+//	    CommunityHallBookingRequest.getHallsBookingApplication().setBookingSlotDetails(slotDetails);
+//			
+		//
+		//bookingRepository.updateSlotStatusToAvailable(request);
 	   
 	}
 }

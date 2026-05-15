@@ -129,6 +129,15 @@ public class EnrichmentService {
 					slot.setStatus("AVAILABLE");
 				});
 
+			} else if(StringUtils.equalsIgnoreCase(CommunityHallBookingConstants.ACTION_CANCEL,
+					communityHallsBookingRequest.getHallsBookingApplication().getWorkflow().getAction())) {
+				 {
+					bookingDetail.getBookingSlotDetails().stream().forEach(slot -> {
+						slot.setStatus("AVAILABLE");
+					});
+
+				}
+				
 			} else {
 				bookingDetail.getBookingSlotDetails().stream().forEach(slot -> {
 					slot.setStatus(statusEnum.toString());
