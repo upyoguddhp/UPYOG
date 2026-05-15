@@ -170,7 +170,7 @@ public class Scheduler {
 	
 	//Property
 		@Scheduled(cron = "${cron.job.default.umeed.dashboard.property.data.matrics.sender}", zone = "IST")
-		public void pushUmeedDashboardMetricsForPropertyService() {
+		public void pushUmeedDashboardMetricsForProperty() {
 			log.info("pushUmeedDashboardMetricsForProperty CRON JOB Starts");
 			RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
 			umeedDashboardService.pushUmeedDashboardMetricsForProperty(requestInfo);

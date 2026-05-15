@@ -5,10 +5,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.pt.config.PropertyConfiguration;
@@ -24,6 +26,8 @@ import org.egov.pt.models.data.ULBMappings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,7 +69,7 @@ public class UmeedDashboardService {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 		// String yesterday = "30-08-2025";
-		LocalDate startDate = LocalDate.parse("08-07-2025", formatter);
+		LocalDate startDate = LocalDate.parse("14-07-2025", formatter);
 		LocalDate endDate = startDate;
 
 		// Define the month (August 2025)
@@ -103,62 +107,6 @@ public class UmeedDashboardService {
 	}
 
 	private final Map<String, Metrics> metricsCache = new ConcurrentHashMap<>();
-
-//	private DataItem buildDataItemMetrics(DataItem dataItem, String date, int slaDays) {
-//
-//		DataItem returnObj = DataItem.builder().date(date).module("PT").state("Himachal Pradesh")
-//				// .ward(dataItem.getWard())
-//				.ward(dataItem.getWard().matches("^\\d+$") ? "Ward" + dataItem.getWard() : dataItem.getWard())
-//				.region(dataItem.getRegion()).ulb(ULBMappings.getCode(dataItem.getUlb())).ulbCode("123456").build();
-//
-//		// Metrics metrics = PropertyRepository.getDataMetrics(date,
-//		// returnObj.getWard(), slaDays);
-//		String cacheKey = date + "_" + returnObj.getWard();
-//		
-//		
-//
-//		Metrics metrics = metricsCache.get(cacheKey);
-//
-//			if (metrics == null) {
-//				metrics = PropertyRepository.getDataMetrics(date, returnObj.getWard(), slaDays);
-//				metricsCache.put(cacheKey, metrics);
-//			}
-//		// Today Moved Application
-//		metrics.setTodaysMovedApplications(buildTodaysMovedApplication(date, returnObj.getWard()));
-//
-//		// PropertyRegistered
-//		metrics.setPropertiesRegistered(buildPropertyRegistered(returnObj.getWard()));
-//
-//		// Assessed Properties
-//		metrics.setAssessedProperties(buildAssessedProperties(date, returnObj.getWard()));
-//
-//		// Transactions
-//		metrics.setTransactions(buildTransaction(date, returnObj.getWard()));
-//
-//		// Today Collection
-//		metrics.setTodayCollection(buildTodayCollection(date, returnObj.getWard()));
-//
-//		// Property Tax
-//		metrics.setPropertyTax(buildPropertyTax(date, returnObj.getWard()));
-////		metrics.setPropertyTax(buildPropertyTax(date, returnObj.getWard(), returnObj.getUlb(), returnObj.getRegion()));
-//
-//		// Cess
-//		metrics.setCess(buildCess(date, returnObj.getWard()));
-//
-//		//rebate
-//		metrics.setRebate(buildRebate(date, returnObj.getWard()));
-//
-//		//Penalty
-//		metrics.setPenalty(buildPenalty(date, returnObj.getWard()));
-//
-//		// Today Reassign Requested Complaints
-//		metrics.setInterest(buildInterest(date, returnObj.getWard()));
-//
-//		returnObj.setMetrics(metrics);
-//		return returnObj;
-//
-//		// Departments Data
-//	}
 	
 	private DataItem buildDataItemMetrics(DataItem dataItem, String date, int slaDays) {
 
@@ -187,28 +135,33 @@ public class UmeedDashboardService {
 
 		metrics.setTransactions(buildTransaction(startEpoch, endEpoch, returnObj.getWard()));
 
-		metrics.setTodayCollection(buildTodayCollection(startEpoch, endEpoch, returnObj.getWard()));
+		metrics.setTodaysCollection(buildTransaction(startEpoch, endEpoch, returnObj.getWard()));
 
-		metrics.setPropertyTax(buildPropertyTax(startEpoch, endEpoch, returnObj.getWard()));
-		
-		metrics.setCess(buildCess(startEpoch, endEpoch, returnObj.getWard()));
-		
-		metrics.setRebate(buildRebate(startEpoch, endEpoch, returnObj.getWard()));
-		
-		metrics.setPenalty(buildPenalty(startEpoch, endEpoch, returnObj.getWard()));
-		
-		metrics.setInterest(buildInterest(startEpoch, endEpoch, returnObj.getWard()));
+		metrics.setPropertyTax(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "propertyTax",
+				repo -> repo.getPropertyTax(startEpoch, endEpoch, returnObj.getWard())));
 
+		metrics.setCess(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "cess",
+				repo -> repo.getCess(startEpoch, endEpoch, returnObj.getWard())));
+
+		metrics.setRebate(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "rebate",
+				repo -> repo.getRebate(startEpoch, endEpoch, returnObj.getWard())));
+
+		metrics.setPenalty(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "penalty",
+				repo -> repo.getPenalty(startEpoch, endEpoch, returnObj.getWard())));
+
+		metrics.setInterest(buildTaxMetric(startEpoch, endEpoch, returnObj.getWard(), "interest",
+				repo -> repo.getInterest(startEpoch, endEpoch, returnObj.getWard())));
+		
 		returnObj.setMetrics(metrics);
 
 		return returnObj;
 	}
 	// All Application Status
-	private List<GroupedData> buildApplicationStatusMetrics(Map<String, Long> deptWiseData, String groupBy) {
+	private List<GroupedData> buildApplicationStatusMetrics(Map<String, Long> deptWiseData, String groupBy, long epochStart, long epochEnd, String wardName) {
 
 		final Map<String, Long> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
 
-		List<String> allStatus = PropertyRepository.getAllStatuses();
+		List<String> allStatus = PropertyRepository.getAllStatuses(epochStart, epochEnd, wardName);
 
 		List<Bucket> buckets = allStatus.stream().map(
 				dept -> Bucket.builder().name(dept).value(BigDecimal.valueOf(safeData.getOrDefault(dept, 0L))).build())
@@ -219,17 +172,6 @@ public class UmeedDashboardService {
 		return Collections.singletonList(groupedData);
 	}
 	
-	private GroupedData buildGenericMetrics(Map<String, Long> data, String groupBy, List<String> masterList) {
-
-		final Map<String, Long> safeData = Optional.ofNullable(data).orElse(Collections.emptyMap());
-
-		List<Bucket> buckets = masterList.stream().map(
-				item -> Bucket.builder().name(item).value(BigDecimal.valueOf(safeData.getOrDefault(item, 0L))).build())
-				.collect(Collectors.toList());
-
-		return GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
-	}
-
 	private List<GroupedData> buildFYMetrics(Map<String, Long> FYData, String groupBy) {
 
 		final Map<String, Long> safeData = Optional.ofNullable(FYData).orElse(Collections.emptyMap());
@@ -245,14 +187,30 @@ public class UmeedDashboardService {
 		return Collections.singletonList(groupedData);
 	}
 
-	private List<GroupedData> buildAssessedPropertiesMetrics(Map<String, Long> deptWiseData, String groupBy) {
+	private List<GroupedData> buildPropertiesMetrics(Map<String, Long> deptWiseData, String groupBy, long epochStart, long epochEnd, String wardName ) {
 
 		final Map<String, Long> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
 
-		List<String> allStatus = PropertyRepository.getAllusagecategory();
+		List<String> allStatus = PropertyRepository.getAllUsageCategory(epochStart, epochEnd, wardName);
 
 		List<Bucket> buckets = allStatus.stream().map(
 				dept -> Bucket.builder().name(dept).value(BigDecimal.valueOf(safeData.getOrDefault(dept, 0L))).build())
+				.collect(Collectors.toList());
+
+		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
+
+		return Collections.singletonList(groupedData);
+	}
+	
+	private List<GroupedData> buildPropertiesMetricsDecimalValue(Map<String, BigDecimal> deptWiseData, String groupBy,long epochStart, long epochEnd, String wardName) {
+
+		final Map<String, BigDecimal> safeData = Optional.ofNullable(deptWiseData).orElse(Collections.emptyMap());
+
+		List<String> allStatus = PropertyRepository.getAllUsageCategory(epochStart, epochEnd, wardName);
+
+		List<Bucket> buckets = allStatus.stream()
+				.map(dept -> Bucket.builder().name(dept).value(safeData.getOrDefault(dept, BigDecimal.ZERO)) 
+						.build())
 				.collect(Collectors.toList());
 
 		GroupedData groupedData = GroupedData.builder().groupBy(groupBy).buckets(buckets).build();
@@ -266,82 +224,41 @@ public class UmeedDashboardService {
 
 		Map<String, Long> data = PropertyRepository.getTodayMovedApplication(epochStart, epochEnd, wardName);
 
-		return buildApplicationStatusMetrics(data, "ApplicationStatus");
+		return buildApplicationStatusMetrics(data, "applicationStatus", epochStart, epochEnd, wardName);
 	}
 
 	private List<GroupedData> buildPropertyRegistered(long epochStart, long epochEnd,String wardName) {
 
 		Map<String, Long> data = PropertyRepository.getPropertiesRegisteredByFinancialYear(epochStart, epochEnd,wardName);
 
-		return buildFYMetrics(data, "FinancialYear");
+		return buildFYMetrics(data, "financialYear");
 	}
 
 	private List<GroupedData> buildAssessedProperties(long epochStart, long epochEnd, String wardName) {
 
-		Map<String, Long> data = PropertyRepository.getAssessedProperties(epochStart, epochEnd, wardName);
+	    Map<String, Long> data = PropertyRepository.getAssessedProperties(epochStart, epochEnd, wardName);
 
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
+	    return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName);
 	}
 
-	
 	private List<GroupedData> buildTransaction(long epochStart, long epochEnd, String wardName) {
 
-	    Map<String, Long> data = PropertyRepository.getTransactions(epochStart, epochEnd, wardName);
+		List<PropertyRepository.TransactionCollectionResponse> responseList = PropertyRepository
+				.getTransactionCollectionAndPayment(epochStart, epochEnd, wardName);
 
-	    return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-	 
-	//Today Collection
-	private List<GroupedData> buildTodayCollection(long epochStart, long epochEnd, String wardName) {
-List<GroupedData> response = new ArrayList<>();
-	
-		Map<String, Long> data = PropertyRepository.getTodayCollection(epochStart, epochEnd, wardName);
-	response.add(buildGenericMetrics(data, "usageCategory", PropertyRepository.getAllusagecategory()));
-		
-		Map<String, Long> channelData = PropertyRepository.getPaymentChannel(epochStart, epochEnd, wardName);
-		response.add(buildGenericMetrics(channelData, "PaymentChannelType", PropertyRepository.getAllPaymentMode()));
-		
-		return  response;
+		Map<String, Long> data = new HashMap<>();
+
+		for (PropertyRepository.TransactionCollectionResponse response : responseList) {
+			data.put(response.getName(), response.getTransactionCount());
+		}
+		return buildPropertiesMetrics(data, "usageCategory", epochStart, epochEnd, wardName);
 	}
 
-	//Property Tax
-	private List<GroupedData> buildPropertyTax(long epochStart, long epochEnd, String wardName) {
+	private List<GroupedData> buildTaxMetric(long epochStart, long epochEnd, String wardName, String metricType,
+			Function<PropertyRepository, Map<String, BigDecimal>> extractor) {
 
-		Map<String, Long> data = PropertyRepository.getPropertyTax(epochStart, epochEnd, wardName);
+		Map<String, BigDecimal> data = extractor.apply(PropertyRepository);
 
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
+		return buildPropertiesMetricsDecimalValue(data, "usageCategory", epochStart, epochEnd, wardName);
 	}
-	
-	//Cess
-	private List<GroupedData> buildCess(long epochStart, long epochEnd, String wardName) {
-
-		Map<String, Long> data = PropertyRepository.getCess(epochStart, epochEnd, wardName);
-
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-	
-	//Rebate
-	private List<GroupedData> buildRebate(long epochStart, long epochEnd, String wardName) {
-
-		Map<String, Long> data = PropertyRepository.getRebate(epochStart, epochEnd, wardName);
-
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-	
-	//Penalty
-	private List<GroupedData> buildPenalty(long epochStart, long epochEnd, String wardName) {
-
-		Map<String, Long> data = PropertyRepository.getPenalty(epochStart, epochEnd, wardName);
-
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-	
-	//Interest
-	private List<GroupedData> buildInterest(long epochStart, long epochEnd, String wardName) {
-
-		Map<String, Long> data = PropertyRepository.getInterest(epochStart, epochEnd, wardName);
-
-		return buildAssessedPropertiesMetrics(data, "usageCategory");
-	}
-
 }

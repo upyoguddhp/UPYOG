@@ -115,7 +115,9 @@ public class BillV2 {
 		
 		PAYMENT_CANCELLED ("PAYMENT_CANCELLED"),
 
-		EXPIRED("EXPIRED");
+		EXPIRED("EXPIRED"),
+		
+		REFUNDED("REFUNDED");
 
 		private String value;
 

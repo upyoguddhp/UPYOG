@@ -22,6 +22,7 @@ import org.egov.demand.repository.DemandRepository;
 import org.egov.demand.service.DemandService;
 import org.egov.demand.service.ReceiptService;
 import org.egov.demand.service.ReceiptServiceV2;
+import org.egov.demand.service.BillServicev2;
 import org.egov.demand.util.Constants;
 import org.egov.demand.util.Util;
 import org.egov.demand.web.contract.BillRequest;
@@ -29,6 +30,7 @@ import org.egov.demand.web.contract.BillRequestV2;
 import org.egov.demand.web.contract.DemandRequest;
 import org.egov.demand.web.contract.Receipt;
 import org.egov.demand.web.contract.ReceiptRequest;
+import org.egov.demand.model.BillCancelRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -61,6 +63,9 @@ public class BillingServiceConsumer {
 	private DemandService demandService;
 	
 	@Autowired
+	private BillServicev2 billServiceV2;
+	
+	@Autowired
 	private DemandRepository demandRepository;
 
 	@Autowired
@@ -85,7 +90,7 @@ public class BillingServiceConsumer {
 	@KafkaListener(topics = { "${kafka.topics.receipt.update.collecteReceipt}", "${kafka.topics.save.bill}",
 			"${kafka.topics.save.demand}", "${kafka.topics.update.demand}", "${kafka.topics.receipt.update.demand}",
 			"${kafka.topics.receipt.cancel.name}", "${kafka.topics.receipt.update.demand.v2}",
-			"${kafka.topics.receipt.cancel.name.v2}" })
+			"${kafka.topics.receipt.cancel.name.v2}","${kafka.topics.advt.bill.cancel}" })
 	public void processMessage(Map<String, Object> consumerRecord, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
 		log.debug("key:" + topic + ":" + "value:" + consumerRecord);
@@ -151,6 +156,13 @@ public class BillingServiceConsumer {
 			
 			Boolean isReceiptCancellation = true;
 			updateDemandsFromPayment(consumerRecord, isReceiptCancellation);
+		}
+		/*
+		 * cancel bill from advertisement
+		 */
+		else if (applicationProperties.getAdvtBillCancelTopic().equals(topic)) {
+			BillCancelRequest cancelRequest = objectMapper.convertValue(consumerRecord, BillCancelRequest.class);
+			billServiceV2.cancelAdvtBill(cancelRequest);
 		}
 	}
 

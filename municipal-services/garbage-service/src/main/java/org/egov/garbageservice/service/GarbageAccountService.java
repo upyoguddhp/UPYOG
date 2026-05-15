@@ -2287,6 +2287,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
+		
+		if ("ARREAR".equalsIgnoreCase(grbgTaxCalculatorMonthTracker.getType())) {
+			String referenceFromDate = grbgTaxCalculatorMonthTracker.getFromDate();
+			String referenceToDate = grbgTaxCalculatorMonthTracker.getToDate();
+
+			grbgTaxCalculatorTracker = grbgTaxCalculatorTracker.stream()
+					.filter(tracker -> Objects.equals(tracker.getFromDate(), referenceFromDate)
+							&& Objects.equals(tracker.getToDate(), referenceToDate))
+					.collect(Collectors.toList());
+		}
 
 		// If no records, return null or empty set
 		if (grbgTaxCalculatorTracker == null || grbgTaxCalculatorTracker.isEmpty()) {
