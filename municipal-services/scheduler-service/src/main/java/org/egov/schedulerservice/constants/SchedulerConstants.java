@@ -6,6 +6,6 @@ public class SchedulerConstants {
 	
 	public static final String NEW_TL = "NewTL";
 	public static final String PGR_SERVICE = "PGR";
-	public static final String PROPERTY_SERVICE = "Property_Service";
+	public static final String PROPERTY_SERVICE = "PT";
 
 }
