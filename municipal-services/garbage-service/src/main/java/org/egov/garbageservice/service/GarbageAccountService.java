@@ -98,6 +98,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
+import org.egov.garbageservice.producer.GarbageProducer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -162,7 +163,9 @@ public class GarbageAccountService {
 	@Autowired
 	private GrbgUtils grbgUtils;
 	
-
+	@Autowired
+	private GarbageProducer producer;
+	
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
 
@@ -199,14 +202,19 @@ public class GarbageAccountService {
 			// call workflow
 			ProcessInstanceResponse processInstanceResponse = callWfUpdate(createGarbageRequest);
 
+			final GarbageAccountRequest request = createGarbageRequest;
 			if (!createGarbageRequest.getCreateChildAccountOnly()) {
 				createGarbageRequest.getGarbageAccounts().forEach(garbageAccount -> {
 
 					// create garbage account
-					garbageAccounts.add(garbageAccountRepository.create(garbageAccount));
-
+//					garbageAccounts.add(garbageAccountRepository.create(garbageAccount));
+					
+					//call to save garbage account topic
+					producer.push(applicationPropertiesAndConstant.getSaveGarbageAccountTopic(), request);
+					garbageAccounts.add(garbageAccount);
+					
 					// create garbage objects
-					createGarbageAccountObjects(garbageAccount);
+//					createGarbageAccountObjects(garbageAccount);
 
 				});
 			}
@@ -220,9 +228,9 @@ public class GarbageAccountService {
 						// map user uuid
 						userService.processGarbageAccount(info,role, subAccount);
 						// create garbage sub account
-						garbageAccountRepository.create(subAccount);
+//						garbageAccountRepository.create(subAccount);
 						// create garbage objects
-						createGarbageAccountObjects(subAccount);
+//						createGarbageAccountObjects(subAccount);
 					});
 				}
 			});
