@@ -115,6 +115,9 @@ public class GrbgConstants {
 	
 	@Value("${kafka.topics.save.grbg.account}")
 	public String saveGarbageAccountTopic;
+	
+	@Value("${kafka.topics.update.grbg.account}")
+	private String updateGarbageAccountTopic;
 
 	@Value(("${egov.grbg.bill.expiry.after}"))
 	private String grbgBillExpiryAfter;

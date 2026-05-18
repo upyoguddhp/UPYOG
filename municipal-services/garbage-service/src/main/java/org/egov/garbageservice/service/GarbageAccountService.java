@@ -736,6 +736,11 @@ public class GarbageAccountService {
 				// update other objects of garbage account
 				updateAndEnrichGarbageAccountObjects(newGarbageAccount, existingGarbageAccount,
 						applicationNumberToCurrentStatus);
+				
+				 producer.push(
+					        applicationPropertiesAndConstant.getUpdateGarbageAccountTopic(),
+					        updateGarbageRequest
+					    );
 
 				garbageAccounts.add(newGarbageAccount);
 			}
@@ -1258,7 +1263,7 @@ public class GarbageAccountService {
 			newGarbageAccount.getGrbgApplication().setStatus(
 					applicationNumberToCurrentStatus.get(newGarbageAccount.getGrbgApplication().getApplicationNo()));
 			// update application
-			grbgApplicationRepository.update(newGarbageAccount.getGrbgApplication());
+//			grbgApplicationRepository.update(newGarbageAccount.getGrbgApplication());
 		}
 
 		// 2. update commercial details
@@ -1281,7 +1286,7 @@ public class GarbageAccountService {
 		if (null != newGarbageAccount.getGrbgOldDetails()
 				&& StringUtils.isEmpty(newGarbageAccount.getGrbgOldDetails().getUuid())) {
 			// create grbgOldDetails
-			grbgOldDetailsRepository.create(newGarbageAccount.getGrbgOldDetails());
+			//grbgOldDetailsRepository.create(newGarbageAccount.getGrbgOldDetails());
 		} else if (null != newGarbageAccount.getGrbgOldDetails()
 				&& StringUtils.isNotEmpty(newGarbageAccount.getGrbgOldDetails().getUuid())
 				&& !newGarbageAccount.getGrbgOldDetails().equals(existingGarbageAccount.getGrbgOldDetails())) {
@@ -1292,7 +1297,7 @@ public class GarbageAccountService {
 				newGarbageAccount.getGrbgOldDetails()
 						.setGarbageId(existingGarbageAccount.getGrbgOldDetails().getGarbageId());
 				// update grbgOldDetails
-				grbgOldDetailsRepository.update(newGarbageAccount.getGrbgOldDetails());
+//				grbgOldDetailsRepository.update(newGarbageAccount.getGrbgOldDetails());
 			}
 		}
 
@@ -1317,15 +1322,15 @@ public class GarbageAccountService {
 				if (child.getAdditionalDetail() == null) {
 	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
 	            }
-				garbageAccountRepository.update(child);
+//				garbageAccountRepository.update(child);
 				// update application
-				grbgApplicationRepository.update(child.getGrbgApplication());
+//				grbgApplicationRepository.update(child.getGrbgApplication());
 
-				if (!CollectionUtils.isEmpty(child.getGrbgCollectionUnits())) {
-					child.getGrbgCollectionUnits().stream().forEach(unit -> {
-						grbgCollectionUnitRepository.update(unit);
-					});
-				}
+//				if (!CollectionUtils.isEmpty(child.getGrbgCollectionUnits())) {
+//					child.getGrbgCollectionUnits().stream().forEach(unit -> {
+//						grbgCollectionUnitRepository.update(unit);
+//					});
+//				}
 			});
 		}
 	}
@@ -1346,15 +1351,15 @@ public class GarbageAccountService {
 		// Deactivate grbgAddressesToDeactivate
 		grbgAddressesToDeactivate.values().forEach(grbgAddress -> {
 			grbgAddress.setIsActive(false);
-			grbgAddressRepository.update(grbgAddress);
+//			grbgAddressRepository.update(grbgAddress);
 		});
 
 		// Update new GrbgAddresses
-		if (!CollectionUtils.isEmpty(newGarbageAccount.getAddresses())) {
-			newGarbageAccount.getAddresses().forEach(address -> {
-				grbgAddressRepository.update(address);
-			});
-		}
+//		if (!CollectionUtils.isEmpty(newGarbageAccount.getAddresses())) {
+//			newGarbageAccount.getAddresses().forEach(address -> {
+//				grbgAddressRepository.update(address);
+//			});
+//		}
 	}
 
 	private void updateGrbgCollectionUnits(GarbageAccount newGarbageAccount, GarbageAccount existingGarbageAccount) {
@@ -1368,15 +1373,15 @@ public class GarbageAccountService {
 		grbgCollectionUnitsToDeactivate.entrySet().stream().forEach(map -> {
 			GrbgCollectionUnit grbgCollectionUnit = map.getValue();
 			grbgCollectionUnit.setIsActive(false);
-			grbgCollectionUnitRepository.update(grbgCollectionUnit);
+//			grbgCollectionUnitRepository.update(grbgCollectionUnit);
 		});
 
 		// update new GrbgCollectionUnits
-		if (!CollectionUtils.isEmpty(newGarbageAccount.getGrbgCollectionUnits())) {
-			newGarbageAccount.getGrbgCollectionUnits().stream().forEach(unit -> {
-				grbgCollectionUnitRepository.update(unit);
-			});
-		}
+//		if (!CollectionUtils.isEmpty(newGarbageAccount.getGrbgCollectionUnits())) {
+//			newGarbageAccount.getGrbgCollectionUnits().stream().forEach(unit -> {
+//				grbgCollectionUnitRepository.update(unit);
+//			});
+//		}
 	}
 
 	private void updateGarbageAccount(GarbageAccountRequest updateGarbageRequest, GarbageAccount newGarbageAccount,
@@ -1385,8 +1390,7 @@ public class GarbageAccountService {
 		// replicate existing grbg acc to history table
 
 		// update garbage account
-		garbageAccountRepository.update(newGarbageAccount);
-
+//		garbageAccountRepository.update(newGarbageAccount);
 	}
 
 	private Map<Long, GarbageAccount> searchGarbageAccountMap(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
