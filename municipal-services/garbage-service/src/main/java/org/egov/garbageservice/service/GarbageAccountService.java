@@ -202,6 +202,24 @@ public class GarbageAccountService {
 			// call workflow
 			ProcessInstanceResponse processInstanceResponse = callWfUpdate(createGarbageRequest);
 
+			
+			createGarbageRequest.getGarbageAccounts().forEach(garbageAccount -> {
+				if (!CollectionUtils.isEmpty(garbageAccount.getChildGarbageAccounts())) {
+					garbageAccount.getChildGarbageAccounts().stream().forEach(subAccount -> {
+						subAccount.setBusinessService(garbageAccount.getBusinessService());
+						org.egov.garbageservice.model.contract.Role role = org.egov.garbageservice.model.contract.Role.builder()
+								.code("CITIZEN").name("Citizen").build();
+						// map user uuid
+						userService.processGarbageAccount(info,role, subAccount);
+						
+						// create garbage sub account
+//						garbageAccountRepository.create(subAccount);
+						// create garbage objects
+//						createGarbageAccountObjects(subAccount);
+					});
+				}
+			});
+			
 			final GarbageAccountRequest request = createGarbageRequest;
 			if (!createGarbageRequest.getCreateChildAccountOnly()) {
 				createGarbageRequest.getGarbageAccounts().forEach(garbageAccount -> {
@@ -219,21 +237,7 @@ public class GarbageAccountService {
 				});
 			}
 
-			createGarbageRequest.getGarbageAccounts().forEach(garbageAccount -> {
-				if (!CollectionUtils.isEmpty(garbageAccount.getChildGarbageAccounts())) {
-					garbageAccount.getChildGarbageAccounts().stream().forEach(subAccount -> {
-						subAccount.setBusinessService(garbageAccount.getBusinessService());
-						org.egov.garbageservice.model.contract.Role role = org.egov.garbageservice.model.contract.Role.builder()
-								.code("CITIZEN").name("Citizen").build();
-						// map user uuid
-						userService.processGarbageAccount(info,role, subAccount);
-						// create garbage sub account
-//						garbageAccountRepository.create(subAccount);
-						// create garbage objects
-//						createGarbageAccountObjects(subAccount);
-					});
-				}
-			});
+
 		}
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder()
