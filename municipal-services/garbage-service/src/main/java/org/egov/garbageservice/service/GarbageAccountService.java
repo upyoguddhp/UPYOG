@@ -737,6 +737,9 @@ public class GarbageAccountService {
 				updateAndEnrichGarbageAccountObjects(newGarbageAccount, existingGarbageAccount,
 						applicationNumberToCurrentStatus);
 				
+				updateGarbageRequest.setGarbageAccounts(
+				        Collections.singletonList(newGarbageAccount));
+				
 				 producer.push(
 					        applicationPropertiesAndConstant.getUpdateGarbageAccountTopic(),
 					        updateGarbageRequest
