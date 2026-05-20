@@ -1273,10 +1273,13 @@ public class PropertyService {
 		List<Property> properties = searchProperty(pptcriteria, genrateArrearRequest.getRequestInfo(), null);
 
 		if (!CollectionUtils.isEmpty(properties)) {
+			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
+				
+				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), properties.get(0));
 
 				if (demand.getAdditionalDetails() instanceof Map) {
 				    Map<?, ?> map = (Map<?, ?>) demand.getAdditionalDetails();
@@ -1362,6 +1365,41 @@ public class PropertyService {
 			message = "Invalid Property Details";
 		}
 		return message;
+	}
+	
+	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo, Property property) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+		        .consumerCode(Collections.singleton(property.getPropertyId()))
+		        .tenantId(property.getTenantId())
+		        .service(PTConstants.MODULE_PROPERTY)
+		        .build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
+		
+		if (billResponse == null) {
+			return;
+		}
+
+		for (Bill bill : billResponse.getBill()) {
+			if (bill.getBillDetails() == null) {
+				continue;
+			}
+
+			for (BillDetail detail : bill.getBillDetails()) {
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
+						existingTo)) {
+					throw new CustomException("ARREAR_PERIOD_OVERLAP",
+							"Arrear period overlaps with existing bill period");
+				}
+			}
+		}
+	}
+
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
 	}
 
 	public void checkPropertyArears(List<Demand> demands, Property property) {
