@@ -5,6 +5,7 @@ import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.service.GarbageAccountSchedulerService;
 import org.egov.garbageservice.util.RequestInfoWrapper;
+import org.egov.garbageservice.model.GenerateBillPreviewResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.egov.garbageservice.model.BillIdRequest;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 
@@ -33,8 +36,14 @@ public class GarbageAccountSchedulerController {
 //		return ResponseEntity.ok("Bill generated successfully!!!");
 		return ResponseEntity.ok(service.generateBill(generateBillRequest));
 	}
-
 	
+	@PostMapping("/bill-generator/preview")
+	public ResponseEntity<List<GenerateBillPreviewResponse>> taxCalculatorPreview(
+			@RequestBody GenerateBillRequest generateBillRequest) {
+
+		return ResponseEntity.ok(service.generateBillPreview(generateBillRequest));
+	}
+
 	@PostMapping("/on-demand-generation")
 	public ResponseEntity<?> demandGeneration(@RequestBody OnDemandBillRequest onDemandBillRequest) {
 		return ResponseEntity.ok(service.generateBillOnDemand(onDemandBillRequest));
