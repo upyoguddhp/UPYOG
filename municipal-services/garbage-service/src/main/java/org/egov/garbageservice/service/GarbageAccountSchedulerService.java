@@ -413,21 +413,16 @@ public class GarbageAccountSchedulerService {
 					}
 				}
 
-				calculationBreakdown.put(
-				        "baseAmount",
-				        billAmount.setScale(2, RoundingMode.HALF_UP));
+				calculationBreakdown.put("baseAmount", billAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
 
-				calculationBreakdown.put(
-				        "rebatePercentage",
-				        rebatePercentage.setScale(2, RoundingMode.HALF_UP));
+				calculationBreakdown.put("rebatePercentage",
+						rebatePercentage.setScale(2, RoundingMode.HALF_UP).toPlainString());
 
-				calculationBreakdown.put(
-				        "rebateAmount",
-				        rebateAmount.setScale(2, RoundingMode.HALF_UP));
+				calculationBreakdown.put("rebateAmount",
+						rebateAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
 
-				calculationBreakdown.put(
-				        "finalAmount",
-				        finalBillAmount.setScale(2, RoundingMode.HALF_UP));
+				calculationBreakdown.put("finalAmount",
+						finalBillAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
 
 				if (billAmount == null || billAmount.compareTo(BigDecimal.ZERO) <= 0) {
 					errorList.add("Amount could not be calculated");
