@@ -68,7 +68,7 @@ public class PropertySmsService {
                 smsJsonNode.put("mobileNumber", bill.getContactNumber());
                 smsJsonNode.put("message", generateMessage(bill)); 
                 smsJsonNode.put("category", "NOTIFICATION");
-                smsJsonNode.put("templateName", "BILL-NOTIFICATION");
+                smsJsonNode.put("templateName", "BILL-NOTIFICATION-PROP");
 
                 String smsJson = smsJsonNode.toString();
 
@@ -121,16 +121,28 @@ public class PropertySmsService {
     private String generateMessage(BillSmsView bill) {
     String billId = bill.getGrbgApplicationId();
 
+//    return String.format(
+//        "Dear %s, your property bill vide property id %s for the period %s/%s "
+//        + "amounting to Rs %.1f has been generated on CitizenSeva portal. "
+//        + "Please pay on CitizenSeva Portal or using link %s .  CitizenSeva H.P.",
+//        bill.getOwnerName(),
+//        billId,
+//        bill.getFromDate(),
+//        bill.getToDate(),
+//        bill.getGrbgBillAmount() != null ? bill.getGrbgBillAmount().doubleValue() : 0.0,
+//        "https://citizenseva.hp.gov.in/egov-url-shortening?id=nob"
+//    );
+    
     return String.format(
-        "Dear %s, your property bill vide property id %s for the period %s/%s "
-        + "amounting to Rs %.1f has been generated on CitizenSeva portal. "
-        + "Please pay on CitizenSeva Portal or using link %s .  CitizenSeva H.P.",
-        bill.getOwnerName(),
-        billId,
-        bill.getFromDate(),
-        bill.getToDate(),
-        bill.getGrbgBillAmount() != null ? bill.getGrbgBillAmount().doubleValue() : 0.0,
-        "https://citizenseva.hp.gov.in/egov-url-shortening?id=nob"
-    );
+    	    "Dear %s, your Property Tax bill for FY %s (Property ID %s) "
+    	    + "is generated for amount Rs.%s after rebate valid for 15 days "
+    	    + "from bill date. Pay: %s. Citizen Seva H.P.",
+    	    
+    	    bill.getOwnerName(),
+    	    bill.getFinancialYear(), 
+    	    billId,
+    	    bill.getGrbgBillAmount() != null ? bill.getGrbgBillAmount().doubleValue() : 0.0,
+    	    "https://citizenseva.hp.gov.in/egov-url-shortening?id=nob"
+    	);
 }
 }
