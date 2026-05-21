@@ -1385,6 +1385,10 @@ public class PropertyService {
 			if (bill.getBillDetails() == null) {
 				continue;
 			}
+			
+			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
+			    continue;
+			}
 
 			for (BillDetail detail : bill.getBillDetails()) {
 				Long existingFrom = detail.getFromPeriod();
