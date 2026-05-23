@@ -2280,11 +2280,21 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			garbapplicationNos.add(childGrbgAccount.getGrbgApplicationNumber());
 
 		}
-		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
-				.grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
-				.year(grbgTaxCalculatorMonthTracker.getYear())
-				.build();
+		
+		GrbgBillTrackerSearchCriteria.GrbgBillTrackerSearchCriteriaBuilder trackerBuilder  =
+		        GrbgBillTrackerSearchCriteria.builder()
+		        .type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+		        .grbgApplicationIds(garbapplicationNos);
+
+		if (!StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getMonth())
+		        && !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getYear())) {
+			trackerBuilder.month(grbgTaxCalculatorMonthTracker.getMonth())
+		           .year(grbgTaxCalculatorMonthTracker.getYear());
+		} else {
+			trackerBuilder.billIds(Collections.singleton(grbgTaxCalculatorMonthTracker.getBillId()));
+		}
+
+		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = trackerBuilder.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
 		
