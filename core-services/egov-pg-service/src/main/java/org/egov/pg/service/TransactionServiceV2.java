@@ -122,6 +122,7 @@ public class TransactionServiceV2 {
 
 			if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
+				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
 				paymentsService.registerPayment(
 						TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
 			}
