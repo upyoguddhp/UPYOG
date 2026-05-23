@@ -154,7 +154,7 @@ serviceMaps:
              type: JSON
              dbType: JSONB
              
-           - jsonPath: $.Transaction.razorpayResponse   # ✅ ADD
+           - jsonPath: $.Transaction.razorpayResponse
              type: JSON
              dbType: JSONB
 

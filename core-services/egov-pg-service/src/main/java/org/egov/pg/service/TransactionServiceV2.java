@@ -266,11 +266,9 @@ public class TransactionServiceV2 {
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
 
-				// Fetch payment response from gateway
+				// Set payment response from gateway
 				if (razorpayRawResponse != null) {
-					newTxn.setRazorpayResponse(ObjectMapper.convertValue(razorpayRawResponse,
-							new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
-							}));
+				    newTxn.setRazorpayResponse(razorpayRawResponse);
 				}
 
 			}
