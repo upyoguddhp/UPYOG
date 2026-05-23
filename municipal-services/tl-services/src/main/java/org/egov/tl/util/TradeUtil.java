@@ -2,6 +2,7 @@ package org.egov.tl.util;
 
 import static org.egov.tl.util.TLConstants.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -200,8 +201,10 @@ public class TradeUtil {
     public StringBuilder getMdmsSearchUrl() {
         return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
     }
-
-
+    //mdmsv2
+    public StringBuilder getMdmsv2SearchUrl() {
+        return new StringBuilder().append(config.getMdmsHostv2()).append(config.getMdmsEndpointv2());
+    }
     /**
      * Creates map containing the startTime and endTime of the given tradeLicense
      * @param license The create or update TradeLicense request
@@ -316,10 +319,12 @@ public class TradeUtil {
         Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
         return result;
     }
-
-
-
-
+    //MDMSV2 call
+    public Object mDMSCallv2(RequestInfo requestInfo, String tenantId) {
+    	MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo,tenantId);
+        Object result = serviceRequestRepository.fetchResult(getMdmsv2SearchUrl(), mdmsCriteriaReq);
+        return result;
+    }
     public Object mDMSCallForBPA(RequestInfo requestInfo,String tenantId,String tradetype){
 
 
@@ -427,8 +432,13 @@ public class TradeUtil {
     	List<MasterDetail> masterDetails = new ArrayList<>();
     	
     	// add criteria FeeStructure
+    	String masterName = TLConstants.APPLICATION_TYPE_RENEWAL
+                .equalsIgnoreCase(tradeLicense.getApplicationType())
+                ? TLConstants.RENEWAL_FEE_STRUCTURE
+                : TLConstants.FEE_STRUCTURE;
+    	
     	MasterDetail masterDetail = MasterDetail.builder()
-    			.name(TLConstants.FEE_STRUCTURE)
+    			.name(masterName)
     			.filter("[?((@."+STRUCTURE_OF+" =~ /.*"+SCALE_OF_BUSINESS+".*?/ && @."+TYPE+" == \""+scaleOfBusiness+"\" && @."+PERIOD_OF_LICENSE+" == "+periodOfLicense.toString()+" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+ZONE+".*?/ && @.type == \""+zone+"\" && @."+TENANT_ID+" == \""+tenantId+"\") || (@."+STRUCTURE_OF+" =~ /.*"+TRADE_CATEGORY+".*?/ && @."+TYPE+" == \""+tradeCategory+"\" && @."+TENANT_ID+" == \""+tenantId+"\") )]")
     			.build();
     	masterDetails.add(masterDetail);
@@ -457,5 +467,5 @@ public class TradeUtil {
         MdmsResponse mdmsResponse = objectMapper.convertValue(result, MdmsResponse.class);
         return mdmsResponse;
     }
-
+    
 }

@@ -1,6 +1,8 @@
 package org.egov.pt.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,12 +22,16 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.Arrays;
+
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.CalculateTaxRequest;
 import org.egov.pt.models.CalculateTaxResponse;
+import org.egov.pt.models.CalculateTaxPreviewResponse;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyBillFailure;
@@ -55,6 +61,30 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.pt.repository.RestCallRepository;
 import org.springframework.beans.factory.annotation.Value;
+import java.util.Comparator;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.egov.pt.repository.PropertyRepository;
+
+//pdf
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.egov.pt.service.AlfrescoService;
+import org.egov.pt.web.contracts.alfresco.DmsResponse;
+import org.egov.pt.web.contracts.alfresco.DmsRequest;
+import org.egov.pt.util.PTConstants;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.BillIdRequest;
+
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+
+
+import java.io.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -85,340 +115,782 @@ public class PropertySchedulerService {
 
 	@Autowired
 	private PropertyConfiguration propertyConfiguration;
-	
+
 	@Autowired
 	private RestCallRepository restCallRepository;
-	
+
+	@Autowired
+	private AlfrescoService alfrescoService;
+
 	@Value("${egov.sms.host}")
 	private String smsHost;
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
 
+//add new
+	@Autowired
+	private PropertyRepository repository;
+
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
-    List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
+		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
 
-    JsonNode ulbModules = null;
-    JsonNode propertyTaxRateModules = null;
-    JsonNode zones = null;
-    JsonNode buildingStructures = null;
-    JsonNode buildingEstablishmentYears = null;
-    JsonNode buildingPurposes = null;
-    JsonNode buildingUses = null;
-    JsonNode overAllRebatePercentages = null;
-    JsonNode earlyPaymentRebatePercentages = null;
-    JsonNode propertyTaxRates = null;
+		Boolean isBilling = false;
+		JsonNode ulbModules = null;
+		JsonNode propertyTaxRateModules = null;
+		JsonNode propertyTaxLandRateModules = null;
+		JsonNode zones = null;
+		JsonNode buildingStructures = null;
+		JsonNode buildingEstablishmentYears = null;
+		JsonNode buildingPurposes = null;
+		JsonNode buildingUses = null;
+		JsonNode overAllRebatePercentages = null;
+		JsonNode earlyPaymentRebatePercentages = null;
+		JsonNode propertyTaxRates = null;
+		JsonNode propertyTaxLandRates = null;
 
-    BigDecimal days = calculateDays(calculateTaxRequest);
+		BigDecimal days = calculateDays(calculateTaxRequest);
 
-    Map<String, Set<String>> errorMap = new HashMap<>();
+		Map<String, Set<String>> errorMap = new HashMap<>();
 
-    MdmsResponse mdmsResponse = mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), null);
+		MdmsResponse mdmsResponse = mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), null);
 
-    if (mdmsResponse != null && mdmsResponse.getMdmsRes() != null
-            && mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS) != null) {
+		if (mdmsResponse != null && mdmsResponse.getMdmsRes() != null
+				&& mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS) != null) {
 
-        ulbModules = objectMapper.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS));
-        propertyTaxRateModules = objectMapper
-                .valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE));
+			ulbModules = objectMapper.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS));
+			propertyTaxRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE));
 
-        zones = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_ZONES));
-        buildingStructures = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE));
-        buildingEstablishmentYears = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR));
-        buildingPurposes = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE));
-        buildingUses = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE));
-        overAllRebatePercentages = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE));
-        earlyPaymentRebatePercentages = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE));
-        propertyTaxRates = objectMapper.valueToTree(propertyTaxRateModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE));
-    }
+			zones = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_ZONES));
+			buildingStructures = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE));
+			buildingEstablishmentYears = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR));
+			buildingPurposes = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE));
+			buildingUses = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE));
+			overAllRebatePercentages = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE));
+			earlyPaymentRebatePercentages = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE));
+			propertyTaxRates = objectMapper
+					.valueToTree(propertyTaxRateModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE));
+			propertyTaxLandRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE_LAND));
+			propertyTaxLandRates = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND));
+		}
 
-    List<Property> properties = getProperties(calculateTaxRequest);
-    properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+		List<Property> properties = getProperties(calculateTaxRequest);
+		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
 
-    for (Property property : properties) {
+		for (Property property : properties) {
 
-        ArrayNode trackeradditionalDetails = objectMapper.createArrayNode();
-        BigDecimal totalPropertyTax = BigDecimal.ZERO;
-        BigDecimal oneDayPropertyTax = BigDecimal.ZERO;
-        BigDecimal finalPropertyTax = BigDecimal.ZERO;
-        BigDecimal rebateAmount = BigDecimal.ZERO;
-        BigDecimal propertyTaxWithoutRebate = BigDecimal.ZERO;
-        String ulbName = property.getTenantId().split("\\.")[1];
-        JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+			if (!Boolean.TRUE.equals(property.getIsBilling())) {
+				log.info("Skipping tax calculation for property {} as isBilling={}", property.getPropertyId(),
+						property.getIsBilling());
+				continue;
+			}
 
-        for (Unit unit : property.getUnits()) {
-            BigDecimal totalRateableValue = BigDecimal.ZERO;
-            BigDecimal netRateableValue = BigDecimal.ZERO;
-            BigDecimal structuralFactor = null;
-            BigDecimal ageFactor = null;
-            BigDecimal occupancyFactor = null;
-            BigDecimal useFactor = null;
-            BigDecimal locationFactor = null;
-            BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
-            BigDecimal oAndMRebatePercentage = null;
-            BigDecimal propertyTaxRatePercentage = null;
-            BigDecimal propertyTax = BigDecimal.ZERO;
+			ArrayNode trackeradditionalDetails = objectMapper.createArrayNode();
+			BigDecimal totalPropertyTax = BigDecimal.ZERO;
+			BigDecimal oneDayPropertyTax = BigDecimal.ZERO;
+			BigDecimal finalPropertyTax = BigDecimal.ZERO;
+			BigDecimal rebateAmount = BigDecimal.ZERO;
+			BigDecimal propertyTaxWithoutRebate = BigDecimal.ZERO;
+			String ulbName = property.getTenantId().split("\\.")[1];
+			JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
 
-            Set<String> errorSet = new HashSet<>();
-            JsonNode unitAdditionalDetails = objectMapper.valueToTree(unit.getAdditionalDetails());
+			for (Unit unit : property.getUnits()) {
+				BigDecimal totalRateableValue = BigDecimal.ZERO;
+				BigDecimal netRateableValue = BigDecimal.ZERO;
+				BigDecimal structuralFactor = null;
+				BigDecimal ageFactor = null;
+				BigDecimal occupancyFactor = null;
+				BigDecimal useFactor = null;
+				BigDecimal locationFactor = null;
+				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
+				BigDecimal oAndMRebatePercentage = null;
+				BigDecimal propertyTaxRatePercentage = null;
+				BigDecimal propertyTaxLandRatePercentage = null;
+				BigDecimal propertyTax = BigDecimal.ZERO;
 
-            // Populate factors from MDMS
-            for (JsonNode buildingStructure : objectMapper.valueToTree(buildingStructures)) {
-                if (ulbName.equalsIgnoreCase(buildingStructure.get("ulbName").asText())
-                        && buildingStructure.get("structureType").asText()
-                                .equalsIgnoreCase(unitAdditionalDetails.get("propBuildingType").asText())) {
-                    structuralFactor = new BigDecimal(buildingStructure.get("rate").asText());
-                }
-            }
-            for (JsonNode buildingEstablishmentYear : objectMapper.valueToTree(buildingEstablishmentYears)) {
-                if (ulbName.equalsIgnoreCase(buildingEstablishmentYear.get("ulbName").asText())
-                        && buildingEstablishmentYear.get("yearRange").asText().equalsIgnoreCase(
-                                ulbName + "." + unitAdditionalDetails.get("propYearOfCons").asText())) {
-                    ageFactor = new BigDecimal(buildingEstablishmentYear.get("rate").asText());
-                }
-            }
-            for (JsonNode buildingPurpose : objectMapper.valueToTree(buildingPurposes)) {
-                if (ulbName.equalsIgnoreCase(buildingPurpose.get("ulbName").asText())
-                        && buildingPurpose.get("purposeName").asText()
-                                .equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)) {
-                    occupancyFactor = new BigDecimal(buildingPurpose.get("rate").asText());
-                }
-            }
-            for (JsonNode buildingUse : objectMapper.valueToTree(buildingUses)) {
-                if (ulbName.equalsIgnoreCase(buildingUse.get("ulbName").asText())
-                        && buildingUse.get("useOfBuilding").asText().equalsIgnoreCase(
-                                ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
-                    useFactor = new BigDecimal(buildingUse.get("rate").asText());
-                }
-            }
-            for (JsonNode zone : objectMapper.valueToTree(zones)) {
-                if (ulbName.equalsIgnoreCase(zone.get("ulbName").asText())
-                        && addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(zone.get("zoneName").asText())) {
-                    locationFactor = new BigDecimal(zone.get("propertyRate").asText());
-                }
-            }
-            for (JsonNode overAllRebatePercentage : objectMapper.valueToTree(overAllRebatePercentages)) {
-                if (ulbName.equalsIgnoreCase(overAllRebatePercentage.get("ulbName").asText())) {
-                    oAndMRebatePercentage = new BigDecimal(overAllRebatePercentage.get("rate").asText());
-                }
-            }
+				Set<String> errorSet = new HashSet<>();
+				JsonNode unitAdditionalDetails = objectMapper.valueToTree(unit.getAdditionalDetails());
 
-            // Validate factors
-            if (structuralFactor == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + " (F2) is missing in mdms");
-            if (ageFactor == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + " (F3) is missing in mdms");
-            if (occupancyFactor == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + " (F4) is missing in mdms");
-            if (useFactor == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + " (F5) is missing in mdms");
-            if (locationFactor == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
-            if (oAndMRebatePercentage == null) errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
+				// Populate factors from MDMS
+				for (JsonNode buildingStructure : objectMapper.valueToTree(buildingStructures)) {
+					if (ulbName.equalsIgnoreCase(buildingStructure.get("ulbName").asText())
+							&& buildingStructure.get("structureType").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propBuildingType").asText())) {
+						structuralFactor = new BigDecimal(buildingStructure.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingEstablishmentYear : objectMapper.valueToTree(buildingEstablishmentYears)) {
+					if (ulbName.equalsIgnoreCase(buildingEstablishmentYear.get("ulbName").asText())
+							&& buildingEstablishmentYear.get("yearRange").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("propYearOfCons").asText())) {
+						ageFactor = new BigDecimal(buildingEstablishmentYear.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingPurpose : objectMapper.valueToTree(buildingPurposes)) {
+					if (ulbName.equalsIgnoreCase(buildingPurpose.get("ulbName").asText())
+							&& buildingPurpose.get("purposeName").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)) {
+						occupancyFactor = new BigDecimal(buildingPurpose.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingUse : objectMapper.valueToTree(buildingUses)) {
+					if (ulbName.equalsIgnoreCase(buildingUse.get("ulbName").asText())
+							&& buildingUse.get("useOfBuilding").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
+						useFactor = new BigDecimal(buildingUse.get("rate").asText());
+					}
+				}
+				for (JsonNode zone : objectMapper.valueToTree(zones)) {
+					if (ulbName.equalsIgnoreCase(zone.get("ulbName").asText()) && addressAdditionalDetails.get("zone")
+							.asText().equalsIgnoreCase(zone.get("zoneName").asText())) {
+						locationFactor = new BigDecimal(zone.get("propertyRate").asText());
+					}
+				}
+				for (JsonNode overAllRebatePercentage : objectMapper.valueToTree(overAllRebatePercentages)) {
+					if (ulbName.equalsIgnoreCase(overAllRebatePercentage.get("ulbName").asText())) {
+						oAndMRebatePercentage = new BigDecimal(overAllRebatePercentage.get("rate").asText());
+					}
+				}
 
-            // Calculate totalRateableValue
-            if (structuralFactor != null && ageFactor != null && occupancyFactor != null && useFactor != null
-                    && locationFactor != null && property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
-                totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
-                        .multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
-                        .multiply(useFactor).multiply(locationFactor);
-            } else if (property.getPropertyType().equalsIgnoreCase("VACANT") && locationFactor != null) {
-                totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
-                        .multiply(locationFactor);
-            } else {
-                errorSet.add("PropertyType issue factor value is missing in mdms");
-            }
+				// Validate factors
+				if (structuralFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + " (F2) is missing in mdms");
+				if (ageFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(
+							PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + " (F3) is missing in mdms");
+				if (occupancyFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + " (F4) is missing in mdms");
+				if (useFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + " (F5) is missing in mdms");
+				if (locationFactor == null )
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
+				if (oAndMRebatePercentage == null)
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
 
-            // Net rateable value after rebate
-            if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null) {
-                oAndMRebateAmount = totalRateableValue.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
-                netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
-            }
+				// Calculate totalRateableValue
+				if (structuralFactor != null && ageFactor != null && occupancyFactor != null && useFactor != null
+						&& locationFactor != null && property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
+					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+							.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
+							.multiply(useFactor).multiply(locationFactor);
+				} else if (property.getPropertyType().equalsIgnoreCase("VACANT") && locationFactor != null) {
+					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+							.multiply(locationFactor);
+				} else {
+					errorSet.add("PropertyType issue factor value is missing in mdms");
+				}
 
-            // Find property tax rate
-            for (JsonNode propertyTaxRate : propertyTaxRates) {
-                if (ulbName.equalsIgnoreCase(propertyTaxRate.get("ulbName").asText())
-                        && addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
-                                propertyTaxRate.get("zoneName").asText().replaceFirst(ulbName + ".", ""))
-                        && propertyTaxRate.get("purposeName").asText()
-                                .equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)
-                        && propertyTaxRate.get("useOfBuilding").asText().equalsIgnoreCase(
-                                ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
+				// Net rateable value after rebate
+				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null) {
+					oAndMRebateAmount = totalRateableValue
+							.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+					netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+				}
 
-                    String propertyAreaString = propertyTaxRate.get("propertyArea").asText();
-                    BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+				// Find property tax rate
+				for (JsonNode propertyTaxRate : propertyTaxRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxRate.get("zoneName").asText().replaceFirst(ulbName + ".", ""))
+							&& propertyTaxRate.get("purposeName").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)
+							&& propertyTaxRate.get("useOfBuilding").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
 
-                    if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
-                        propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
-                    }
-                }
-            }
+						String propertyAreaString = propertyTaxRate.get("propertyArea").asText();
+						BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
 
-            if (!BigDecimal.ZERO.equals(netRateableValue) && propertyTaxRatePercentage != null) {
-                propertyTax = netRateableValue.multiply(propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
-            } else {
-                errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
-            }
+						if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+							propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+						}
+					}
+				}
+				
+				for (JsonNode propertyTaxLandRate : propertyTaxLandRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxLandRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxLandRate.get("zone").asText().replaceFirst(ulbName + ".", ""))
+							) {
 
-            if (!BigDecimal.ZERO.equals(propertyTax)) {
-                totalPropertyTax = totalPropertyTax.add(propertyTax);
-            }
+						propertyTaxLandRatePercentage = new BigDecimal(propertyTaxLandRate.get("rate").asText());
+						
+					}
+				}
 
-            if (BigDecimal.ZERO.equals(totalPropertyTax)) {
-                errorSet.add("Calculated tax is " + totalPropertyTax);
-            }
+				if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxRatePercentage != null 
+				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
 
-            if (!CollectionUtils.isEmpty(errorSet)) {
-                errorMap.put(property.getPropertyId(), errorSet);
-            } else {
-                // Add details for tracker
-                BigDecimal taxPerDay = propertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
-                BigDecimal propertyTaxGenerated = taxPerDay.multiply(days);
-                ObjectNode node = objectMapper.createObjectNode();
+				    // Case 1: NOT VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
 
-                node.put("propertyType", property.getPropertyType())
-                        .put(PTConstants.MDMS_MASTER_DETAILS_ZONES+"(f1)", locationFactor != null ? locationFactor.doubleValue() : 0)
-                        .put(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE, oAndMRebatePercentage != null ? oAndMRebatePercentage.doubleValue() : 0)
-                        .put(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE, propertyTaxRatePercentage != null ? propertyTaxRatePercentage.doubleValue() : 0)
-                        .put("netRateableValue", netRateableValue.doubleValue())
-                        .put("propertyArea", unitAdditionalDetails.get("propArea").asText())
-                        .put("propertyTaxCalculated", propertyTax.doubleValue())
-                        .put("propertyTaxGenerated", propertyTaxGenerated.doubleValue())
-                        .put("days", days.doubleValue())
-                        .put("unitId", unit.getId());
+				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxLandRatePercentage != null 
+				        && property.getPropertyType().equalsIgnoreCase("VACANT")) {
 
-                if (property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
-                    node.put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE+"(f2)", structuralFactor != null ? structuralFactor.doubleValue() : 0)
-                        .put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR+"(f3)", ageFactor != null ? ageFactor.doubleValue() : 0)
-                        .put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE+"(f4)", occupancyFactor != null ? occupancyFactor.doubleValue() : 0)
-                        .put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE+"(f5)", useFactor != null ? useFactor.doubleValue() : 0);
-                }
+				    // Case 2: VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxLandRatePercentage.divide(BigDecimal.valueOf(100)));
 
-                trackeradditionalDetails.add(node);
-            }
-        }
+				} else {
+				    // Common error for both cases
+				    if (property.getPropertyType().equalsIgnoreCase("VACANT")) {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND + " is missing in mdms");
+				    } else {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    }
+				}
 
-        if (!errorMap.containsKey(property.getPropertyId()) && !BigDecimal.ZERO.equals(totalPropertyTax)) {
+				if (!BigDecimal.ZERO.equals(propertyTax)) {
+					totalPropertyTax = totalPropertyTax.add(propertyTax);
+				}
 
-            oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
-            finalPropertyTax = oneDayPropertyTax.multiply(days);
-            propertyTaxWithoutRebate = finalPropertyTax;
+				if (BigDecimal.ZERO.equals(totalPropertyTax)) {
+					errorSet.add("Calculated tax is " + totalPropertyTax);
+				}
 
-            // early payment rebate
-            BigDecimal epRebatePercentage = null;
-            for (JsonNode earlyPaymentRebatePercentage : objectMapper.valueToTree(earlyPaymentRebatePercentages)) {
-                if (ulbName.equalsIgnoreCase(earlyPaymentRebatePercentage.get("ulbName").asText())) {
-                    epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
-                }
-            }
-            if (epRebatePercentage != null) {
-                rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
-                finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
-            }
+				if (!CollectionUtils.isEmpty(errorSet)) {
+					errorMap.put(property.getPropertyId(), errorSet);
+				} else {
+					// Add details for tracker
+					BigDecimal taxPerDay = propertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
+					BigDecimal propertyTaxGenerated = taxPerDay.multiply(days);
+					ObjectNode node = objectMapper.createObjectNode();
 
-            BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
+					node.put("propertyType", property.getPropertyType())
+							.put(PTConstants.MDMS_MASTER_DETAILS_ZONES + "(f1)",
+									locationFactor != null ? locationFactor.doubleValue() : 0)
+							.put(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE,
+									oAndMRebatePercentage != null ? oAndMRebatePercentage.doubleValue() : 0)
+							.put(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE,
+									propertyTaxRatePercentage != null ? propertyTaxRatePercentage.doubleValue() : 0)
+							.put("netRateableValue", netRateableValue.doubleValue())
+							.put("propertyArea", unitAdditionalDetails.get("propArea").asText())
+							.put("propertyTaxCalculated", propertyTax.doubleValue())
+							.put("propertyTaxGenerated", propertyTaxGenerated.doubleValue())
+							.put("days", days.doubleValue()).put("unitId", unit.getId());
 
-            if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
+					if (property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
+						node.put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + "(f2)",
+								structuralFactor != null ? structuralFactor.doubleValue() : 0)
+								.put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + "(f3)",
+										ageFactor != null ? ageFactor.doubleValue() : 0)
+								.put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + "(f4)",
+										occupancyFactor != null ? occupancyFactor.doubleValue() : 0)
+								.put(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + "(f5)",
+										useFactor != null ? useFactor.doubleValue() : 0);
+					}
 
-                PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
-                        .enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest, finalPropertyTax,
-                                trackeradditionalDetails, billResponse.getBill(), rebateAmount,
-                                propertyTaxWithoutRebate);
+					trackeradditionalDetails.add(node);
+				}
+			}
 
-                PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property, calculateTaxRequest,billResponse,null);
-                propertyService.removePtBillFailure(propertyBillFailure);
+			if (!errorMap.containsKey(property.getPropertyId()) && !BigDecimal.ZERO.equals(totalPropertyTax)) {
 
-                PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
-                        .saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
+				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
+				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				propertyTaxWithoutRebate = finalPropertyTax;
 
-                taxCalculatorTrackers.add(ptTaxCalculatorTracker);
+				// early payment rebate
+				BigDecimal epRebatePercentage = null;
+				for (JsonNode earlyPaymentRebatePercentage : objectMapper.valueToTree(earlyPaymentRebatePercentages)) {
+					if (ulbName.equalsIgnoreCase(earlyPaymentRebatePercentage.get("ulbName").asText())) {
+						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
+					}
+				}
+				if (epRebatePercentage != null) {
+					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
+					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
+				}
+				
+				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
-                // 1️ Notification flow
-                try {
-                    notificationService.triggerNotificationsGenerateBill(
-                            ptTaxCalculatorTracker,
-                            billResponse.getBill().get(0),
-                            ptTaxCalculatorTrackerRequest.getRequestInfo()
-                    );
-                } catch (Exception ex) {
-                    log.error("Notification flow failed for property billId {}", billResponse.getBill().get(0).getId(), ex);
-                }
+				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
 
-                // SMS tracker creation flow
-                try {
-                    if (CollectionUtils.isEmpty(property.getOwners())) {
-                        throw new RuntimeException("No owners found for property " + property.getPropertyId());
-                    }
+					PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property,
+							calculateTaxRequest, billResponse, null);
+					propertyService.removePtBillFailure(propertyBillFailure);
+					List<BillDetail> relevantBillDetails = billResponse.getBill().stream()
+							.flatMap(bill -> bill.getBillDetails().stream()).filter(bd -> {
+								long from = bd.getFromPeriod();
+								long to = bd.getToPeriod();
+								long fyFrom = calculateTaxRequest.getFromDate().getTime();
+								long fyTo = calculateTaxRequest.getToDate().getTime();
+								return (from >= fyFrom && to <= fyTo);
+							}).collect(Collectors.toList());
 
-                    ObjectNode smsRequestJson = notificationService.buildGeneratePropertyBillSmsRequest(
-                            property, billResponse.getBill().get(0), ptTaxCalculatorTracker);
-                    
-                    log.info("SMS Request ObjectNode : {}", smsRequestJson);
+					for (BillDetail billDetail : relevantBillDetails) {
+						String demandId = billDetail.getDemandId();
+						String ward = null;
 
-                    // Convert ObjectNode to Map
-                    Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson, Map.class);
+						if (property.getAddress() != null && property.getAddress().getAdditionalDetails() != null) {
+							JsonNode addrDetails = objectMapper
+									.valueToTree(property.getAddress().getAdditionalDetails());
+							JsonNode wardNode = addrDetails.get("wardNumber");
 
-                    
-                    log.info("SMS Request Map : {}", smsRequestMap);
-                    
-                    StringBuilder smsTrackerUri = new StringBuilder();
-                    smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+							if (wardNode != null && !wardNode.isNull()) {
+								ward = wardNode.asText();
+							}
+						}
+						Bill parentBill = billResponse.getBill().stream()
+								.filter(b -> b.getBillDetails().contains(billDetail)).findFirst().orElse(null);
 
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-                    String fromDateStr = formatter.format(calculateTaxRequest.getFromDate());
-                    String toDateStr = formatter.format(calculateTaxRequest.getToDate());
-                    
-                    
-                    String ward = null;
-                    if (property.getAddress() != null
-                            && property.getAddress().getAdditionalDetails() != null) {
-                        JsonNode wardNumberNode = addressAdditionalDetails.get("wardNumber");
+						PtTaxCalculatorTrackerRequest trackerRequest = enrichmentService
+								.enrichTaxCalculatorTrackerCreateRequest(property, calculateTaxRequest,
+										finalPropertyTax, trackeradditionalDetails,
+										Collections.singletonList(parentBill), rebateAmount, propertyTaxWithoutRebate,
+										demandId, ward);
 
-                        if (wardNumberNode != null && !wardNumberNode.isNull()) {
-                            ward = wardNumberNode.asText();
-                        }
-                    }
-                    
-                    Map<String, Object> smsTrackerRequest = new HashMap<>();
-                    smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
-                    smsTrackerRequest.put("amount", finalPropertyTax);
-                    smsTrackerRequest.put("applicationNo", property.getPropertyId());
-                    smsTrackerRequest.put("tenantId", property.getTenantId());
-                    smsTrackerRequest.put("service", "PROPERTY");
-                    smsTrackerRequest.put("fromDate", fromDateStr);
-                    smsTrackerRequest.put("toDate", toDateStr);
-                    smsTrackerRequest.put("createdBy", "system");
-                    smsTrackerRequest.put("createdTime", System.currentTimeMillis());
-                    smsTrackerRequest.put("billId", billResponse.getBill().get(0).getId());
-                    smsTrackerRequest.put("smsStatus", false);
-                    smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
-                    smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
-                    smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
-                    smsTrackerRequest.put("smsRequest", smsRequestMap);
-                    smsTrackerRequest.put("smsResponse", null);
-                    smsTrackerRequest.put("ward", ward);
-                    
+						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
+						taxCalculatorTrackers.add(tracker);
+						try {
+							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
+									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
+									.billStatus(new HashSet<>(Arrays.asList(
+										    BillStatus.ACTIVE, 
+										    BillStatus.PARTIALLY_PAID
+										)))
+									.build();
 
-                    Object response = restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
-                    log.info("SMS Tracker Response : {}", response);
-                    log.info("SMS tracker entry created for property billId {}", billResponse.getBill().get(0).getId());
-                    
-                    log.info("SMS Tracker URI : {}", smsTrackerUri.toString());
-                    log.info("SMS Tracker Request JSON : {}",smsTrackerRequest);
+							List<PtTaxCalculatorTracker> prevTrackers = propertyService
+									.getTaxCalculatedProperties(prevCriteria);
 
-                } catch (Exception e) {
-                    log.error("SMS tracker creation failed for property billId {}", billResponse.getBill().get(0).getId(), e);
-                }
+							if (!CollectionUtils.isEmpty(prevTrackers)) {
+								for (PtTaxCalculatorTracker prev : prevTrackers) {
+									if (prev.getUuid() != null && prev.getUuid().equals(tracker.getUuid()))
+										continue;
+									if (prev.getBillStatus() == BillStatus.PAID)
+										continue;
 
-            } else {
-                createFailureLog(property, calculateTaxRequest, billResponse, null);
-            }
-        } else {
-            createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
-        }
-    }
+									prev.setBillStatus(BillStatus.EXPIRED);
 
-    return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).build();
-}
-	
-	private void createFailureLog(Property property,CalculateTaxRequest generateBillRequest, BillResponse billResponse,Set<String> errorMap) {
-		PropertyBillFailure propertyBillFailure	= enrichmentService.enrichPtBillFailure(property, generateBillRequest,billResponse,errorMap);
+									PtTaxCalculatorTrackerRequest prevUpdateRequest = enrichmentService
+											.enrichTaxCalculatorTrackerUpdateRequest(prev,
+													trackerRequest.getRequestInfo());
+
+									try {
+										propertyService.updatePtTaxCalculatorTracker(prevUpdateRequest);
+										log.info("Marked previous tracker {} as EXPIRED for property {}",
+												prev.getUuid(), property.getPropertyId());
+									} catch (Exception e) {
+										log.error("Failed to update previous tracker {} for property {}",
+												prev.getUuid(), property.getPropertyId(), e);
+									}
+								}
+							}
+						} catch (Exception ex) {
+							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(),
+									ex);
+						}
+
+						// Notification
+						try {
+							notificationService.triggerNotificationsGenerateBill(tracker, parentBill,
+									trackerRequest.getRequestInfo());
+						} catch (Exception ex) {
+							log.error("Notification failed for billId {}", parentBill.getId(), ex);
+						}
+
+						// SMS Tracker (same as your existing code)
+						try {
+							if (CollectionUtils.isEmpty(property.getOwners())) {
+								throw new RuntimeException("No owners found for property " + property.getPropertyId());
+							}
+
+							ObjectNode smsRequestJson = notificationService
+									.buildGeneratePropertyBillSmsRequest(property, parentBill, tracker);
+
+							Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,
+									Map.class);
+
+							StringBuilder smsTrackerUri = new StringBuilder();
+							smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+
+							Map<String, Object> smsTrackerRequest = new HashMap<>();
+							smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
+							smsTrackerRequest.put("amount", finalPropertyTax);
+							smsTrackerRequest.put("applicationNo", property.getPropertyId());
+							smsTrackerRequest.put("tenantId", property.getTenantId());
+							smsTrackerRequest.put("service", "PROPERTY");
+							smsTrackerRequest.put("fromDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getFromDate()));
+							smsTrackerRequest.put("toDate",
+									new SimpleDateFormat("dd-MM-yyyy").format(calculateTaxRequest.getToDate()));
+							smsTrackerRequest.put("createdBy", "system");
+							smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+							smsTrackerRequest.put("billId", parentBill.getId());
+							smsTrackerRequest.put("demandId", demandId);
+							smsTrackerRequest.put("smsStatus", false);
+							smsTrackerRequest.put("additionalDetail", trackeradditionalDetails);
+							smsTrackerRequest.put("ownerMobileNo", property.getOwners().get(0).getMobileNumber());
+							smsTrackerRequest.put("ownerName", property.getOwners().get(0).getName());
+							smsTrackerRequest.put("smsRequest", smsRequestMap);
+							smsTrackerRequest.put("smsResponse", null);
+							smsTrackerRequest.put("ward", ward);
+
+							restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+							log.info("SMS tracker entry created for billId {} demandId {}", parentBill.getId(),
+									demandId);
+
+						} catch (Exception e) {
+							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
+						}
+					}
+				} else {
+					createFailureLog(property, calculateTaxRequest, billResponse, null);
+				}
+
+			
+			} else {
+				createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
+			}
+		}
+
+		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).build();
+	}
+
+	public List<CalculateTaxPreviewResponse> taxCalculatorPreview(CalculateTaxRequest calculateTaxRequest) {
+
+		List<CalculateTaxPreviewResponse> previewResponses = new ArrayList<>();
+
+		JsonNode ulbModules = null;
+		JsonNode propertyTaxRateModules = null;
+		JsonNode propertyTaxLandRateModules = null;
+		JsonNode zones = null;
+		JsonNode buildingStructures = null;
+		JsonNode buildingEstablishmentYears = null;
+		JsonNode buildingPurposes = null;
+		JsonNode buildingUses = null;
+		JsonNode overAllRebatePercentages = null;
+		JsonNode earlyPaymentRebatePercentages = null;
+		JsonNode propertyTaxRates = null;
+		JsonNode propertyTaxLandRates = null;
+		BigDecimal days = calculateDays(calculateTaxRequest);
+
+		Map<String, Set<String>> errorMap = new HashMap<>();
+
+		MdmsResponse mdmsResponse = mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), null);
+		if (mdmsResponse != null && mdmsResponse.getMdmsRes() != null
+				&& mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS) != null) {
+
+			ulbModules = objectMapper.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS));
+			propertyTaxRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE));
+			
+			propertyTaxLandRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE_LAND));
+
+			zones = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_ZONES));
+			buildingStructures = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE));
+			buildingEstablishmentYears = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR));
+			buildingPurposes = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE));
+			buildingUses = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE));
+			overAllRebatePercentages = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE));
+			earlyPaymentRebatePercentages = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE));
+			propertyTaxRates = objectMapper
+					.valueToTree(propertyTaxRateModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE));
+			propertyTaxLandRates = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND));
+		}
+
+		List<Property> properties = getProperties(calculateTaxRequest);
+		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+		Property property = properties.get(0);
+
+		if (Boolean.TRUE.equals(property.getIsBilling())) {
+			log.info("Skipping tax calculation for property {} as isBilling={}", property.getPropertyId(),
+					property.getIsBilling());
+
+			ArrayNode trackeradditionalDetails = objectMapper.createArrayNode();
+			BigDecimal totalPropertyTax = BigDecimal.ZERO;
+			BigDecimal oneDayPropertyTax = BigDecimal.ZERO;
+			BigDecimal finalPropertyTax = BigDecimal.ZERO;
+			BigDecimal rebateAmount = BigDecimal.ZERO;
+			BigDecimal propertyTaxWithoutRebate = BigDecimal.ZERO;
+			String ulbName = property.getTenantId().split("\\.")[1];
+			JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+
+			for (Unit unit : property.getUnits()) {
+				BigDecimal totalRateableValue = BigDecimal.ZERO;
+				BigDecimal netRateableValue = BigDecimal.ZERO;
+				BigDecimal structuralFactor = null;
+				BigDecimal ageFactor = null;
+				BigDecimal occupancyFactor = null;
+				BigDecimal useFactor = null;
+				BigDecimal locationFactor = null;
+				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
+				BigDecimal oAndMRebatePercentage = null;
+				BigDecimal propertyTaxRatePercentage = null;
+				BigDecimal propertyTaxLandRatePercentage = null;
+				BigDecimal propertyTax = BigDecimal.ZERO;
+
+				Set<String> errorSet = new HashSet<>();
+				JsonNode unitAdditionalDetails = objectMapper.valueToTree(unit.getAdditionalDetails());
+
+				// Populate factors from MDMS
+				for (JsonNode buildingStructure : objectMapper.valueToTree(buildingStructures)) {
+					if (ulbName.equalsIgnoreCase(buildingStructure.get("ulbName").asText())
+							&& buildingStructure.get("structureType").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propBuildingType").asText())) {
+						structuralFactor = new BigDecimal(buildingStructure.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingEstablishmentYear : objectMapper.valueToTree(buildingEstablishmentYears)) {
+					if (ulbName.equalsIgnoreCase(buildingEstablishmentYear.get("ulbName").asText())
+							&& buildingEstablishmentYear.get("yearRange").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("propYearOfCons").asText())) {
+						ageFactor = new BigDecimal(buildingEstablishmentYear.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingPurpose : objectMapper.valueToTree(buildingPurposes)) {
+					if (ulbName.equalsIgnoreCase(buildingPurpose.get("ulbName").asText())
+							&& buildingPurpose.get("purposeName").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)) {
+						occupancyFactor = new BigDecimal(buildingPurpose.get("rate").asText());
+					}
+				}
+				for (JsonNode buildingUse : objectMapper.valueToTree(buildingUses)) {
+					if (ulbName.equalsIgnoreCase(buildingUse.get("ulbName").asText())
+							&& buildingUse.get("useOfBuilding").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
+						useFactor = new BigDecimal(buildingUse.get("rate").asText());
+					}
+				}
+				for (JsonNode zone : objectMapper.valueToTree(zones)) {
+					if (ulbName.equalsIgnoreCase(zone.get("ulbName").asText()) && addressAdditionalDetails.get("zone")
+							.asText().equalsIgnoreCase(zone.get("zoneName").asText())) {
+						locationFactor = new BigDecimal(zone.get("propertyRate").asText());
+					}
+				}
+				for (JsonNode overAllRebatePercentage : objectMapper.valueToTree(overAllRebatePercentages)) {
+					if (ulbName.equalsIgnoreCase(overAllRebatePercentage.get("ulbName").asText())) {
+						oAndMRebatePercentage = new BigDecimal(overAllRebatePercentage.get("rate").asText());
+					}
+				}
+
+				// Validate factors
+				if (structuralFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + " (F2) is missing in mdms");
+				if (ageFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(
+							PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + " (F3) is missing in mdms");
+				if (occupancyFactor == null && property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + " (F4) is missing in mdms");
+				if (useFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + " (F5) is missing in mdms");
+				if (locationFactor == null)
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
+				if (oAndMRebatePercentage == null)
+					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
+
+				// Calculate totalRateableValue
+				if (structuralFactor != null && ageFactor != null && occupancyFactor != null && useFactor != null
+						&& locationFactor != null && property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
+					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+							.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
+							.multiply(useFactor).multiply(locationFactor);
+				} else if (property.getPropertyType().equalsIgnoreCase("VACANT") && locationFactor != null) {
+					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+							.multiply(locationFactor);
+				} else {
+					errorSet.add("PropertyType issue factor value is missing in mdms");
+				}
+
+				// Net rateable value after rebate
+				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null) {
+					oAndMRebateAmount = totalRateableValue
+							.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+					netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+				}
+
+				// Find property tax rate
+				for (JsonNode propertyTaxRate : propertyTaxRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxRate.get("zoneName").asText().replaceFirst(ulbName + ".", ""))
+							&& propertyTaxRate.get("purposeName").asText()
+									.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)
+							&& propertyTaxRate.get("useOfBuilding").asText().equalsIgnoreCase(
+									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
+
+						String propertyAreaString = propertyTaxRate.get("propertyArea").asText();
+						BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+
+						if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+							propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+						}
+					}
+				}
+
+				// Find property tax rate for land
+				for (JsonNode propertyTaxLandRate : propertyTaxLandRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxLandRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxLandRate.get("zone").asText().replaceFirst(ulbName + ".", ""))
+							) {
+
+						propertyTaxLandRatePercentage = new BigDecimal(propertyTaxLandRate.get("rate").asText());
+						
+					}
+				}
+				if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxRatePercentage != null 
+				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 1: NOT VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+
+				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxLandRatePercentage != null 
+				        && property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 2: VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxLandRatePercentage.divide(BigDecimal.valueOf(100)));
+
+				} else {
+				    // Common error for both cases
+				    if (property.getPropertyType().equalsIgnoreCase("VACANT")) {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND + " is missing in mdms");
+				    } else {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    }
+				}
+
+				if (!BigDecimal.ZERO.equals(propertyTax)) {
+					totalPropertyTax = totalPropertyTax.add(propertyTax);
+				}
+
+				if (BigDecimal.ZERO.equals(totalPropertyTax)) {
+					errorSet.add("Calculated tax is " + totalPropertyTax);
+				}
+
+				if (!CollectionUtils.isEmpty(errorSet)) {
+					errorMap.put(property.getPropertyId(), errorSet);
+				} else {
+					// Add details for tracker
+					BigDecimal taxPerDay = propertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
+					BigDecimal propertyTaxGenerated = taxPerDay.multiply(days);
+					ObjectNode node = objectMapper.createObjectNode();
+
+					String zoneLabel = null;
+					String structureLabel = null;
+					String ageLabel = null;
+					String occupancyLabel = null;
+					String useLabel = null;
+					String floorNo = unitAdditionalDetails.has("floorNo")
+							? unitAdditionalDetails.get("floorNo").asText()
+							: "0";
+
+					for (JsonNode n : buildingStructures)
+						if (ulbName.equalsIgnoreCase(n.get("ulbName").asText()) && n.get("structureType").asText()
+								.equalsIgnoreCase(unitAdditionalDetails.get("propBuildingType").asText())) {
+
+							structuralFactor = new BigDecimal(n.get("rate").asText());
+							structureLabel = n.get("structureType").asText();
+						}
+
+					for (JsonNode n : buildingEstablishmentYears)
+						if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+								&& n.get("yearRange").asText().equalsIgnoreCase(
+										ulbName + "." + unitAdditionalDetails.get("propYearOfCons").asText())) {
+
+							ageFactor = new BigDecimal(n.get("rate").asText());
+							ageLabel = unitAdditionalDetails.get("propYearOfCons").asText();
+						}
+
+					for (JsonNode n : buildingPurposes)
+						if (ulbName.equalsIgnoreCase(n.get("ulbName").asText()) && n.get("purposeName").asText()
+								.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText() + "." + ulbName)) {
+
+							occupancyFactor = new BigDecimal(n.get("rate").asText());
+							occupancyLabel = unitAdditionalDetails.get("propType").asText();
+						}
+
+					for (JsonNode n : buildingUses)
+						if (ulbName.equalsIgnoreCase(n.get("ulbName").asText())
+								&& n.get("useOfBuilding").asText().equalsIgnoreCase(
+										ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
+
+							useFactor = new BigDecimal(n.get("rate").asText());
+							useLabel = unitAdditionalDetails.get("useOfBuilding").asText();
+						}
+
+					for (JsonNode n : zones)
+						if (ulbName.equalsIgnoreCase(n.get("ulbName").asText()) && addressAdditionalDetails.get("zone")
+								.asText().equalsIgnoreCase(n.get("zoneName").asText())) {
+
+							locationFactor = new BigDecimal(n.get("propertyRate").asText());
+							zoneLabel = n.get("zoneName").asText();
+						}
+
+					node.put("floorNo", floorNo);
+					node.put("zone", zoneLabel);
+					node.put("structure", structureLabel);
+					node.put("age", ageLabel);
+					node.put("occupancy", occupancyLabel);
+					node.put("use", useLabel);
+					node.put("plinthArea", unitAdditionalDetails.get("propArea").asText());
+					node.put("taxAmount", propertyTax.setScale(2, RoundingMode.HALF_UP));
+					trackeradditionalDetails.add(node);
+				}
+			}
+
+			if (!errorMap.containsKey(property.getPropertyId()) && !BigDecimal.ZERO.equals(totalPropertyTax)) {
+
+				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
+				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				propertyTaxWithoutRebate = finalPropertyTax;
+
+				// early payment rebate
+				BigDecimal epRebatePercentage = null;
+				for (JsonNode earlyPaymentRebatePercentage : objectMapper.valueToTree(earlyPaymentRebatePercentages)) {
+					if (ulbName.equalsIgnoreCase(earlyPaymentRebatePercentage.get("ulbName").asText())) {
+						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
+					}
+				}
+				if (epRebatePercentage != null) {
+					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
+					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
+				}
+
+			} else {
+				createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
+			}
+
+			Object address = objectMapper.convertValue(property.getAddress(), Object.class);
+			previewResponses.add(CalculateTaxPreviewResponse.builder().propertyId(properties.get(0).getPropertyId())
+					.tenantId(properties.get(0).getTenantId())
+					.totalAnnualTax(totalPropertyTax.setScale(2, RoundingMode.HALF_UP)).address(address)
+					.propertyTaxWithoutRebate(finalPropertyTax.setScale(2, RoundingMode.HALF_UP))
+					.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP)).days(days)
+					.calculationDetails(trackeradditionalDetails).build());
+
+		}
+
+		return previewResponses;
+	}
+
+	private void createFailureLog(Property property, CalculateTaxRequest generateBillRequest, BillResponse billResponse,
+			Set<String> errorMap) {
+		PropertyBillFailure propertyBillFailure = enrichmentService.enrichPtBillFailure(property, generateBillRequest,
+				billResponse, errorMap);
 		propertyService.saveToPtBillFailure(propertyBillFailure);
 
 	}
@@ -443,8 +915,8 @@ public class PropertySchedulerService {
 			LocalDate currentDate = LocalDate.now();
 			// Calculate the current financial year
 			int currentYear = currentDate.getYear();
-//			int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear
-//					: currentYear - 1;
+//                                          int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear
+//                                                                        : currentYear - 1;
 			int financialYearStart = currentDate.isBefore(LocalDate.of(currentYear, 4, 1)) ? currentYear - 1
 					: currentYear;
 
@@ -466,9 +938,11 @@ public class PropertySchedulerService {
 		Set<String> wardNumbers = calculateTaxRequest.getWardNumbers();
 		Set<String> mobileNumbers = calculateTaxRequest.getMobileNumbers();
 
-		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
-				.status(Collections.singleton(Status.APPROVED)).propertyIds(calculateTaxRequest.getPropertyIds()).isActiveUnit(true)
-				.build();
+		String tenantId = calculateTaxRequest.getUlbNames().stream().findFirst().map(ulb -> "hp." + ulb).orElse(null);
+
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true).tenantId(tenantId)
+				.status(Collections.singleton(Status.APPROVED)).propertyIds(calculateTaxRequest.getPropertyIds())
+				.isActiveUnit(true).build();
 
 		List<Property> properties = propertyService.searchProperty(propertyCriteria,
 				calculateTaxRequest.getRequestInfo(), null);
@@ -523,8 +997,10 @@ public class PropertySchedulerService {
 		finalProperty = properties.stream().filter(property -> {
 			List<PtTaxCalculatorTracker> trackers = ptTaxCalculatorTrackerMap.get(property.getPropertyId());
 
-			return trackers == null || trackers.stream().noneMatch(tracker -> isOverlapping(tracker.getFromDate(),
-					tracker.getToDate(), calculateTaxRequest.getFromDate(), calculateTaxRequest.getToDate()));
+			return trackers == null || trackers.stream().noneMatch(
+					tracker -> tracker.getBillStatus() != BillStatus.CANCELLED && isOverlapping(tracker.getFromDate(),
+							tracker.getToDate(), calculateTaxRequest.getFromDate(), calculateTaxRequest.getToDate()));
+
 		}).collect(Collectors.toList());
 
 		return finalProperty;
@@ -698,7 +1174,7 @@ public class PropertySchedulerService {
 				.orElseGet(HashMap::new);
 	}
 
-	public Map<String, Integer> getPenaltyRateMap(MdmsResponse mdmsResponse) {
+	public Map<String, Double> getPenaltyRateMap(MdmsResponse mdmsResponse) {
 		return Optional.ofNullable(mdmsResponse).map(MdmsResponse::getMdmsRes)
 				.map(mdmsRes -> mdmsRes.get(PTConstants.MDMS_MODULE_ULBS)).map(objectMapper::valueToTree)
 				.map(ulbsNode -> {
@@ -707,8 +1183,26 @@ public class PropertySchedulerService {
 				}).filter(JsonNode::isArray)
 				.map(rebateDaysNode -> StreamSupport.stream(rebateDaysNode.spliterator(), false)
 						.collect(Collectors.toMap(node -> propertyConfiguration.getStateLevelTenantId() + "."
-								+ node.get("ulbName").asText(), node -> node.get("rate").asInt())))
+								+ node.get("ulbName").asText(), node -> node.get("rate").asDouble())))
 				.orElseGet(HashMap::new);
+	}
+	
+	public Map<String, Integer> getPenaltyDaysMap(MdmsResponse mdmsResponse) {
+	    return Optional.ofNullable(mdmsResponse)
+	            .map(MdmsResponse::getMdmsRes)
+	            .map(mdmsRes -> mdmsRes.get(PTConstants.MDMS_MODULE_ULBS))
+	            .map(objectMapper::valueToTree)
+	            .map(ulbsNode -> {
+	                JsonNode jsonNode = (JsonNode) ulbsNode;
+	                return jsonNode.get(PTConstants.MDMS_MASTER_DETAILS_PENALTYDAYS);
+	            })
+	            .filter(JsonNode::isArray)
+	            .map(penaltyDaysNode -> StreamSupport.stream(penaltyDaysNode.spliterator(), false)
+	                    .collect(Collectors.toMap(
+	                            node -> propertyConfiguration.getStateLevelTenantId() + "." + node.get("ulbName").asText(),
+	                            node -> node.get("days").asInt()
+	                    )))
+	            .orElseGet(HashMap::new);
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndDays(String tenantId, int days) {
@@ -718,21 +1212,43 @@ public class PropertySchedulerService {
 				.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
-				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId)
-				.billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
+				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId).type("CYCLIC")
+				.rebateamount(BigDecimal.ZERO).billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
 		return propertyService.getTaxCalculatedProperties(criteria);
 	}
 
-	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days) {
+	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days, int penaltyCycleDays) {
 		long startDateTime = LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant()
 				.toEpochMilli();
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
 				.startDateTime(startDateTime).tenantId(tenantId).billStatus(Collections.singleton(BillStatus.ACTIVE))
+		        .type("CYCLIC") 
 				.build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
+
+		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		return trackers.stream().filter(tracker -> {
+			long createdTime = tracker.getAuditDetails().getCreatedTime();
+			long diffDays = ChronoUnit.DAYS.between(
+					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),
+					Instant.ofEpochMilli(todayStart).atZone(ZoneId.systemDefault()).toLocalDate());
+			
+			int baseCycle = 30;
+	        int buffer = penaltyCycleDays - baseCycle;
+	        if (buffer <= 0) {
+	            return diffDays >= baseCycle && diffDays % baseCycle == 0;
+	        }
+
+	        int firstPenaltyDay = baseCycle + buffer;
+
+	        return diffDays >= firstPenaltyDay &&
+	               (diffDays - firstPenaltyDay) % baseCycle == 0;
+		}).collect(Collectors.toList());
+
 	}
 
 	private Map<String, Bill> fetchBillsByBatch(Set<String> billIds, RequestInfoWrapper requestInfoWrapper) {
@@ -765,6 +1281,7 @@ public class PropertySchedulerService {
 						demandIdToTenantMap.put(billDetail.getDemandId(), bill.getTenantId());
 					}
 				}
+
 			}
 		}
 		return demandIdToTenantMap;
@@ -802,7 +1319,7 @@ public class PropertySchedulerService {
 
 	private List<PtTaxCalculatorTracker> processTrackers(String constantValue, List<PtTaxCalculatorTracker> trackers,
 			Map<String, Bill> billIdBillMap, Map<String, Demand> demandIdToDemandMap,
-			RequestInfoWrapper requestInfoWrapper, Map<String, Integer> tenantIdPenaltyRateMap) {
+			RequestInfoWrapper requestInfoWrapper, Map<String, Double> tenantIdPenaltyRateMap) {
 		List<PtTaxCalculatorTracker> updatedTrackers = new ArrayList<>();
 
 		for (PtTaxCalculatorTracker tracker : trackers) {
@@ -810,13 +1327,22 @@ public class PropertySchedulerService {
 				continue;
 			}
 
+			Map<String, Bill> demandIdBillMap = new HashMap<>();
+
+			billIdBillMap.values().forEach(bill -> {
+				if (bill.getBillDetails() != null) {
+					bill.getBillDetails().forEach(detail -> {
+						demandIdBillMap.put(detail.getDemandId(), bill);
+					});
+				}
+			});
 			Bill bill = billIdBillMap.get(tracker.getBillId());
+
 			if (bill == null || CollectionUtils.isEmpty(bill.getBillDetails())) {
 				log.warn("No bill or bill details found for billId [{}]. Skipping tracker [{}].", tracker.getBillId(),
 						tracker.getUuid());
 				continue;
 			}
-
 			BigDecimal penaltyAmount = BigDecimal.ZERO;
 			BigDecimal newAmount = BigDecimal.ZERO;
 
@@ -830,22 +1356,23 @@ public class PropertySchedulerService {
 								.add(penaltyAmount));
 			} else if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_REABATE)) {
 				newAmount = tracker.getPropertyTaxWithoutRebate();
-				tracker.setRebateAmount(BigDecimal.ZERO);
+//                                                tracker.setRebateAmount(BigDecimal.ZERO);
 			}
 
 			if (!newAmount.equals(BigDecimal.ZERO)) {
 				try {
-					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper);
+					updateBillAndDemandAmounts(bill, demandIdToDemandMap, newAmount, requestInfoWrapper, tracker);
 
 					tracker.setPropertyTax(newAmount);
+					tracker.setRebateAmount(BigDecimal.ZERO);
 
 					PtTaxCalculatorTrackerRequest updateRequest = enrichmentService
 							.enrichTaxCalculatorTrackerUpdateRequest(tracker, requestInfoWrapper.getRequestInfo());
 
 					PtTaxCalculatorTracker updatedTracker = propertyService.updatePtTaxCalculatorTracker(updateRequest);
 
-					updatedTrackers.add(updatedTracker);	
-				}catch(Exception e) {
+					updatedTrackers.add(updatedTracker);
+				} catch (Exception e) {
 					log.error(e.getMessage());
 				}
 			}
@@ -854,7 +1381,7 @@ public class PropertySchedulerService {
 		return updatedTrackers;
 	}
 
-	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, int penaltyRatePercent) {
+	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
 		return tracker.getPropertyTaxWithoutRebate().multiply(BigDecimal.valueOf(penaltyRatePercent))
 				.divide(BigDecimal.valueOf(100));
 	}
@@ -870,29 +1397,82 @@ public class PropertySchedulerService {
 		}
 		return true;
 	}
+//
+//	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
+//			RequestInfoWrapper requestInfoWrapper, PtTaxCalculatorTracker tracker) {
+//
+//		for (BillDetail billDetail : bill.getBillDetails()) {
+//			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
+//			if (demand != null) {
+//				demand.setMinimumAmountPayable(newAmount);
+//				if (demand.getDemandDetails() != null) {
+//					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
+//				}
+//				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
+//			}
+//
+//			if (billDetail.getBillAccountDetails() != null) {
+//				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
+//			}
+//
+//			billDetail.setAmount(newAmount);
+//		}
+//		bill.setTotalAmount(newAmount);
+//		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+//	}
+	
+	private void updateBillAndDemandAmounts(
+	        Bill bill,
+	        Map<String, Demand> demandIdToDemandMap,
+	        BigDecimal newAmount,
+	        RequestInfoWrapper requestInfoWrapper,
+	        PtTaxCalculatorTracker tracker) {
 
-	private void updateBillAndDemandAmounts(Bill bill, Map<String, Demand> demandIdToDemandMap, BigDecimal newAmount,
-			RequestInfoWrapper requestInfoWrapper) {
+	    for (BillDetail billDetail : bill.getBillDetails()) {
 
-		for (BillDetail billDetail : bill.getBillDetails()) {
-			Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
-			if (demand != null) {
-				demand.setMinimumAmountPayable(newAmount);
-				if (demand.getDemandDetails() != null) {
-					demand.getDemandDetails().forEach(demandDetail -> demandDetail.setTaxAmount(newAmount));
-				}
-				demandService.updateDemand(requestInfoWrapper.getRequestInfo(), Collections.singletonList(demand));
-			}
+	        //ONLY update matching demand
+	        if (!billDetail.getDemandId().equals(tracker.getDemandId())) {
+	            continue;
+	        }
 
-			if (billDetail.getBillAccountDetails() != null) {
-				billDetail.getBillAccountDetails().forEach(billAccountDetail -> billAccountDetail.setAmount(newAmount));
-			}
+	        Demand demand = demandIdToDemandMap.get(billDetail.getDemandId());
 
-			billDetail.setAmount(newAmount);
-		}
+	        if (demand != null) {
 
-		bill.setTotalAmount(newAmount);
-		billService.updateBill(requestInfoWrapper.getRequestInfo(), Collections.singletonList(bill));
+	            // Update ONLY this demand
+	            demand.setMinimumAmountPayable(newAmount);
+
+	            if (demand.getDemandDetails() != null) {
+	                demand.getDemandDetails().forEach(demandDetail ->
+	                        demandDetail.setTaxAmount(newAmount));
+	            }
+
+	            demandService.updateDemand(
+	                    requestInfoWrapper.getRequestInfo(),
+	                    Collections.singletonList(demand)
+	            );
+	        }
+
+	        // Update ONLY this billDetail
+	        if (billDetail.getBillAccountDetails() != null) {
+	            billDetail.getBillAccountDetails().forEach(billAccountDetail ->
+	                    billAccountDetail.setAmount(newAmount));
+	        }
+
+	        billDetail.setAmount(newAmount);
+	    }
+
+	    // IMPORTANT: totalAmount recompute 
+	    BigDecimal total = bill.getBillDetails().stream()
+	            .map(BillDetail::getAmount)
+	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+	    bill.setTotalAmount(total);
+
+	    billService.updateBill(
+	            requestInfoWrapper.getRequestInfo(),
+	            Collections.singletonList(bill)
+	    );
 	}
 
 	public Object updatePenaltyAmount(RequestInfoWrapper requestInfoWrapper) {
@@ -905,13 +1485,18 @@ public class PropertySchedulerService {
 		}
 
 		MdmsResponse mdmsResponse = mdmsService.getPenaltyRateMdmsData(requestInfoWrapper.getRequestInfo(), null);
+		MdmsResponse mdmsPenaltyDaysResponse = mdmsService.getPenaltyDaysMdmsData(requestInfoWrapper.getRequestInfo(), null);
 
-		Map<String, Integer> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
+		Map<String, Double> tenantIdPenaltyRateMap = getPenaltyRateMap(mdmsResponse);
+		Map<String, Integer> tenantIdPenaltyDaysMap = getPenaltyDaysMap(mdmsPenaltyDaysResponse);
 
 		for (String tenantId : taxCalculatedTenantIds) {
-			Integer days = 30; // need to change if needed
+			Integer penaltyDays = tenantIdPenaltyDaysMap.get(tenantId);
+			if (penaltyDays == null || penaltyDays == 0) {
+			    penaltyDays = 30;
+			}
 
-			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, days);
+			List<PtTaxCalculatorTracker> ptTaxCalculatorTrackers = getTrackersForTenantAndStartDays(tenantId, 365, penaltyDays);
 
 			Set<String> billIds = ptTaxCalculatorTrackers.stream().map(PtTaxCalculatorTracker::getBillId)
 					.filter(Objects::nonNull).collect(Collectors.toSet());
@@ -928,5 +1513,193 @@ public class PropertySchedulerService {
 
 		return latestTaxCalculatorTrackers;
 	}
+
+	public boolean uploadBulkBills(RequestInfoWrapper requestInfoWrapper, String isforce,String ulb,String ward , String created_at) throws Exception {
+		String[] tenants = new String[0];
+
+		if(ulb ==null && ward == null) {
+			MdmsResponse mdmsResponse = mdmsService.getDownloadPdfMdmsData(requestInfoWrapper.getRequestInfo(), null);
+			Map<String, Map<String, JSONArray>> mdmsRes = mdmsResponse.getMdmsRes();
+
+			if (mdmsRes != null) {
+				Map<String, JSONArray> moduleData = mdmsRes.get(PTConstants.MDMS_MODULE_ULBS);
+				if (moduleData != null) {
+					List<Object> masterList = (List<Object>) moduleData.get(PTConstants.DOWNLOADPDF);
+
+					if (masterList != null) {
+						List<String> tenantList = new ArrayList<>();
+
+						for (Object obj : masterList) {
+
+							Map<String, Object> map = (Map<String, Object>) obj;
+
+							String getulbName = map.get("ulbName").toString();
+							String tenantId = "hp." + getulbName;
+
+							tenantList.add(tenantId);
+						}
+
+						tenants = tenantList.toArray(new String[0]);
+					}
+				}
+			}
+
+
+		} else  {
+		    tenants = new String[]{"hp." +ulb};
+
+		}
+		String ulbName = null;
+		List<Map<String, Object>> bills = new ArrayList<>();
+
+		for (String tenant : tenants) {
+
+			List<Map<String, Object>> result = repository.getActiveBills("ACTIVE", tenant, isforce, ward, created_at);
+
+			if (result != null && !result.isEmpty()) {
+				bills.addAll(result);
+			}
+		}
+
+		if (bills.isEmpty()) {
+			return false;
+		}
+
+		Map<String, List<Map<String, Object>>> billsByUlb = new HashMap<>();
+
+		for (Map<String, Object> bill : bills) {
+
+			String wardName = String.valueOf(bill.get("ward"));
+			ulbName = String.valueOf(bill.get("tenantid"));
+			if (ulbName != null && ulbName.contains(".")) {
+				ulbName = ulbName.split("\\.")[1];
+			}
+			billsByUlb.computeIfAbsent(wardName, k -> new ArrayList<>()).add(bill);
+		}
+
+		for (Map.Entry<String, List<Map<String, Object>>> entry : billsByUlb.entrySet()) {
+
+			String wardName = entry.getKey();
+			List<Map<String, Object>> ulbBills = entry.getValue();
+
+			PDFMergerUtility merger = new PDFMergerUtility();
+			ByteArrayOutputStream mergedOutput = new ByteArrayOutputStream();
+
+			// 4 Generate PDF for each bill
+			for (Map<String, Object> bill : ulbBills) {
+
+				String propertyId = String.valueOf(bill.get("propertyid"));
+				String billId = String.valueOf(bill.get("bill_id"));
+				String status = String.valueOf(bill.get("bill_status"));
+				String UlbNames = String.valueOf(bill.get("tenantId"));
+				if (UlbNames != null && UlbNames.contains(".")) {
+					UlbNames = UlbNames.split("\\.")[1];
+				}
+				ResponseEntity<Resource> billResponse = propertyService
+						.generatePropertyTaxBillReceipt(requestInfoWrapper, propertyId, billId, status);
+
+//				if (billResponse != null && billResponse.getBody() != null) {
+//
+//					InputStream inputStream = billResponse.getBody().getInputStream();
+//
+//					merger.addSource(inputStream);
+//				}
+				Resource resource = billResponse.getBody();
+
+				if (resource != null) {
+				    InputStream is = resource.getInputStream();
+				    
+				    byte[] pdfBytes = convertInputStreamToByteArray(is);
+				    
+				    is.close();   
+
+				    if (pdfBytes.length > 4 &&
+				        pdfBytes[0] == '%' &&
+				        pdfBytes[1] == 'P' &&
+				        pdfBytes[2] == 'D' &&
+				        pdfBytes[3] == 'F') {
+
+				        merger.addSource(new ByteArrayInputStream(pdfBytes));
+				    } else {
+				        System.out.println("❌ Skipping invalid PDF for billId: " + billId);
+				    }
+				}
+				
+				
+			}
+
+			// Merge PDFs of that ULB
+			merger.setDestinationStream(mergedOutput);
+			merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+
+			byte[] finalPdf = mergedOutput.toByteArray();
+
+        // 6️ Convert to resource
+        ByteArrayResource resource = new ByteArrayResource(finalPdf) {
+            @Override
+            public String getFilename() {
+				String timestamp = String.valueOf(System.currentTimeMillis());
+        		return timestamp + "_" + wardName + "_Bills.pdf"; 
+            }
+        };
+
+			// 7️ Prepare DMS request
+			DmsRequest dmsRequest = generateDmsRequestFromBulkBillUpload(resource, wardName, ulbName,
+					requestInfoWrapper.getRequestInfo());
+
+			// 8️ Upload to Alfresco
+			try {
+
+				alfrescoService.uploadAttachment(dmsRequest, requestInfoWrapper.getRequestInfo());
+
+			} catch (IOException e) {
+
+				throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed " + e.getMessage());
+			}
+		}
+
+		return true;
+	}
+
+	private DmsRequest generateDmsRequestFromBulkBillUpload(Resource resource, String wardName, String ulbName,
+			RequestInfo requestInfo) {
+		return DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+				.objectId(UUID.randomUUID().toString()).description(PTConstants.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+				.id(PTConstants.ALFRESCO_COMMON_CERTIFICATE_ID).type(PTConstants.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+				.objectName(PTConstants.BUSINESS_SERVICE).comments(PTConstants.ALFRESCO_TL_CERTIFICATE_COMMENT)
+				.status(PTConstants.APPLICATION_STATUS_APPROVED).file(resource)
+				.servicetype(PTConstants.BUSINESS_SERVICE).documentType(PTConstants.ALFRESCO_DOCUMENT_TYPE)
+				.documentId(PTConstants.ALFRESCO_COMMON_DOCUMENT_ID).ward_name(wardName).ulb_name(ulbName).build();
+
+	}
+
+	private byte[] convertInputStreamToByteArray(InputStream inputStream) throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		int nRead;
+		byte[] data = new byte[4096];
+
+		while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+		}
+
+		buffer.flush();
+		return buffer.toByteArray();
+	}
+	
+	public PtTaxCalculatorTracker getTrackerByBillId(BillIdRequest request) {
+		if (request.getBillId() == null) {
+			throw new CustomException("INVALID_REQUEST", "billId is required");
+		}
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.billId(request.getBillId())
+				.build();
+		List<PtTaxCalculatorTracker> trackers = repository.extractTrackers(criteria);
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
+		}
+		return trackers.get(0);
+	}
+
+
 
 }

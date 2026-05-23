@@ -28,5 +28,7 @@ public class GarbageAccountDetail {
 	private Map<Object, Object> userDetails;
 	private GarbageAccount garbageAccount;
 	private List<Bill> bills;
+	private List<String> formulas;
+
 	
 }

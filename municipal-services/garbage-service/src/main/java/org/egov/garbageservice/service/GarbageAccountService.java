@@ -25,6 +25,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.egov.garbageservice.contract.bill.DemandRepository;
+import org.egov.garbageservice.model.ApplicationBillDTO;
+import org.egov.garbageservice.model.ApplicationDetails;
 
 import javax.validation.Valid;
 
@@ -88,11 +90,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.egov.garbageservice.contract.bill.BillDetail;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.contract.bill.DemandDetail;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -156,6 +161,7 @@ public class GarbageAccountService {
 
 	@Autowired
 	private GrbgUtils grbgUtils;
+	
 
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
@@ -662,7 +668,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
@@ -798,7 +804,7 @@ public class GarbageAccountService {
 		// Build the search criteria request
 		SearchCriteriaGarbageAccountRequest searchCriteria = SearchCriteriaGarbageAccountRequest.builder()
 				.requestInfo(updateGarbageRequest.getRequestInfo()).searchCriteriaGarbageAccount(
-						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts()))
+						createSearchCriteriaByGarbageAccounts(updateGarbageRequest.getGarbageAccounts(),true))
 				.build();
 
 		// Get the response from the database
@@ -1295,6 +1301,10 @@ public class GarbageAccountService {
 	private void updateChildGarbageAccounts(GarbageAccount newGarbageAccount) {
 		if (!CollectionUtils.isEmpty(newGarbageAccount.getChildGarbageAccounts())) {
 			newGarbageAccount.getChildGarbageAccounts().stream().forEach(child -> {
+				
+				if (child.getAdditionalDetail() == null) {
+	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
+	            }
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
@@ -1384,11 +1394,14 @@ public class GarbageAccountService {
 		return existingGarbageAccountsMap;
 	}
 
-	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts) {
+	private SearchCriteriaGarbageAccount createSearchCriteriaByGarbageAccounts(List<GarbageAccount> garbageAccounts,Boolean searchActiveAccount) {
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = SearchCriteriaGarbageAccount.builder().build();
-		searchCriteriaGarbageAccount.setIsActiveAccount(true);
-		searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		if(searchActiveAccount) {
+			searchCriteriaGarbageAccount.setIsActiveAccount(true);
+			searchCriteriaGarbageAccount.setIsActiveSubAccount(true);
+		}
+		
 //		List<Long> ids = new ArrayList<>();
 		List<Long> garbageIds = new ArrayList<>();
 		List<String> applicationNos = new ArrayList<>();
@@ -1502,6 +1515,25 @@ public class GarbageAccountService {
 
 		return garbageAccountResponse;
 	}
+	
+
+private RequestInfo buildPublicRequestInfo(String tenantId) {
+
+    User user = User.builder()
+            .tenantId(tenantId)
+            .type("SYSTEM")
+            .build();
+
+    return RequestInfo.builder()
+            .apiId("garbage-service")
+            .ver("1.0")
+            .ts(System.currentTimeMillis())
+            .userInfo(user)  
+            .authToken(null)
+            .build();
+}
+
+
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
 
@@ -1666,8 +1698,14 @@ public class GarbageAccountService {
 		}
 
 	}
+	
 
 	public GarbageAccountActionResponse getApplicationDetails(GarbageAccountActionRequest garbageAccountActionRequest) {
+
+		
+		boolean skipValidation =
+		        Boolean.TRUE.equals(garbageAccountActionRequest.getSkipValidation());
+
 
 		SearchCriteriaGarbageAccount criteria = SearchCriteriaGarbageAccount.builder().build();
 		GarbageAccountActionResponse garbageAccountActionResponse = GarbageAccountActionResponse.builder()
@@ -1681,7 +1719,7 @@ public class GarbageAccountService {
 					&& !StringUtils.isEmpty(garbageAccountActionRequest.getRequestInfo().getUserInfo().getUuid())) {
 				criteria.setUser_uuid(Collections
 						.singletonList(garbageAccountActionRequest.getRequestInfo().getUserInfo().getUuid()));
-			} else {
+			} else if (!skipValidation) {
 				throw new CustomException("INVALID REQUEST", "Provide Application Number.");
 			}
 		} else {
@@ -1771,7 +1809,7 @@ public class GarbageAccountService {
 			} else {
 				garbageAccountDetail.setTotalPayableAmount(new BigDecimal(100.00));
 			}
-			garbageAccountDetail.setBillDetails(billDetailsMap);
+			//garbageAccountDetail.setBillDetails(billDetailsMap);
 
 			// enrich formula
 			if (!CollectionUtils.isEmpty(account.getGrbgCollectionUnits())) {
@@ -1779,10 +1817,13 @@ public class GarbageAccountService {
 						.setFeeCalculationFormula("category: (" + account.getGrbgCollectionUnits().get(0).getCategory()
 								+ "), SubCategory: (" + account.getGrbgCollectionUnits().get(0).getSubCategory() + ")");
 			}
+			
 
 			// enrich userDetails
 			Map<Object, Object> userDetails = new HashMap<>();
+
 			userDetails.put("UserName", account.getName());
+			userDetails.put("Uuid", account.getUserUuid());
 			userDetails.put("MobileNo", account.getMobileNumber());
 			userDetails.put("Email", account.getEmailId());
 			userDetails.put("Address",
@@ -1792,7 +1833,31 @@ public class GarbageAccountService {
 							.concat(account.getAddresses().get(0).getUlbName().concat(", "))
 							.concat(account.getAddresses().get(0).getWardName().concat(", "))
 							.concat(account.getAddresses().get(0).getAdditionalDetail().get("district").asText()));
+			
+			userDetails.put("OwnerName", account.getAdditionalDetail().get("propertyOwnerName").asText());
+			userDetails.put("ApplicantName", account.getAdditionalDetail().get("applicantName").asText());
+			userDetails.put("ApplicantEmail", account.getAdditionalDetail().get("applicantEmail").asText());
+			userDetails.put("OwnerFatherName", account.getAdditionalDetail().get("ownerFatherName").asText());
+			userDetails.put("ApplicantPhoneNumber", account.getAdditionalDetail().get("applicantPhoneNumber").asText());
 
+			userDetails.put("ApplicationNumber", account.getGrbgApplication().getApplicationNo());
+		    userDetails.put("ApplicationStatus", account.getGrbgApplication().getStatus());
+
+			userDetails.put("IsOwner", account.getIsOwner());
+			userDetails.put("BusinessService", account.getBusinessService());
+			userDetails.put("Gender", account.getGender());
+
+			GrbgAddress addr = account.getAddresses().get(0);
+			userDetails.put("Address", addr.getAddress1() + ", " + addr.getPincode() + ", " +
+			            addr.getZone() + ", " + addr.getUlbName() + ", " + addr.getWardName() + ", " +
+			            addr.getAdditionalDetail().get("district").asText());
+			userDetails.put("AddressLine1", addr.getAddress1());
+			userDetails.put("Pincode", addr.getPincode());
+			userDetails.put("Zone", addr.getZone());
+			userDetails.put("ULBName", addr.getUlbName());
+			userDetails.put("ULBType", addr.getUlbType());
+			userDetails.put("WardName", addr.getWardName());
+			userDetails.put("District", addr.getAdditionalDetail().get("district").asText());
 			garbageAccountDetail.setUserDetails(userDetails);
 
 			if (garbageAccountActionRequest.getIsEmptyBillFilter()) {
@@ -1804,7 +1869,11 @@ public class GarbageAccountService {
 			}
 		});
 
-		return garbageAccountDetails;
+
+		return garbageAccountDetails.stream()
+		            .filter(detail -> !CollectionUtils.isEmpty(detail.getBills()))
+		            .collect(Collectors.toList());
+		
 	}
 
 	public GarbageAccountActionResponse getActionsOnApplication(
@@ -1897,23 +1966,28 @@ public class GarbageAccountService {
 		return roleCodes;
 	}
 
-	public GarbageAccountActionResponse payNowGrbgBill(PayNowRequest payNowRequest) {
-
-		if (StringUtils.isEmpty(payNowRequest.getUserUuid())) {
-			throw new CustomException("INVALID REQUEST", "Please Provide User Uuid.");
-		}
+	public GarbageAccountActionResponse payNowGrbgBill(PayNowRequest payNowRequest, Boolean skipValidation) {
+		
+		 if (!skipValidation) {
+		        if (StringUtils.isEmpty(payNowRequest.getUserUuid())) {
+		            throw new CustomException("INVALID REQUEST", "Please Provide User Uuid.");
+		        }
+		    }
 
 		// validate user
 		UserSearchResponse userSearchResponse = userService.searchUser(payNowRequest.getUserUuid());
 
+		if (!skipValidation) {
 		if (null == userSearchResponse || CollectionUtils.isEmpty(userSearchResponse.getUserSearchResponseContent())) {
 			throw new CustomException("USER NOT FOUND", "User not found for given user uuid.");
+		}
 		}
 
 		GarbageAccountActionRequest garbageAccountActionRequest = GarbageAccountActionRequest.builder()
 				.applicationNumbers(payNowRequest.getGarbageApplicationNumbers())
 				.billStatus(payNowRequest.getBillStatus()).month(payNowRequest.getMonth()).year(payNowRequest.getYear())
 				.propertyIds(payNowRequest.getPropertyIds()).garbageUuid(payNowRequest.getGarbageUuid())
+				.skipValidation(skipValidation)
 				.requestInfo(RequestInfo.builder().userInfo(User.builder().uuid(payNowRequest.getUserUuid()).build())
 						.build())
 				.build();
@@ -1922,6 +1996,39 @@ public class GarbageAccountService {
 
 		return garbageAccountActionResponse;
 	}
+	
+public GarbageAccountActionResponse openSearchPayPreview(
+        SearchCriteriaGarbageAccountRequest request,
+        Boolean isIndex) {
+
+    GarbageAccountResponse searchResponse =
+            searchGarbageAccounts(request, isIndex);
+
+    if (CollectionUtils.isEmpty(searchResponse.getGarbageAccounts())) {
+        return GarbageAccountActionResponse.builder()
+                .applicationDetails(Collections.emptyList())
+                .responseInfo(
+                        responseInfoFactory.createResponseInfoFromRequestInfo(
+                                request.getRequestInfo(), true))
+                .build();
+    }
+
+  
+    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
+            .stream()
+            .map(acc -> acc.getGrbgApplication().getApplicationNo())
+            .collect(Collectors.toList());
+
+    
+    GarbageAccountActionRequest actionRequest =
+            GarbageAccountActionRequest.builder()
+                    .applicationNumbers(applicationNumbers)
+                    .requestInfo(request.getRequestInfo())
+                    .skipValidation(true) 
+                    .build();
+
+    return getApplicationDetails(actionRequest);
+}
 
 	public GrbgBillTrackerRequest enrichGrbgBillTrackerCreateRequest(GarbageAccount garbageAccount,
 			GenerateBillRequest generateBillRequest, BigDecimal billAmount, Bill bill,
@@ -1930,7 +2037,7 @@ public class GarbageAccountService {
 		AuditDetails createAuditDetails = grbgUtils.buildCreateAuditDetails(generateBillRequest.getRequestInfo());
 		GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder().uuid(UUID.randomUUID().toString())
 				.grbgApplicationId(garbageAccount.getGrbgApplicationNumber()).tenantId(garbageAccount.getTenantId())
-				.month(null != generateBillRequest.getMonth() ? generateBillRequest.getMonth().toUpperCase() : null)
+				.month(resolveTrackerMonth(generateBillRequest))
 				.year(generateBillRequest.getYear())
 				.fromDate(
 						null != generateBillRequest.getFromDate() ? dateFormat.format(generateBillRequest.getFromDate())
@@ -1944,6 +2051,16 @@ public class GarbageAccountService {
 		return GrbgBillTrackerRequest.builder().requestInfo(generateBillRequest.getRequestInfo())
 				.grbgBillTracker(grbgBillTracker).build();
 	}
+	
+	private String resolveTrackerMonth(GenerateBillRequest request) {
+	    if (!CollectionUtils.isEmpty(request.getMonths())) {
+	        return request.getMonths()
+	                .get(request.getMonths().size() - 1)
+	                .toUpperCase();
+	    }
+	    return null;
+	}
+
 
 	public GrbgBillFailure enrichGrbgBillFailure(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
 			BillResponse billResponse, List<String> errorList) {
@@ -1958,7 +2075,7 @@ public class GarbageAccountService {
 						null != generateBillRequest.getFromDate() ? dateFormat.format(generateBillRequest.getFromDate())
 								: null)
 				.id(UUID.randomUUID()).module_name("GB").failure_reason(failure_reason)
-				.month(null != generateBillRequest.getMonth() ? generateBillRequest.getMonth().toUpperCase() : null)
+				.month(null)
 				.request_payload(request_payload).response_payload(response_payload).status_code("400")
 				.created_time(new Date().getTime()).last_modified_time(new Date().getTime()).error_json(errorList)
 				.to_date(null != generateBillRequest.getToDate() ? dateFormat.format(generateBillRequest.getToDate())
@@ -2119,13 +2236,13 @@ public class GarbageAccountService {
 	}
 
 	public ResponseEntity<Resource> generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
-			@Valid String grbgId, @Valid String billid) {
+			@Valid String grbgId, @Valid String billid, @Valid String status) {
 
 		List<GarbageAccount> garbageAccounts = Collections
 				.singletonList(GarbageAccount.builder().grbgApplicationNumber(grbgId).build());
 
 		SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-				garbageAccounts);
+				garbageAccounts,false);
 
 		SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest = SearchCriteriaGarbageAccountRequest
 				.builder().searchCriteriaGarbageAccount(searchCriteriaGarbageAccount)
@@ -2152,8 +2269,11 @@ public class GarbageAccountService {
 		int conut = 1;
 		List<String> slNos = new ArrayList<>();
 		Set<String> garbapplicationNos = new HashSet<>();
+		Set<String> reqbillIds = new HashSet<>();
+		
 
 		garbapplicationNos.add(grbAccount.getGrbgApplicationNumber());
+		reqbillIds.add(grbAccount.getGrbgApplicationNumber());
 
 		for (GarbageAccount childGrbgAccount : grbAccount.getChildGarbageAccounts()) {
 			slNos.add(String.valueOf(conut++));
@@ -2161,10 +2281,22 @@ public class GarbageAccountService {
 
 		}
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(grbgTaxCalculatorMonthTracker.getType()).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+				.grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
+				.year(grbgTaxCalculatorMonthTracker.getYear())
 				.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
+		
+		if ("ARREAR".equalsIgnoreCase(grbgTaxCalculatorMonthTracker.getType())) {
+			String referenceFromDate = grbgTaxCalculatorMonthTracker.getFromDate();
+			String referenceToDate = grbgTaxCalculatorMonthTracker.getToDate();
+
+			grbgTaxCalculatorTracker = grbgTaxCalculatorTracker.stream()
+					.filter(tracker -> Objects.equals(tracker.getFromDate(), referenceFromDate)
+							&& Objects.equals(tracker.getToDate(), referenceToDate))
+					.collect(Collectors.toList());
+		}
 
 		// If no records, return null or empty set
 		if (grbgTaxCalculatorTracker == null || grbgTaxCalculatorTracker.isEmpty()) {
@@ -2175,9 +2307,22 @@ public class GarbageAccountService {
 		Set<String> billIds = grbgTaxCalculatorTracker.stream().map(GrbgBillTracker::getBillId)
 				.collect(Collectors.toSet());
 
-		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-				.tenantId(grbgTaxCalculatorMonthTracker.getTenantId()).service(grbAccount.getBusinessService())
-				.billId(billIds).build();
+		BillSearchCriteria.BillSearchCriteriaBuilder builder = BillSearchCriteria.builder()
+		        .tenantId(grbgTaxCalculatorMonthTracker.getTenantId())
+		        .service(grbAccount.getBusinessService())
+		        .billId(billIds);
+
+//		
+//		if (status != null && !status.trim().isEmpty()) {
+//		     
+//		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+//		        builder.status(dynamicStatus);
+//		   
+//		}
+
+
+		BillSearchCriteria billSearchCriteria = builder.build();
+
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
@@ -2186,6 +2331,7 @@ public class GarbageAccountService {
 		}
 
 		List<Bill> bill = billResponse.getBill();
+		bill.removeIf(b -> b.getStatus() == Bill.StatusEnum.CANCELLED);
 
 		// return null;
 		PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequestForBill(requestInfoWrapper, grbAccount, bill,
@@ -2203,7 +2349,7 @@ public class GarbageAccountService {
 		Map<String, GarbageAccount> existingGarbageApplicationAccountsMap;
 		try {
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount = createSearchCriteriaByGarbageAccounts(
-					updateGarbageRequest.getGarbageAccounts());
+					updateGarbageRequest.getGarbageAccounts(),true);
 			existingGarbageIdAccountsMap = searchGarbageAccountMap(searchCriteriaGarbageAccount,
 					updateGarbageRequest.getRequestInfo());
 			existingGarbageApplicationAccountsMap = existingGarbageIdAccountsMap.entrySet().stream().collect(
@@ -2359,7 +2505,7 @@ public class GarbageAccountService {
 				.builder().requestInfo(genrateArrearRequest.getRequestInfo())
 				.searchCriteriaGarbageAccount(searchCriteriaGarbageAccount).build();
 		GarbageAccountResponse garbageAccountResponse = searchGarbageAccounts(searchCriteriaGarbageAccountRequest,
-				true);
+				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
@@ -2409,6 +2555,13 @@ public class GarbageAccountService {
 					GrbgBillTrackerRequest grbgBillTrackerRequest = enrichGrbgBillTrackerCreateRequest(garbageAccount,
 							generateBillRequest, demand.getMinimumAmountPayable(), billResponse.getBill().get(0),
 							calculationBreakdown);
+					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(savedDemands.get(0).getId());
+					
+					AuditDetails audit = grbgUtils.buildCreateAuditDetails(genrateArrearRequest.getRequestInfo());
+
+					garbageBillTrackerRepository
+							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
+					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
@@ -2449,14 +2602,189 @@ public class GarbageAccountService {
 
 		int fyEndYear = fyStartYear + 1;
 
-		return fyStartYear + "-" + (fyEndYear % 100); // e.g., "2023-24"
+		return fyStartYear + "-" + (fyEndYear % 100);
 	}
-
 	
 	
+		public List<GrbgBillTracker> fetchExpiredUnpaidBills(RequestInfo requestInfo) {
+		
+		    GrbgBillTrackerSearchCriteria criteria =
+		        GrbgBillTrackerSearchCriteria.builder()
+		            .status(Collections.singleton("ACTIVE"))
+		            .type(Collections.singleton("MONTHLY"))
+		            .build();
+		
+		    List<GrbgBillTracker> trackers =
+		        garbageBillTrackerRepository.getBillTracker(criteria);
+		
+		    long now = System.currentTimeMillis();
+		
+		    List<GrbgBillTracker> expiredTrackers = new ArrayList<>();
+		
+		    for (GrbgBillTracker tracker : trackers) {
+		        if (tracker.getPenaltyAmount() != null
+		                && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
+		            continue;
+		        }
+		        BillSearchCriteria billSearchCriteria =
+		            BillSearchCriteria.builder()
+		                .tenantId(tracker.getTenantId())
+		                .billId(Collections.singleton(tracker.getBillId()))
+		                .build();
+		
+		        Bill bill;
+		        try {
+		            bill = billService
+		                .searchBill(billSearchCriteria, requestInfo)
+		                .getBill()
+		                .get(0);
+		        } catch (Exception e) {
+		            log.warn("No bill found for {}", tracker.getGrbgApplicationId());
+		            continue;
+		        }
+		
+		        if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+		            continue;
+		        }
+		
+		        BillDetail billDetail = bill.getBillDetails().get(0);
+		        Long expiry = billDetail.getExpiryDate();
+		
+		        if (expiry == null || expiry >= now) {
+		            continue;
+		        }
+		        tracker.setExpiryDate(expiry);
+		
+		        expiredTrackers.add(tracker);
+		    }
+		
+		    return expiredTrackers;
+		}
 
-	
 
+	 
+		public void applyPenalty(
+		        GrbgBillTracker tracker,
+		        Demand demand,
+		        BigDecimal penalty,
+		        RequestInfo requestInfo) {
+		
+		    if (tracker.getPenaltyAmount() != null
+		            && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
+		        return;
+		    }
+		
+		    if (tracker.getGrbgBillWithoutPenalty() == null) {
+		        tracker.setGrbgBillWithoutPenalty(tracker.getGrbgBillAmount());
+		    }
+		
+		    demandService.addPenaltyTaxHead(
+		        demand,
+		        GrbgConstants.GARBAGE_PENALTY_TAX_HEAD,
+		        penalty
+		    );
 
+		    if (demand.getMinimumAmountPayable() == null
+		            || demand.getMinimumAmountPayable().compareTo(BigDecimal.ZERO) == 0) {
 
+		        BigDecimal existingBase = demand.getDemandDetails().stream()
+		            .map(DemandDetail::getTaxAmount)
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		        demand.setMinimumAmountPayable(existingBase);
+		    }
+		    demand.setMinimumAmountPayable(
+		        demand.getMinimumAmountPayable().add(penalty)
+		    );
+		
+		    demandService.updateDemand(
+		        requestInfo,
+		        Collections.singletonList(demand)
+		    );
+		
+		    BillSearchCriteria billSearchCriteria =
+		        BillSearchCriteria.builder()
+		            .tenantId(tracker.getTenantId())
+		            .consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+		            .build();
+		
+		    Bill bill = billService
+		        .searchBill(billSearchCriteria, requestInfo)
+		        .getBill()
+		        .get(0);
+		
+		    for (BillDetail bd : bill.getBillDetails()) {
+		
+		        bd.setAmount(bd.getAmount().add(penalty));
+		        bd.setAmountPaid(BigDecimal.ZERO);
+		        
+		
+		        boolean penaltyFound = false;
+		
+		        for (BillAccountDetail bad : bd.getBillAccountDetails()) {
+		        	
+		        	if (bad.getTenantId() == null) {
+		        	    bad.setTenantId(tracker.getTenantId());
+		        	}
+		        	
+		        	if (bad.getAuditDetails() == null) {
+		        	    bad.setAuditDetails(
+		        	        AuditDetails.builder()
+		        	            .createdBy(requestInfo.getUserInfo().getUuid())
+		        	            .createdTime(System.currentTimeMillis())
+		        	            .lastModifiedBy(requestInfo.getUserInfo().getUuid())
+		        	            .lastModifiedTime(System.currentTimeMillis())
+		        	            .build()
+		        	    );
+		        	}
+		            if (GrbgConstants.GARBAGE_PENALTY_TAX_HEAD.equals(bad.getTaxHeadCode())) {
+		            	bad.setAmount(bad.getAmount().add(penalty));
+		            	bad.setAdjustedAmount(BigDecimal.ZERO);
+		            	bad.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+		            	bad.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+		                penaltyFound = true;
+		            }
+		        }
+		
+		        if (!penaltyFound) {
+		            BillAccountDetail penaltyBAD = new BillAccountDetail();
+		            penaltyBAD.setBillDetailId(bd.getId());
+		            penaltyBAD.setDemandDetailId(
+		            	    bd.getBillAccountDetails().get(0).getDemandDetailId()
+		            	);
+		            penaltyBAD.setId(UUID.randomUUID().toString());
+		            penaltyBAD.setTenantId(tracker.getTenantId());
+		            penaltyBAD.setTaxHeadCode(GrbgConstants.GARBAGE_PENALTY_TAX_HEAD);
+		            penaltyBAD.setAmount(penalty);
+		            penaltyBAD.setAdjustedAmount(BigDecimal.ZERO);
+		            penaltyBAD.setOrder(1);
+
+		            penaltyBAD.setAuditDetails(
+		                AuditDetails.builder()
+		                    .createdBy(requestInfo.getUserInfo().getUuid())
+		                    .createdTime(System.currentTimeMillis())
+		                    .lastModifiedBy(requestInfo.getUserInfo().getUuid())
+		                    .lastModifiedTime(System.currentTimeMillis())
+		                    .build()
+		            );
+		            bd.getBillAccountDetails().add(penaltyBAD);
+		        }
+		    }
+		
+		    bill.setTotalAmount(bill.getTotalAmount().add(penalty));
+		    bill.setAmountPaid(BigDecimal.ZERO);
+		    bill.setStatus(Bill.StatusEnum.ACTIVE);
+		
+		    billService.updateBill(
+		        requestInfo,
+		        Collections.singletonList(bill)
+		    );
+		
+		    tracker.setPenaltyAmount(penalty);
+		    tracker.setGrbgBillAmount(
+		        tracker.getGrbgBillWithoutPenalty().add(penalty)
+		    );
+		
+		    garbageBillTrackerRepository.updatePenalty(tracker);
+		}
 }

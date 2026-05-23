@@ -24,9 +24,15 @@ public class PGRQueryBuilder {
 	public PGRQueryBuilder(PGRConfiguration config) {
 		this.config = config;
 	}
-	
+
+// eg_pgr_address_v2
+	private static final String UNIQUE_WARDS_SEARCH_QUERY = "SELECT DISTINCT "
+			+ "(additionaldetails::jsonb)->>'ward' AS ward, " + "city AS ulb, " + "district AS region "
+			+ "FROM eg_pgr_address_v2 " + "WHERE TO_TIMESTAMP(createdtime / 1000)::date = "
+			+ "TO_DATE(?, 'DD-MM-YYYY')";
+
 	private static final String NOTIFICATION_SEARCH_QUERY = "SELECT * FROM eg_pgr_notification epn";
-	
+
 	private static final String NOTIFICATION_DELETE_QUERY = "DELETE FROM eg_pgr_notification epn where epn.uuid IN (:uuid)";
 
 	private static final String QUERY_ALIAS = "ser.id as ser_id,ads.id as ads_id,"
@@ -50,36 +56,515 @@ public class PGRQueryBuilder {
 
 	private static final String AVERAGE_RESOLUTION_TIME_QUERY = "select case when round(avg(lastmodifiedtime-createdtime)/ 86400000) is null then  0 else round(avg(lastmodifiedtime-createdtime)/ 86400000) end from eg_pgr_service_v2 where applicationstatus = 'CLOSEDAFTERRESOLUTION' and tenantid = ?";
 
-	public static final String COUNT_QUERY = "SELECT " 
-	+       "SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) AS pendingForAssignment, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) AS pendingForReAssignment, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END) AS pendingAtLME, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END) AS rejected, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END) AS resolved, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END) AS closedAfterRejection, " +
-            "SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END) AS closedAfterResolution " +
-            "FROM eg_pgr_service_v2 as pt " ;
-	
-	public static final String COUNT_APPLCATIONSTATUS_SUMMARY  = "SELECT " + 
-		    " period, " +
-		    " SUM(pendingForAssignment) AS pendingForAssignment, " + 
-		    " SUM(pendingForReAssignment) AS pendingForReAssignment, "+ 
-		    " SUM(pendingAtLME) AS pendingAtLME, "+ 
-		    " SUM(rejected) AS rejected, " + 
-		    " SUM(resolved) AS resolved, "+ 
-		    " SUM(closedAfterRejection) AS closedAfterRejection, " +
-		    " SUM(closedAfterResolution) AS closedAfterResolution " + 
-		    " FROM application_status_summary " +
-		    " GROUP BY period " +
-		    " ORDER BY CASE period " + 
-		    " WHEN 'Last_10_days' THEN 1 " + 
-		    " WHEN '11_to_30_days' THEN 2 " + 
-		    " WHEN '31_to_60_days' THEN 3 " + 
-		    " ELSE 4 END";
+	public static final String COUNT_QUERY = "SELECT "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) AS pendingForAssignment, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) AS pendingForReAssignment, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'PENDINGATLME' THEN 1 ELSE 0 END) AS pendingAtLME, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'REJECTED' THEN 1 ELSE 0 END) AS rejected, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'RESOLVED' THEN 1 ELSE 0 END) AS resolved, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERREJECTION' THEN 1 ELSE 0 END) AS closedAfterRejection, "
+			+ "SUM(CASE WHEN pt.applicationstatus = 'CLOSEDAFTERRESOLUTION' THEN 1 ELSE 0 END) AS closedAfterResolution "
+			+ "FROM eg_pgr_service_v2 as pt ";
 
-           /* "WHERE created_date BETWEEN CURRENT_DATE - INTERVAL '60 days' AND CURRENT_DATE " +
-            "GROUP BY date_range " +
-            "ORDER BY date_range";*/
+	public static final String COUNT_APPLCATIONSTATUS_SUMMARY = "SELECT " + " period, "
+			+ " SUM(pendingForAssignment) AS pendingForAssignment, "
+			+ " SUM(pendingForReAssignment) AS pendingForReAssignment, " + " SUM(pendingAtLME) AS pendingAtLME, "
+			+ " SUM(rejected) AS rejected, " + " SUM(resolved) AS resolved, "
+			+ " SUM(closedAfterRejection) AS closedAfterRejection, "
+			+ " SUM(closedAfterResolution) AS closedAfterResolution " + " FROM application_status_summary "
+			+ " GROUP BY period " + " ORDER BY CASE period " + " WHEN 'Last_10_days' THEN 1 "
+			+ " WHEN '11_to_30_days' THEN 2 " + " WHEN '31_to_60_days' THEN 3 " + " ELSE 4 END";
+//----------------------------------------------
+	
+	private static final String TODAYS_COLLECTION_SEARCH_QUERY = "SELECT dt.additionaldetail->>'tradeCategory' AS tradeType, "
+			+ "COUNT(*) AS totalTransactions, SUM(eg_pg_transactions.txn_amount) AS totalTxnAmount "
+			+ "FROM eg_tl_tradelicense tl JOIN eg_tl_tradelicensedetail dt ON tl.id = dt.tradelicenseid "
+			+ "JOIN eg_tl_address addr ON addr.tradelicensedetailid = dt.id "
+			+ "JOIN eg_pg_transactions ON eg_pg_transactions.consumer_code = tl.applicationnumber "
+			+ "WHERE txn_status='SUCCESS' and addr.additionaldetail->>'wardName' = ? "
+			+ "AND TO_TIMESTAMP(eg_pg_transactions.created_time / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') GROUP BY tradeType";
+
+	private static final String TODAYS_TRADE_LICENSES_SEARCH_QUERY = "SELECT status, COUNT(CASE "
+			+ "    WHEN TO_TIMESTAMP(tl.createdtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') THEN 1 "
+			+ "    ELSE NULL END) AS created_today_count, COUNT(CASE "
+			+ "    WHEN TO_TIMESTAMP(tl.lastmodifiedtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') THEN 1 "
+			+ "    ELSE NULL END) AS modified_today_count FROM eg_tl_tradelicense tl "
+			+ "JOIN eg_tl_tradelicensedetail dt ON tl.id = dt.tradelicenseid "
+			+ "JOIN eg_tl_address addr ON addr.tradelicensedetailid = dt.id "
+			+ "WHERE addr.additionaldetail->>'wardName' = ? GROUP BY status";
+
+	
+	private static final String DATA_METRICS_SEARCH_QUERY =
+			// Average
+			"SELECT " + "ROUND(AVG(CASE "
+					+ "WHEN s.applicationstatus IN ('RESOLVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') "
+					+ "AND TO_TIMESTAMP(s.createdtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "THEN (TO_TIMESTAMP(s.lastmodifiedtime/1000)::date - "
+					+ "TO_TIMESTAMP(s.createdtime/1000)::date) END),2) " + "AS avgDaysForApplicationApproval, " +
+
+					/* Unique Citizens */
+					"COUNT(DISTINCT CASE " + "WHEN TO_TIMESTAMP(s.createdtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "THEN s.accountid END) AS uniqueCitizen, "
+
+					+ "COUNT(CASE WHEN TO_TIMESTAMP(s.createdtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "THEN 1 END) AS todaysApplicationsCreated, " +
+
+					"COUNT(CASE WHEN TO_TIMESTAMP(s.createdtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "AND (TO_TIMESTAMP(s.lastmodifiedtime/1000)::date - "
+					+ "TO_TIMESTAMP(s.createdtime/1000)::date) <= ? " + "THEN 1 END) AS todaysLicenseIssuedWithinSLA, "
+					+
+
+					"COUNT(CASE WHEN s.applicationstatus = 'RESOLVED' "
+					+ "AND TO_TIMESTAMP(s.createdtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "THEN 1 END) AS todaysApprovedApplications, " +
+
+					"COUNT(CASE WHEN (s.applicationstatus IS NULL OR s.applicationstatus <> 'RESOLVED') "
+					+ "AND (TO_DATE(?,'DD-MM-YYYY') - TO_TIMESTAMP(s.createdtime/1000)::date) > ? "
+					+ "THEN 1 END) AS pendingApplicationsBeyondTimeline, " +
+
+					"COUNT(CASE WHEN s.applicationstatus = 'RESOLVED' "
+					+ "AND TO_TIMESTAMP(s.lastmodifiedtime/1000)::date = TO_DATE(?,'DD-MM-YYYY') "
+					+ "AND (TO_TIMESTAMP(s.lastmodifiedtime/1000)::date - "
+					+ "TO_TIMESTAMP(s.createdtime/1000)::date) <= ? "
+					+ "THEN 1 END) AS todaysApprovedApplicationsWithinSLA, " +
+
+					"? AS StipulatedDays " +
+
+					"FROM eg_pgr_service_v2 s " + "JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id "
+					+ "WHERE addr.additionaldetails->>'ward' = ?";
+
+	public String getTodaysTradeLicensesSearchQuery(String stringDate, String wardName, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(TODAYS_TRADE_LICENSES_SEARCH_QUERY);
+		// sequence should be same for preparedStmtList.add
+		preparedStmtList.add(stringDate); // for created_today_count date
+		preparedStmtList.add(stringDate); // for modified_today_count date
+		preparedStmtList.add(wardName); // for wardName
+
+		return builder.toString();
+	}
+
+	public String getTodaysCollectionSearchQuery(String stringDate, String wardName, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(TODAYS_COLLECTION_SEARCH_QUERY);
+		// sequence should be same for preparedStmtList.add
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(stringDate);
+
+		return builder.toString();
+	}
+
+	// Department data per day
+//	public String getDepartmentWiseComplaintCountQuery(String stringDate, String wardName,
+//			List<Object> preparedStmtList) {
+//
+//		StringBuilder query = new StringBuilder();
+//
+//		query.append(" SELECT pt.servicecode AS department, ");
+//		query.append(" COUNT(*) AS count ");
+//		query.append(" FROM eg_pgr_service_v2 pt ");
+//		query.append(" JOIN eg_pgr_address_v2 addr ");
+//		query.append(" ON pt.id = addr.parentid ");
+//		query.append(" WHERE DATE(to_timestamp(pt.createdtime/1000)) = to_date(?, 'DD-MM-YYYY') ");
+//		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+//		query.append(" GROUP BY pt.servicecode ");
+//		query.append(" ORDER BY pt.servicecode ");
+//
+//		preparedStmtList.add(stringDate);
+//		preparedStmtList.add(wardName);
+//
+//		return query.toString();
+//	}
+
+	public String getDepartmentWiseSlaQuery(String date, String wardName, Integer slaDays,
+			List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT pt.servicecode AS department, ");
+		query.append(" ROUND( ");
+		query.append("   COUNT( CASE ");
+		query.append("     WHEN (pt.lastmodifiedtime - pt.createdtime) ");
+		query.append("          <= (? * 24 * 60 * 60 * 1000) ");
+		query.append("     THEN 1 END ) ");
+		query.append("   * 100.0 / NULLIF(COUNT(*),0), 2 ");
+		query.append(" ) AS sla_percentage ");
+
+		query.append(" FROM eg_pgr_service_v2 pt ");
+		query.append(" JOIN eg_pgr_address_v2 addr ");
+		query.append("   ON pt.id = addr.parentid ");
+
+		query.append(" WHERE pt.applicationstatus IN ");
+		query.append(" ('RESOLVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') ");
+
+		query.append(" AND DATE(to_timestamp(pt.lastmodifiedtime/1000)) ");
+		query.append("     = TO_DATE(?, 'DD-MM-YYYY') ");
+
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+
+		query.append(" GROUP BY pt.servicecode ");
+		query.append(" ORDER BY pt.servicecode ");
+
+		preparedStmtList.add(slaDays); // for SLA comparison
+		preparedStmtList.add(date); // date filter
+		preparedStmtList.add(wardName); // ward filter
+
+		return query.toString();
+	}
+
+	// Completion Rate
+	public String getDepartmentWiseCompletionRateQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT svc.servicecode AS department, ");
+
+		query.append(" COUNT(CASE ");
+		query.append(" WHEN svc.applicationstatus IN ('CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION', 'RESOLVED') ");
+		query.append(" AND TO_TIMESTAMP(svc.lastmodifiedtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" THEN 1 END) AS total_closed, ");
+
+		query.append(" COUNT(CASE ");
+		query.append(" WHEN TO_TIMESTAMP(svc.lastmodifiedtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" THEN 1 END) AS total_complaints, ");
+
+		query.append(" ROUND( ");
+		query.append(" (COUNT(CASE ");
+		query.append(" WHEN svc.applicationstatus IN ('CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION','RESOLVED') ");
+		query.append(" AND TO_TIMESTAMP(svc.lastmodifiedtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" THEN 1 END) * 100.0) ");
+		query.append(" / NULLIF(COUNT(CASE ");
+		query.append(" WHEN TO_TIMESTAMP(svc.lastmodifiedtime / 1000)::DATE = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" THEN 1 END), 0), 2) AS completion_rate ");
+
+		query.append(" FROM eg_pgr_service_v2 svc ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+		query.append(" GROUP BY svc.servicecode ");
+		query.append(" ORDER BY completion_rate DESC ");
+
+		preparedStmtList.add(date);
+		preparedStmtList.add(date);
+		preparedStmtList.add(date);
+		preparedStmtList.add(date);
+		preparedStmtList.add(wardName);
+
+		return query.toString();
+	}
+
+	// Todays Complaints Departments
+	public String getTodaysComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT svc.servicecode AS department, ");
+		query.append(" COUNT(*) AS todays_complaints ");
+		query.append(" FROM eg_pgr_service_v2 svc ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY svc.servicecode ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Category
+	public String getCategoryQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT svc.additionaldetails->>'grievanceType' AS category, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 svc ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" AND svc.additionaldetails->>'grievanceType' IS NOT NULL ");
+		query.append(" GROUP BY svc.additionaldetails->>'grievanceType' ");
+		query.append(" ORDER BY category ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// status
+	public String getStatusQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT svc.applicationstatus AS status, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 svc ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY svc.applicationstatus ");
+		query.append(" ORDER BY svc.applicationstatus ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// ChannelSource
+	public String getChannelQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT svc.source AS channel, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 svc ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON svc.id = addr.parentid ");
+		query.append(" WHERE addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(svc.createdtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY svc.source ");
+		query.append(" ORDER BY svc.source ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+// Today Reopened Complaints 	
+	public String getTodaysReopenedComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'OPEN' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY value DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Open Complaints
+	public String getTodaysOpenComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'OPEN' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY value DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Todays Assigned Complaints
+	public String getTodaysAssisgnedComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'PENDINGATLME' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY value DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// AverageSolutionTimeQuery
+	public String getAverageSolutionTimeQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" ROUND(AVG((s.lastmodifiedtime - s.createdtime) ");
+		query.append(" / 1000.0 / 3600), 2) AS value ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus IN ");
+		query.append(" ('RESOLVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY value DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Rejected Complaints Query
+	public String getTodayRejectedCompalaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS count ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'CLOSEDAFTERREJECTION' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY count DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Reassigned Complaints Query
+	public String getTodaysReassignComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS count ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'PENDINGATLME' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY count DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Reassigned Request Complaints Query
+	public String getTodaysReassignrequestComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS count ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'PENDINGATLMHE' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY count DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Closed Complaints Query
+	public String getTodaysClosedComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS value ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ");
+		query.append(" ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus IN ");
+		query.append(" ('RESOLVED','CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION') ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY value DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	// Today Resolved Complaints Query
+	public String getTodaysResolvedComplaintsQuery(String date, String wardName, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder();
+
+		query.append(" SELECT s.servicecode AS department, ");
+		query.append(" COUNT(*) AS count ");
+		query.append(" FROM eg_pgr_service_v2 s ");
+		query.append(" JOIN eg_pgr_address_v2 addr ON addr.parentid = s.id ");
+		query.append(" WHERE s.applicationstatus = 'RESOLVED' ");
+		query.append(" AND addr.additionaldetails->>'ward' = ? ");
+		query.append(" AND TO_TIMESTAMP(s.lastmodifiedtime / 1000)::DATE ");
+		query.append(" = TO_DATE(?, 'DD-MM-YYYY') ");
+		query.append(" GROUP BY s.servicecode ");
+		query.append(" ORDER BY count DESC ");
+
+		preparedStmtList.add(wardName);
+		preparedStmtList.add(date);
+
+		return query.toString();
+	}
+
+	public String getUniqueWardsSearchQuery(String stringDate, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(UNIQUE_WARDS_SEARCH_QUERY);
+		preparedStmtList.add(stringDate);
+
+		return builder.toString();
+	}
+
+	public String getDataMetricsSearchQuery(String date, String wardName, int slaDays, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(DATA_METRICS_SEARCH_QUERY);
+		// sequence should be same for preparedStmtList.add
+		preparedStmtList.add(date); // 1 avg
+		preparedStmtList.add(date); // 2 uniqueCitizen
+		preparedStmtList.add(date); // 3 todaysApplicationsCreated
+		preparedStmtList.add(date); // 4 todaysLicenseIssuedWithinSLA
+		preparedStmtList.add(slaDays); // 5
+		preparedStmtList.add(date); // 6 todaysApprovedApplications
+		preparedStmtList.add(date); // 7 pendingApplicationsBeyondTimeline
+		preparedStmtList.add(slaDays); // 8
+		preparedStmtList.add(date); // 9 todaysApprovedApplicationsWithinSLA
+		preparedStmtList.add(slaDays); // 10
+		preparedStmtList.add(slaDays); // 11 StipulatedDays
+		preparedStmtList.add(wardName); // 12 ward
+
+		return builder.toString();
+	}
+
+	/*
+	 * "WHERE created_date BETWEEN CURRENT_DATE - INTERVAL '60 days' AND CURRENT_DATE "
+	 * + "GROUP BY date_range " + "ORDER BY date_range";
+	 */
 	public String getPGRSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
@@ -292,10 +777,10 @@ public class PGRQueryBuilder {
 		return query.toString();
 	}
 
-	public String getPGRNotificationSearchQuery(PgrNotificationSearchCriteria criteria,
-			List<Object> preparedStmtList) {
+	public String getPGRNotificationSearchQuery(PgrNotificationSearchCriteria criteria, List<Object> preparedStmtList) {
+
 		StringBuilder builder = new StringBuilder(NOTIFICATION_SEARCH_QUERY);
-		
+
 		builder.append(" WHERE 1 = 1 ");
 
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
@@ -373,8 +858,6 @@ public class PGRQueryBuilder {
 
 	public String getPGRNotificationDeleteQuery() {
 		StringBuilder builder = new StringBuilder(NOTIFICATION_DELETE_QUERY);
-		
 		return builder.toString();
 	}
-
 }

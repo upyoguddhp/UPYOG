@@ -151,12 +151,13 @@ public class UserService {
 
         UserResponse userResponse = null;
         request.put("RequestInfo", requestInfo);
-        request.put("name", name);
+       // request.put("name", name);
         request.put("mobileNumber", phoneNo);
         request.put("type", "CITIZEN");
+        request.put("active", true);
         request.put("tenantid", tenantId.split("\\.")[0]);
         StringBuilder url = new StringBuilder();
-        url.append(appProperties.getUserServiceHost()).append(appProperties.getUserServiceSearchPath());
+        url.append(appProperties.getUserServiceHost()).append(appProperties.getUserServiceSearchNewPath());
         try {
             userResponse = restTemplate.postForObject(url.toString(), request, UserResponse.class);
         }catch(Exception e) {
@@ -187,7 +188,7 @@ public class UserService {
         role.put("tenantId", transaction.getTenantId().split("\\.")[0]);
         roles.add(role);
 
-        user.put("name", transaction.getUser().getName());
+        user.put("name",  transaction.getUser().getName() != null ? transaction.getUser().getName() : "Citizen");
         user.put("mobileNumber", transaction.getUser().getMobileNumber());
         user.put("userName", transaction.getUser().getName());
         user.put("active", true);
@@ -213,7 +214,7 @@ public class UserService {
     
 	public UserSearchResponse searchUser(String userUuid) {
 		StringBuilder url = new StringBuilder(appProperties.getUserServiceHost());
-		url.append(appProperties.getUserServiceSearchPath());
+		url.append(appProperties.getUserServiceSearchNewPath());
 
 		UserSearchRequest userSearchRequest = UserSearchRequest.builder()
 				.requestInfo(RequestInfo.builder()

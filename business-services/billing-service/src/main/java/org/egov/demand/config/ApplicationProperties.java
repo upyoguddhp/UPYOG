@@ -117,6 +117,9 @@ public class ApplicationProperties {
 	@Value("${kafka.topics.receipt.cancel.name}")
 	private String receiptCancellationTopic;
 	
+	@Value("${kafka.topics.advt.bill.cancel}")
+	private String advtBillCancelTopic;
+	
 	@Value("${kafka.topics.demand.index.name}")
 	private String demandIndexTopic;
 	
@@ -195,4 +198,16 @@ public class ApplicationProperties {
 
 	@Value("${statelevel.rolecode.excluded.list}")
 	private List<String> statelevelRolecodeExclusionList;
+	
+	@Value("${egov.garbage.context.host}")
+	private String garbageHost;
+	
+	@Value("${egov.garbage.endpoint.extract.tracker}")
+	private String extractGarbageTracker;
+	
+	@Value("${egov.property.context.host}")
+	private String propertyHost;
+	
+	@Value("${egov.property.endpoint.extract.tracker}")
+	private String extractPropertyTracker;
 }

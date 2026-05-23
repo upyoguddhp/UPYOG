@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
+import org.egov.garbageservice.model.ApplicationBillDTO;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.repository.rowmapper.GarbageAccountRowMapper;
@@ -25,6 +28,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -336,6 +340,7 @@ public class GarbageAccountRepository {
         
         return garbageAccounts;
     }
+	
 
 	private StringBuilder getSearchQueryByCriteria(StringBuilder searchQuery,
 			SearchCriteriaGarbageAccount searchCriteriaGarbageAccount, List<Object> preparedStatementValues,

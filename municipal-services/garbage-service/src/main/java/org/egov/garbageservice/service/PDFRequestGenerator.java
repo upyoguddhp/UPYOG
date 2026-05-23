@@ -16,7 +16,9 @@ import org.egov.garbageservice.model.contract.PDFRequest;
 import org.egov.garbageservice.contract.bill.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.egov.garbageservice.contract.bill.BillDetail;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
+import java.time.LocalDate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,6 +44,14 @@ public class PDFRequestGenerator {
 		
 		grbg.put("ulbName", grbgAccount.getAddresses().get(0).getUlbName());
 		grbg.put("ulbType", grbgAccount.getAddresses().get(0).getUlbType());
+		grbg.put(
+			    "oldGarbageId",
+			    grbgAccount.getGrbgOldDetails() != null &&
+			    grbgAccount.getGrbgOldDetails().getOldGarbageId() != null
+			        ? grbgAccount.getGrbgOldDetails().getOldGarbageId()
+			        : "NA"
+			);
+
 
 		Map<String, BigDecimal> grbgTaxMap = new HashMap<>();
 		for (GrbgBillTracker grbgBillTrackerObj : grbgBillTracker) {
@@ -85,6 +95,7 @@ public class PDFRequestGenerator {
 				int lastIndex = bill.get(i).getBillDetails().size() - 1;
 
 				grbg.put("billNo", bill.get(i).getBillNumber());
+				grbg.put("mobileNo", grbgAccount.getMobileNumber());
 				grbg.put("billDueDate", Instant.ofEpochMilli(bill.get(i).getBillDetails().get(lastIndex).getExpiryDate())
 						.atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 			}
@@ -149,6 +160,65 @@ public class PDFRequestGenerator {
 		BigDecimal totalTax = allGrbgTaxPlusArrear.stream().map(BigDecimal::new).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		grbg.put("totalTax", totalTax);
+		
+		BigDecimal totalArrear = allArrears.stream()
+		        .map(BigDecimal::new)
+		        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		grbg.put("arrearAmount", totalArrear);
+		
+		BigDecimal totalPaid = BigDecimal.ZERO;
+		BigDecimal totalDue = BigDecimal.ZERO;
+		BigDecimal totalAmount = BigDecimal.ZERO;
+
+		for (Bill billObj : bill) {
+
+		    BigDecimal amount = billObj.getTotalAmount() != null 
+		            ? billObj.getTotalAmount() 
+		            : BigDecimal.ZERO;
+
+		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
+		        totalPaid = totalPaid.add(amount);
+		        totalAmount = amount;
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		        totalDue = totalDue.add(amount);
+		        totalAmount = amount;
+		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
+		        BigDecimal billPaid = BigDecimal.ZERO;
+		        for (BillDetail billDetail : billObj.getBillDetails()) {
+		            if (billDetail.getBillAccountDetails() != null) {
+		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
+		                            ? accDetail.getAdjustedAmount()
+		                            : BigDecimal.ZERO;
+		                    billPaid = billPaid.add(adjusted);
+		                }
+		            }
+		        }
+		        totalPaid = totalPaid.add(billPaid);
+		        totalDue = totalDue.add(amount.subtract(billPaid));
+		        totalAmount = amount;
+		    }
+		}
+
+		BigDecimal totalRebate = BigDecimal.ZERO;
+		BigDecimal totalWithoutRebate = BigDecimal.ZERO;
+
+		for (GrbgBillTracker tracker : grbgBillTracker) {
+			if (tracker.getRebateAmount() != null) {
+				totalRebate = totalRebate.add(tracker.getRebateAmount());
+			}
+
+			if (tracker.getGarbageBillWithoutRebate() != null) {
+				totalWithoutRebate = totalWithoutRebate.add(tracker.getGarbageBillWithoutRebate());
+			}
+		}
+		
+		grbg.put("amountPaid", totalPaid);
+		grbg.put("amountDue", totalDue);
+		grbg.put("totalAmount", totalAmount);
+		grbg.put("rebateAmount", totalRebate);
+		grbg.put("amountWithoutRebate", totalWithoutRebate);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
@@ -169,21 +239,60 @@ public class PDFRequestGenerator {
 
 		grbg.put("billPeriod", grbgBillTracker.get(0).getYear());
 
-		grbg.put("from", grbgBillTracker.get(0).getFromDate());
+		Long minFromPeriod = Long.MAX_VALUE;
+		Long maxToPeriod = Long.MIN_VALUE;
+		for (Bill billObj : bill) {
+		    if (billObj.getBillDetails() != null) {
+		        for (BillDetail detail : billObj.getBillDetails()) {
 
-		grbg.put("to", grbgBillTracker.get(0).getToDate());
+		            if (detail.getFromPeriod() != null) {
+		                minFromPeriod = Math.min(minFromPeriod, detail.getFromPeriod());
+		            }
 
+		            if (detail.getToPeriod() != null) {
+		                maxToPeriod = Math.max(maxToPeriod, detail.getToPeriod());
+		            }
+		        }
+		    }
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+		String fromDate = Instant.ofEpochMilli(minFromPeriod)
+		        .atZone(ZoneId.systemDefault())
+		        .toLocalDate()
+		        .format(formatter);
+
+		String toDate = Instant.ofEpochMilli(maxToPeriod)
+		        .atZone(ZoneId.systemDefault())
+		        .toLocalDate()
+		        .format(formatter);
 		
-
-		if(!grbgBillTracker.get(0).getType().equals("ARREAR"))
-		{
-			int year = Integer.parseInt(grbgBillTracker.get(0).getYear());
-			grbg.put("finYear", year + "-" + (year + 1));
-			grbg.put("finYear", grbgBillTracker.get(0).getYear() + "-" + (year + 1));
+		grbg.put("from", fromDate);
+		grbg.put("to", toDate);
+		
+		//CODE to set from date according to from date from bills GOT
+		
+//		Long fromPeriod = bill.get(0).getBillDetails().get(0).getFromPeriod();
+//		int year = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getYear();
+//		int month = Instant.ofEpochMilli(fromPeriod).atZone(ZoneId.systemDefault()).getMonthValue();
+//		int startYear;
+//		if (month <= 3) {
+//				startYear = year - 1;
+//		} else {
+//				startYear = year;
+//		}
+		
+		LocalDate today = LocalDate.now();
+		int year = today.getYear();
+		int month = today.getMonthValue();
+		int startYear;
+		if (month <= 3) {
+			startYear = year - 1;
+		} else {
+			startYear = year;
 		}
-		else {
-			grbg.put("finYear", grbgBillTracker.get(0).getYear());
-		}
+		
+		grbg.put("finYear", startYear + "-" + (startYear + 1));
 		grbg.put("district", "district");
 		grbg.put("wardNumber", grbgAccount.getAddresses().get(0).getWardName());
 		grbg.put("unitCategory", escapeHtml(grbgAccount.getGrbgCollectionUnits().get(0).getCategory()));
@@ -201,6 +310,10 @@ public class PDFRequestGenerator {
 		grbg.put("ownerOrOccupier",
 				AdditionalDetail.has("propertyOwnerName") && !AdditionalDetail.get("propertyOwnerName").isNull()
 						? AdditionalDetail.get("propertyOwnerName").asText()
+						: "N/A");
+		grbg.put("fatherOrHusbandName",
+				AdditionalDetail.has("ownerFatherName") && !AdditionalDetail.get("ownerFatherName").isNull()
+						? AdditionalDetail.get("ownerFatherName").asText()
 						: "N/A");
 
 		StringBuilder uri = new StringBuilder(applicationPropertiesAndConstant.getFrontEndBaseUri());

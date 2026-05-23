@@ -10,8 +10,10 @@ import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.egov.ptr.config.PetConfiguration;
 import org.egov.ptr.models.AuditDetails;
+import org.egov.ptr.models.PetApplicationSearchCriteria;
 import org.egov.ptr.models.PetRegistrationApplication;
 import org.egov.ptr.models.PetRegistrationRequest;
+import org.egov.ptr.repository.PetRegistrationRepository;
 import org.egov.ptr.util.PTRConstants;
 import org.egov.ptr.util.PetUtil;
 import org.egov.tracer.model.CustomException;
@@ -32,6 +34,9 @@ public class EnrichmentService {
 
 	@Autowired
 	private PetUtil petUtil;
+	
+	@Autowired
+	private PetRegistrationRepository petRegistrationRepository;
 
 	public void enrichPetApplication(PetRegistrationRequest petRegistrationRequest) {
 		// List<String> petRegistrationIdList =
@@ -72,6 +77,60 @@ public class EnrichmentService {
 			// application.setApplicationNumber(UUID.randomUUID().toString());
 		}
 	}
+	//-------------Start  for Renewal
+	public void enrichPetApplicationForRenewal(
+	        PetRegistrationRequest request) {
+
+	    for (PetRegistrationApplication app :
+	            request.getPetRegistrationApplications()) {
+
+	        List<PetRegistrationApplication> oldApps =
+	                petRegistrationRepository.getApplications(
+	                        PetApplicationSearchCriteria.builder()
+	                                .applicationNumber(app.getApplicationNumber())
+	                                .tenantId(app.getTenantId())
+	                                .build());
+
+	        if (CollectionUtils.isEmpty(oldApps)) {
+	            throw new CustomException(
+	                    "INVALID_RENEWAL",
+	                    "No application found for renewal");
+	        }
+
+	        PetRegistrationApplication oldApp = oldApps.get(0);
+
+	        // ONLY APPROVED CAN RENEW
+	        if (!PTRConstants.APPLICATION_STATUS_APPROVED
+	                .equalsIgnoreCase(oldApp.getStatus())) {
+	            throw new CustomException(
+	                    "RENEWAL_NOT_ALLOWED",
+	                    "Only APPROVED applications can be Renewed");
+	        }
+
+	        AuditDetails auditDetails = AuditDetails.builder()
+	                .createdBy(request.getRequestInfo().getUserInfo().getUuid())
+	                .createdTime(System.currentTimeMillis())
+	                .lastModifiedBy(request.getRequestInfo().getUserInfo().getUuid())
+	                .lastModifiedTime(System.currentTimeMillis())
+	                .build();
+	        app.setId(UUID.randomUUID().toString());
+	        app.setAuditDetails(auditDetails);
+	        app.setApplicationNumber(oldApp.getApplicationNumber());
+	        app.setApplicantName(oldApp.getApplicantName());
+	        app.setFatherName(oldApp.getFatherName());
+	        app.setMobileNumber(oldApp.getMobileNumber());
+	        app.setEmailId(oldApp.getEmailId());
+	        app.setAadharNumber(oldApp.getAadharNumber());
+	        //  New address & pet records
+	        app.getAddress().setId(UUID.randomUUID().toString());
+	        app.getAddress().setRegistrationId(app.getId());
+
+	        app.getPetDetails().setId(UUID.randomUUID().toString());
+	        app.getPetDetails().setPetDetailsId(app.getId());
+	    }
+	}
+	//-------------End	
+	
 	
 	private String makeDesiredNumber(PetRegistrationApplication petregistrationApplication,String ApplicationNumber) {
 		
@@ -91,13 +150,13 @@ public class EnrichmentService {
 	}
 	
 	private String getFormatOfPeriodOfPT() {
-		  	LocalDate currentDate = LocalDate.now();
+			LocalDate currentDate = LocalDate.now();
 
 	        // Define a formatter for "MMyyyy"
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMyyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMyyyy");
 
 	        // Format the current date
-	        return currentDate.format(formatter);
+			return currentDate.format(formatter);
 	}
 
 
@@ -126,12 +185,12 @@ public class EnrichmentService {
 				&& !CollectionUtils.isEmpty(petRegistrationRequest.getPetRegistrationApplications().get(0).getDocuments())) {
 			petRegistrationRequest.getPetRegistrationApplications().get(0).getDocuments().stream().forEach(document -> {
 				Optional.ofNullable(document.getAuditDetails()).ifPresent(auditDetails -> {
-				    Optional.ofNullable(petRegistrationRequest.getRequestInfo())
-				            .map(requestInfo -> requestInfo.getUserInfo())
-				            .map(userInfo -> userInfo.getUuid())
-				            .ifPresent(auditDetails::setLastModifiedBy);
-				    
-				    auditDetails.setLastModifiedTime(System.currentTimeMillis());
+					Optional.ofNullable(petRegistrationRequest.getRequestInfo())
+							.map(requestInfo -> requestInfo.getUserInfo())
+							.map(userInfo -> userInfo.getUuid())
+							.ifPresent(auditDetails::setLastModifiedBy);
+					
+					auditDetails.setLastModifiedTime(System.currentTimeMillis());
 				});
 			});
 		}

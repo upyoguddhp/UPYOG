@@ -237,6 +237,15 @@ public class DemandService {
 
 		RequestInfo requestInfo = demandRequest.getRequestInfo();
 		List<Demand> demands = demandRequest.getDemands();
+		
+		Set<String> billIds = demands.stream().map(d -> {
+			if (d.getAdditionalDetails() instanceof Map) {
+				Object val = ((Map<?, ?>) d.getAdditionalDetails()).get("billId");
+				return val != null ? val.toString() : null;
+			}
+			return null;
+		}).filter(Objects::nonNull).collect(Collectors.toSet());
+		
 		AuditDetails auditDetail = util.getAuditDetail(requestInfo);
 
 		List<Demand> newDemands = new ArrayList<>();
@@ -280,6 +289,7 @@ public class DemandService {
 				.consumerCodes(demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet()))
 				.businessService(businessService)
 				.tenantId(tenantId)
+				.billIds(billIds)
 				.build();
 		
 		if(org.apache.commons.lang3.StringUtils.equalsIgnoreCase(businessService, Constants.NEWTL_BUSINESS_SERVICE)
@@ -291,14 +301,13 @@ public class DemandService {
 			updateBillCriteria.setStatusToBeUpdated(BillStatus.EXPIRED);
 			billRepoV2.updateBillStatus(updateBillCriteria);
 		} else {
-			
-			updateBillCriteria.setStatusToBeUpdated(BillStatus.PAID);
-			billRepoV2.updateBillStatus(updateBillCriteria);
+			 BillStatus status = getBillStatusFromDemands(demands);
+			 updateBillCriteria.setStatusToBeUpdated(status);
+			 billRepoV2.updateBillStatus(updateBillCriteria);
 		}
 		// producer.push(applicationProperties.getDemandIndexTopic(), demandRequest);
 		return new DemandResponse(responseInfoFactory.getResponseInfo(requestInfo, HttpStatus.CREATED), demands);
 	}
-
 
 	private void validateDemandAndUpdateBill(DemandRequest demandRequest, UpdateBillCriteria updateBillCriteria) {
 		
@@ -324,6 +333,37 @@ public class DemandService {
 		}
 		
 	}
+	
+	private BillStatus getBillStatusFromDemands(List<Demand> demands) {
+
+	    BigDecimal totalTax = BigDecimal.ZERO;
+	    BigDecimal totalCollection = BigDecimal.ZERO;
+
+	    for (Demand demand : demands) {
+	        if (demand.getDemandDetails() == null) continue;
+
+	        for (DemandDetail detail : demand.getDemandDetails()) {
+
+	            if (detail.getTaxAmount() != null) {
+	                totalTax = totalTax.add(detail.getTaxAmount());
+	            }
+	            if (detail.getCollectionAmount() != null) {
+	                totalCollection = totalCollection.add(detail.getCollectionAmount());
+	            }
+	        }
+	    }
+
+	    if (totalCollection.compareTo(BigDecimal.ZERO) == 0) {
+	        return BillStatus.ACTIVE;
+	    }
+
+	    if (totalCollection.compareTo(totalTax) >= 0) {
+	        return BillStatus.PAID;
+	    }
+	    
+	    return BillStatus.PARTIALLY_PAID;
+	}
+
 
 	/**
 	 * Search method to fetch demands from DB

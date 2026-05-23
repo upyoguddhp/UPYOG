@@ -41,6 +41,8 @@ public class AppProperties {
     private final String collectionServiceValidatePath;
     
     private final String paymentCreatePath;
+    
+    private final String paymentUpdatePath;
 
     private final String paymentValidatePath;
 
@@ -53,6 +55,8 @@ public class AppProperties {
     private final String userServiceCreatePath;
 
     private final String userServiceSearchPath;
+    
+    private final String userServiceSearchNewPath;
 
     private final Boolean isUserCreationEnable;
 
@@ -100,6 +104,8 @@ public class AppProperties {
 
     private final String internalMicroserviceUserType;
     
+    private final String billservicedemandsearchendpoint;
+    
     @Value("${egov.mdmsv2.host}")
     private String mdmsV2host;
     
@@ -130,10 +136,12 @@ public class AppProperties {
         this.bankAccountHost = environment.getRequiredProperty("egov.bankaccountservice.host");
         this.bankAccountPath = environment.getRequiredProperty("egov.bankaccountservice.path");
         this.paymentCreatePath = environment.getRequiredProperty("egov.collectionservice.payment.create.path");
+        this.paymentUpdatePath = environment.getRequiredProperty("egov.collectionservice.payment.update.path");
         this.paymentValidatePath = environment.getRequiredProperty("egov.collectionservice.payment.validate.path");
         this.userServiceHost = environment.getRequiredProperty("egov.userservice.host");
         this.userServiceCreatePath = environment.getRequiredProperty("egov.userservice.create.path");
         this.userServiceSearchPath = environment.getRequiredProperty("egov.userservice.search.path");
+        this.userServiceSearchNewPath = environment.getRequiredProperty("egov.userservice.search.new.path");
         this.isUserCreationEnable = Boolean.valueOf(environment.getRequiredProperty("pg.is.user.create.enabled"));
         this.isSMSEnable = Boolean.valueOf(environment.getRequiredProperty("notification.sms.enabled"));
         this.isLocalizationStateLevel = Boolean.valueOf(environment.getRequiredProperty("egov.localization.statelevel"));
@@ -157,6 +165,7 @@ public class AppProperties {
         this.internalMicroserviceUserUsername = environment.getRequiredProperty("internal.microservice.user.username");
         this.internalMicroserviceUserMobilenumber = environment.getRequiredProperty("internal.microservice.user.mobilenumber");
         this.internalMicroserviceUserType = environment.getRequiredProperty("internal.microservice.user.type");
+        this.billservicedemandsearchendpoint = environment.getRequiredProperty("egov.bill.searchdemandendpoint"); 
     }
 
 }

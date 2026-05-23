@@ -76,8 +76,7 @@ public class SMSServiceImpl implements SMSService {
 		smsBody = smsBody.replace(VALID_FOR_PLACEHOLDER, String.valueOf(otpValidFor));
 
 		Sms sms = Sms.builder().mobileNumber(otpSentRequest.getNumber()).message(smsBody)
-				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).build();
-
+				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).smsServiceType("otpmsg").build();
 		baseSmsService.sendSMS(sms);
 	}
 
@@ -125,4 +124,40 @@ public class SMSServiceImpl implements SMSService {
 				.templateId(smsTemplate.getTemplateId()).build();
 	}
 
-}
+	public UserSearchResponse validateCitizen(OTPSentRequest otpSentRequest) {
+
+		if (!otpSentRequest.isNumberValid()) {
+			throw new CustomException("INVALID REQUEST", "Mobile number");
+		}
+
+		UserSearchResponse userSearchResponse = userService.searchUserByNumber(otpSentRequest.getNumber());
+
+		if (null == userSearchResponse || CollectionUtils.isEmpty(userSearchResponse.getUserSearchResponseContent())) {
+			throw new CustomException("USER NOT FOUND", "User not found for given user uuid.");
+		}
+
+		String userUuid = userSearchResponse.getUserSearchResponseContent().get(0).getUuid();
+
+		String otp = otpService.createOtp(userUuid);
+
+		SMSTemplate smsTemplate = getSmsTemplate(SMSConstants.TEMPLATE_NAME_LOGIN_OTP);
+
+		if (null == smsTemplate) {
+			throw new CustomException("SMS TEMPLATE NOT FOUND", "SMS template not found.");
+		}
+
+		long otpValidFor = 15;
+
+		String smsBody = SMS_BODY_OTP;
+		smsBody = smsBody.replace(OTP_PLACEHOLDER, otp);
+		smsBody = smsBody.replace(VALID_FOR_PLACEHOLDER, String.valueOf(otpValidFor));
+
+		Sms sms = Sms.builder().mobileNumber(otpSentRequest.getNumber()).message(smsBody)
+				.templateId(smsTemplate.getTemplateId()).expiryTime(otpValidFor * 60 * 1000).smsServiceType("otpmsg")
+				.build();
+		baseSmsService.sendSMS(sms);
+		
+		return userSearchResponse;
+	}
+	
+	}

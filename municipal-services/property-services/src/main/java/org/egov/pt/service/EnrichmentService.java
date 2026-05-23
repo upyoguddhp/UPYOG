@@ -68,6 +68,8 @@ public class EnrichmentService {
 		RequestInfo requestInfo = request.getRequestInfo();
 		Property property = request.getProperty();
 		
+		property.setIsBilling(request.getProperty().getIsBilling());
+		
 		property.setAccountId(requestInfo.getUserInfo().getUuid());
 		enrichUuidsForPropertyCreate(requestInfo, property);
 		setIdgenIds(request);
@@ -126,7 +128,7 @@ public class EnrichmentService {
         RequestInfo requestInfo = request.getRequestInfo();
         AuditDetails auditDetailsForUpdate = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
         propertyFromDb.setAuditDetails(auditDetailsForUpdate);
-        
+        propertyFromDb.setIsBilling(property.getIsBilling());     
         
 		Boolean isWfEnabled = config.getIsWorkflowEnabled();
 		Boolean iswfStarting = propertyFromDb.getStatus().equals(Status.ACTIVE);
@@ -385,10 +387,9 @@ public class EnrichmentService {
                     property.getWorkflow().setAssignes(assignes);
             }
     }
-    
 	public PtTaxCalculatorTrackerRequest enrichTaxCalculatorTrackerCreateRequest(Property property,
 			CalculateTaxRequest calculateTaxRequest, BigDecimal finalPropertyTax, JsonNode additionalDetails,
-			List<Bill> bills, BigDecimal rebateAmount, BigDecimal propertyTaxWithoutRebate) {
+			List<Bill> bills, BigDecimal rebateAmount, BigDecimal propertyTaxWithoutRebate, String demandId, String ward) {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		AuditDetails createAuditDetails = propertyutil
@@ -403,7 +404,10 @@ public class EnrichmentService {
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
 				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
 				.type(calculateTaxRequest.getType())
-				.propertyTaxWithoutRebate(propertyTaxWithoutRebate).billStatus(BillStatus.ACTIVE).build();
+				.propertyTaxWithoutRebate(propertyTaxWithoutRebate).billStatus(BillStatus.ACTIVE)
+				.demandId(demandId)
+				.ward(ward)
+				.build();
 
 		return PtTaxCalculatorTrackerRequest.builder().requestInfo(calculateTaxRequest.getRequestInfo())
 				.ptTaxCalculatorTracker(ptTaxCalculatorTracker).build();

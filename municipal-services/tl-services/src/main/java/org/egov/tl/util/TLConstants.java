@@ -13,6 +13,8 @@ public class TLConstants {
 
     public static  final String businessService_TL = "TL";
     
+    public static  final String businessService_RENEWAL = "RENEWAL";
+    
     public static  final String businessService_NewTL = "NewTL";
 
     public static  final String businessService_DIRECT_RENEWAL = "DIRECTRENEWAL";
@@ -501,6 +503,7 @@ public class TLConstants {
     	// mdms keys
     public static final String TRADE_LICENSE = "TradeLicense";
     public static final String FEE_STRUCTURE = "FeeStructure";
+    public static final String RENEWAL_FEE_STRUCTURE = "RenewalFeeStructure";
     public static final String CALCULATION_TYPE = "CalculationType";
     public static final String STRUCTURE_OF = "feeStructureOf";
     public static final String TYPE = "type";
@@ -516,5 +519,10 @@ public class TLConstants {
 
     // kafka
     public static final String KAFKA_TOPIC_TL_CERTIFICATE = "save-tl-certificate";
+
+	public static final String ACTION_PENDING_FOR_MODIFICATION = "PENDING_FOR_MODIFICATION";
+
+	public static final String STATUS_PENDING_FOR_MODIFICATION = "PENDING_FOR_MODIFICATION";
+	
 
 }

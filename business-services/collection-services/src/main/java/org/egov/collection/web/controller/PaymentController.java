@@ -139,12 +139,12 @@ public class PaymentController {
         return getSuccessResponse(payments, receiptWorkflowRequest.getRequestInfo());
     }
 
-//    @RequestMapping(value = "/_update", method = RequestMethod.POST)
-//    @ResponseBody
-//    public ResponseEntity<?> update(@RequestBody @Valid PaymentRequest paymentRequest) {
-//        List<Payment> payments = paymentService.updatePayment(paymentRequest);
-//        return getSuccessResponse(payments, paymentRequest.getRequestInfo());
-//    }
+    @RequestMapping(value = "/_update", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<?> update(@RequestBody @Valid PaymentRequest paymentRequest) {
+        List<Payment> payments = paymentService.updatePayment(paymentRequest);
+        return getSuccessResponse(payments, paymentRequest.getRequestInfo());
+    }
 
     @RequestMapping(value = "/_validate", method = RequestMethod.POST)
     @ResponseBody

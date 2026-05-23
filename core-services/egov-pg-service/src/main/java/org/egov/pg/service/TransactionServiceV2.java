@@ -42,13 +42,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
+import org.egov.pg.models.DemandAmountInfo;
+import org.egov.pg.models.Bill;
+import org.egov.pg.models.BillResponse;
+import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
 import org.egov.pg.service.gateways.razorpay.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import lombok.extern.slf4j.Slf4j;
-
+import org.egov.pg.models.DemandResponse;
+import org.egov.pg.models.DemandDetail;
 /**
  * Handles all transaction related requests
  */
@@ -82,6 +86,9 @@ public class TransactionServiceV2 {
 
 	@Autowired
 	private PaymentsService paymentsService;
+	
+	@Autowired
+	private BillingService billingService;
 	
 	@Autowired
 	private RazorpayGateway RazorpayGateway;
@@ -127,10 +134,24 @@ public class TransactionServiceV2 {
 				paymentsService.registerPayment(
 						TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
 			}
-			else if(transaction.getGateway().equalsIgnoreCase("OFFLINE")){
-				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
-				paymentsService.registerPayment(
-						TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
+			else if (transaction.getGateway().equalsIgnoreCase("OFFLINE")) {
+
+			    transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
+			    
+			    enrichmentService.enrichUpdateTransaction(
+			        TransactionRequest.builder()
+			            .transaction(transaction)
+			            .requestInfo(requestInfo)
+			            .build(),
+			        transaction
+			    );
+
+			    paymentsService.registerPayment(
+			        TransactionRequest.builder()
+			            .transaction(transaction)
+			            .requestInfo(requestInfo)
+			            .build()
+			    );
 			}
 			else {
 				URI uri = gatewayService.initiateTxn(transaction);
@@ -236,7 +257,7 @@ public class TransactionServiceV2 {
 
 			if (validator.skipGateway(currentTxnStatus)) {
 				newTxn = currentTxnStatus;
-
+				
 			} else {
 				newTxn = gatewayService.getLiveStatus(currentTxnStatus, requestParams);
 				Object razorpayRawResponse = newTxn.getResponseJson();
@@ -244,25 +265,18 @@ public class TransactionServiceV2 {
 				// Enrich the new transaction status before persisting
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
-				
-				
-				// Fetch payment response from gateway
-				if (razorpayRawResponse != null) {
-				    newTxn.setRazorpayResponse(
-				        ObjectMapper.convertValue(
-				            razorpayRawResponse,
-				            new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {}
-				        )
-				    );
-				}
 			}
+			
+			String tenantId = currentTxnStatus.getTenantId();
+			String BillId = currentTxnStatus.getBillId();
+			DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo,tenantId, BillId);
 
 			// Check if transaction is successful, amount matches etc
-			if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
-				TransactionRequest request = TransactionRequest.builder().requestInfo(requestInfo).transaction(newTxn)
-						.build();
-				paymentsService.registerPayment(request);
-			}
+						if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
+							TransactionRequest request = TransactionRequest.builder().requestInfo(requestInfo).transaction(newTxn)
+									.build();
+							paymentsService.registerPayment(request);
+						}
 
 			TransactionDump dump = TransactionDump.builder().txnId(currentTxnStatus.getTxnId())
 					.txnResponse(newTxn.getResponseJson()).auditDetails(newTxn.getAuditDetails()).build();
@@ -360,6 +374,44 @@ public class TransactionServiceV2 {
 				.totalPayableAmount(totalPayableAmount).callbackUrl(callbackUrl).orderIdArray(orderIdArray)
 				.consumerCodeArray(consumerCodeArray).user(user).build();
 	}
+	
+	public DemandAmountInfo fetchDemandAmountsForBill(
+	        RequestInfo requestInfo,
+	        String tenantId,
+	        String billId) {
+	
+	    BillResponse billResponse = billingService.searchBillById(requestInfo, tenantId, billId);
+	
+	    if (billResponse == null || billResponse.getBill() == null || billResponse.getBill().isEmpty()) {
+	        throw new CustomException("INVALID_BILL", "No bill found for billId: " + billId);
+	    }
+	
+	    Bill bill = billResponse.getBill().get(0);
+	    String consumerCode = bill.getConsumerCode();
+	
+	    DemandResponse demandResponse = billingService.searchDemand(requestInfo, tenantId, consumerCode);
+	
+	    if (demandResponse == null || demandResponse.getDemands() == null || demandResponse.getDemands().isEmpty()) {
+	        throw new CustomException("DEMAND_NOT_FOUND", "No demand found for consumerCode: " + consumerCode);
+	    }
+	
+	    BigDecimal taxAmount = BigDecimal.ZERO;
+	    BigDecimal collectionAmount = BigDecimal.ZERO;
+	
+	    for (Demand demand : demandResponse.getDemands()) {
+	
+	        if (demand.getDemandDetails() == null) continue;
+	
+	        for (DemandDetail detail : demand.getDemandDetails()) {
+	            taxAmount = taxAmount.add(detail.getTaxAmount());
+	            collectionAmount = collectionAmount.add(detail.getCollectionAmount());
+	        }
+	    }
+	
+	    return new DemandAmountInfo(taxAmount, collectionAmount);
+	}
+
+
 
 
 }

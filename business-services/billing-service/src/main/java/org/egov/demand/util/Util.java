@@ -29,10 +29,13 @@ import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.egov.demand.model.GrbgBillTracker;
+import org.egov.demand.model.PtTaxCalculatorTracker;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
+import org.egov.demand.model.BillIdRequest;
 
 import static java.util.Objects.isNull;
 import static org.egov.demand.util.Constants.*;
@@ -49,6 +52,8 @@ public class Util {
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
+	
+	
 
 	/**
 	 * prepares mdms request
@@ -93,6 +98,30 @@ public class Util {
 		} catch (Exception e) {
 			log.error("Error while fetvhing MDMS data", e);
 			throw new CustomException(INVALID_TENANT_ID_MDMS_KEY, INVALID_TENANT_ID_MDMS_MSG);
+		}
+	}
+	
+	public GrbgBillTracker getGarbageTracker(BillIdRequest request) {
+		StringBuilder uri = new StringBuilder(appProps.getGarbageHost()).append(appProps.getExtractGarbageTracker());
+		try {
+			Object response = serviceRequestRepository.fetchResult(uri.toString(), request);
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.convertValue(response, GrbgBillTracker.class);
+		} catch (Exception e) {
+			log.error("Error while fetching Garbage Tracker", e);
+			throw new CustomException(GARBAGE_TRACKER_FETCH_EXCEPTION, GARBAGE_TRACKER_FETCH_EXCEPTION_MSG);
+		}
+	}
+	
+	public PtTaxCalculatorTracker getPropertyTracker(BillIdRequest request) {
+		StringBuilder uri = new StringBuilder(appProps.getPropertyHost()).append(appProps.getExtractPropertyTracker());
+		try {
+			Object response = serviceRequestRepository.fetchResult(uri.toString(), request);
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.convertValue(response, PtTaxCalculatorTracker.class);
+		} catch (Exception e) {
+			log.error("Error while fetching Property Tracker", e);
+			throw new CustomException(PROPERTY_TRACKER_FETCH_EXCEPTION, PROPERTY_TRACKER_FETCH_EXCEPTION_MSG);
 		}
 	}
 

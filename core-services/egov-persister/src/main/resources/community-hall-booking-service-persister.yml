@@ -211,10 +211,11 @@ serviceMaps:
          
         - query: >
            UPDATE public.eg_chb_slot_detail
-           SET booking_date = ?, booking_to_date = ?
+           SET booking_date = ?, booking_to_date = ?,status = ?
            WHERE slot_id = ?;
           basePath: hallsBookingApplication.bookingSlotDetails.*
           jsonMaps:
            - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingDate
            - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingToDate
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.status
            - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.slotId

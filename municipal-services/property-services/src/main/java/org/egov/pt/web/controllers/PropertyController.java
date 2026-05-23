@@ -40,6 +40,7 @@ import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.pt.web.contracts.PropertyResponse;
 import org.egov.pt.web.contracts.PropertyStatusUpdateRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
+import org.egov.pt.web.contracts.CancelPropertyBillRequest;
 import org.egov.pt.web.contracts.TotalCountRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.egov.pt.web.contracts.PropertyBillSearchRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -218,6 +220,21 @@ public class PropertyController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping("/open/_search")
+	public ResponseEntity<?> searchPropertyAndBill(
+	        @RequestBody PropertyBillSearchRequest request) {
+
+		return propertyService.searchPropertyAndBillOpen(request);
+	}
+	
+	@PostMapping("/open/property-bills-search")
+	public ResponseEntity<?> searchPropertyWithBills(
+	        @RequestBody PropertyBillSearchRequest request) {
+
+	    return propertyService.searchPropertyWithAllBills(request);
+	}
+
+
 	@PostMapping("/_migration")
 	public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute OldPropertyCriteria propertyCriteria) {
@@ -359,10 +376,10 @@ public class PropertyController {
 	@PostMapping("/_generatePropertyTaxBillReceipt")
 	public ResponseEntity<Resource> generatePropertyTaxBillReceipt(
 			@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, @RequestParam String propertyId,
-			@RequestParam(required = false) String billId) {
+			@RequestParam(required = false) String billId, @RequestParam(required = false) String status) {
 
 		ResponseEntity<Resource> response = propertyService.generatePropertyTaxBillReceipt(requestInfoWrapper,
-				propertyId, billId);
+				propertyId, billId, status);
 
 		return response;
 	}
@@ -408,5 +425,79 @@ return ResponseEntity
         .status(HttpStatus.OK)
         .body(body);//		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping("/_searchProperty")
+	public ResponseEntity<PropertyResponse> searchProperty(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+
+		// If inbox search has been disallowed at config level or if inbox search is
+		// allowed but the current search is NOT, from inbox service validate the search
+		// criteria.
+		if (!configs.getIsInboxSearchAllowed() || !propertyCriteria.getIsInboxSearch()) {
+			propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
+		}
+
+		List<Property> properties = new ArrayList<Property>();
+		Map<Integer, PropertyCriteria> propertyCriteriaMap = new HashMap<>();
+		Integer count = 0;
+		Integer counter = 1;
+
+		if (propertyCriteria.getIsRequestForCount()) {
+			count = propertyService.count(requestInfoWrapper.getRequestInfo(), propertyCriteria);
+
+		} else {
+			propertyCriteriaMap.put(counter++, propertyCriteria);
+
+			if (propertyService.isCriteriaEmpty(propertyCriteria) && null != requestInfoWrapper.getRequestInfo()
+					&& null != requestInfoWrapper.getRequestInfo().getUserInfo() && requestInfoWrapper.getRequestInfo()
+							.getUserInfo().getType().equalsIgnoreCase(PTConstants.USER_TYPE_EMPLOYEE)) {
+				PropertyCriteria propertyCriteriaCreatedBy = propertyCriteria.copy();
+				if (!CollectionUtils.isEmpty(propertyCriteriaCreatedBy.getStatusList())) {
+					propertyCriteriaCreatedBy.setStatusList(null);
+				}
+				propertyCriteriaCreatedBy.setCreatedBy(
+						Collections.singleton(requestInfoWrapper.getRequestInfo().getUserInfo().getUuid()));
+
+				propertyCriteriaMap.put(counter++, propertyCriteriaCreatedBy);
+			}
+
+			if (propertyService.isCriteriaEmpty(propertyCriteria) && null != requestInfoWrapper.getRequestInfo()
+					&& null != requestInfoWrapper.getRequestInfo().getUserInfo() && requestInfoWrapper.getRequestInfo()
+							.getUserInfo().getType().equalsIgnoreCase(PTConstants.USER_TYPE_EMPLOYEE)) {
+
+				List<String> rolesWithinTenant = propertyValidator.getRolesByTenantId(propertyCriteria.getTenantId(),
+						requestInfoWrapper.getRequestInfo().getUserInfo().getRoles());
+
+				for (String role : rolesWithinTenant) {
+					if (role.equalsIgnoreCase(PTConstants.USER_ROLE_PROPERTY_VERIFIER)) {
+						PropertyCriteria propertyCriteriaFromExcel = propertyCriteria.copy();
+						if (!CollectionUtils.isEmpty(propertyCriteriaFromExcel.getStatusList())) {
+							propertyCriteriaFromExcel.setStatusList(null);
+						}
+						propertyCriteriaFromExcel.setStatus(Collections.singleton(Status.INITIATED));
+						propertyCriteriaFromExcel.setChannels(Collections.singleton(Channel.MIGRATION));
+
+						propertyCriteriaMap.put(counter++, propertyCriteriaFromExcel);
+					}
+				}
+			}
+
+			properties = propertyService.searchProperty(propertyCriteria, requestInfoWrapper.getRequestInfo(),
+					propertyCriteriaMap);
+		}
+
+		log.info("Property count after search" + properties.size());
+
+		PropertyResponse response = PropertyResponse
+				.builder().responseInfo(responseInfoFactory
+						.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.properties(properties).count(properties.size()).build();
+
+		propertyService.setAllCount(properties, response);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
 
 }

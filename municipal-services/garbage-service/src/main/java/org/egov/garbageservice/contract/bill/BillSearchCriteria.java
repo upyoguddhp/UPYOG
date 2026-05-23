@@ -46,6 +46,8 @@ public class BillSearchCriteria {
 	private Boolean isCancelled;
 
 	private Set<String> consumerCode;
+	
+	private Set<String> demandId;
 
 //	@Size(max = 256)
 	private String billNumber;

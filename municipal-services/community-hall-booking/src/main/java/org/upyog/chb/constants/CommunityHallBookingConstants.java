@@ -125,5 +125,9 @@ public class CommunityHallBookingConstants {
 	public static final String ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT = "RETURN_TO_INITIATOR_FOR_PAYMENT";
 
 	public static final String ACTION_APPROVE = "APPROVE";
+	
+	public static final String ACTION_REJECT = "REJECT";
+	public static final String ACTION_CANCEL = "CANCEL";
+
 
 }

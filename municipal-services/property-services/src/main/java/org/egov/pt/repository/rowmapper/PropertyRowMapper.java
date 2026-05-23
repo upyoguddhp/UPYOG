@@ -400,6 +400,12 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		currentProperty.setSurveyId(rs.getString("surveyId"));
 		currentProperty.setLinkedProperties(linkedProperties);
 		currentProperty.setTenantId(tenantId);
+		Boolean isBilling = null;
+		Object isBillingObj = rs.getObject("isbilling");
+		if(isBillingObj != null) {
+		    isBilling = rs.getBoolean("isbilling");
+		}
+		currentProperty.setIsBilling(isBilling);
 		currentProperty.setId(propertyUuId);
 	}
 

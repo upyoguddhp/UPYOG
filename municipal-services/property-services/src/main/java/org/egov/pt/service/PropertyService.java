@@ -14,11 +14,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.egov.pt.models.enums.BillStatus;
 
+
+import org.egov.pt.service.DemandService;
 import javax.validation.Valid;
-
+import org.egov.pt.models.bill.Demand.StatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -33,9 +37,12 @@ import org.egov.pt.models.PropertyBookingDetail;
 import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.PropertySearchRequest;
 import org.egov.pt.models.PropertySearchResponse;
+import org.egov.pt.web.contracts.CancelPropertyBillRequest;
+import org.egov.pt.web.contracts.PropertyBillSearchRequest;
 import org.egov.pt.models.PtTaxCalculatorTracker;
 import org.egov.pt.models.PtTaxCalculatorTrackerSearchCriteria;
 import org.egov.pt.models.bill.BillSearchCriteria;
+
 import org.egov.pt.models.bill.Demand;
 import org.egov.pt.models.bill.DemandDetail;
 import org.egov.pt.models.bill.GenerateBillCriteria;
@@ -86,6 +93,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 import org.egov.common.contract.request.RequestInfo;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper; 
+import org.egov.pt.web.contracts.UpdatePropertyBillCriteria;
+import org.egov.pt.models.AuditDetails;
+import org.egov.pt.util.CommonUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+
 
 @Slf4j
 @Service
@@ -129,6 +143,12 @@ public class PropertyService {
 
 	@Autowired
 	private CalculationService calculatorService;
+	
+	@Autowired
+	private DemandService demandService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Autowired
 	private FuzzySearchService fuzzySearchService;
@@ -159,9 +179,13 @@ public class PropertyService {
 
 	@Autowired
 	private PropertyService propertyService;
-	
+
 	@Autowired
 	private RequestInfoUtils requestInfoUtils;
+	
+	@Autowired
+	@Qualifier("propertyUtil")
+	private CommonUtils commonUtils;
 
 	/**
 	 * Enriches the Request and pushes to the Queue
@@ -981,7 +1005,7 @@ public class PropertyService {
 	}
 
 	public ResponseEntity<Resource> generatePropertyTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
-			@Valid String propertyId, @Valid String billId) {
+			@Valid String propertyId, @Valid String billId, String status) {
 
 		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
 				.propertyIds(Collections.singleton(propertyId)).build();
@@ -1004,9 +1028,20 @@ public class PropertyService {
 			return null;
 		}
 
-		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
-				.tenantId(ptTaxCalculatorTracker.getTenantId())
-				.billId(Collections.singleton(ptTaxCalculatorTracker.getBillId())).build();
+		BillSearchCriteria.BillSearchCriteriaBuilder builder =
+		        BillSearchCriteria.builder()
+		                .tenantId(ptTaxCalculatorTracker.getTenantId())
+		                .billId(Collections.singleton(ptTaxCalculatorTracker.getBillId()));
+		
+		if (status != null && !status.trim().isEmpty()) {
+		    Demand.StatusEnum dynamicStatus =
+		            Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+		    builder.status(dynamicStatus);
+		}
+		
+		BillSearchCriteria billSearchCriteria = builder.build();
+		
+	
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
@@ -1028,6 +1063,185 @@ public class PropertyService {
 				ptTaxCalculatorTracker, bill, tenantIdDaysMap);
 
 		return reportService.createNoSavePDF(pdfRequest);
+	}
+
+	public Boolean cancelPropertyBill(CancelPropertyBillRequest cancelRequest) {
+		
+		if (CollectionUtils.isEmpty(cancelRequest.getDemandId())) {
+		    throw new CustomException("INVALID_REQUEST", "DemandId is required");
+		}
+		
+		String demandId = cancelRequest.getDemandId().iterator().next();
+		
+		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
+		        PtTaxCalculatorTrackerSearchCriteria.builder()
+		        .demandIds(Collections.singleton(demandId))
+		        .billStatus(Collections.singleton(BillStatus.ACTIVE))
+				.build();
+
+		List<PtTaxCalculatorTracker> trackers = repository.getTaxCalculatedProperties(trackerSearchCriteria);
+		
+		if (CollectionUtils.isEmpty(trackers)) {
+			throw new CustomException("NO_TRACKER", "No active tracker found for the demand id");
+		}
+
+		PtTaxCalculatorTracker tracker = trackers.get(0);
+
+		if (trackers.size() > 1) {
+			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
+		}
+		
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.tenantId(cancelRequest.getTenantId())
+				.billId(Collections.singleton(cancelRequest.getBillId()))
+				.service(PTConstants.MODULE_PROPERTY)
+				.isActive(true)
+				.isCancelled(false)
+				.build();
+
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, cancelRequest.getRequestInfo());
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("INVALID UPDATE","No Bill exists for billId: " + cancelRequest.getBillId());
+		}
+
+		Bill bill = billResponse.getBill().get(0);
+		
+			demandService.cancelDemand(bill.getTenantId(), Collections.singleton(tracker.getDemandId()),
+					cancelRequest.getRequestInfo(), bill.getBusinessService());
+		
+		JsonNode additionalDetailsNode = buildCancelAdditionalDetails(cancelRequest.getReason());
+
+		UpdatePropertyBillCriteria updateBillCriteria = UpdatePropertyBillCriteria.builder().tenantId(bill.getTenantId())
+				.consumerCodes(Collections.singleton(bill.getConsumerCode()))
+				.billIds(Collections.singleton(bill.getId()))
+				.statusToBeUpdated(StatusEnum.CANCELLED)
+				.businessService(bill.getBusinessService())
+				.additionalDetails(additionalDetailsNode)
+				.build();
+		billService.cancelBill(updateBillCriteria, cancelRequest.getRequestInfo());
+		
+		AuditDetails audit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
+
+		PtTaxCalculatorTracker ptBilltracker =
+			PtTaxCalculatorTracker.builder()
+			.uuid(tracker.getUuid())
+			.propertyId(tracker.getPropertyId())
+			.tenantId(tracker.getTenantId())
+			.demandId(tracker.getDemandId())
+			.billStatus(BillStatus.CANCELLED)
+			.billId(bill.getId())
+			.auditDetails(audit)
+			.rebateAmount(tracker.getRebateAmount())
+			.penaltyAmount(tracker.getPenaltyAmount())
+			.propertyTax(tracker.getPropertyTax())
+			.build();
+
+		PtTaxCalculatorTrackerRequest trackerRequest =
+		        PtTaxCalculatorTrackerRequest.builder()
+		        .ptTaxCalculatorTracker(ptBilltracker)
+		        .requestInfo(cancelRequest.getRequestInfo())
+		        .build();
+
+		propertyService.updatePtTaxCalculatorTracker(trackerRequest);
+
+		PtTaxCalculatorTracker previousTracker = getPreviousTracker(tracker);
+		
+		if (previousTracker != null) {
+			BillSearchCriteria prevBillSearch = BillSearchCriteria.builder()
+					.billId(Collections.singleton(previousTracker.getBillId()))
+					.tenantId(cancelRequest.getTenantId())
+					.status(StatusEnum.EXPIRED)
+					.build();
+			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
+			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
+				Bill prevBill = prevBillResponse.getBill().get(0);
+
+				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
+
+				AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
+				PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
+						.uuid(previousTracker.getUuid()).billStatus(BillStatus.ACTIVE).auditDetails(prevAudit).build();
+
+				propertyService.updatePtTaxCalculatorTracker(
+						PtTaxCalculatorTrackerRequest.builder().ptTaxCalculatorTracker(prevTrackerToUpdate)
+								.requestInfo(cancelRequest.getRequestInfo()).build());
+				
+					BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+						.tenantId(cancelRequest.getTenantId())
+						.consumerCode(Collections.singleton(prevBill.getConsumerCode()))
+						.service(PTConstants.MODULE_PROPERTY)
+						.isActive(true)
+						.build();
+				BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+				if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+					for (Bill other : otherActiveResponse.getBill()) {
+						if (!Objects.equals(other.getId(), prevBill.getId())
+								&& other.getStatus() == Bill.StatusEnum.ACTIVE) {
+							other.setStatus(Bill.StatusEnum.CANCELLED);
+					        other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
+							billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+						}
+				}			
+				}
+			}
+		} else {
+		    BillSearchCriteria otherActiveSearch = BillSearchCriteria.builder()
+		            .tenantId(cancelRequest.getTenantId())
+		            .consumerCode(Collections.singleton(bill.getConsumerCode()))
+		            .service(PTConstants.MODULE_PROPERTY)
+		            .isActive(true)
+		            .build();
+
+		    BillResponse otherActiveResponse = billService.searchBill(otherActiveSearch, cancelRequest.getRequestInfo());
+
+		    if (otherActiveResponse != null && !CollectionUtils.isEmpty(otherActiveResponse.getBill())) {
+		        for (Bill other : otherActiveResponse.getBill()) {
+		            if (other.getStatus() == Bill.StatusEnum.ACTIVE) {
+		                other.setStatus(Bill.StatusEnum.CANCELLED);
+		                other.setAdditionalDetails(buildCancelAdditionalDetails(cancelRequest.getReason()));
+		                billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(other));
+		            }
+		        }
+		    }
+		}
+		 return true;  
+	}
+	
+	private PtTaxCalculatorTracker getPreviousTracker(PtTaxCalculatorTracker ptBillTracker) {
+		
+		PtTaxCalculatorTrackerSearchCriteria ptBillTrackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(Collections.singleton(ptBillTracker.getPropertyId()))
+				.build();
+
+		List<PtTaxCalculatorTracker> trackers = getTaxCalculatedProperties(ptBillTrackerSearchCriteria);
+    	trackers.sort((a, b) -> Long.compare(b.getAuditDetails().getCreatedTime(), a.getAuditDetails().getCreatedTime()));
+
+    	int index = -1;
+		for (int i = 0; i < trackers.size(); i++) {
+			if (trackers.get(i).getUuid().equals(ptBillTracker.getUuid())) {
+				index = i;
+				break;
+			}
+		}
+		if (index >= 0) {
+		    for (int i = index + 1; i < trackers.size(); i++) {
+		        PtTaxCalculatorTracker candidate = trackers.get(i);
+
+		        if (candidate.getBillStatus() != BillStatus.CANCELLED) {
+		            return candidate;
+		        }
+		    }
+		}
+		return null;
+	}
+	
+	private JsonNode buildCancelAdditionalDetails(String reason) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("reason", reason);
+	    map.put("reasonMessage", reason);
+	    return objectMapper.valueToTree(map);
 	}
 
 	public Map<String, Integer> getUlbDaysMap(MdmsResponse mdmsResponse) {
@@ -1059,10 +1273,13 @@ public class PropertyService {
 		List<Property> properties = searchProperty(pptcriteria, genrateArrearRequest.getRequestInfo(), null);
 
 		if (!CollectionUtils.isEmpty(properties)) {
+			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
+				
+				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), properties.get(0));
 
 				if (demand.getAdditionalDetails() instanceof Map) {
 				    Map<?, ?> map = (Map<?, ?>) demand.getAdditionalDetails();
@@ -1101,7 +1318,7 @@ public class PropertyService {
 								? properties.get(0).getOwners().get(0).getMobileNumber()
 								: "N/A");
 				
-				demand.setAdditionalDetails(demandAdditionalDetail);
+				demand.setAdditionalDetails(demandAdditionalDetail); 
 				
 				List<Demand> savedDemands = demandRepository.saveDemand(genrateArrearRequest.getRequestInfo(),
 						createArearDemand(demand, properties.get(0)));
@@ -1116,19 +1333,31 @@ public class PropertyService {
 						billCriteria);
 				if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 
-					CalculateTaxRequest calculateTaxRequest = CalculateTaxRequest.builder().requestInfo(genrateArrearRequest.getRequestInfo()).fromDate(new Date(demand.getTaxPeriodFrom()))
-										.toDate(new Date(demand.getTaxPeriodTo())).type("ARREAR").financialYear(getFinancialYearFromTimestamps(demand.getTaxPeriodFrom(),demand.getTaxPeriodTo())).build();
+					CalculateTaxRequest calculateTaxRequest = CalculateTaxRequest.builder()
+							.requestInfo(genrateArrearRequest.getRequestInfo())
+							.fromDate(new Date(demand.getTaxPeriodFrom())).toDate(new Date(demand.getTaxPeriodTo()))
+							.type("ARREAR")
+							.financialYear(
+									getFinancialYearFromTimestamps(demand.getTaxPeriodFrom(), demand.getTaxPeriodTo()))
+							.build();
 					JsonNode node = mapper.createObjectNode();
+					
+					String demandId = savedDemands.get(0).getId();
+					String ward = StringUtils.isNotEmpty(wardName) ? wardName : null;
+					
 					PtTaxCalculatorTrackerRequest ptTaxCalculatorTrackerRequest = enrichmentService
 							.enrichTaxCalculatorTrackerCreateRequest(properties.get(0), calculateTaxRequest,
-									demand.getMinimumAmountPayable(), node, billResponse.getBill(), BigDecimal.ZERO, demand.getMinimumAmountPayable());
+									demand.getMinimumAmountPayable(), node, billResponse.getBill(), BigDecimal.ZERO,
+									demand.getMinimumAmountPayable(),demandId, ward);
+					
+					AuditDetails audit = commonUtils.buildCreateAuditDetails(genrateArrearRequest.getRequestInfo());
+
+					repository.expireActiveTrackersByPropertyId(properties.get(0).getPropertyId(), audit);
+					
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
-				}
-				else 
-				{
-					throw new CustomException("INVALID_CONSUMERCODE",
-							"Bill not generated");
+				} else {
+					throw new CustomException("INVALID_CONSUMERCODE", "Bill not generated");
 				}
 			});
 			message = "Arear Generated Successfully";
@@ -1137,37 +1366,72 @@ public class PropertyService {
 		}
 		return message;
 	}
+	
+	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo, Property property) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+		        .consumerCode(Collections.singleton(property.getPropertyId()))
+		        .tenantId(property.getTenantId())
+		        .service(PTConstants.MODULE_PROPERTY)
+		        .build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
+		
+		if (billResponse == null) {
+			return;
+		}
+
+		for (Bill bill : billResponse.getBill()) {
+			if (bill.getBillDetails() == null) {
+				continue;
+			}
+
+			for (BillDetail detail : bill.getBillDetails()) {
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
+						existingTo)) {
+					throw new CustomException("ARREAR_PERIOD_OVERLAP",
+							"Arrear period overlaps with existing bill period");
+				}
+			}
+		}
+	}
+
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
+	}
 
 	public void checkPropertyArears(List<Demand> demands, Property property) {
 
 	}
 
-    public static String getFinancialYearFromTimestamps(long timestamp1, long timestamp2) {
-        // Pick the earlier date between the two
-        Date date1 = new Date(timestamp1);
-        Date date2 = new Date(timestamp2);
+	public static String getFinancialYearFromTimestamps(long timestamp1, long timestamp2) {
+		// Pick the earlier date between the two
+		Date date1 = new Date(timestamp1);
+		Date date2 = new Date(timestamp2);
 
-        Date earlierDate = date1.before(date2) ? date1 : date2;
+		Date earlierDate = date1.before(date2) ? date1 : date2;
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(earlierDate);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(earlierDate);
 
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH); // 0 = Jan, 3 = April
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH); // 0 = Jan, 3 = April
 
-        int fyStartYear;
-        if (month >= Calendar.APRIL) {
-            // If April or after, FY starts this year
-            fyStartYear = year;
-        } else {
-            // If before April, FY started last year
-            fyStartYear = year - 1;
-        }
+		int fyStartYear;
+		if (month >= Calendar.APRIL) {
+			// If April or after, FY starts this year
+			fyStartYear = year;
+		} else {
+			// If before April, FY started last year
+			fyStartYear = year - 1;
+		}
 
-        int fyEndYear = fyStartYear + 1;
+		int fyEndYear = fyStartYear + 1;
 
-        return fyStartYear + "-" + (fyEndYear % 100);  // e.g., "2023-24"
-    }
+		return fyStartYear + "-" + (fyEndYear % 100); // e.g., "2023-24"
+	}
 
 	public List<Demand> createArearDemand(Demand demand, Property property) {
 //		DemandDetail demandDetail = DemandDetail.builder().taxHeadMasterCode(PTConstants.PROPERTY_TAX_HEAD_MASTER_CODE)
@@ -1233,15 +1497,177 @@ public class PropertyService {
 	public void removePtBillFailure(PropertyBillFailure propertyBillFailure) {
 		producer.push(config.getRemoveBillFailureTopic(), propertyBillFailure);
 	}
-	
-	
+
 	public ResponseEntity<?> checkAndCreateUser(CreateObPassUserRequest createUserRequest) {
-		
+
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
-		
-		return userService.createNewObPassUser(createUserRequest,requestInfo);
-			
+
+		return userService.createNewObPassUser(createUserRequest, requestInfo);
+
 	}
 	
+	public ResponseEntity<?> searchPropertyAndBillOpen(PropertyBillSearchRequest request){
+
+
+	    RequestInfo systemRequestInfo = requestInfoUtils.getSystemRequestInfo();
+
+	    PropertyCriteria.PropertyCriteriaBuilder builder =
+	            PropertyCriteria.builder()
+	                    .isSearchInternal(true);
+
+	    if (StringUtils.isNotBlank(request.getPropertyUuid())) {
+	        builder.uuids(Collections.singleton(request.getPropertyUuid()));
+	    }
+
+	    if (StringUtils.isNotBlank(request.getPropertyId())) {
+	        builder.propertyIds(Collections.singleton(request.getPropertyId()));
+	    }
+
+	    if (StringUtils.isNotBlank(request.getApplicationNumber())) {
+	        builder.acknowledgementIds(
+	                Collections.singleton(request.getApplicationNumber())
+	        );
+	    }
+
+	    if (StringUtils.isNotBlank(request.getMobileNumber())) {
+	        builder.mobileNumber(request.getMobileNumber());
+	    }
+	    
+	    if (StringUtils.isNotBlank(request.getOldPropertyId())) {
+	        builder.oldPropertyId(request.getOldPropertyId());
+	    }
+
+	    if (StringUtils.isNotBlank(request.getOwnerName())) {
+	        builder.name(request.getOwnerName());
+	    }
+
+	    PropertyCriteria propertyCriteria = builder.build();
+
+	    if (propertyCriteria.getUuids() == null
+	            && propertyCriteria.getPropertyIds() == null
+	            && StringUtils.isBlank(propertyCriteria.getMobileNumber())
+	            && StringUtils.isBlank(propertyCriteria.getOldPropertyId())
+	            && StringUtils.isBlank(propertyCriteria.getName())) {
+
+	        throw new CustomException(
+	                "INVALID_SEARCH",
+	                "Provide at least one property filter"
+	        );
+	    }
+
+
+	    List<Property> properties =
+	            searchProperty(propertyCriteria, systemRequestInfo, null);
+
+	    Property property = properties.get(0);
+	    String tenantId = property.getTenantId();  
+
+	    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+	            .tenantId(tenantId)
+	            .billId(Collections.singleton(request.getBillId()))
+	            .build();
+
+	    BillResponse billResponse =
+	            billService.searchBill(billSearchCriteria, systemRequestInfo);
+
+	    if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+	        throw new CustomException("BILL_NOT_FOUND",
+	                "No bill found for billId: " + request.getBillId());
+	    }
+
+	    ObjectNode response = objectMapper.createObjectNode();
+	    response.set("property", objectMapper.valueToTree(property));
+	    response.set("bill", objectMapper.valueToTree(billResponse.getBill().get(0)));
+
+	    return ResponseEntity.ok(response);
+	}
+	
+	public ResponseEntity<?> searchPropertyWithAllBills(PropertyBillSearchRequest request) {
+	
+	    RequestInfo systemRequestInfo = requestInfoUtils.getSystemRequestInfo();
+	
+	    PropertyCriteria.PropertyCriteriaBuilder builder = PropertyCriteria.builder()
+	            .isSearchInternal(true);
+	
+	    if (StringUtils.isNotBlank(request.getPropertyId())) {
+	        builder.propertyIds(Collections.singleton(request.getPropertyId()));
+	    }
+	
+	    if (StringUtils.isNotBlank(request.getOldPropertyId())) {
+	        builder.oldpropertyids(Collections.singleton(request.getOldPropertyId()));
+	    }
+	
+	    if (StringUtils.isNotBlank(request.getMobileNumber())) {
+	        builder.mobileNumber(request.getMobileNumber());
+	    }
+	
+	    if (StringUtils.isNotBlank(request.getOwnerOldCustomerIds())) {
+	        builder.ownerOldCustomerIds(Collections.singleton(request.getOwnerOldCustomerIds()));
+	    }
+	
+	    if (StringUtils.isNotBlank(request.getOwnerName())) {
+	        builder.name(request.getOwnerName());
+	    }
+	
+	    PropertyCriteria propertyCriteria = builder.build();
+	
+	    if ((propertyCriteria.getPropertyIds() == null || propertyCriteria.getPropertyIds().isEmpty())
+	            && StringUtils.isBlank(propertyCriteria.getMobileNumber())
+	            && (propertyCriteria.getOldpropertyids() == null || propertyCriteria.getOldpropertyids().isEmpty())
+	            && (propertyCriteria.getOwnerOldCustomerIds() == null || propertyCriteria.getOwnerOldCustomerIds().isEmpty())
+	            && StringUtils.isBlank(propertyCriteria.getName())) {
+	
+	        throw new CustomException("INVALID_SEARCH", "Provide at least one property filter");
+	    }
+	
+	
+//	    if (CollectionUtils.isEmpty(matchedPropertyIds)) {
+//	        throw new CustomException("PROPERTY_NOT_FOUND", "No property found for given criteria");
+//	    }
+	
+	    PropertyCriteria idCriteria = PropertyCriteria.builder()
+	            .propertyIds(propertyCriteria.getPropertyIds())
+	            .oldpropertyids(propertyCriteria.getOldpropertyids())
+	            .ownerOldCustomerIds(propertyCriteria.getOwnerOldCustomerIds())
+	            .mobileNumber(propertyCriteria.getMobileNumber())
+	            .name(propertyCriteria.getName())
+	            .isSearchInternal(true)
+	            .build();
+	 
+	    List<Property> properties = searchProperty(idCriteria, systemRequestInfo, null);
+	
+	    if (CollectionUtils.isEmpty(properties)) {
+	        throw new CustomException("PROPERTY_NOT_FOUND", "No property found for given criteria");
+	    }
+	
+	    List<String> propertyIds = properties.stream()
+	            .map(Property::getPropertyId)
+	            .filter(Objects::nonNull)
+	            .collect(Collectors.toList());
+	
+	    BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+	            .tenantId(properties.get(0).getTenantId())
+	            .consumerCode(new HashSet<>(propertyIds))
+	            .retrieveAll(true)
+	            .service("PROPERTY")   
+	            .skipValidation(true)
+	            .isActive(true)
+	            .build();
+	
+	    BillResponse billResponse = billService.searchBill(billSearchCriteria, systemRequestInfo);
+	
+	    ObjectNode response = objectMapper.createObjectNode();
+	    response.set("properties", objectMapper.valueToTree(properties));
+	
+	    if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+	        response.putArray("bills");
+	    } else {
+	        response.set("bills", objectMapper.valueToTree(billResponse.getBill()));
+	    }
+	
+	    return ResponseEntity.ok(response);
+	}
+
+
 
 }

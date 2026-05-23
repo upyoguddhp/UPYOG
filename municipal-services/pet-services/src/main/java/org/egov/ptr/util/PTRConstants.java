@@ -300,6 +300,10 @@ public class PTRConstants {
 
 	public static final String MASTER_NAME_FEE_STRUCTURE = "FeeStructure";
 	
+	public static final String APPLICATION_TYPE_RENEWAL = "RENEWAL";
+	
+	public static final String APPLICATION_TYPE_NEW = "NEW";
+	
     // Alfresco keys
     public static final Long ALFRESCO_COMMON_DOCUMENT_ID = 0L;
     public static final String ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION = "PET certificate";

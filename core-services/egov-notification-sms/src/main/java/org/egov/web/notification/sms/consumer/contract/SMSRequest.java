@@ -36,10 +36,11 @@ public class SMSRequest {
     private String templateId;
 
     public Sms toDomain() {
+    	String smsServiceType = "otpmsg";
         if (category == null) {
-            return new Sms(mobileNumber, message, Category.OTHERS, expiryTime,templateId);
+            return new Sms(mobileNumber, message, Category.OTHERS, expiryTime,templateId,smsServiceType);
         } else {
-            return new Sms(mobileNumber, message, category, expiryTime, templateId);
+            return new Sms(mobileNumber, message, category, expiryTime, templateId,smsServiceType);
         }
     }
 }

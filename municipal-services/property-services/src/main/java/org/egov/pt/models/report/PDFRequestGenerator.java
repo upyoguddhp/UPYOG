@@ -23,9 +23,13 @@ import org.egov.pt.models.collection.Bill.StatusEnum;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.egov.pt.models.collection.BillDetail;
+import org.egov.pt.models.collection.BillAccountDetail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +51,14 @@ public class PDFRequestGenerator {
 		ptbr.put("ulbType", addressAdditionalDetails.get("ulbType").asText());
 		ptbr.put("ulbName", addressAdditionalDetails.get("ulbName").asText());
 		ptbr.put("billNo", bill.getBillNumber());
+		ptbr.put("mobileNumber", bill.getMobileNumber());
+		ptbr.put(
+			    "billDueDate",
+			    Instant.ofEpochMilli(bill.getBillDetails().get(0).getExpiryDate())
+			        .atZone(ZoneId.systemDefault())
+			        .toLocalDate()
+			        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+			);
 
 		ptbr.put("date",
 				Instant.ofEpochMilli(ptTaxCalculatorTracker.getAuditDetails().getCreatedTime())
@@ -83,7 +95,35 @@ public class PDFRequestGenerator {
 		ptbr.put("propertyId", property.getPropertyId());
 
 		ptbr.put("ownerOrOccupier",
-				property.getOwners().stream().map(OwnerInfo::getPropertyOwnerName).collect(Collectors.joining(", ")));
+			    property.getOwners().stream()
+			        .flatMap(owner -> {
+			            List<String> names = new ArrayList<>();
+
+			            if (owner.getPropertyOwnerName() != null) {
+			                names.add(owner.getPropertyOwnerName());
+			            }
+
+							if (owner.getAdditionalDetails() != null
+									&& owner.getAdditionalDetails().has("coOwnerName")) {
+
+								String anyOtherCoWorker = owner.getAdditionalDetails().has("anyOtherCoWorker")
+										? owner.getAdditionalDetails().get("anyOtherCoWorker").asText()
+										: null;
+								
+								if (!"No".equalsIgnoreCase(anyOtherCoWorker)) {
+									String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
+									if (coOwner != null && !coOwner.isEmpty()) {
+										names.add(coOwner);
+									}
+
+								}
+							}
+
+							return names.stream();
+						})
+			        .distinct()
+			        .collect(Collectors.joining(" & "))
+			);
 
 		ptbr.put("fatherOrHusbandName", property.getOwners().stream().map(owner -> {
 			if (owner.getAdditionalDetails() == null)
@@ -94,6 +134,19 @@ public class PDFRequestGenerator {
 			return nameObj.toString().replaceAll("\"", "");
 		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", ")));
 
+		
+		String fatherOrHusbandName = property.getOwners().stream().map(owner -> {
+			if (owner.getAdditionalDetails() == null)
+				return null;
+
+			Object nameObj = owner.getAdditionalDetails().get("fatherOrHusbandName");
+			if (nameObj == null)
+				return null;
+
+			return nameObj.toString().replaceAll("\"", "");
+		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", "));
+
+		ptbr.put("fatherOrHusbandName", escapeHtml(fatherOrHusbandName));
 		ptbr.put("noOfStories", String.valueOf(property.getNoOfFloors()));
 		ptbr.put("buildingNo", ""); // TODO blank
 
@@ -133,9 +186,7 @@ public class PDFRequestGenerator {
 				taxCalculated.add(matchedNode.get("propertyTaxCalculated").asText());
 				floorNos.add(escapeHtml(unit.getFloorNo().toString()));
 			}
-		}
-			
-
+		}	
 		Map<String, Object> ptDetailsTableRow = new HashMap<>();
 
 		ptDetailsTableRow.put("slNo", slNos);
@@ -153,24 +204,66 @@ public class PDFRequestGenerator {
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "PROPERTY_TAX_BILL_TABLE_ROW");
 		tableRow.put("values", ptDetailsTableRow);
+		
+		int arrearCount = 1;
+		List<String> arrearSlNos = new ArrayList<>();
+		List<String> financialYears = new ArrayList<>();
+		List<String> arrearTotals = new ArrayList<>();
+
+		if (bill.getBillDetails() != null) {
+
+		    for (BillDetail billDetail : bill.getBillDetails()) {
+		        arrearSlNos.add(String.valueOf(arrearCount++));
+		        LocalDate fromDate = Instant.ofEpochMilli(billDetail.getFromPeriod())
+		                .atZone(ZoneId.systemDefault())
+		                .toLocalDate();
+
+		        LocalDate toDate = Instant.ofEpochMilli(billDetail.getToPeriod())
+		                .atZone(ZoneId.systemDefault())
+		                .toLocalDate();
+
+		        String financialYear = fromDate.getYear() + "-" + toDate.getYear();
+		        financialYears.add(financialYear);
+		        BigDecimal total = BigDecimal.ZERO;
+		        if (billDetail.getBillAccountDetails() != null) {
+		            for (BillAccountDetail acc : billDetail.getBillAccountDetails()) {
+		                BigDecimal amt = acc.getAmount() != null ? acc.getAmount() : BigDecimal.ZERO;
+		                total = total.add(amt);
+		            }
+		        }
+		        arrearTotals.add(total.toString());
+		    }
+		}
+		
+		// Make arrear values a map of column -> list to match the expected table shape
+		Map<String, Object> arrearValuesMap = new HashMap<>();
+		arrearValuesMap.put("slNo", arrearSlNos);
+		arrearValuesMap.put("financialYear", financialYears);
+		arrearValuesMap.put("totalTax", arrearTotals);
+
+		Map<String, Object> arrearRowWrapper = new HashMap<>();
+		arrearRowWrapper.put("tag", "ARREAR_BILL_TABLE_ROW");
+		arrearRowWrapper.put("values", arrearValuesMap);
 
 		List<Map<String, Object>> tableRows = new ArrayList<>();
-		tableRows.add(tableRow);
-
+		if (ptTaxCalculatorTracker.getType().equals("ARREAR")) {
+		    tableRows.add(arrearRowWrapper);
+		} else {
+		    tableRows.add(tableRow);
+		}
+		
 		Map<String, Object> tableRowMap = new HashMap<>();
 		tableRowMap.put("TABLE_ROW", tableRows);
-
 		ptbr.put("plinthAreaTotal", String.valueOf(plinthAreaTotal));
-
 		BigDecimal propertyTax = ptTaxCalculatorTracker.getPropertyTaxWithoutRebate();
 		ptbr.put("propertyTax", String.valueOf(propertyTax));
-
 		BigDecimal penalty = null != ptTaxCalculatorTracker.getPenaltyAmount()
 				? ptTaxCalculatorTracker.getPenaltyAmount()
 				: new BigDecimal("0.00");
 		ptbr.put("penalty", String.valueOf(penalty));
+		
+		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax());
 
-		BigDecimal arrear = bill.getTotalAmount().subtract(ptTaxCalculatorTracker.getPropertyTax()).subtract(penalty);
 		ptbr.put("arrear", String.valueOf(arrear));
 
 		ptbr.put("propertyTaxPlusArrear", String.valueOf(propertyTax.add(arrear)));
@@ -183,15 +276,39 @@ public class PDFRequestGenerator {
 		ptbr.put("totalTax", String.valueOf(bill.getTotalAmount()));
 
 		BigDecimal amountPaid = BigDecimal.ZERO;
+		BigDecimal amountDue = BigDecimal.ZERO;
 		String paymentStatus = "";
 		String paymentDate = "";
-		if (bill.getStatus().equals(StatusEnum.PAID)) {
-			amountPaid = bill.getTotalAmount();
-			paymentStatus = "Success";
-			
-			paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime()).atZone(ZoneId.systemDefault())
-					.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		if (bill.getBillDetails() != null) {
+			for (BillDetail billDetail : bill.getBillDetails()) {
+				if (billDetail.getBillAccountDetails() != null) {
+					for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+						BigDecimal adjusted = accDetail.getAdjustedAmount() != null ? accDetail.getAdjustedAmount()
+								: BigDecimal.ZERO;
+						amountPaid = amountPaid.add(adjusted);
+					}
+				}
+			}
 		}
+		BigDecimal totalAmount = bill.getTotalAmount() != null
+		        ? bill.getTotalAmount()
+		        : BigDecimal.ZERO;
+		amountDue = totalAmount.subtract(amountPaid);
+
+		if (bill.getStatus().equals(StatusEnum.PAID)) {
+		    paymentStatus = "Success";
+		} else if (bill.getStatus().equals(StatusEnum.PARTIALLY_PAID)) {
+		    paymentStatus = "Partially Paid";
+		} else {
+		    paymentStatus = "Pending";
+		}
+		if (amountPaid.compareTo(BigDecimal.ZERO) > 0) {
+		    paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime())
+		            .atZone(ZoneId.systemDefault())
+		            .toLocalDateTime()
+		            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		}
+		ptbr.put("amountDue", String.valueOf(amountDue));
 		ptbr.put("amountPaid", String.valueOf(amountPaid));
 		ptbr.put("paymentStatus", paymentStatus);
 		ptbr.put("billGeneratedDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())

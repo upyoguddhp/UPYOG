@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import org.egov.common.contract.request.RequestInfo;
 import javax.validation.Valid;
 
 import org.egov.demand.model.AuditDetails;
@@ -55,6 +55,36 @@ public class BillRepositoryV2 {
 		String queryStr = billQueryBuilder.getBillQuery(billCriteria, preparedStatementValues);
 		log.debug("query:::"+queryStr+"  preparedStatementValues::"+preparedStatementValues);
 		return jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), searchBillRowMapper);
+	}
+	
+	public void updateBillStatusToExpiredByConsumerCodes(Set<String> consumerCodes, String tenantId,
+			RequestInfo requestInfo) {
+
+		if (CollectionUtils.isEmpty(consumerCodes)) {
+			return;
+		}
+
+		List<String> consumerCodeList = new ArrayList<>(consumerCodes);
+
+		jdbcTemplate.batchUpdate(BillQueryBuilder.UPDATE_BILL_STATUS_TO_EXPIRED_BY_CONSUMERCODE,
+				new BatchPreparedStatementSetter() {
+
+					@Override
+					public void setValues(PreparedStatement ps, int index) throws SQLException {
+						String consumerCode = consumerCodeList.get(index);
+						ps.setString(1, BillStatus.EXPIRED.name());
+						ps.setString(2, requestInfo.getUserInfo().getUuid());
+						ps.setLong(3, System.currentTimeMillis());
+						ps.setString(4, tenantId);
+						ps.setString(5, consumerCode);
+						ps.setString(6, BillStatus.ACTIVE.name());
+					}
+
+					@Override
+					public int getBatchSize() {
+						return consumerCodeList.size();
+					}
+				});
 	}
 	
 	@Transactional
@@ -198,23 +228,44 @@ public class BillRepositoryV2 {
 	 */
 	public Integer updateBillStatus(UpdateBillCriteria updateBillCriteria) {
 
-		Set<String> consumerCodes = updateBillCriteria.getConsumerCodes();
-		if(CollectionUtils.isEmpty(consumerCodes))
-			return 0;
-		
-		List<BillV2> bills =  findBill(BillSearchCriteria.builder()
-				.service(updateBillCriteria.getBusinessService())
-				.tenantId(updateBillCriteria.getTenantId())
-				.consumerCode(consumerCodes)
-				.build());
-		
+		Set<String> billIds = updateBillCriteria.getBillIds();
+		List<BillV2> bills;
+		if (!CollectionUtils.isEmpty(billIds)) {
+			bills = findBill(BillSearchCriteria.builder()
+					.service(updateBillCriteria.getBusinessService())
+					.tenantId(updateBillCriteria.getTenantId())
+					.billId(billIds)
+					.build());
+		}else {
+			Set<String> consumerCodes = updateBillCriteria.getConsumerCodes();
+			if (CollectionUtils.isEmpty(consumerCodes))
+				return 0;
+			bills = findBill(BillSearchCriteria.builder()
+					.service(updateBillCriteria.getBusinessService())
+					.tenantId(updateBillCriteria.getTenantId())
+					.consumerCode(consumerCodes)
+					.build());
+		}
+
 		if (CollectionUtils.isEmpty(bills))
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!status.equals(BillStatus.ACTIVE)) {
-			if (status.equals(BillStatus.PAID) || status.equals(BillStatus.PARTIALLY_PAID)) {
-				return -1;
+		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
+			if (status.equals(BillStatus.PAID)) {
+				if ("ADVT".equalsIgnoreCase(updateBillCriteria.getBusinessService())
+						&& BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
+
+					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
+
+					updateBillCriteria.setAdditionalDetails(util.jsonMerge(updateBillCriteria.getAdditionalDetails(),
+							bills.get(0).getAdditionalDetails()));
+					updateBillCriteria.setStatusToBeUpdated(BillStatus.REFUNDED);
+
+					String queryStr = billQueryBuilder.getRefundedBillUpdateQuery(updateBillCriteria, preparedStmtList);
+					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
+				}
+			    return -1;
 			}
 			else {
 				if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated()) && status.equals(BillStatus.EXPIRED)) {
@@ -224,22 +275,20 @@ public class BillRepositoryV2 {
 					String queryStr = billQueryBuilder.getBillCancelQuery(updateBillCriteria, preparedStmtList);
 					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 				}
-				else
+				else {
 					return 0;
+				}
 			}
 		}
 
 		if (BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
-
 			updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
 			updateBillCriteria.setAdditionalDetails(
 					util.jsonMerge(updateBillCriteria.getAdditionalDetails(), bills.get(0).getAdditionalDetails()));
-
 		} else {
-
 			updateBillCriteria.setBillIds(bills.stream().map(BillV2::getId).collect(Collectors.toSet()));
 		}
-		
+
 		String queryStr = billQueryBuilder.getBillStatusUpdateQuery(updateBillCriteria, preparedStmtList);
 		return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 	}
@@ -280,7 +329,7 @@ public class BillRepositoryV2 {
 				ps.setString(8, bill.getStatus().toString());
 				ps.setObject(9, util.getPGObject(bill.getAdditionalDetails()));
 				ps.setString(10, bill.getFileStoreId());
-				ps.setString(11, bill.getUserId());
+				ps.setString(11, bill.getPayerId());
 				ps.setString(12, bill.getConsumerCode());
 				ps.setString(13, bill.getId()); // WHERE clause uses ID
 			}

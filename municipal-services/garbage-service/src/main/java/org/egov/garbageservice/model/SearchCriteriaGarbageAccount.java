@@ -66,6 +66,9 @@ public class SearchCriteriaGarbageAccount {
     private Boolean isUserUuidNull;
     
     private Boolean isMonthlyBilling;
+    
+	@Builder.Default
+	private Boolean isPayNow = false;
 
     @Builder.Default
 	private Boolean isSchedulerCall = false;

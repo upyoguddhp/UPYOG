@@ -162,7 +162,7 @@
       </tr>
       <tr>
          <td>Issuance date:</td>
-         <td><span th:text="${createdTime}">NA</span></td>
+         <td><span th:text="${modifiedTime}">NA</span></td>
          
       </tr>
       <tr>
@@ -218,7 +218,7 @@
    <div class="sign">
 
    		<img th:src="${signature}" alt="signature..." />
-   		<p class="signature-details">Digitally Signed at <span th:text="${createdTime}">NA</span>
+   		<p class="signature-details">Digitally Signed at <span th:text="${modifiedTime}">NA</span>
    			<br />
    			<span th:text="${userName}">userName</span><br />
    			<span th:text="${ulbType}">NA</span>, <span th:text="${ulbName}">NA</span>

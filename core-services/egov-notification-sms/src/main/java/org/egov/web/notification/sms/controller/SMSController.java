@@ -6,13 +6,18 @@ import org.egov.web.notification.sms.models.SMSSentRequest;
 import org.egov.web.notification.sms.service.SMSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.egov.web.notification.sms.models.SmsTracker;
 import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.HashMap;
 import org.egov.web.notification.sms.service.SmsTrackerService;
+import org.egov.web.notification.sms.models.UserSearchResponse;
+
 
 
 @Slf4j
@@ -48,5 +53,14 @@ public class SMSController {
 	        smsTrackerService.createSmsTracker(tracker);
 	        return ResponseEntity.ok("SMS Tracker entry created successfully");
 	    }
-
+	 
+	@PostMapping(value = "/validateCitizen")
+		public ResponseEntity<?> validateCitizen(@RequestBody OTPSentRequest otpSentRequest) {
+			UserSearchResponse userSearchResponse = smsService.validateCitizen(otpSentRequest);
+			Map<String, Object> response = new HashMap<>();
+			response.put("requestInfo", userSearchResponse.getResponseInfo());
+			response.put("message", "Message sent successfully");
+			response.put("user", userSearchResponse.getUserSearchResponseContent().get(0));
+			return ResponseEntity.ok(response);
+		}
 }
