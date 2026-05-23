@@ -265,6 +265,14 @@ public class TransactionServiceV2 {
 				// Enrich the new transaction status before persisting
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
+
+				// Fetch payment response from gateway
+				if (razorpayRawResponse != null) {
+					newTxn.setRazorpayResponse(ObjectMapper.convertValue(razorpayRawResponse,
+							new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+							}));
+				}
+
 			}
 			
 			String tenantId = currentTxnStatus.getTenantId();
