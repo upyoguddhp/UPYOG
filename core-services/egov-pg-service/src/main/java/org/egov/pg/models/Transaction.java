@@ -202,6 +202,9 @@ public class Transaction {
 	@JsonProperty("isMultiTransaction")
     @Builder.Default
 	private Boolean isMultiTransaction = false;
+	
+	@JsonProperty("razorpayResponse")
+	private Object razorpayResponse;
 
 	/**
 	 * Current status of the transaction
