@@ -68,6 +68,7 @@ import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.contract.bill.BillAccountDetail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.egov.garbageservice.model.BillIdRequest;
+import org.egov.garbageservice.model.GenerateBillPreviewResponse;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -335,6 +336,116 @@ public class GarbageAccountSchedulerService {
 
 	}
 	
+	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
+
+		List<GenerateBillPreviewResponse> previewResponses = new ArrayList<>();
+		setFromDateToDate(generateBillRequest);
+		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
+		garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
+
+		if (garbageAccounts != null && !CollectionUtils.isEmpty(garbageAccounts)) {
+			garbageAccounts.forEach(garbageAccount -> {
+				List<String> errorList = new ArrayList<>();
+				ObjectNode calculationBreakdown = objectMapper.createObjectNode();
+				int numberOfMonths = 0;
+
+				if (!Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+					calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
+					calculationBreakdown.put("month",
+							generateBillRequest.getMonths().get(generateBillRequest.getMonths().size() - 1));
+				}
+
+				if (garbageAccount.getUserUuid() == null) {
+					errorList.add("Mobile number user not mapped");
+					previewResponses.add(GenerateBillPreviewResponse.builder()
+							.applicationNo(garbageAccount.getGrbgApplicationNumber())
+							.tenantId(garbageAccount.getTenantId()).ownerName(garbageAccount.getName())
+							.mobileNumber(garbageAccount.getMobileNumber())
+							.build());
+					return;
+				}
+
+				Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
+						garbageAccount.getTenantId());
+
+				BigDecimal monthlyAmount = mdmsService.fetchGarbageAmountFromMDMSResponse(mdmsResponse, garbageAccount,
+						errorList, calculationBreakdown);
+
+				if (monthlyAmount == null) {
+					errorList.add("Monthly amount not found from MDMS");
+					previewResponses.add(GenerateBillPreviewResponse.builder()
+							.applicationNo(garbageAccount.getGrbgApplicationNumber())
+							.tenantId(garbageAccount.getTenantId()).ownerName(garbageAccount.getName())
+							.mobileNumber(garbageAccount.getMobileNumber())
+							.build());
+					return;
+				}
+
+				if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+					Long from = generateBillRequest.getFromDateTimestamp();
+					Long to = generateBillRequest.getToDateTimestamp();
+
+					if (from != null && to != null) {
+						LocalDate fromDate = Instant.ofEpochMilli(from).atZone(ZoneId.systemDefault()).toLocalDate();
+						LocalDate toDate = Instant.ofEpochMilli(to).atZone(ZoneId.systemDefault()).toLocalDate();
+						numberOfMonths = (int) ChronoUnit.MONTHS.between(fromDate.withDayOfMonth(1),
+								toDate.withDayOfMonth(1)) + 1;
+					}
+				} else {
+					numberOfMonths = generateBillRequest.getMonths().size();
+				}
+
+				calculationBreakdown.put("monthCount", numberOfMonths);
+
+				BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
+				BigDecimal rebatePercentage = BigDecimal.ZERO;
+				BigDecimal rebateAmount = BigDecimal.ZERO;
+				BigDecimal finalBillAmount = billAmount;
+
+				if (Boolean.TRUE.equals(generateBillRequest.getIsRebate())) {
+					rebatePercentage = mdmsService.fetchGarbageRebateRate(generateBillRequest.getRequestInfo(),
+							garbageAccount.getTenantId());
+
+					if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
+						rebateAmount = billAmount.multiply(rebatePercentage).divide(BigDecimal.valueOf(100), 2,
+								RoundingMode.HALF_UP);
+						finalBillAmount = billAmount.subtract(rebateAmount);
+					}
+				}
+
+				calculationBreakdown.put("baseAmount", billAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("rebatePercentage",
+						rebatePercentage.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("rebateAmount",
+						rebateAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("finalAmount",
+						finalBillAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				if (billAmount == null || billAmount.compareTo(BigDecimal.ZERO) <= 0) {
+					errorList.add("Amount could not be calculated");
+				}
+
+				Object address = objectMapper.convertValue(garbageAccount.getAddresses(), Object.class);
+
+				previewResponses.add(GenerateBillPreviewResponse.builder()
+						.applicationNo(garbageAccount.getGrbgApplicationNumber()).tenantId(garbageAccount.getTenantId())
+						.ownerName(garbageAccount.getName()).mobileNumber(garbageAccount.getMobileNumber())
+						.monthlyAmount(monthlyAmount.setScale(2, RoundingMode.HALF_UP)).monthCount(numberOfMonths)
+						.garbageBillWithoutRebate(billAmount.setScale(2, RoundingMode.HALF_UP))
+						.rebatePercentage(rebatePercentage.setScale(2, RoundingMode.HALF_UP))
+						.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP))
+						.finalBillAmount(finalBillAmount.setScale(2, RoundingMode.HALF_UP))
+						.calculationDetails(calculationBreakdown).address(address)
+						.build());
+			});
+		}
+
+		return previewResponses;
+	}
+
 	private void sanatizeFailureLog(GenerateBillRequest generateBillRequest) {
 		producer.push(properties.getSanatizeLogger(),generateBillRequest.getUlbNames().get(0));
 	}
