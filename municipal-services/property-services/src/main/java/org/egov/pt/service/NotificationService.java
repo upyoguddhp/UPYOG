@@ -83,6 +83,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		    " after rebate valid for 15 days from bill date. " +
 		    "Pay: " + LINK_PLACEHOLDER +
 		    ". Citizen Seva H.P.";
+
 	private static final String EMAIL_SUBJECT_GENERATE_BILL = "Your Property Collection Bill for " + MONTH_PLACEHOLDER
 			+ "/" + " with " + PROPERTY_ID_PLACEHOLDER;
 	

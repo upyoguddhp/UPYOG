@@ -136,10 +136,10 @@ public class PropertySmsService {
     return String.format(
     	    "Dear %s, your Property Tax bill for FY %s (Property ID %s) "
     	    + "is generated for amount Rs.%s after rebate valid for 15 days "
-    	    + "from bill date. Pay: %s. Citizen Seva H.P.",
+    	    + "from bill date. Pay: %s%s%s. Citizen Seva H.P.",
     	    
     	    bill.getOwnerName(),
-    	    bill.getFinancialYear(), 
+    	    bill.getFromDate() + bill.getToDate(), 
     	    billId,
     	    bill.getGrbgBillAmount() != null ? bill.getGrbgBillAmount().doubleValue() : 0.0,
     	    "https://citizenseva.hp.gov.in/egov-url-shortening?id=nob"
