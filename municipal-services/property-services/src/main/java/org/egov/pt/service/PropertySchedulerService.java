@@ -50,6 +50,7 @@ import org.egov.pt.models.enums.Status;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.PtTaxCalculatorTrackerRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
+import org.egov.pt.web.contracts.SendPropertyEmailRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1698,6 +1699,22 @@ public class PropertySchedulerService {
 			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
 		}
 		return trackers.get(0);
+	}
+	
+	public void sendPropertyEmail(SendPropertyEmailRequest request) {
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(request.getBillId()))
+				.demandId(Collections.singleton(request.getDemandId())).tenantId(request.getTenantId())
+				.skipValidation(true).build();
+
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for given billId and demandId");
+		}
+
+		Bill bill = billResponse.getBill().get(0);
 	}
 
 
