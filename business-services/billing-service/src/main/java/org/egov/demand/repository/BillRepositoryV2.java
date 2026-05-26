@@ -253,6 +253,29 @@ public class BillRepositoryV2 {
 		BillStatus status = bills.get(0).getStatus();
 		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
 			if (status.equals(BillStatus.PAID)) {
+				if ("ADVT".equalsIgnoreCase(updateBillCriteria.getBusinessService())
+						&& BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
+
+					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
+
+					updateBillCriteria.setAdditionalDetails(util.jsonMerge(updateBillCriteria.getAdditionalDetails(),
+							bills.get(0).getAdditionalDetails()));
+					updateBillCriteria.setStatusToBeUpdated(BillStatus.REFUNDED);
+
+					String queryStr = billQueryBuilder.getRefundedBillUpdateQuery(updateBillCriteria, preparedStmtList);
+					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
+				} 
+				if ("chb-services".equalsIgnoreCase(updateBillCriteria.getBusinessService())) {
+
+					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
+
+					updateBillCriteria.setAdditionalDetails(util.jsonMerge(updateBillCriteria.getAdditionalDetails(),
+							bills.get(0).getAdditionalDetails()));
+					updateBillCriteria.setStatusToBeUpdated(BillStatus.REFUNDED);
+
+					String queryStr = billQueryBuilder.getRefundedBillUpdateQuery(updateBillCriteria, preparedStmtList);
+					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
+				} 
 			    return -1;
 			}
 			else {
@@ -262,7 +285,8 @@ public class BillRepositoryV2 {
 							util.jsonMerge(updateBillCriteria.getAdditionalDetails(), bills.get(0).getAdditionalDetails()));
 					String queryStr = billQueryBuilder.getBillCancelQuery(updateBillCriteria, preparedStmtList);
 					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
-				}
+				} 
+				
 				else {
 					return 0;
 				}

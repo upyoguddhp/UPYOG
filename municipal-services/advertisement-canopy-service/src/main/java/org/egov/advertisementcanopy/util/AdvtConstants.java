@@ -94,6 +94,8 @@ public class AdvtConstants {
 	public static final String SITE_BOOKING_CREATE_KAFKA_TOPIC = "create-site-booking";
 
 	public static final String SITE_BOOKING_UPDATE_KAFKA_TOPIC = "update-site-booking";
+	
+	public static final String BILL_CANCEL_TOPIC = "advt-bill-cancel-topic";
 
 	public static final String ACTION_INITIATE = "INITIATE";
 
@@ -122,7 +124,15 @@ public class AdvtConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 
 	public static final String STATUS_APPROVED = "APPROVED";
-
+	
+	public static final String ACTION_CANCEL = "CANCEL";
+	
+	public static final String STATUS_CANCELLED = "CANCELLED";
+	
+	public static final String ACTION_REJECT = "REJECT";
+	
+	public static final String STATUS_REJECTED = "REJECTED";
+	
     public static final String WORKFLOW_SITE_BOOKING_MODULE = "ADVT";
 
 	public static final String BUSINESS_SERVICE_SITE_BOOKING = "ADVT";
@@ -153,6 +163,8 @@ public class AdvtConstants {
 		map.put(ACTION_FORWARD_TO_APPROVER, STATUS_PENDINGFORAPPROVAL);
 		map.put(ACTION_VERIFY, STATUS_PENDINGFORAPPROVAL);
 		map.put(ACTION_APPROVE,STATUS_APPROVED);
+		map.put(ACTION_CANCEL, STATUS_CANCELLED);
+		map.put(ACTION_REJECT, STATUS_REJECTED);
 
 		if (!fetchValue) {
 			// return key
