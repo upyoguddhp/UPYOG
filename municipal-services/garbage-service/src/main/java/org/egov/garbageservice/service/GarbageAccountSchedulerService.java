@@ -632,6 +632,14 @@ public class GarbageAccountSchedulerService {
 		    }
 			generateBillRequest.setAdditionalDetail(additionalDetails);
 			String service = Type.equals("ON-DEMAND")?"GB_BULK":"GB";
+			
+			String mobileNumber = garbageAccount.getMobileNumber();
+			if (mobileNumber == null || !mobileNumber.matches("^[0-9]{10}$")) {
+			    throw new CustomException(
+			        "INVALID_MOBILE_NUMBER",
+			        "MobileNumber should be 10 digit number"
+			    );
+			}
 			savedDemands = demandService.generateDemand(generateBillRequest.getRequestInfo(), garbageAccount,service, billAmount, generateBillRequest);
 
 			if (CollectionUtils.isEmpty(savedDemands)) {
