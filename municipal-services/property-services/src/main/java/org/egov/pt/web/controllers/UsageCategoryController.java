@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/usage-category")
 public class UsageCategoryController {
-
     @Autowired
     private UsageCategoryUpdateService usageCategoryUpdateService;
     
