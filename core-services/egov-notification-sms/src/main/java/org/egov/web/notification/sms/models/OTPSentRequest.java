@@ -22,4 +22,7 @@ public class OTPSentRequest {
 		return isNotEmpty(number) && isNotEmpty(userUuid);
 	}
 
+	public boolean isNumberValid() {
+    	return isNotEmpty(number);}
+
 }

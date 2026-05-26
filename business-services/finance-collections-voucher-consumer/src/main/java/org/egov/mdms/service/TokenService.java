@@ -87,11 +87,12 @@ public class TokenService {
         map.add("grant_type", propertiesManager.getSiGrantType());
         map.add("tenantId", tenantId);
         map.add("userType", propertiesManager.getSiUserType());
-
+        map.add("skipTenantCheck", "TRUE");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, header);
 
         try {
-            LOGGER.debug("call: {}", propertiesManager.getTokenGenUrl());
+            LOGGER.info("call: {}", propertiesManager.getTokenGenUrl());
+            LOGGER.info("User Object: {}",request);
             Object response = restTemplate.postForObject(propertiesManager.getUserHostUrl().trim() + propertiesManager.getTokenGenUrl().trim(),
                     request, Object.class);
             if (response != null) {

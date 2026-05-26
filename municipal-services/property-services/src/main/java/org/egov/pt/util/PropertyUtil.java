@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
+import org.egov.pt.models.bill.BillAuditDetails;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
@@ -32,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.egov.pt.models.AuditDetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -303,6 +305,15 @@ public class PropertyUtil extends CommonUtils {
 		}
 		return response;
 	}
-
+	
+	public AuditDetails buildAuditDetails(RequestInfo requestInfo) {
+		String uuid = requestInfo.getUserInfo().getUuid();
+		return AuditDetails.builder()
+				.createdBy(uuid)
+				.createdTime(System.currentTimeMillis())
+				.lastModifiedBy(uuid)
+				.lastModifiedTime(System.currentTimeMillis())
+				.build();
+	}
 
 }

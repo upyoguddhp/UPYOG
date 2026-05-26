@@ -67,6 +67,12 @@ public class CommonUtils {
             return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
     }
     
+    public AuditDetails buildCreateAuditDetails(RequestInfo requestInfo) {
+		String uuid = requestInfo.getUserInfo().getUuid();
+		return AuditDetails.builder().createdBy(uuid).createdTime(System.currentTimeMillis()).lastModifiedBy(uuid)
+				.lastModifiedTime(System.currentTimeMillis()).build();
+	}
+    
 	/**
 	 *
 	 * @param property Property whose owners are to be returned

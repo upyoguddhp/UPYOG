@@ -655,7 +655,7 @@ config:
       - work-dir: "municipal-services/scheduler-service"
         image-name: "scheduler-services"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "municipal-services/scheduler-service/src/main/resources/db"
+      - work-dir: "municipal-services/scheduler-services/src/main/resources/db"
         image-name: "scheduler-services-db"
         
   - name: "builds/municipal-services/feedback-service"
@@ -860,6 +860,25 @@ config:
     build:
       - work-dir: dx-services/requester-services-dx
         image-name: requester-services-dx
-        dockerfile: build/maven/Dockerfile 
+        dockerfile: build/maven/Dockerfile
 
-   
+  - name: builds/rdf-monitoring
+    repo: https://github.com/upyoguddhp/RDFMonitoring.git
+    build:
+      - work-dir: .
+        image-name: rdf-monitoring
+        dockerfile: Dockerfile
+  - name: builds/upyog-frontend
+    repo: https://github.com/upyoguddhp/upyog-frontend.git
+    build:
+      - work-dir: .
+        image-name: hp-udd
+        dockerfile: Dockerfile
+        
+  - name: builds/upyog-frontend-vite
+    repo: https://github.com/upyoguddhp/upyog-frontend.git
+    build:
+      - work-dir: .
+        image-name: hp-udd-vite
+        dockerfile: Dockerfile
+

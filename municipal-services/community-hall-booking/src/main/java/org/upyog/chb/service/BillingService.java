@@ -9,6 +9,8 @@ import org.upyog.chb.web.models.billing.UpdateBillCriteria;
 import org.upyog.chb.web.models.collection.Bill;
 import org.upyog.chb.web.models.collection.BillRepository;
 //import org.egov.ptr.models.Property;
+import org.upyog.chb.web.models.collection.UpdateBillCriteria;
+
 import org.upyog.chb.web.models.collection.BillResponse;
 import org.upyog.chb.web.models.collection.BillSearchCriteria;
 import org.upyog.chb.web.models.collection.GenerateBillCriteria;
@@ -23,6 +25,10 @@ import org.springframework.stereotype.Service;
 import org.upyog.chb.web.models.billing.UpdateBillCriteria;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.upyog.chb.util.RestCallRepository;
+import org.upyog.chb.web.models.collection.UpdateBillRequest;
+//rest call 
 
 @Service
 public class BillingService {
@@ -45,6 +51,8 @@ public class BillingService {
 	@Autowired
 	private BillRepository billRepository;
 
+	@Autowired
+	private RestCallRepository restcallRepository;
 	
 
     public BillResponse generateBill(RequestInfo requestInfo,GenerateBillCriteria billCriteria){
@@ -111,5 +119,15 @@ public class BillingService {
 	    return billRepository.updateBill(requestInfo, bills);
 	}
 	
+
+	public void cancelBill(UpdateBillCriteria updateBillCriteria, RequestInfo requestInfo) {
+		String uri = config.getBillingHost().concat(config.getBillCancellEndpoint());
+		try {
+			restcallRepository.fetchResult(new StringBuilder(uri),UpdateBillRequest.builder()
+					.RequestInfo(requestInfo).UpdateBillCriteria(updateBillCriteria).build());
+		}catch(Exception e) {
+			//log.error("Exception while fetching user: ", e);
+		}
+	}
 
 }

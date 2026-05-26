@@ -38,5 +38,8 @@ public class CancelPropertyBillRequest {
 	
 	@NotNull
 	private String billId;
+	
+	@NotNull
+	private Set<String> demandId;
 
 }

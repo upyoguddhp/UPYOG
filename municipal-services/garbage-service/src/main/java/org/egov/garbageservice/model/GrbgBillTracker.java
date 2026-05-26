@@ -25,6 +25,8 @@ public class GrbgBillTracker {
 	private String toDate;
 	private String ward;
 	private String billId;
+	private String demandId;
+	private String consumerCode;
 	private String status = "ACTIVE";
 	@Builder.Default
 	private String type = "GENERAL";
@@ -32,4 +34,10 @@ public class GrbgBillTracker {
 	private AuditDetails auditDetails;
 	@JsonProperty("additionaldetail")
 	private JsonNode additionaldetail;
+	private Long expiryDate;                  
+	private BigDecimal grbgBillWithoutPenalty;
+	private BigDecimal penaltyAmount;
+	private BigDecimal rebateAmount;
+	private BigDecimal garbageBillWithoutRebate;
+
 }

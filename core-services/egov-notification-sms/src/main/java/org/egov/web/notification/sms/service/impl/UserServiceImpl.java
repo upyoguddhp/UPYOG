@@ -47,4 +47,36 @@ public class UserServiceImpl implements UserService {
 		return userSearchResponse;
 	}
 
+	public UserSearchResponse searchUserByNumber(String number) {
+
+    StringBuilder url = new StringBuilder(smsProperties.getUserServiceHostUrl());
+    url.append(smsProperties.getUserSearchEndpoint());
+
+    UserSearchRequest userSearchRequest = UserSearchRequest.builder()
+            .requestInfo(RequestInfo.builder().build())
+            .mobileNumber(number)
+            .tenantId("hp")
+            .build();
+
+    UserSearchResponse userSearchResponse = null;
+
+    try {
+
+        userSearchResponse = restTemplate.postForObject(
+                url.toString(),
+                userSearchRequest,
+                UserSearchResponse.class);
+
+    } catch (Exception e) {
+
+        log.error("Error occured while user search.", e);
+
+        throw new CustomException(
+                "USER SEARCH ERROR",
+                "Error occured while user search. Message: " + e.getMessage());
+    }
+
+    return userSearchResponse;
+}
+
 }

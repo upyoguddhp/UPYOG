@@ -35,8 +35,8 @@ public class GenerateBillRequest {
 	@JsonProperty("mobileNumbers")
 	private List<String> mobileNumbers;
 
-	@JsonProperty("month")
-	private String month;
+	@JsonProperty("months")
+	private List<String> months;
 
 	@JsonProperty("year")
 	private String year;
@@ -53,5 +53,17 @@ public class GenerateBillRequest {
 	
     @JsonProperty("additionalDetail")
     private Object additionalDetail;
+    
+    @Builder.Default
+    private Boolean isRebate = false;
+    
+    @Builder.Default
+    private Boolean isMultiMonth = false;
+    
+    @JsonProperty("fromDateTimestamp")
+    private Long fromDateTimestamp;
+
+    @JsonProperty("toDateTimestamp")
+    private Long toDateTimestamp;
 
 }

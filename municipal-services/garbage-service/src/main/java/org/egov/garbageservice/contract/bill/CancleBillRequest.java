@@ -25,6 +25,10 @@ public class CancleBillRequest {
 	@NotNull
 	@Valid
 	private Set<String> consumerCode;
+	
+	@NotNull
+	@Valid
+	private Set<String> demandId;
 
 	@NotNull
 	@Valid

@@ -4,9 +4,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.egov.pt.util.PTConstants;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
+@Component
+
 public class PTConstants {
 
-    private PTConstants() {}
+    //private PTConstants() {}
 
 
     public static final String PT_TYPE_VACANT = "VACANT";
@@ -475,6 +488,8 @@ public class PTConstants {
 	
 	public static final String MDMS_MODULE_ULBS = "ULBS";
 	public static final String MDMS_MODULE_PROPERTYTAXRATE = "PropertyTaxRate";
+	
+	public static final String MDMS_MODULE_PROPERTYTAXRATE_LAND = "PropertyTaxLandRate";
 
 	public static final String MDMS_MASTER_DETAILS_ZONES = "Zones";
 	public static final String MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE = "BuildingStructure";
@@ -488,7 +503,12 @@ public class PTConstants {
 	
 	public static final String MDMS_MASTER_DETAILS_PENALTYRATE = "PenaltyRate";
 	
+	public static final String MDMS_MASTER_DETAILS_PENALTYDAYS = "PropertyPenaltyDays";
+	
 	public static final String MDMS_MASTER_DETAILS_PROPERTYTAXRATE = "PropertyTaxRate";
+	
+	public static final String MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND = "PropertyTaxLandRate";
+	
 
 	public static final String MDMS_MODULE_ACTIVE_FILTER = "[?(@.active == true)]";
 	
@@ -496,5 +516,29 @@ public class PTConstants {
 	
 	public static final String PROPERTY_CONSTANT_REABATE = "REABATE";
 	public static final String PROPERTY_CONSTANT_PENALTY = "PENALTY";
+	
+	
+
+    // Alfresco keys
+	public static final String APPLICATION_STATUS_APPROVED = "APPROVED";
+	public static final String BUSINESS_SERVICE = "PROPERTY";
+
+    public static final Long ALFRESCO_COMMON_DOCUMENT_ID = 0L;
+    public static final String ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION = "Bulk Bills pdf";
+    public static final String ALFRESCO_COMMON_CERTIFICATE_ID = "";
+    public static final String ALFRESCO_COMMON_CERTIFICATE_TYPE = "PDF";
+    public static final String ALFRESCO_DOCUMENT_TYPE = "PDF";
+    public static final String ALFRESCO_TL_CERTIFICATE_COMMENT = "ward wise bills";
+    
+	public static final String DOWNLOADPDF = "downloadPdf";
+
+    
+    
+    @Value("${egov.alfresco.host}")
+    private String alfrescoHost;
+    
+    @Value("${egov.alfresco.endpoint.upload}")
+    private String alfrescoUploadEndPoint;
+
 }
 

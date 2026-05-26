@@ -222,7 +222,10 @@ public class PGRConfiguration {
     private String numberOfDays;
     
     @Value("${egov.complaints.category}")
-    private String complaintTypes;
-
+    private String complaintTypes; 
+//Application Count 
+    
+    @Value("${umeed.dashboard.sla.days}")
+    private int umeedDashboardSlaDays;
 
 }
