@@ -576,6 +576,10 @@ public class PetRegistrationService {
 				.equalsIgnoreCase(application.getStatus(), PTRConstants.APPLICATION_STATUS_REJECTED)).count());
 		responseDetail.put("applicationApproved", applications.stream().filter(application -> StringUtils
 				.equalsIgnoreCase(application.getStatus(), PTRConstants.APPLICATION_STATUS_APPROVED)).count());
+		responseDetail.put("applicationReverted", applications.stream().filter(application -> StringUtils
+				.equalsIgnoreCase(application.getStatus(), PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION)).count());
+		responseDetail.put("isBannedPet",
+			applications.stream().filter(application -> Boolean.TRUE.equals(application.getIsBannedPet())).count());
 
 		return responseDetail;
 	}
@@ -589,9 +593,7 @@ public class PetRegistrationService {
 		
 		PetRegistrationActionResponse tradeLicenseActionResponse = PetRegistrationActionResponse.builder()
 																.applicationDetails(new ArrayList<>())
-																.build();
-//		Map<String, Object> totalTaxMap = new HashMap<>();
-		
+																.build();		
 		ptradeLicenseActionRequest.getApplicationNumbers().stream().forEach(applicationNumber -> {
 			
 			// search application number
