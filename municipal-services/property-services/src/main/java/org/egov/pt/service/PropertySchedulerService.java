@@ -128,6 +128,9 @@ public class PropertySchedulerService {
 
 	@Value("${egov.sms.tracker.create.endpoint}")
 	private String smsTrackerCreateEndpoint;
+	
+	@Value("${egov.mail.tracker.create.endpoint}")
+	private String mailTrackerCreateEndpoint;
 
 //add new
 	@Autowired
@@ -1705,7 +1708,8 @@ public class PropertySchedulerService {
 
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
 				.billId(Collections.singleton(request.getBillId()))
-				.demandId(Collections.singleton(request.getDemandId())).tenantId(request.getTenantId())
+				.demandId(Collections.singleton(request.getDemandId()))
+				.tenantId(request.getTenantId())
 				.skipValidation(true).build();
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
@@ -1715,6 +1719,11 @@ public class PropertySchedulerService {
 		}
 
 		Bill bill = billResponse.getBill().get(0);
+		PtTaxCalculatorTracker tracker = getTrackerByBillId(BillIdRequest.builder()
+				                         .billId(request.getBillId())
+				                         .build());
+
+		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo());
 	}
 
 

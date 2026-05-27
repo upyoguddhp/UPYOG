@@ -42,11 +42,6 @@ public class EmailNotificationListener {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
-    	System.out.println("Printing Records for Kakfka Water topic");
-    	
-        System.out.println("Recors is ================================"+record);
-
         
     }
     

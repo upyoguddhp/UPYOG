@@ -56,6 +56,9 @@ import static org.egov.pt.util.PTConstants.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.JsonPath;
+import org.egov.pt.repository.RestCallRepository;
+import org.egov.pt.models.collection.BillDetail;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Slf4j
 @Service
@@ -113,6 +116,16 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	@Value("${frontend.base.uri}")
 	private String frontEndUri;
+	
+
+	@Value("${egov.mail.tracker.create.endpoint}")
+	private String mailTrackerCreateEndpoint;
+	
+	@Value("${egov.sms.host}")
+	private String mailHost;
+	
+	@Autowired
+	private RestCallRepository restCallRepository;
 	
 	public void sendNotificationForMutation(PropertyRequest propertyRequest) {
 
@@ -582,6 +595,67 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	}
 	
+	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo) {
+		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
+		String emailBody = getContentAsString(resource);
+		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
+	
+		Property newproperty = new Property();
+		newproperty.setPropertyId(propertyTracker.getPropertyId());
+		newproperty.setTenantId(bill.getTenantId());
+		
+		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
+		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
+	
+		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
+		sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null, emailSubject);
+		}
+		
+		try {
+			StringBuilder mailTrackerUri = new StringBuilder();
+			mailTrackerUri.append(mailHost).append(mailTrackerCreateEndpoint);
+			BillDetail billDetail = bill.getBillDetails().get(0);
+			
+			Map<String, Object> mailTrackerRequest = new HashMap<>();
+			mailTrackerRequest.put("uuid", UUID.randomUUID().toString());
+			mailTrackerRequest.put("amount", bill.getTotalAmount());
+			mailTrackerRequest.put("applicationNo", propertyTracker.getPropertyId());
+			mailTrackerRequest.put("tenantId", bill.getTenantId());
+			mailTrackerRequest.put("service", bill.getBusinessService());
+			mailTrackerRequest.put("fromDate",new SimpleDateFormat("dd-MM-yyyy").format(new Date(billDetail.getFromPeriod())));
+			mailTrackerRequest.put("toDate",new SimpleDateFormat("dd-MM-yyyy").format(new Date(billDetail.getToPeriod())));
+			mailTrackerRequest.put("createdBy", propertyTracker.getAuditDetails().getCreatedBy());
+			mailTrackerRequest.put("createdTime", System.currentTimeMillis());
+			mailTrackerRequest.put("billId", bill.getId());
+
+			JsonNode additionalDetails = billDetail.getAdditionalDetails();
+			mailTrackerRequest.put("additionalDetail", additionalDetails);
+			mailTrackerRequest.put("ownerMobileNo", bill.getMobileNumber());
+			mailTrackerRequest.put("ownerName", bill.getPayerName());
+			mailTrackerRequest.put("ward", additionalDetails.has("ward") ? additionalDetails.get("ward").asText() : null);
+			mailTrackerRequest.put("status", true);
+			
+			mailTrackerRequest.put("financialYear", propertyTracker.getFinancialYear());
+			mailTrackerRequest.put("year", propertyTracker.getFinancialYear());
+			mailTrackerRequest.put("lastModifiedBy", propertyTracker.getAuditDetails().getLastModifiedBy());
+			mailTrackerRequest.put("lastModifiedTime",propertyTracker.getAuditDetails().getLastModifiedTime());
+
+			Map<String, Object> emailRequestMap = new HashMap<>();
+			emailRequestMap.put("emailTo", Collections.singletonList(bill.getPayerEmail()));
+			emailRequestMap.put("subject", emailSubject);
+			emailRequestMap.put("body", emailBody);
+			emailRequestMap.put("isHTML", true);
+			mailTrackerRequest.put("mailRequest", emailRequestMap);
+
+			restCallRepository.fetchResult(mailTrackerUri, mailTrackerRequest);
+
+			log.info("Mail tracker entry created for billId {}", bill.getId());
+		} catch (Exception e) {
+			log.error("Mail tracker creation failed for billId {}", bill.getId(), e);
+		}	
+		
+	}
+	
 	public ObjectNode buildGeneratePropertyBillSmsRequest(
         Property property,
         Bill bill,
@@ -697,6 +771,8 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 		EmailRequest emailRequest = EmailRequest.builder().requestInfo(requestInfo).email(email).build();
 		kafkaTemplate.send(emailTopic, emailRequest);
+
+		
 	}
 	
 	public String getContentAsString(ClassPathResource resource) {
