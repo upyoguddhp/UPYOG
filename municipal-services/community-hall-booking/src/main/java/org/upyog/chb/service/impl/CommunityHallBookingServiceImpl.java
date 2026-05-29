@@ -314,16 +314,19 @@ public class CommunityHallBookingServiceImpl implements CommunityHallBookingServ
 				    Map<String, Object> additionalDetails = new HashMap<>();
 				    additionalDetails.put("reason", "CHB_CANCEL");
 				    additionalDetails.put("reasonMessage", "Booking Cancelled");
-				    JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
+				    JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);				    
+				    StatusEnum statusToUpdate = 
+				            StatusEnum.PAID.equals(bill.getStatus())
+				            ? StatusEnum.REFUNDED
+				            : StatusEnum.CANCELLED;
 				    UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder()
 				            .tenantId(bill.getTenantId())
 				            .billIds(Collections.singleton(bill.getId()))
 				            .consumerCodes(Collections.singleton(bill.getConsumerCode()))
 				            .businessService(bill.getBusinessService())
-				            .statusToBeUpdated(StatusEnum.CANCELLED)
+				            .statusToBeUpdated(statusToUpdate)
 				            .additionalDetails(additionalDetailsNode)
 				            .build();
-	
 				    billingService.cancelBill(updateBillCriteria,
 				            communityHallsBookingRequest.getRequestInfo());
 				  }

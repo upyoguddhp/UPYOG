@@ -45,7 +45,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.egov.pg.models.DemandAmountInfo;
 import org.egov.pg.models.Bill;
 import org.egov.pg.models.BillResponse;
-import org.egov.pg.models.Demand;
+import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
+import org.egov.pg.service.gateways.razorpay.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import lombok.extern.slf4j.Slf4j;
 import org.egov.pg.models.DemandResponse;
 import org.egov.pg.models.DemandDetail;
@@ -85,6 +89,11 @@ public class TransactionServiceV2 {
 	
 	@Autowired
 	private BillingService billingService;
+	
+	@Autowired
+	private RazorpayGateway RazorpayGateway;
+	
+	private ObjectMapper ObjectMapper;
 
 	/**
 	 * Initiates a transaction by generating a gateway redirect URI for the request
@@ -252,10 +261,17 @@ public class TransactionServiceV2 {
 				
 			} else {
 				newTxn = gatewayService.getLiveStatus(currentTxnStatus, requestParams);
+				Object razorpayRawResponse = newTxn.getResponseJson();
 
 				// Enrich the new transaction status before persisting
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
+
+				// Set payment response from gateway
+				if (razorpayRawResponse != null) {
+				    newTxn.setRazorpayResponse(razorpayRawResponse);
+				}
+
 			}
 			
 			String tenantId = currentTxnStatus.getTenantId();
