@@ -1162,7 +1162,17 @@ public class PropertyService {
 
 				AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 				PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
-						.uuid(previousTracker.getUuid()).billStatus(BillStatus.ACTIVE).auditDetails(prevAudit).build();
+					    .uuid(previousTracker.getUuid())
+					    .billStatus(BillStatus.ACTIVE)
+					    .auditDetails(prevAudit)
+					    .rebateAmount(previousTracker.getRebateAmount())           
+					    .penaltyAmount(previousTracker.getPenaltyAmount())         
+					    .propertyTax(previousTracker.getPropertyTax())             
+					    .propertyId(previousTracker.getPropertyId())               
+					    .tenantId(previousTracker.getTenantId())                   
+					    .demandId(previousTracker.getDemandId())                   
+					    .billId(previousTracker.getBillId())        
+					    .build();
 
 				propertyService.updatePtTaxCalculatorTracker(
 						PtTaxCalculatorTrackerRequest.builder().ptTaxCalculatorTracker(prevTrackerToUpdate)
