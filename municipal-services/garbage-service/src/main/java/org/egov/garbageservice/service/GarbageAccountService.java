@@ -2280,11 +2280,21 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			garbapplicationNos.add(childGrbgAccount.getGrbgApplicationNumber());
 
 		}
-		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
-				.grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
-				.year(grbgTaxCalculatorMonthTracker.getYear())
-				.build();
+		
+		GrbgBillTrackerSearchCriteria.GrbgBillTrackerSearchCriteriaBuilder trackerBuilder  =
+		        GrbgBillTrackerSearchCriteria.builder()
+		        .type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+		        .grbgApplicationIds(garbapplicationNos);
+
+		if (!StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getMonth())
+		        && !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getYear())) {
+			trackerBuilder.month(grbgTaxCalculatorMonthTracker.getMonth())
+		           .year(grbgTaxCalculatorMonthTracker.getYear());
+		} else {
+			trackerBuilder.billIds(Collections.singleton(grbgTaxCalculatorMonthTracker.getBillId()));
+		}
+
+		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = trackerBuilder.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
 		
@@ -2511,6 +2521,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 
+				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount);
+				
 				Map<String, Object> additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
 
 				// if null, initialize
@@ -2576,6 +2588,53 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		response.put("ResponseInfo", resInfo);
 		response.put("message", message);
 		return response;
+	}
+	
+	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
+			GarbageAccount garbageAccount) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+				.consumerCode(Collections.singleton(garbageAccount.getGrbgApplicationNumber()))
+				.tenantId(garbageAccount.getTenantId())
+				.service("GB")
+				.build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return;
+		}
+
+		for (Bill bill : billResponse.getBill()) {
+			
+			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+				continue;
+			}
+			
+			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
+			    continue;
+			}
+			 
+			for (BillDetail detail : bill.getBillDetails()) {
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+
+				if (existingFrom == null || existingTo == null) {
+					continue;
+				}
+
+				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
+						existingTo)) {
+
+					throw new CustomException("ARREAR_PERIOD_OVERLAP",
+							"Arrear period overlaps with existing bill period");
+				}
+			}
+		}
+	}
+	
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
 	}
 
 	public static String getFinancialYearFromTimestamps(long timestamp1, long timestamp2) {

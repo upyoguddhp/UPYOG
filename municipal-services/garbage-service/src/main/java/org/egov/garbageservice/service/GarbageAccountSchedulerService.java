@@ -208,7 +208,9 @@ public class GarbageAccountSchedulerService {
 								generateBillRequest.getMonths().size() > 1
 						        ? "MULTI_MONTH"
 						        : "MONTHLY";
-						        
+
+						validateExistingBillOverlap(generateBillRequest, garbageAccount);
+		
 						        AtomicReference<String> demandId = new AtomicReference<>(null);
 						        
 						        BillResponse billResponse =
@@ -334,6 +336,55 @@ public class GarbageAccountSchedulerService {
 		
 		return GrbgBillTrackerResponse.builder().grbgBillTrackers(grbgBillTrackers).message(message).build();
 
+	}
+	
+	private void validateExistingBillOverlap(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+				.consumerCode(Collections.singleton(garbageAccount.getGrbgApplicationNumber()))
+				.tenantId(garbageAccount.getTenantId()).service("GB").build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, generateBillRequest.getRequestInfo());
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return;
+		}
+
+		Long newFrom = generateBillRequest.getFromDateTimestamp() != null
+		        ? generateBillRequest.getFromDateTimestamp()
+		        : generateBillRequest.getFromDate().getTime();
+
+		Long newTo = generateBillRequest.getToDateTimestamp() != null
+		        ? generateBillRequest.getToDateTimestamp()
+		        : generateBillRequest.getToDate().getTime();
+
+		for (Bill bill : billResponse.getBill()) {
+
+			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+				continue;
+			}
+			
+			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
+			    continue;
+			}
+			for (BillDetail detail : bill.getBillDetails()) {
+
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+
+				if (existingFrom == null || existingTo == null) {
+					continue;
+				}
+
+				if (isOverlapping(newFrom, newTo, existingFrom, existingTo)) {
+					throw new CustomException("BILL_PERIOD_OVERLAP", "Bill already exists for overlapping period");
+				}
+			}
+		}
+	}
+	
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
 	}
 	
 	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
