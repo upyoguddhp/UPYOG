@@ -500,7 +500,7 @@ public class PropertySchedulerService {
 						// Notification
 						try {
 							notificationService.triggerNotificationsGenerateBill(tracker, parentBill,
-									trackerRequest.getRequestInfo());
+									trackerRequest.getRequestInfo(), calculateTaxRequest.getUlbNames().toString());
 						} catch (Exception ex) {
 							log.error("Notification failed for billId {}", parentBill.getId(), ex);
 						}
@@ -1711,6 +1711,8 @@ public class PropertySchedulerService {
 				.demandId(Collections.singleton(request.getDemandId()))
 				.tenantId(request.getTenantId())
 				.skipValidation(true).build();
+		
+		String ulbName = request.getTenantId().replaceFirst("^hp\\.", "");
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
 
@@ -1723,7 +1725,7 @@ public class PropertySchedulerService {
 				                         .billId(request.getBillId())
 				                         .build());
 
-		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo());
+		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName);
 	}
 
 

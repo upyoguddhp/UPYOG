@@ -571,7 +571,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	}
 	
-	public void triggerNotificationsGenerateBill(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo) {
+	public void triggerNotificationsGenerateBill(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName) {
 		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
 		String emailBody = getContentAsString(resource);
 		String smsBody = SMS_BODY_GENERATE_BILL;
@@ -587,7 +587,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
 			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
-					emailSubject);
+					emailSubject, ulbName);
 		}
 		if (!StringUtils.isEmpty(bill.getMobileNumber())) {
 			//sendSms(smsBody, bill.getMobileNumber());
@@ -595,7 +595,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	}
 	
-	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo) {
+	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName) {
 		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
 		String emailBody = getContentAsString(resource);
 		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
@@ -608,7 +608,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
-		sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null, emailSubject);
+		sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null, emailSubject, ulbName);
 		}
 		
 		try {
@@ -756,12 +756,13 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	}
 	
 	private void sendEmailforGenerateBill(String emailBody, List<String> emailIds, RequestInfo requestInfo,
-			List<String> attachmentDocRefIds, String emailSubject) {
+			List<String> attachmentDocRefIds, String emailSubject, String ulbName) {
 		Email email = new Email();
 		email.setEmailTo(new HashSet<>(emailIds));
 		email.setBody(emailBody);
 		email.setSubject(emailSubject);
-
+		email.setUlbName(ulbName);
+		
 		if (!CollectionUtils.isEmpty(attachmentDocRefIds)) {
 			email.setHTML(true);
 //			email.setFileStoreIds(attachmentDocRefIds);
