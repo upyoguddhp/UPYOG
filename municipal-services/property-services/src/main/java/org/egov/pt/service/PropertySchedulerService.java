@@ -137,9 +137,9 @@ public class PropertySchedulerService {
 		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
 
 		Boolean isBilling = false;
-
 		JsonNode ulbModules = null;
 		JsonNode propertyTaxRateModules = null;
+		JsonNode propertyTaxLandRateModules = null;
 		JsonNode zones = null;
 		JsonNode buildingStructures = null;
 		JsonNode buildingEstablishmentYears = null;
@@ -148,6 +148,7 @@ public class PropertySchedulerService {
 		JsonNode overAllRebatePercentages = null;
 		JsonNode earlyPaymentRebatePercentages = null;
 		JsonNode propertyTaxRates = null;
+		JsonNode propertyTaxLandRates = null;
 
 		BigDecimal days = calculateDays(calculateTaxRequest);
 
@@ -176,6 +177,10 @@ public class PropertySchedulerService {
 					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE));
 			propertyTaxRates = objectMapper
 					.valueToTree(propertyTaxRateModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE));
+			propertyTaxLandRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE_LAND));
+			propertyTaxLandRates = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND));
 		}
 
 		List<Property> properties = getProperties(calculateTaxRequest);
@@ -209,6 +214,7 @@ public class PropertySchedulerService {
 				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
 				BigDecimal oAndMRebatePercentage = null;
 				BigDecimal propertyTaxRatePercentage = null;
+				BigDecimal propertyTaxLandRatePercentage = null;
 				BigDecimal propertyTax = BigDecimal.ZERO;
 
 				Set<String> errorSet = new HashSet<>();
@@ -256,16 +262,16 @@ public class PropertySchedulerService {
 				}
 
 				// Validate factors
-				if (structuralFactor == null)
+				if (structuralFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + " (F2) is missing in mdms");
-				if (ageFactor == null)
+				if (ageFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(
 							PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + " (F3) is missing in mdms");
-				if (occupancyFactor == null)
+				if (occupancyFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + " (F4) is missing in mdms");
-				if (useFactor == null)
+				if (useFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + " (F5) is missing in mdms");
-				if (locationFactor == null)
+				if (locationFactor == null )
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
 				if (oAndMRebatePercentage == null)
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
@@ -308,11 +314,41 @@ public class PropertySchedulerService {
 						}
 					}
 				}
+				
+				for (JsonNode propertyTaxLandRate : propertyTaxLandRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxLandRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxLandRate.get("zone").asText().replaceFirst(ulbName + ".", ""))
+							) {
 
-				if (!BigDecimal.ZERO.equals(netRateableValue) && propertyTaxRatePercentage != null) {
-					propertyTax = netRateableValue.multiply(propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+						propertyTaxLandRatePercentage = new BigDecimal(propertyTaxLandRate.get("rate").asText());
+						
+					}
+				}
+
+				if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxRatePercentage != null 
+				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 1: NOT VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+
+				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxLandRatePercentage != null 
+				        && property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 2: VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxLandRatePercentage.divide(BigDecimal.valueOf(100)));
+
 				} else {
-					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    // Common error for both cases
+				    if (property.getPropertyType().equalsIgnoreCase("VACANT")) {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND + " is missing in mdms");
+				    } else {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    }
 				}
 
 				if (!BigDecimal.ZERO.equals(propertyTax)) {
@@ -376,7 +412,7 @@ public class PropertySchedulerService {
 					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
-
+				
 				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
 				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
@@ -513,6 +549,8 @@ public class PropertySchedulerService {
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
 				}
+
+			
 			} else {
 				createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
 			}
@@ -527,6 +565,7 @@ public class PropertySchedulerService {
 
 		JsonNode ulbModules = null;
 		JsonNode propertyTaxRateModules = null;
+		JsonNode propertyTaxLandRateModules = null;
 		JsonNode zones = null;
 		JsonNode buildingStructures = null;
 		JsonNode buildingEstablishmentYears = null;
@@ -535,6 +574,7 @@ public class PropertySchedulerService {
 		JsonNode overAllRebatePercentages = null;
 		JsonNode earlyPaymentRebatePercentages = null;
 		JsonNode propertyTaxRates = null;
+		JsonNode propertyTaxLandRates = null;
 		BigDecimal days = calculateDays(calculateTaxRequest);
 
 		Map<String, Set<String>> errorMap = new HashMap<>();
@@ -546,6 +586,9 @@ public class PropertySchedulerService {
 			ulbModules = objectMapper.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS));
 			propertyTaxRateModules = objectMapper
 					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE));
+			
+			propertyTaxLandRateModules = objectMapper
+					.valueToTree(mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_PROPERTYTAXRATE_LAND));
 
 			zones = objectMapper.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_ZONES));
 			buildingStructures = objectMapper
@@ -561,6 +604,8 @@ public class PropertySchedulerService {
 					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_EARLYPAYMENTREBATE));
 			propertyTaxRates = objectMapper
 					.valueToTree(propertyTaxRateModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE));
+			propertyTaxLandRates = objectMapper
+					.valueToTree(ulbModules.get(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND));
 		}
 
 		List<Property> properties = getProperties(calculateTaxRequest);
@@ -591,6 +636,7 @@ public class PropertySchedulerService {
 				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
 				BigDecimal oAndMRebatePercentage = null;
 				BigDecimal propertyTaxRatePercentage = null;
+				BigDecimal propertyTaxLandRatePercentage = null;
 				BigDecimal propertyTax = BigDecimal.ZERO;
 
 				Set<String> errorSet = new HashSet<>();
@@ -638,14 +684,14 @@ public class PropertySchedulerService {
 				}
 
 				// Validate factors
-				if (structuralFactor == null)
+				if (structuralFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE + " (F2) is missing in mdms");
-				if (ageFactor == null)
+				if (ageFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(
 							PTConstants.MDMS_MASTER_DETAILS_BUILDINGESTABLISHMENTYEAR + " (F3) is missing in mdms");
-				if (occupancyFactor == null)
+				if (occupancyFactor == null && property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGPURPOSE + " (F4) is missing in mdms");
-				if (useFactor == null)
+				if (useFactor == null && !property.getPropertyType().equalsIgnoreCase("VACANT"))
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_BUILDINGUSE + " (F5) is missing in mdms");
 				if (locationFactor == null)
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
@@ -691,10 +737,40 @@ public class PropertySchedulerService {
 					}
 				}
 
-				if (!BigDecimal.ZERO.equals(netRateableValue) && propertyTaxRatePercentage != null) {
-					propertyTax = netRateableValue.multiply(propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+				// Find property tax rate for land
+				for (JsonNode propertyTaxLandRate : propertyTaxLandRates) {
+					if (ulbName.equalsIgnoreCase(propertyTaxLandRate.get("ulbName").asText())
+							&& addressAdditionalDetails.get("zone").asText().equalsIgnoreCase(
+									propertyTaxLandRate.get("zone").asText().replaceFirst(ulbName + ".", ""))
+							) {
+
+						propertyTaxLandRatePercentage = new BigDecimal(propertyTaxLandRate.get("rate").asText());
+						
+					}
+				}
+				if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxRatePercentage != null 
+				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 1: NOT VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+
+				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
+				        && propertyTaxLandRatePercentage != null 
+				        && property.getPropertyType().equalsIgnoreCase("VACANT")) {
+
+				    // Case 2: VACANT
+				    propertyTax = netRateableValue.multiply(
+				            propertyTaxLandRatePercentage.divide(BigDecimal.valueOf(100)));
+
 				} else {
-					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    // Common error for both cases
+				    if (property.getPropertyType().equalsIgnoreCase("VACANT")) {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND + " is missing in mdms");
+				    } else {
+				        errorSet.add(PTConstants.MDMS_MASTER_DETAILS_PROPERTYTAXRATE + " is missing in mdms");
+				    }
 				}
 
 				if (!BigDecimal.ZERO.equals(propertyTax)) {
