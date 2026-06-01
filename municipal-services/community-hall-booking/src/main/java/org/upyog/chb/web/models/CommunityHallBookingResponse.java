@@ -51,6 +51,15 @@ public class CommunityHallBookingResponse   {
     @JsonProperty("applicationApplied")
     private int applicationApplied;
     
+    @JsonProperty("applicationCancelled")
+    private int applicationCancelled;
+    
+    @JsonProperty("applicationRejected")
+    private int applicationRejected;
+    
+    @JsonProperty("applicationPendingformodification")
+    private int applicationPendingformodification;
+    
     @JsonProperty("applicationPendingForPayment")
     private int applicationPendingForPayment;
     
