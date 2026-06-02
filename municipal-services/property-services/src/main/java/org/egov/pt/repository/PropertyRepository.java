@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,7 +48,6 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.egov.pt.models.AuditDetails;
 
 import org.egov.pt.models.data.TaxMetricsDTO;
@@ -65,36 +63,33 @@ public class PropertyRepository {
 
 	@Autowired
 	private PropertyQueryBuilder queryBuilder;
-	
-	
 
 	@Autowired
 	private PropertyRowMapper rowMapper;
-	
 	@Autowired
 	private PropertySearchRowMapper rowSearchMapper;
-	
+
 	@Autowired
 	private OpenPropertyRowMapper openRowMapper;
-	
+
 	@Autowired
 	private PropertyAuditRowMapper auditRowMapper;
-	
+
 	@Autowired
 	private PropertyUtil util;
-	
-    @Autowired
-    private UserService userService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private EncryptionCountRowMapper encryptionCountRowMapper;
 
 	@Autowired
 	private PropertyAuditEncRowMapper propertyAuditEncRowMapper;
-	
+
 	@Autowired
 	private PtTaxCalculatorTrackerRowMapper ptTaxCalculatorTrackerRowMapper;
-    
+
 	public List<String> getPropertyIds(Set<String> ownerIds, String tenantId) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -107,16 +102,17 @@ public class PropertyRepository {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query;
-		
-		if(criteria.getIsDefaulterNoticeSearch())
-			query=queryBuilder.getPropertySearchQueryForDeafauterNotice(criteria,preparedStmtList);
+
+		if (criteria.getIsDefaulterNoticeSearch())
+			query = queryBuilder.getPropertySearchQueryForDeafauterNotice(criteria, preparedStmtList);
 		else
-			query=queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch, false, propertyCriteriaMap);
-		
-		log.info("Query for Property search is " + query + " with parameters {}" ,  preparedStmtList);
+			query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch, false,
+					propertyCriteriaMap);
+
+		log.info("Query for Property search is " + query + " with parameters {}", preparedStmtList);
 		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
-		if(criteria.getIsDefaulterNoticeSearch())
+		if (criteria.getIsDefaulterNoticeSearch())
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowSearchMapper);
 		else
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
@@ -128,29 +124,24 @@ public class PropertyRepository {
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, false, true, null);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), new SingleColumnRowMapper<>());
 	}
-	
-	public List<PropertyInfo> getPropertyId(PropertyCriteria criteria){
+
+	public List<PropertyInfo> getPropertyId(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, false, true, null);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), new SingleColumnRowMapper<>());
-		
+
 	}
-	
+
 	public List<String> getOnlyPropertyIds(PropertyCriteria criteria) {
 
-	    List<Object> preparedStmtList = new ArrayList<>();
+		List<Object> preparedStmtList = new ArrayList<>();
 
-	    String query = queryBuilder.getOnlyPropertyIdQuery(criteria, preparedStmtList);
+		String query = queryBuilder.getOnlyPropertyIdQuery(criteria, preparedStmtList);
 
-	    log.info("Property ID Query: " + query);
+		log.info("Property ID Query: " + query);
 
-	    return jdbcTemplate.query(
-	            query,
-	            preparedStmtList.toArray(),
-	            new SingleColumnRowMapper<>(String.class)
-	    );
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
 	}
-
 
 	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria, Boolean isPlainSearch) {
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -170,23 +161,18 @@ public class PropertyRepository {
 	}
 
 	public List<String> fetchIds(PropertyCriteria criteria, Boolean isPlainSearch) {
-		
+
 		List<Object> preparedStmtList = new ArrayList<>();
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
-		if(isPlainSearch)
-		{
+		if (isPlainSearch) {
 			Set<String> tenantIds = criteria.getTenantIds();
-			if(!ObjectUtils.isEmpty(tenantIds))
-			{
+			if (!ObjectUtils.isEmpty(tenantIds)) {
 				builder.append(" where tenantid IN (").append(createQuery(tenantIds)).append(")");
 				addToPreparedStatement(preparedStmtList, tenantIds);
 			}
-		}
-		else
-		{
-			if(!ObjectUtils.isEmpty(criteria.getTenantId()))
-			{
+		} else {
+			if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
 				builder.append(" where tenantid=?");
 				preparedStmtList.add(criteria.getTenantId());
 			}
@@ -195,8 +181,10 @@ public class PropertyRepository {
 		builder.append(orderbyClause);
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
-		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
+		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(),
+				new SingleColumnRowMapper<>(String.class));
 	}
+
 	/**
 	 * Returns list of properties based on the given propertyCriteria with owner
 	 * fields populated from user service
@@ -209,7 +197,7 @@ public class PropertyRepository {
 			Boolean isInternal, Map<Integer, PropertyCriteria> propertyCriteriaMap) {
 
 		List<Property> properties;
-		
+
 		Boolean isOpenSearch = isInternal ? false : util.isPropertySearchOpen(requestInfo.getUserInfo());
 
 		if (criteria.isAudit() && !isOpenSearch) {
@@ -222,72 +210,73 @@ public class PropertyRepository {
 
 		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)
 				.map(OwnerInfo::getUuid).collect(Collectors.toSet());
-		
-	    List<String> ownerIdList = new ArrayList<>(ownerIds);
-	    int batchSize = 100;
-	    List<OwnerInfo> mergedUsers = new ArrayList<>();
-	    for (int i = 0; i < ownerIdList.size(); i += batchSize) {
-	        List<String> batch = ownerIdList.subList(i, Math.min(i + batchSize, ownerIdList.size()));
 
-	        UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
-	        userSearchRequest.setUuid(new HashSet<>(batch));
+		List<String> ownerIdList = new ArrayList<>(ownerIds);
+		int batchSize = 100;
+		List<OwnerInfo> mergedUsers = new ArrayList<>();
+		for (int i = 0; i < ownerIdList.size(); i += batchSize) {
+			List<String> batch = ownerIdList.subList(i, Math.min(i + batchSize, ownerIdList.size()));
 
-	        UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-	        if (userDetailResponse != null && !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-	            mergedUsers.addAll(userDetailResponse.getUser());
-	        }
-	    }
+			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(),
+					requestInfo);
+			userSearchRequest.setUuid(new HashSet<>(batch));
 
-	    UserDetailResponse mergedResponse = new UserDetailResponse();
-	    
-	    mergedResponse.setUser(mergedUsers);
+			UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+			if (userDetailResponse != null && !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
+				mergedUsers.addAll(userDetailResponse.getUser());
+			}
+		}
 
+		UserDetailResponse mergedResponse = new UserDetailResponse();
+
+		mergedResponse.setUser(mergedUsers);
 
 //		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
 //		userSearchRequest.setUuid(ownerIds);
 //
 //		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
 		util.enrichOwner(mergedResponse, properties, isOpenSearch);
-		
+
 		return properties;
 	}
-	
+
 	private List<Property> getPropertyAudit(PropertyCriteria criteria) {
 
 		String query = queryBuilder.getpropertyAuditQuery();
 		return jdbcTemplate.query(query, criteria.getPropertyIds().toArray(), auditRowMapper);
 	}
 
-
 	/**
 	 * 
 	 * Method to enrich property search criteria with user based criteria info
 	 * 
-	 * If no info found based on user criteria boolean true will be returned so that empty list can be returned 
+	 * If no info found based on user criteria boolean true will be returned so that
+	 * empty list can be returned
 	 * 
 	 * else returns false to continue the normal flow
 	 * 
-	 * The enrichment of object is done this way(instead of directly applying in the search query) to fetch multiple owners related to property at once
+	 * The enrichment of object is done this way(instead of directly applying in the
+	 * search query) to fetch multiple owners related to property at once
 	 * 
 	 * @param criteria
 	 * @param requestInfo
 	 * @return
 	 */
 	public Boolean enrichCriteriaFromUser(PropertyCriteria criteria, RequestInfo requestInfo) {
-		
+
 		Set<String> ownerIds = new HashSet<String>();
-		
-		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+
+		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
 			ownerIds.addAll(criteria.getOwnerIds());
 		criteria.setOwnerIds(null);
-		
+
 		String userTenant = criteria.getTenantId();
-		if(criteria.getTenantId() == null)
+		if (criteria.getTenantId() == null)
 			userTenant = requestInfo.getUserInfo().getTenantId();
 
 		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
-		//userSearchRequest.setName(criteria.getName());
+		// userSearchRequest.setName(criteria.getName());
 		userSearchRequest.setUuid(ownerIds);
 
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
@@ -296,16 +285,16 @@ public class PropertyRepository {
 
 		// fetching property id from owner table and enriching criteria
 		ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
-		
-		if (criteria.getIsCitizen()!=null && criteria.getMobileNumber()!=null) {
+
+		if (criteria.getIsCitizen() != null && criteria.getMobileNumber() != null) {
 			for (OwnerInfo user : userDetailResponse.getUser()) {
-				if (user.getAlternatemobilenumber()!=null && user.getAlternatemobilenumber().equalsIgnoreCase(criteria.getMobileNumber())) {
+				if (user.getAlternatemobilenumber() != null
+						&& user.getAlternatemobilenumber().equalsIgnoreCase(criteria.getMobileNumber())) {
 					ownerIds.remove(user.getUuid());
 				}
-				
+
 			}
 		}
-		
 
 		// only used to eliminate property-ids which does not have the owner
 		List<String> propertyIds = getPropertyIds(ownerIds, userTenant);
@@ -337,12 +326,12 @@ public class PropertyRepository {
 	}
 
 	public Integer getCount(PropertyCriteria propertyCriteria, RequestInfo requestInfo) {
-		
-        List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getPropertySearchQuery(propertyCriteria, preparedStmtList, false, false, null);
-        Integer count =  jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
-        return count;
-    }
+
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getPropertySearchQuery(propertyCriteria, preparedStmtList, false, false, null);
+		Integer count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
+		return count;
+	}
 
 	/** Method to find the total count of applications present in dB */
 	public Integer getTotalApplications(PropertyCriteria criteria) {
@@ -353,7 +342,7 @@ public class PropertyRepository {
 		Integer count = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return count;
 	}
-	
+
 	private void addToPreparedStatement(List<Object> preparedStmtList, Set<String> ids) {
 		ids.forEach(id -> {
 			preparedStmtList.add(id);
@@ -369,7 +358,8 @@ public class PropertyRepository {
 		log.info("\nQuery executed:" + query);
 		if (query == null)
 			return null;
-		EncryptionCount encryptionCount = jdbcTemplate.query(query, preparedStatement.toArray(), encryptionCountRowMapper);
+		EncryptionCount encryptionCount = jdbcTemplate.query(query, preparedStatement.toArray(),
+				encryptionCountRowMapper);
 		return encryptionCount;
 	}
 
@@ -394,7 +384,7 @@ public class PropertyRepository {
 				ptTaxCalculatorTrackerRowMapper);
 		return ptTaxCalculatorTrackers;
 	}
-	
+
 	public List<String> getTaxCalculatedTenantIds(
 			PtTaxCalculatorTrackerSearchCriteria ptTaxCalculatorTrackerSearchCriteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -402,31 +392,32 @@ public class PropertyRepository {
 				preparedStmtList);
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
-	
+
 	public List<Map<String, Object>> getStatusCounts(TotalCountRequest totalCountRequest) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getStatusBasedCountQuery(totalCountRequest, preparedStmtList);
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray());
 	}
-	
+
 	public List<Map<String, Object>> getPropertyMastersStatus(String UlbName) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertyMastersStatusQuery(UlbName, preparedStmtList);
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray());
 	}
-	
-	//DataMetrics
-	public Metrics getDataMetrics(long epochStart,long epochEnd, String wardName, int slaDays) {
+
+	// MetricsData
+	public Metrics getDataMetrics(long epochStart, long epochEnd, String wardName, int slaDays) {
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getDataMetricsSearchQuery(epochStart,epochEnd, wardName, slaDays, preparedStmtList);
+		String query = queryBuilder.getDataMetricsSearchQuery(epochStart, epochEnd, wardName, slaDays,
+				preparedStmtList);
 
 		return jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), (rs, rowNum) -> {
 			Metrics metrics = new Metrics();
-
+			metrics.setAssessments(rs.getInt("assessedProperties"));
 			metrics.setTodaysTotalApplications(rs.getInt("todaysTotalApplications"));
-		    metrics.setTodaysClosedApplications(rs.getInt("todaysClosedApplications"));
-		    metrics.setTodaysApprovedApplications(rs.getInt("todaysApprovedApplications"));
+			metrics.setTodaysClosedApplications(rs.getInt("todaysClosedApplications"));
+			metrics.setTodaysApprovedApplications(rs.getInt("todaysApprovedApplications"));
 			metrics.setTodaysApprovedApplicationsWithinSLA(rs.getInt("todaysApprovedApplicationsWithinSLA"));
 			metrics.setPendingApplicationsBeyondTimeline(rs.getInt("pendingApplicationsBeyondTimeline"));
 			metrics.setNoOfPropertiesPaidToday(rs.getInt("noOfPropertiesPaidToday"));
@@ -437,7 +428,7 @@ public class PropertyRepository {
 			return metrics;
 		});
 	}
-	
+
 	public List<DataItem> getUniqueWards(long startEpoch, long endEpoch) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getUniqueWardsSearchQuery(startEpoch, endEpoch, preparedStmtList);
@@ -449,77 +440,6 @@ public class PropertyRepository {
 			dataItem.setRegion(rs.getString("region"));
 			return dataItem;
 		});
-	}
-	
-	public List<DataItem> getTransactionWards(long startEpoch, long endEpoch) {
-
-	    List<Object> preparedStmtList = new ArrayList<>();
-
-	    String query = queryBuilder.getTransactionWardsQuery(startEpoch, endEpoch, preparedStmtList);
-
-	    return jdbcTemplate.query(query, preparedStmtList.toArray(), (rs, rowNum) -> {
-	        DataItem dataItem = new DataItem();
-	        dataItem.setWard(rs.getString("ward"));
-	        dataItem.setUlb(rs.getString("ulb"));
-	        dataItem.setRegion(rs.getString("region"));
-	        return dataItem;
-	    });
-	}
-
-	public List<String> getAllStatuses(Long epochStart, Long epochEnd, String wardNumber) {
-
-	    String query = "SELECT DISTINCT p.status " +
-	                   "FROM eg_pt_property p " +
-	                   "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-	                   "WHERE p.createdtime BETWEEN ? AND ? " +
-	                   "AND p.status IS NOT NULL " +
-	                   "AND addr.additionaldetails->>'wardNumber' = ? " +
-	                   "ORDER BY p.status";
-
-	    return jdbcTemplate.query(query,
-	            new Object[]{epochStart, epochEnd, wardNumber},
-	            (rs, rowNum) -> rs.getString("status"));
-	}
-
-public List<String> getAllUsageCategory(long epochStart, long epochEnd, String wardName) {
-
-    String query = "SELECT DISTINCT u.usagecategory AS usagecategory " +
-                   "FROM eg_pt_unit u " +
-                   "JOIN eg_pt_property p ON u.propertyid = p.id " +
-                   "JOIN eg_pt_address addr ON p.id = addr.propertyid " +
-                   "WHERE u.createdtime BETWEEN ? AND ? " +
-                   "AND addr.additionaldetails->>'wardNumber' = ?";
-
-    return jdbcTemplate.query(
-            query,
-            new Object[]{epochStart, epochEnd, wardName},
-            (rs, rowNum) -> rs.getString("usagecategory")
-    );
-}
-	
-//	public List<String> getAllPaymentMode() {
-//
-//		String query = "SELECT DISTINCT CASE "
-//				+ "WHEN gateway IN ('RAZORPAY','PAYTMPOS') THEN 'Digital' "
-//				+ "ELSE 'Non Digital' END AS paymentMode FROM eg_pg_transactions ORDER BY paymentMode;";
-//
-//		return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("paymentMode"));
-//	}
-//	
-	
-	public List<String> getAllPaymentMode() {
-
-	    return Arrays.asList("Digital", "Non Digital");
-	}
-	
-	public List<String> getAllFinancialYears() {
-
-		String query = "SELECT DISTINCT " + "CONCAT( "
-				+ "   EXTRACT(YEAR FROM to_timestamp(createdtime/1000) - INTERVAL '3 months'), " + "   '-', "
-				+ "   RIGHT(EXTRACT(YEAR FROM to_timestamp(createdtime/1000) + INTERVAL '9 months')::TEXT, 2) "
-				+ ") AS financial_year " + "FROM eg_pt_property " + "ORDER BY financial_year";
-
-	    return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("financial_year"));
 	}
 
 	public Map<String, Long> getTodayMovedApplication(long epochStart, long epochEnd, String wardName) {
@@ -536,13 +456,12 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return result;
 		});
 	}
-	
-	
-	public Map<String, Long> getPropertiesRegisteredByFinancialYear( long epochStart, long epochEnd,String wardName) {
+
+	public Map<String, Long> getPropertiesRegisteredByFinancialYear(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getPropertiesRegisteredFYQuery(epochStart, epochEnd,wardName, preparedStmtList);
+		String query = queryBuilder.getPropertiesRegisteredFYQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, Long> result = new HashMap<>();
@@ -552,7 +471,7 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return result;
 		});
 	}
-	
+
 	public Map<String, Long> getAssessedProperties(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -567,12 +486,13 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return result;
 		});
 	}
-	
+
 	public Map<String, Long> getTransactions(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName, preparedStmtList);
+		String query = queryBuilder.getTransactionAndCollectionAndPaymentQuery(epochStart, epochEnd, wardName,
+				preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, Long> result = new HashMap<>();
@@ -582,13 +502,13 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return result;
 		});
 	}
+
 //	
 	public Map<String, BigDecimal> getTodayCollection(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 
-		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName,
-				preparedStmtList);
+		String query = queryBuilder.getTodayCollectionQuery(epochStart, epochEnd, wardName, preparedStmtList);
 
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
 			Map<String, BigDecimal> result = new HashMap<>();
@@ -617,68 +537,7 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return result;
 		});
 	}
-//	public Map<String, BigDecimal> getPropertyTax(long epochStart, long epochEnd, String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//	        Map<String, BigDecimal> result = new HashMap<>();
-//	        while (rs.next()) {
-//	            result.put(rs.getString("name"), rs.getBigDecimal("propertyTax")); 
-//	        }
-//	        return result;
-//	    });
-//	}
-//	
-//	public Map<String, BigDecimal> getCess(long epochStart, long epochEnd, String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//	        Map<String, BigDecimal> result = new HashMap<>();
-//	        while (rs.next()) {
-//	            result.put(rs.getString("name"), rs.getBigDecimal("cess")); 
-//	        }
-//	        return result;
-//	    });
-//	}
-//	
-//	public Map<String, BigDecimal> getRebate(long epochStart, long epochEnd, String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//	        Map<String, BigDecimal> result = new HashMap<>();
-//	        while (rs.next()) {
-//	            result.put(rs.getString("name"), rs.getBigDecimal("rebate")); 
-//	        }
-//	        return result;
-//	    });
-//	}
-//	
-//	public Map<String, BigDecimal> getPenalty(long epochStart, long epochEnd, String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//	        Map<String, BigDecimal> result = new HashMap<>();
-//	        while (rs.next()) {
-//	            result.put(rs.getString("name"), rs.getBigDecimal("penalty")); 
-//	        }
-//	        return result;
-//	    });
-//	}
-	
-	
-	//----new
+
 	public List<TaxMetricsDTO> getTaxMetrics(long epochStart, long epochEnd, String wardName) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -701,72 +560,52 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 
 			dto.setRebate(rs.getBigDecimal("rebate"));
 
-			return dto;			
+			return dto;
 		});
 	}
+	//---------------metricData end  
+	
 
-	//--
-	
-	
-//	public Map<String, BigDecimal> getInterest(long epochStart, long epochEnd, String wardName) {
-//
-//	    List<Object> preparedStmtList = new ArrayList<>();
-//
-//	    String query = queryBuilder.getTaxMetricsQuery(epochStart, epochEnd, wardName, preparedStmtList);
-//
-//	    return jdbcTemplate.query(query, preparedStmtList.toArray(), rs -> {
-//	        Map<String, BigDecimal> result = new HashMap<>();
-//	        while (rs.next()) {
-//	            result.put(rs.getString("name"), rs.getBigDecimal("interest")); 
-//	        }
-//	        return result;
-//	    });
-//	}
-	
 	public List<Map<String, Object>> getUsageCategoryData() {
-		
-		String query =
-		        "SELECT id, additional_details->>'useOfBuilding' AS useOfBuilding "
-		      + "FROM eg_pt_unit "
-		      + "WHERE additional_details IS NOT NULL ";
-		    //  + "AND usagecategory IS  NULL";
+
+		String query = "SELECT id, additional_details->>'useOfBuilding' AS useOfBuilding " + "FROM eg_pt_unit "
+				+ "WHERE additional_details IS NOT NULL ";
 		return jdbcTemplate.queryForList(query);
 	}
-	
+
 	public void updateUsageCategory(String category, String id) {
 
 		String query = "UPDATE eg_pt_unit " + "SET usagecategory = ? " + "WHERE id = ? ";
-		//  + "AND usagecategoryv2 IS NULL";
-		
+
 		jdbcTemplate.update(query, category, id);
 	}
 
-	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward, String created_at) { 
+	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward,
+			String created_at) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		//preparedStmtList.add(status);   
-	    String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList,ulbName, isforce, ward, created_at );
-        log.info("propertyLog {}", query );
-        log.info("params {}",preparedStmtList );
+		// preparedStmtList.add(status);
+		String query = queryBuilder.getActiveBillsQuery(status, preparedStmtList, ulbName, isforce, ward, created_at);
+		log.info("propertyLog {}", query);
+		log.info("params {}", preparedStmtList);
 
-
-		return jdbcTemplate.queryForList(query, preparedStmtList.toArray()); 
-		}
-	
-		public List<PtTaxCalculatorTracker> extractTrackers(PtTaxCalculatorTrackerSearchCriteria criteria) {
-			List<Object> preparedStmtList = new ArrayList<>();
-			String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
-			return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
-		}
-		
-		public int expireActiveTrackersByPropertyId(String propertyId, AuditDetails auditDetails) {
-			String query = queryBuilder.getExpireActiveTrackersByPropertyIdQuery();
-			return jdbcTemplate.update(query, auditDetails.getLastModifiedBy(), auditDetails.getLastModifiedTime(),
-					propertyId);
-		}
-		
-		public int updateStatus(PtTaxCalculatorTracker tracker) {
-			List<Object> preparedStmtList = new ArrayList<>();
-			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
-			return jdbcTemplate.update(query, preparedStmtList.toArray());
-		}
+		return jdbcTemplate.queryForList(query, preparedStmtList.toArray());
 	}
+
+	public List<PtTaxCalculatorTracker> extractTrackers(PtTaxCalculatorTrackerSearchCriteria criteria) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getTaxCalculatedPropertiesSearchQuery(criteria, preparedStmtList);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), ptTaxCalculatorTrackerRowMapper);
+	}
+
+	public int expireActiveTrackersByPropertyId(String propertyId, AuditDetails auditDetails) {
+		String query = queryBuilder.getExpireActiveTrackersByPropertyIdQuery();
+		return jdbcTemplate.update(query, auditDetails.getLastModifiedBy(), auditDetails.getLastModifiedTime(),
+				propertyId);
+	}
+
+	public int updateStatus(PtTaxCalculatorTracker tracker) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
+		return jdbcTemplate.update(query, preparedStmtList.toArray());
+	}
+}

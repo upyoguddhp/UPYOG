@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Metrics {
-	 private long assessments;
+	    private long assessments;
 		private long todaysTotalApplications;
 		private long todaysClosedApplications;
 		private long noOfPropertiesPaidToday;
