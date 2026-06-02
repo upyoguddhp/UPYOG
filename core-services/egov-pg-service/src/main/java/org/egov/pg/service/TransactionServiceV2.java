@@ -276,7 +276,11 @@ public class TransactionServiceV2 {
 			
 			String tenantId = currentTxnStatus.getTenantId();
 			String BillId = currentTxnStatus.getBillId();
-			DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo,tenantId, BillId);
+			try {
+				DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo, tenantId, BillId);
+			} catch (Exception e) {
+			    log.error("Unable to fetch demand amounts for bill {}", BillId, e);
+			}
 
 			// Check if transaction is successful, amount matches etc
 						if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
