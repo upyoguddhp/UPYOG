@@ -9,6 +9,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.egov.web.notification.mail.config.EmailProperties;
+import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,9 +22,13 @@ public class ExternalEmailService implements EmailService {
 	public static final String EXCEPTION_MESSAGE = "Exception creating HTML email";
 	private JavaMailSenderImpl mailSender;
 
-    public ExternalEmailService(JavaMailSenderImpl mailSender) {
-        this.mailSender = mailSender;
-    }
+	public ExternalEmailService(JavaMailSenderImpl mailSender, EmailProperties emailProperties) {
+
+		this.mailSender = mailSender;
+		this.emailProperties = emailProperties;
+	}
+    
+    private EmailProperties emailProperties;
     
     @Override
     public void sendEmail(Email email) {
@@ -42,8 +48,10 @@ public class ExternalEmailService implements EmailService {
 	}
 
 	private void sendHTMLEmail(Email email) {
-		MimeMessage message = mailSender.createMimeMessage();
+		JavaMailSenderImpl dynamicSender = getMailSender(email.getUlbName());
+		MimeMessage message = dynamicSender.createMimeMessage();
 		MimeMessageHelper helper;
+
 		try {
 			helper = new MimeMessageHelper(message, true);
 			helper.setTo(email.getEmailTo().toArray(new String[0]));
@@ -53,6 +61,29 @@ public class ExternalEmailService implements EmailService {
 			log.error(EXCEPTION_MESSAGE, e);
 			throw new RuntimeException(e);
 		}
-		mailSender.send(message);
+		dynamicSender.send(message);
 	}
+	
+	private JavaMailSenderImpl getMailSender(String ulbName) {
+
+		if (!"Solan".equalsIgnoreCase(ulbName)) {
+			return mailSender;
+		}
+
+		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+
+		sender.setHost(emailProperties.getMailHost());
+		sender.setPort(emailProperties.getMailPort());
+		sender.setProtocol(emailProperties.getMailProtocol());
+		sender.setUsername(emailProperties.getSolanUsername());
+		sender.setPassword(emailProperties.getSolanPassword());
+
+		Properties props = sender.getJavaMailProperties();
+		props.put("mail.smtps.auth", emailProperties.getMailSmtpsAuth());
+		props.put("mail.smtps.starttls.enable", emailProperties.getMailStartTlsEnabled());
+		props.put("mail.smtps.debug", emailProperties.getMailSmtpsDebug());
+
+		return sender;
+	}
+	
 }
