@@ -34,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import java.math.BigDecimal;
 
 import static org.egov.echallan.util.ChallanConstants.*;
 
@@ -152,7 +153,16 @@ public class NotificationService {
 
 		String body = SMS_BODY_CREATE_CHALLAN;
 		String citizenName = challan.getCitizen() != null ? challan.getCitizen().getName() : "";
-		String amount = challan.getAmount() != null ? challan.getAmount().toString() : "0";
+		String amount = "0";
+
+		if (challan.getAmount() != null) {
+		    BigDecimal totalAmount = challan.getAmount().stream()
+		            .map(Amount::getAmount)
+		            .filter(Objects::nonNull)
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		    amount = totalAmount.toPlainString();
+		}
 		String service = challan.getBusinessService();
 		String challanNo = challan.getChallanNo();
 		String date = "";
