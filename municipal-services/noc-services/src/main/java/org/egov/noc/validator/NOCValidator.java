@@ -110,18 +110,29 @@ public class NOCValidator {
  
 		// if multi busines service is requieed then use from nonoc.getNocType()
 		//String filterExp = "$.[?(@.code == '" + noc.getNocType() + "' )]";
-		String filterExp = "$.[?(@.code == '" + "NOC" + "' )]";
+		String filterExp = "$.[?(@.code == '" + noc.getNocType() + "' )]";
 		List<Map<String, Object>> jsonOutput = JsonPath.read(result, filterExp);
 		if (jsonOutput.isEmpty()) {
 			throw new CustomException("MDMS DATA ERROR", "Unable to fetch " + noc.getNocType() + " workflow mode from MDMS");
 		}
+		
+		Map<String, Object> config = jsonOutput.get(0);
 
 		Map<String, String> businessValues = new HashMap<>();
 		businessValues.put(NOCConstants.MODE, (String) jsonOutput.get(0).get(NOCConstants.MODE));
-		if (jsonOutput.get(0).get(NOCConstants.MODE).equals(NOCConstants.ONLINE_MODE))
-			businessValues.put(NOCConstants.WORKFLOWCODE, (String) jsonOutput.get(0).get(NOCConstants.ONLINE_WF));
-		else
-			businessValues.put(NOCConstants.WORKFLOWCODE, (String) jsonOutput.get(0).get(NOCConstants.OFFLINE_WF));
+		String mode = (String) config.get(NOCConstants.MODE);
+		businessValues.put(NOCConstants.MODE, mode);
+
+		String businessService;
+
+		if (NOCConstants.ONLINE_MODE.equalsIgnoreCase(mode)) {
+		    businessService = (String) config.get(NOCConstants.ONLINE_WF);
+		} else {
+		    businessService = (String) config.get(NOCConstants.OFFLINE_WF);
+		}
+
+		noc.setBusinessService(businessService);
+		businessValues.put(NOCConstants.WORKFLOWCODE, businessService);
 
 		if (!ObjectUtils.isEmpty(noc.getWorkflow()) && !StringUtils.isEmpty(noc.getWorkflow().getAction()) && noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
 			businessValues.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
