@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 import org.postgresql.util.PGobject;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import org.egov.web.notification.sms.models.NotificationMailTracker;
+import java.util.Map;
+import java.util.HashMap;
+import org.egov.common.contract.request.RequestInfo;
+import java.util.UUID;
+
 
 
 @Repository
@@ -131,7 +137,56 @@ public class SmsTrackerRepository {
 			
 			return counter != null ? counter : 0;
 	}
+   
+	public void insertMailTracker(NotificationMailTracker tracker) {
 
+		PGobject additionalDetailJson = null;
+		PGobject mailRequestJson = null;
 
+		try {
+
+			if (tracker.getAdditionalDetail() != null) {
+				additionalDetailJson = new PGobject();
+				additionalDetailJson.setType("jsonb");
+				additionalDetailJson.setValue(objectMapper.writeValueAsString(tracker.getAdditionalDetail()));
+			}
+
+			if (tracker.getMailRequest() != null) {
+				mailRequestJson = new PGobject();
+				mailRequestJson.setType("jsonb");
+				mailRequestJson.setValue(objectMapper.writeValueAsString(tracker.getMailRequest()));
+			}
+
+		} catch (Exception e) {
+			log.error("Error converting json fields to jsonb", e);
+		}
+		tracker.setUuid(UUID.randomUUID().toString());
+
+		Object[] params = new Object[] { 
+				tracker.getUuid(), 
+				tracker.getAmount(),
+				tracker.getApplicationNo(),
+				tracker.getTenantId(),
+				tracker.getService(), 
+				tracker.getMonth(), 
+				tracker.getYear(),
+				tracker.getFinancialYear(), 
+				tracker.getFromDate(),
+				tracker.getToDate(), 
+				tracker.getCreatedBy(),
+				tracker.getCreatedTime(), 
+				tracker.getLastModifiedBy(),
+				tracker.getLastModifiedTime(),
+				tracker.getWard(),
+				tracker.getBillId(), 
+				additionalDetailJson, 
+				tracker.getOwnerMobileNo(), 
+				tracker.getOwnerName(),
+				mailRequestJson, 
+				tracker.getStatus() 
+				};
+
+		jdbcTemplate.update(SMSTemplateQueryBuilder.INSERT_MAIL_TRACKER_QUERY, params);
+		}
 }
 

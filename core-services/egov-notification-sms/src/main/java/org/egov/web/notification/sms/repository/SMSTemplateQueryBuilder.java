@@ -64,14 +64,16 @@ public class SMSTemplateQueryBuilder {
 		return query + " order by est.createddate desc ";
 	}
 	
-	
-	
-	 public static final String INSERT_SMS_TRACKER = 
+	public static final String INSERT_SMS_TRACKER = 
 		        "INSERT INTO eg_notification_sms_tracker (" +
 		        "uuid, amount, application_no, tenant_id, service, month, year, financial_year, " +
 		        "from_date, to_date, created_by, created_time, last_modified_by, last_modified_time, " +
 		        "ward, bill_id, additional_detail, sms_status, sms_request, sms_response, owner_mobile_no, owner_name" +
 		        ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	
-
+	 
+	public static final String INSERT_MAIL_TRACKER_QUERY = "INSERT INTO eg_notification_mail_tracker (" + "uuid,"
+			+ "amount," + "application_no," + "tenant_id," + "service," + "month," + "year," + "financial_year,"
+			+ "from_date," + "to_date," + "created_by," + "created_time," + "last_modified_by," + "last_modified_time,"
+			+ "ward," + "bill_id," + "additional_detail," + "owner_mobile_no," + "owner_name," + "mail_request,"
+			+ "mail_status" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 }
