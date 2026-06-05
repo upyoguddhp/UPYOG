@@ -171,15 +171,25 @@ public class NotificationService {
 			Date challanDate = new Date(challan.getAuditDetails().getCreatedTime());
 			date = new java.text.SimpleDateFormat("dd-MM-yyyy").format(challanDate);
 		}
-
-		String paymentUrl = config.getUiAppHost() + "/citizen/payment/my-bills/" + challan.getTenantId();
+		
+		String payNowUrl =
+		        "https://citizenseva.hp.gov.in/hp-udd/"
+		        + "citizen-payment"
+		        + "/"
+//		        + property.getId()
+		        + "/"
+//		        + bill.getId()
+				+"/pt/";
+		
+		String shortUrl = util.getShortenedUrl(payNowUrl);
+		
 
 		body = body.replace("{NAME}", citizenName);
 		body = body.replace("{AMOUNT}", amount);
 		body = body.replace("{SERVICE}", service);
 		body = body.replace("{CHALLANNO}", challanNo);
 		body = body.replace("{DATE}", date);
-		body = body.replace("{URL}", paymentUrl);
+		body = body.replace("{URL}", payNowUrl);
 
 		return body;
 	}
