@@ -1432,6 +1432,11 @@ public class GarbageAccountService {
 			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex) {
 
 		searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setUserType(searchCriteriaGarbageAccountRequest.getRequestInfo().getUserInfo().getType());
+		
+		if (searchCriteriaGarbageAccountRequest.getIsDdpVerified() != null) {
+			searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setIsDdpVerified(searchCriteriaGarbageAccountRequest.getIsDdpVerified());
+		}
+		
 		// validate search criteria
 		validateAndEnrichSearchGarbageAccount(searchCriteriaGarbageAccountRequest);
 

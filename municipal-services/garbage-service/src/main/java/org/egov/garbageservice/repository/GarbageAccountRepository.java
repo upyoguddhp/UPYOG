@@ -295,8 +295,6 @@ public class GarbageAccountRepository {
 
 		//generate search query
     	searchQuery = getSearchQueryByCriteriaForIndex(searchQuery, searchCriteriaGarbageAccount, preparedStatementValues, garbageCriteriaMap);
-        
-        log.info("### search garbage account: "+searchQuery.toString() + " {}",preparedStatementValues);
 
         List<GarbageAccount> garbageAccounts = jdbcTemplate.query(searchQuery.toString(), preparedStatementValues.toArray(), garbageAccountRowMapper);
 
@@ -657,6 +655,11 @@ public class GarbageAccountRepository {
 		    } else {
 		        whereClause.append(" acc.user_uuid IS NOT NULL ");
 		    }
+		}
+		
+		if (Boolean.TRUE.equals(searchCriteriaGarbageAccount.getIsDdpVerified())) {
+		    isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+		    whereClause.append(" acc.ddp_verified = true ");
 		}
 
 		 
