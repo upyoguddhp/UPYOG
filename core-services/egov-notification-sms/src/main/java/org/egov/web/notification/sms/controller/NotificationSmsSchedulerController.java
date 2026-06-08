@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.egov.web.notification.sms.service.SmsProcessing;
 import org.egov.web.notification.sms.service.SmsTrackerService;
+import org.egov.web.notification.sms.models.NotificationMailTrackerResponse;
+import org.egov.web.notification.sms.models.NotificationMailTracker;
+import org.egov.web.notification.sms.models.NotificationMailTrackerRequest;
 
 @RestController
 @RequestMapping()
@@ -45,5 +48,11 @@ public class NotificationSmsSchedulerController {
 	     Short resendCounter = smsTrackerService.getResendCounterByBillId(billId);
 	     return ResponseEntity.ok(resendCounter);
 	 }
+	 
+		@PostMapping("/mail-tracker-create")
+		public ResponseEntity<NotificationMailTrackerResponse> createMailTracker(@RequestBody NotificationMailTracker tracker) {
+			tracker = smsTrackerService.createMailTracker(tracker);
+			return ResponseEntity.ok(NotificationMailTrackerResponse.builder().notificationMailTracker(tracker).build());
+		}
 }
 

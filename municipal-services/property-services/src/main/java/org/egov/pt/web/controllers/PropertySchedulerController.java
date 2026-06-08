@@ -35,8 +35,7 @@ import org.egov.pt.models.BillIdRequest;
 import org.springframework.web.bind.annotation.RequestParam;
 //import org.egov.ptr.web.contracts.alfresco.DMSResponse;
 //import org.egov.ptr.web.contracts.alfresco.DmsRequest;
-
-
+import org.egov.pt.web.contracts.SendPropertyEmailRequest;
 
 import java.io.*;
 import java.util.*;
@@ -114,5 +113,11 @@ public class PropertySchedulerController {
 	@PostMapping("/extract-tracker")
 	public ResponseEntity<?> getTrackerByBillId(@RequestBody BillIdRequest request) {
 	    return ResponseEntity.ok(service.getTrackerByBillId(request));
+	}
+	
+	@PostMapping("/send-property-email")
+	public ResponseEntity<?> sendPropertyEmail(@RequestBody SendPropertyEmailRequest request) {
+	    service.sendPropertyEmail(request);
+	    return ResponseEntity.ok("Property email sent successfully");
 	}
 }
