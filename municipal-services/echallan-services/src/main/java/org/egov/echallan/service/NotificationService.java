@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
-
+import org.egov.echallan.service.BillingService;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,10 @@ public class NotificationService {
 	
 	private Producer producer;
 	
-	 private ServiceRequestRepository serviceRequestRepository;
+	@Autowired
+	private BillingService billingService;
+	
+	private ServiceRequestRepository serviceRequestRepository;
 	
 	private static final String BUSINESSSERVICE_MDMS_MODULE = "BillingService";
 	public static final String BUSINESSSERVICE_MDMS_MASTER = "BusinessService";
@@ -145,11 +148,11 @@ public class NotificationService {
 			return null;
 		}
 
-		String message = populateCreateChallanTemplate(challan);
+		String message = populateCreateChallanTemplate(challan, challanRequest);
 		return SMSRequest.builder().mobileNumber(mobileNumber).message(message).build();
 	}
 	
-	private String populateCreateChallanTemplate(Challan challan) {
+	private String populateCreateChallanTemplate(Challan challan, ChallanRequest challanRequest) {
 
 		String body = SMS_BODY_CREATE_CHALLAN;
 		String citizenName = challan.getCitizen() != null ? challan.getCitizen().getName() : "";
@@ -172,24 +175,40 @@ public class NotificationService {
 			date = new java.text.SimpleDateFormat("dd-MM-yyyy").format(challanDate);
 		}
 		
+		BillSearchCriteria criteria = BillSearchCriteria.builder()
+		        .tenantId(challan.getTenantId())
+		        .consumerCode(Collections.singleton(challan.getChallanNo()))
+		        .build();
+
+		Object response = billingService.searchBill(criteria, challanRequest.getRequestInfo());
+
+		String billId = "";
+
+		if (response instanceof Map) {
+			Map<String, Object> responseMap = (Map<String, Object>) response;
+			List<Map<String, Object>> bills = (List<Map<String, Object>>) responseMap.get("Bill");
+			if (bills != null && !bills.isEmpty()) {
+				billId = (String) bills.get(0).get("id");
+			}
+		}
+		
 		String payNowUrl =
 		        "https://citizenseva.hp.gov.in/hp-udd/"
 		        + "citizen-payment"
 		        + "/"
-//		        + property.getId()
+		        + challan.getId() 
 		        + "/"
-//		        + bill.getId()
-				+"/pt/";
+		        + billId
+				+"/CHL/";
 		
 		String shortUrl = util.getShortenedUrl(payNowUrl);
 		
-
 		body = body.replace("{NAME}", citizenName);
 		body = body.replace("{AMOUNT}", amount);
 		body = body.replace("{SERVICE}", service);
 		body = body.replace("{CHALLANNO}", challanNo);
 		body = body.replace("{DATE}", date);
-		body = body.replace("{URL}", payNowUrl);
+		body = body.replace("{URL}", shortUrl);
 
 		return body;
 	}

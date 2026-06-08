@@ -109,7 +109,9 @@ public class ChallanConfiguration {
 
     @Value("${egov.bill.gen.endpoint}")
     private String fetchBillEndpoint;
-
+    
+    @Value("${egov.bill.search.endpoint}")
+    private String searchBillEndpoint;
 
     //Localization
     @Value("${egov.localization.host}")
