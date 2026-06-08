@@ -56,6 +56,8 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                         .uuid(rs.getString("uuid"))
                         .garbageId(rs.getLong("garbage_id"))
                         .propertyId(rs.getString("property_id"))
+                        .systemPropertyId(rs.getString("system_property_id"))
+                        .isDdpVerified((Boolean) rs.getObject("ddp_verified"))
                         .type(rs.getString("type"))
                         .name(rs.getString("name"))
                         .mobileNumber(rs.getString("mobile_number"))
