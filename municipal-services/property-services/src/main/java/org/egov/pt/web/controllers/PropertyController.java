@@ -31,6 +31,7 @@ import org.egov.pt.service.FuzzySearchService;
 import org.egov.pt.service.MigrationService;
 import org.egov.pt.service.PropertyEncryptionService;
 import org.egov.pt.service.PropertyService;
+import org.egov.pt.service.UsageCategoryUpdateService;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.util.ResponseInfoFactory;
 import org.egov.pt.validator.PropertyValidator;
@@ -85,6 +86,9 @@ public class PropertyController {
 
 	@Autowired
 	PropertyEncryptionService propertyEncryptionService;
+	
+	@Autowired
+	private UsageCategoryUpdateService usageCategoryUpdateService;
 
 	@PostMapping("/_create")
 	public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
@@ -108,7 +112,24 @@ public class PropertyController {
 				}
 			}
 		}
+		
 		Property property = propertyService.createProperty(propertyRequest);
+		
+		String propertyId = property.getPropertyId(); 
+		Object detailsObj = property.getUnits().get(0).getAdditionalDetails();
+
+		String buildingType = null;
+
+		if (detailsObj instanceof Map) {
+			Map<?, ?> details = (Map<?, ?>) detailsObj;
+			Object useOfBuilding = details.get("useOfBuilding");
+
+			if (useOfBuilding != null) {
+				buildingType = useOfBuilding.toString();
+			}
+		}
+		usageCategoryUpdateService.updateUsageCategory(propertyId, buildingType);
+		
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
 				true);
 		PropertyResponse response = PropertyResponse.builder().properties(Arrays.asList(property)).responseInfo(resInfo)

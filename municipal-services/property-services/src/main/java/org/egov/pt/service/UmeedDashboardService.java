@@ -62,13 +62,13 @@ public class UmeedDashboardService {
 		int slaDays = Optional.ofNullable(propertyConfiguration.getUmeedDashboardSlaDays()).orElse(7);
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-		LocalDate startDate = LocalDate.parse("03-10-2025", formatter);
+//------Single Date 
+		LocalDate startDate = LocalDate.parse("18-07-2025", formatter);
 		LocalDate endDate = startDate;
 		
 // -----Fetch data between From Date and To Date
-//		LocalDate startDate = LocalDate.parse("30-07-2025", formatter);
-//		LocalDate endDate = LocalDate.parse("31-07-2025", formatter);
+//		LocalDate startDate = LocalDate.parse("07-05-2025", formatter);
+//		LocalDate endDate = LocalDate.parse("20-05-2025", formatter);
 
 		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
 

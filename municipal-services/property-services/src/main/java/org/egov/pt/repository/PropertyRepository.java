@@ -416,7 +416,7 @@ public class PropertyRepository {
 			Metrics metrics = new Metrics();
 			metrics.setAssessments(rs.getInt("assessedProperties"));
 			metrics.setTodaysTotalApplications(rs.getInt("todaysTotalApplications"));
-			metrics.setTodaysClosedApplications(rs.getInt("todaysClosedApplications"));
+		  //metrics.setTodaysClosedApplications(rs.getInt("todaysClosedApplications"));
 			metrics.setTodaysApprovedApplications(rs.getInt("todaysApprovedApplications"));
 			metrics.setTodaysApprovedApplicationsWithinSLA(rs.getInt("todaysApprovedApplicationsWithinSLA"));
 			metrics.setPendingApplicationsBeyondTimeline(rs.getInt("pendingApplicationsBeyondTimeline"));

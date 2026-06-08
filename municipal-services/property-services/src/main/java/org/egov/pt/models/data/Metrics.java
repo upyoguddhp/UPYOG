@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class Metrics {
 	    private long assessments;
 		private long todaysTotalApplications;
-		private long todaysClosedApplications;
+		//private long todaysClosedApplications;
 		private long noOfPropertiesPaidToday;
 		private long todaysApprovedApplications;
 		private long todaysApprovedApplicationsWithinSLA;

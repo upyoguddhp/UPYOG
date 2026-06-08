@@ -19,28 +19,41 @@ public class UsageCategoryUpdateService {
 	private PropertyRepository propertyRepository;
 
 	@Transactional
-	public void updateUsageCategory() {
+	public void updateUsageCategory(String propertyId, String buildingType) {
 
-		List<Map<String, Object>> data = propertyRepository.getUsageCategoryData();
+	    if (propertyId == null || propertyId.trim().isEmpty()) {
+	        log.warn("Property ID is null or empty");
+	        return;
+	    }
 
-		for (Map<String, Object> row : data) {
+	    String category = getCategory(buildingType);
 
-			String id = String.valueOf(row.get("id"));
-
-			String buildingType = Optional.ofNullable(row.get("useOfBuilding")).map(Object::toString).map(String::trim)
-					.orElse("").replaceAll("\\s+", " ").replace("''", "'");
-
-			String category = getCategory(buildingType);
-
-			if (category != null) {
-
-				propertyRepository.updateUsageCategory(category, id);
-
-				log.info("Updated ID {} with category {}", id, category);
-			}
-		}
+	    if (category != null) {
+	        propertyRepository.updateUsageCategory(category, propertyId);
+	        log.info("Updated ID {} with category {}", propertyId, category);
+	    }
 	}
-
+//	public void updateUsageCategory() {
+//
+//		List<Map<String, Object>> data = propertyRepository.getUsageCategoryData();
+//
+//		for (Map<String, Object> row : data) {
+//
+//			String id = String.valueOf(row.get("id"));
+//
+//			String buildingType = Optional.ofNullable(row.get("useOfBuilding")).map(Object::toString).map(String::trim)
+//					.orElse("").replaceAll("\\s+", " ").replace("''", "'");
+//
+//			String category = getCategory(buildingType);
+//
+//			if (category != null) {
+//
+//				propertyRepository.updateUsageCategory(category, id);
+//
+//				log.info("Updated ID {} with category {}", id, category);
+//			}
+//		}
+//	}
 	private String getCategory(String value) {
 
 	    if (value == null) {
@@ -52,6 +65,7 @@ public class UsageCategoryUpdateService {
 	    // Residential
 	    if (value.equalsIgnoreCase("Resdential")
 	            || value.equalsIgnoreCase("Resedential")
+	            || value.equalsIgnoreCase("Residential")
 	            || value.equalsIgnoreCase("Residencial")
 	            || value.equalsIgnoreCase("residential")
 	            || value.equalsIgnoreCase("Residential")
