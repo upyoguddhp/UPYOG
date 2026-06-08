@@ -374,6 +374,8 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                 .uuid(rs.getString(prefix + "uuid"))
                 .garbageId(rs.getLong(prefix + "garbage_id"))
                 .propertyId(rs.getString(prefix + "property_id"))
+                .systemPropertyId(rs.getString(prefix + "system_property_id"))
+                .isDdpVerified((Boolean) rs.getObject(prefix + "ddp_verified"))
                 .type(rs.getString(prefix + "type"))
                 .name(rs.getString(prefix + "name"))
                 .mobileNumber(rs.getString(prefix + "mobile_number"))
