@@ -30,6 +30,8 @@ public class GarbageAccount {
 	private String propertyId;
 	
 	private String systemPropertyId;
+	
+	private Boolean isDdpVerified;
 
 	private String type;
 

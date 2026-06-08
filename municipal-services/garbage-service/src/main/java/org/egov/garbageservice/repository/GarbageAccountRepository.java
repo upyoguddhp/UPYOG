@@ -100,7 +100,7 @@ public class GarbageAccountRepository {
     		+ ", property_id = :propertyId, type = :type, name = :name, mobile_number = :mobileNumber, is_owner = :isOwner"
     		+ ", user_uuid = :userUuid, declaration_uuid = :declarationUuid, status = :status"
     		+ ", gender = :gender, email_id = :emailId, additional_detail = :additionalDetail :: JSONB, last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate,"
-    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel , system_property_id = :systemPropertyId WHERE id = :id";
+    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel , system_property_id = :systemPropertyId , ddp_verified = :isDdpVerified WHERE id = :id";
 
 	public static final String SELECT_NEXT_SEQUENCE = "select nextval('seq_id_hpudd_grbg_account')";
 	
@@ -204,6 +204,7 @@ public class GarbageAccountRepository {
         accountInputs.put("uuid", newGarbageAccount.getUuid());
         accountInputs.put("garbageId", newGarbageAccount.getGarbageId());
         accountInputs.put("propertyId", newGarbageAccount.getPropertyId());
+        accountInputs.put("isDdpVerified", newGarbageAccount.getIsDdpVerified());
         accountInputs.put("systemPropertyId",newGarbageAccount.getSystemPropertyId());
         accountInputs.put("type", newGarbageAccount.getType());
         accountInputs.put("name", newGarbageAccount.getName());
