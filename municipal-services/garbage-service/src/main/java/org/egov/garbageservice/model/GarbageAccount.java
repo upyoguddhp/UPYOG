@@ -28,6 +28,8 @@ public class GarbageAccount {
 	private Long garbageId;
 
 	private String propertyId;
+	
+	private String systemPropertyId;
 
 	private String type;
 
