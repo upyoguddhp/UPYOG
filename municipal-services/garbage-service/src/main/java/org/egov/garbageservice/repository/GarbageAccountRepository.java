@@ -128,7 +128,9 @@ public class GarbageAccountRepository {
             "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
             "FROM eg_grbg_account acc " +
             "WHERE acc.parent_account IS NULL " +
-            "AND acc.tenant_id = ?";
+            "AND acc.tenant_id = ? " +
+            "AND acc.is_active = true " +
+            "AND acc.status = 'APPROVED'";
 	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
