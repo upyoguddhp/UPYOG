@@ -19,19 +19,19 @@ public class UsageCategoryUpdateService {
 	private PropertyRepository propertyRepository;
 
 	@Transactional
-	public void updateUsageCategory(String propertyId, String buildingType) {
+	public void updateUsageCategory(String unitId, String buildingType) {
 
-	    if (propertyId == null || propertyId.trim().isEmpty()) {
-	        log.warn("Property ID is null or empty");
-	        return;
-	    }
+		if (unitId == null || unitId.trim().isEmpty()) {
+			log.warn("Unit ID is null or empty");
+			return;
+		}
 
-	    String category = getCategory(buildingType);
+		String category = getCategory(buildingType);
 
-	    if (category != null) {
-	        propertyRepository.updateUsageCategory(category, propertyId);
-	        log.info("Updated ID {} with category {}", propertyId, category);
-	    }
+		if (category != null) {
+			propertyRepository.updateUsageCategory(category, unitId);
+			log.info("Updated Unit ID {} with category {}", unitId, category);
+		}
 	}
 //	public void updateUsageCategory() {
 //

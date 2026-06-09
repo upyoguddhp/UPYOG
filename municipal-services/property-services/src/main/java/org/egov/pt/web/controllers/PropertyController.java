@@ -115,20 +115,25 @@ public class PropertyController {
 		
 		Property property = propertyService.createProperty(propertyRequest);
 		
-		String propertyId = property.getPropertyId(); 
-		Object detailsObj = property.getUnits().get(0).getAdditionalDetails();
-
-		String buildingType = null;
-
-		if (detailsObj instanceof Map) {
-			Map<?, ?> details = (Map<?, ?>) detailsObj;
-			Object useOfBuilding = details.get("useOfBuilding");
-
-			if (useOfBuilding != null) {
-				buildingType = useOfBuilding.toString();
+		// Update usageCategory per unit (safe null checks)
+		if (property.getUnits() != null) {
+			for (org.egov.pt.models.Unit unit : property.getUnits()) {
+				try {
+					String unitId = unit.getId();
+					String buildingType = null;
+					Object detailsObj = unit.getAdditionalDetails();
+					if (detailsObj instanceof Map) {
+						Map<?, ?> details = (Map<?, ?>) detailsObj;
+						Object useOfBuilding = details.get("useOfBuilding");
+						if (useOfBuilding != null)
+							buildingType = useOfBuilding.toString();
+					}
+					usageCategoryUpdateService.updateUsageCategory(unitId, buildingType);
+				} catch (Exception e) {
+					log.warn("Failed to update usageCategory for a unit: {}", e.getMessage());
+				}
 			}
 		}
-		usageCategoryUpdateService.updateUsageCategory(propertyId, buildingType);
 		
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
 				true);

@@ -575,7 +575,7 @@ public class PropertyRepository {
 
 	public void updateUsageCategory(String category, String id) {
 
-		String query = "UPDATE eg_pt_unit " + "SET usagecategory = ? " + "WHERE id = ? ";
+		String query = "UPDATE eg_pt_unit SET usagecategory = ? WHERE id = ?";
 
 		jdbcTemplate.update(query, category, id);
 	}
