@@ -33,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.model.DdpVerificationCount;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -121,6 +122,13 @@ public class GarbageAccountRepository {
 	private static final String INSERT_ACCOUNT_AUDIT = "INSERT INTO eg_grbg_account_audit (auditid, grbg_application_no, status, type"
 			+ ", grbg_account_details, auditcreatedtime) VALUES ((select nextval('seq_eg_grbg_account_audit')), :grbgApplicationNo, :status"
 			+ ", :type, :grbgAccountDetails, (SELECT extract(epoch from now())))";
+	
+	private static final String DDP_VERIFICATION_COUNT =  "SELECT " +
+            "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, " +
+            "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
+            "FROM eg_grbg_account acc " +
+            "WHERE acc.parent_account IS NULL " +
+            "AND acc.tenant_id = ?";
 	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
@@ -288,6 +296,14 @@ public class GarbageAccountRepository {
         
         return garbageAccounts;
     }
+	
+	public DdpVerificationCount getDdpVerificationCount(String tenantId) {
+
+		String query = DDP_VERIFICATION_COUNT;
+		return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
+				(rs, rowNum) -> DdpVerificationCount.builder().totalDdpVerified(rs.getInt("total_ddp_verified"))
+						.remainingForDdpVerification(rs.getInt("remaining_for_ddp_verification")).build());
+	}
 	
 	public List<GarbageAccount> searchGarbageAccountIndex(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
 			Map<Integer, SearchCriteriaGarbageAccount> garbageCriteriaMap) {

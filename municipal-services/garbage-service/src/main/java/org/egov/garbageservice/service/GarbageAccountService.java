@@ -98,6 +98,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
+import org.egov.garbageservice.model.DdpVerificationCount;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -1514,7 +1515,7 @@ public class GarbageAccountService {
 			grbgAccs = garbageAccountRepository.searchGarbageAccount(
 					searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount(), garbageCriteriaMap);
 
-		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs);
+		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest);
 
 		if (CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			garbageAccountResponse.setResponseInfo(responseInfoFactory
@@ -1546,11 +1547,16 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 
 
-	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
+	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
 				.build();
 
+		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
+		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
+		
 		processResponse(garbageAccountResponse);
 
 		return garbageAccountResponse;
