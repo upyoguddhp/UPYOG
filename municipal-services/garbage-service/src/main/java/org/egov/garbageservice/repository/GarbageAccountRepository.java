@@ -659,9 +659,10 @@ public class GarbageAccountRepository {
 		    }
 		}
 		
-		if (Boolean.TRUE.equals(searchCriteriaGarbageAccount.getIsDdpVerified())) {
+		if (searchCriteriaGarbageAccount.getIsDdpVerified() != null) {
 		    isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
-		    whereClause.append(" acc.ddp_verified = true ");
+		    whereClause.append(" acc.ddp_verified = ? ");
+		    preparedStatementValues.add(searchCriteriaGarbageAccount.getIsDdpVerified());
 		}
 
 		 
