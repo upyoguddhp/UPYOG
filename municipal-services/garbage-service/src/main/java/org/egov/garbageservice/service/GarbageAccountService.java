@@ -1305,6 +1305,12 @@ public class GarbageAccountService {
 				if (child.getAdditionalDetail() == null) {
 	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
 	            }
+				if (child.getIsDdpVerified() == null) {
+					child.setIsDdpVerified(newGarbageAccount.getIsDdpVerified());
+				}
+				if (StringUtils.isBlank(child.getSystemPropertyId())) {
+					child.setSystemPropertyId(newGarbageAccount.getSystemPropertyId());
+				}
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
