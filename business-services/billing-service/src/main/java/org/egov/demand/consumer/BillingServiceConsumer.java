@@ -170,9 +170,8 @@ public class BillingServiceConsumer {
 	private void updateDemandsFromPayment(Map<String, Object> consumerRecord, Boolean isReceiptCancellation) {
 		
 		BillRequestV2 billReq = BillRequestV2.builder().build();
-		
+		log.info("***BILLING SERVICE Request*** ==> consumerRecord: {}",consumerRecord);
 		try {
-
 			setBillRequestFromPayment(consumerRecord, billReq, isReceiptCancellation);
 			receiptServiceV2.updateDemandFromReceipt(billReq, isReceiptCancellation);
 			updateTrackerStatusAfterDemandUpdate(billReq, isReceiptCancellation);
