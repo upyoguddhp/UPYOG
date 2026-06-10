@@ -63,7 +63,7 @@ public class UmeedDashboardService {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 //------Single Date 
-		LocalDate startDate = LocalDate.parse("09-06-2026", formatter);
+		LocalDate startDate = LocalDate.parse("19-07-2025", formatter);
 		LocalDate endDate = startDate;
 		
 // -----Fetch data between From Date and To Date

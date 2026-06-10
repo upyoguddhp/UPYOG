@@ -107,15 +107,14 @@ public class PropertyController {
 							if (!properties.isEmpty())
 								throw new CustomException(null,
 										"Document numbers added in Owner Information is already present in the system.");
-
 						}
 				}
 			}
 		}
-		
+
 		Property property = propertyService.createProperty(propertyRequest);
 		
-		// Update usageCategory per unit (safe null checks)
+		// Update usageCategory per unit
 		if (property.getUnits() != null) {
 			for (org.egov.pt.models.Unit unit : property.getUnits()) {
 				try {
