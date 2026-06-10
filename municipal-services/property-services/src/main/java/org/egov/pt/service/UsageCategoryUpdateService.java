@@ -41,7 +41,8 @@ public class UsageCategoryUpdateService {
         PropertyRequest request = PropertyRequest.builder().requestInfo(null).property(property).build();
 
         // Push to persister update topic so async persister updates eg_pt_unit usageCategory
-        producer.pushAfterEncrytpion(config.getUpdatePropertyTopic(), request);
+       // producer.pushAfterEncrytpion(config.getUpdatePropertyTopic(), request);
+		producer.pushAfterEncrytpion(config.getUpdateUnitUsageCategoryTopic(), request);
 
         log.info("Pushed usageCategory update for Unit ID {} with category {} to topic {}", unitId, category,
                 config.getUpdatePropertyTopic());
