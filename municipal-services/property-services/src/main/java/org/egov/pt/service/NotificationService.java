@@ -586,8 +586,8 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
-			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
-					emailSubject, ulbName);
+//			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
+//					emailSubject, ulbName);
 		}
 		if (!StringUtils.isEmpty(bill.getMobileNumber())) {
 			//sendSms(smsBody, bill.getMobileNumber());
