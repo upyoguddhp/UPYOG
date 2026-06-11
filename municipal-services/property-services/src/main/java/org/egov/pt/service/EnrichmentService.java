@@ -35,11 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.pt.util.UsageCategoryMapper;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class EnrichmentService {
 
@@ -58,9 +59,6 @@ public class EnrichmentService {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Autowired
-	private UsageCategoryUpdateService usageCategoryUpdateService;
 
 
     /**
@@ -106,7 +104,6 @@ public class EnrichmentService {
 				unit.setId(UUID.randomUUID().toString());
 				unit.setActive(true);
 
-				// Extract building type (useOfBuilding) from additionalDetails safely using JsonNode
 				String buildingType = null;
 				if (unit.getAdditionalDetails() != null) {
 					JsonNode addl = objectMapper.valueToTree(unit.getAdditionalDetails());
@@ -115,11 +112,8 @@ public class EnrichmentService {
 						buildingType = uob.asText();
 				}
 
-				// Map to usage category and set on unit so persister will persist it on initial insert
 				String usageCategory = UsageCategoryMapper.map(buildingType);
 				unit.setUsageCategory(usageCategory);
-
-			
 			});
 		
 		property.getOwners().forEach(owner -> {
@@ -179,6 +173,24 @@ public class EnrichmentService {
 				}
 
 			});
+
+			// Set usageCategory for units based on additionalDetails
+			if (!CollectionUtils.isEmpty(property.getUnits())) {
+				property.getUnits().forEach(unit -> {
+					String buildingType = null;
+					if (unit.getAdditionalDetails() != null) {
+						JsonNode addl = objectMapper.valueToTree(unit.getAdditionalDetails());
+						JsonNode uob = addl.get("useOfBuilding");
+						if (uob != null && !uob.isNull())
+							buildingType = uob.asText();
+					}
+
+					String usageCategory = UsageCategoryMapper.map(buildingType);
+					unit.setUsageCategory(usageCategory);
+
+
+				});
+			}
 	    	
 	    	
 	    	if (!CollectionUtils.isEmpty(propertyFromDb.getUnits())) {
