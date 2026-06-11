@@ -128,6 +128,8 @@ public class TransactionServiceV2 {
 
 			TransactionDump dump = TransactionDump.builder().txnId(transaction.getTxnId())
 					.auditDetails(transaction.getAuditDetails()).build();
+			
+			log.info("***PG SERVICE Request*** ==> Amount: {}, billId: {}",transaction.getTxnAmount(),transaction.getBillId());
 
 			if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);

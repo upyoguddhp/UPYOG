@@ -16,10 +16,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.egov.util.ApportionConstants.DEFAULT;
 
 @Service
+@Slf4j
 public class OrderByPriority implements ApportionV2 {
 
 
@@ -47,6 +49,8 @@ public class OrderByPriority implements ApportionV2 {
         BigDecimal remainingAmount = apportionRequestV2.getAmountPaid();
         BigDecimal amount;
         Boolean isAmountPositive;
+        
+		log.info("***APPORTION SERVICE*** ==> apportionRequestV2: {}",apportionRequestV2);
 
         /*
         * If zero amount payment is done and the total amount of bill or demands is zero. We will
@@ -126,7 +130,7 @@ public class OrderByPriority implements ApportionV2 {
             addAdvanceBillAccountDetail(remainingAmount,apportionRequestV2,masterData);
         }
 
-
+        log.info("***APPORTION SERVICE*** ==> taxDetails: {}",taxDetails);
         return taxDetails;
     }
 
