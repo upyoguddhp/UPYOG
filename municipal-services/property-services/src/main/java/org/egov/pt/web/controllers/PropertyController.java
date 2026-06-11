@@ -114,25 +114,24 @@ public class PropertyController {
 
 		Property property = propertyService.createProperty(propertyRequest);
 		
-		// Update usageCategory per unit
-		if (property.getUnits() != null) {
-			for (org.egov.pt.models.Unit unit : property.getUnits()) {
-				try {
-					String unitId = unit.getId();
-					String buildingType = null;
-					Object detailsObj = unit.getAdditionalDetails();
-					if (detailsObj instanceof Map) {
-						Map<?, ?> details = (Map<?, ?>) detailsObj;
-						Object useOfBuilding = details.get("useOfBuilding");
-						if (useOfBuilding != null)
-							buildingType = useOfBuilding.toString();
-					}
-					usageCategoryUpdateService.updateUsageCategory(unitId, buildingType);
-				} catch (Exception e) {
-					log.warn("Failed to update usageCategory for a unit: {}", e.getMessage());
-				}
-			}
-		}
+//		// Update usageCategory per unit
+//		if (property.getUnits() != null) {
+//			for (org.egov.pt.models.Unit unit : property.getUnits()) {
+//				try {
+//					String unitId = unit.getId();
+//					String buildingType = null;
+//					Object detailsObj = unit.getAdditionalDetails();
+//					if (detailsObj instanceof Map) {
+//						Map<?, ?> details = (Map<?, ?>) detailsObj;
+//						Object useOfBuilding = details.get("useOfBuilding");
+//						if (useOfBuilding != null)
+//							buildingType = useOfBuilding.toString();
+//					}
+//				} catch (Exception e) {
+//					log.warn("Failed to update usageCategory for a unit: {}", e.getMessage());
+//				}
+//			}
+//		}
 		
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
 				true);

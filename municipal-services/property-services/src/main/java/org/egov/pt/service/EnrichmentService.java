@@ -38,6 +38,7 @@ import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.pt.util.UsageCategoryMapper;
 
 @Service
 public class EnrichmentService {
@@ -57,6 +58,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private UsageCategoryUpdateService usageCategoryUpdateService;
 
 
     /**
@@ -101,6 +105,21 @@ public class EnrichmentService {
 
 				unit.setId(UUID.randomUUID().toString());
 				unit.setActive(true);
+
+				// Extract building type (useOfBuilding) from additionalDetails safely using JsonNode
+				String buildingType = null;
+				if (unit.getAdditionalDetails() != null) {
+					JsonNode addl = objectMapper.valueToTree(unit.getAdditionalDetails());
+					JsonNode uob = addl.get("useOfBuilding");
+					if (uob != null && !uob.isNull())
+						buildingType = uob.asText();
+				}
+
+				// Map to usage category and set on unit so persister will persist it on initial insert
+				String usageCategory = UsageCategoryMapper.map(buildingType);
+				unit.setUsageCategory(usageCategory);
+
+			
 			});
 		
 		property.getOwners().forEach(owner -> {
@@ -160,7 +179,6 @@ public class EnrichmentService {
 				}
 
 			});
-	    	
 	    	
 	    	
 	    	if (!CollectionUtils.isEmpty(propertyFromDb.getUnits())) {
