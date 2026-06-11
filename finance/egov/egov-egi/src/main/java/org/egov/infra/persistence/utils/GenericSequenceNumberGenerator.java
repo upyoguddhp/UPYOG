@@ -48,14 +48,14 @@
 
 package org.egov.infra.persistence.utils;
 
+import static org.egov.infra.utils.ApplicationConstant.UNDERSCORE;
+
+import java.io.Serializable;
+
 import org.hibernate.exception.SQLGrammarException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-
-import static org.egov.infra.utils.ApplicationConstant.UNDERSCORE;
 
 /**
  * Generic db sequence number generator class, this class first try to return the next val
@@ -75,9 +75,9 @@ public class GenericSequenceNumberGenerator {
 
     @Transactional
     public Serializable getNextSequence(String sequenceName) {
-        String normalizedSequenceName = sequenceName.replaceAll(DISALLOWED_CHARACTERS, UNDERSCORE);
+        String normalizedSequenceName = /*ApplicationThreadLocals.getTenantID()*/"shimla."+ sequenceName.replaceAll(DISALLOWED_CHARACTERS, UNDERSCORE);
         try {
-            return this.databaseSequenceProvider.getNextSequence(normalizedSequenceName);
+           return this.databaseSequenceProvider.getNextSequence(normalizedSequenceName);
         } catch (SQLGrammarException e) {
             this.databaseSequenceCreator.createSequence(normalizedSequenceName);
         }
