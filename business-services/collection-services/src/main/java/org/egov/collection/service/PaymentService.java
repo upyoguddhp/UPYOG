@@ -20,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
+@Slf4j
 public class PaymentService {
 
     private ApportionerService apportionerService;
@@ -106,6 +108,8 @@ public class PaymentService {
         paymentEnricher.enrichPaymentPostValidate(paymentRequest);
 
         Payment payment = paymentRequest.getPayment();
+        log.info("***Collection Service*** ==> Payment: {}",payment);
+
         Map<String, Bill> billIdToApportionedBill = apportionerService.apportionBill(paymentRequest);
         paymentEnricher.enrichAdvanceTaxHead(new LinkedList<>(billIdToApportionedBill.values()));
         setApportionedBillsToPayment(billIdToApportionedBill,payment);
