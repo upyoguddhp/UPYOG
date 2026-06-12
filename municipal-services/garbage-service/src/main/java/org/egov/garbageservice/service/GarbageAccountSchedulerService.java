@@ -375,7 +375,12 @@ public class GarbageAccountSchedulerService {
 				if (existingFrom == null || existingTo == null) {
 					continue;
 				}
-
+				
+				log.info("newFrom {}",newFrom);
+				log.info("newTo {}",newTo);
+				log.info("existingFrom {}",existingFrom);
+				log.info("existingTo {}",existingTo);
+				
 				if (isOverlapping(newFrom, newTo, existingFrom, existingTo)) {
 					throw new CustomException("BILL_PERIOD_OVERLAP", "Bill already exists for overlapping period");
 				}
