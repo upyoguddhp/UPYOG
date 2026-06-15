@@ -57,10 +57,13 @@ public class UmeedDashboardService {
 //    		LocalDate endDate = yesterday;
 		// LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 		
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+
+		LocalDate startDate = yesterday;
+		LocalDate endDate = yesterday;
 		
-		
-		LocalDate startDate = LocalDate.parse("01-04-2026", formatter);
-		LocalDate endDate   = LocalDate.parse("27-04-2026", formatter);
+//		LocalDate startDate = LocalDate.parse("01-04-2026", formatter);
+//		LocalDate endDate   = LocalDate.parse("27-04-2026", formatter);
 
 		List<DataItem> allProcessedItems = new ArrayList<>();
 		
