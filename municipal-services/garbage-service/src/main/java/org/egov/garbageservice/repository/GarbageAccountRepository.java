@@ -57,7 +57,7 @@ public class GarbageAccountRepository {
 			+ ", old_dtl.uuid as old_dtl_uuid, old_dtl.garbage_id as old_dtl_garbage_id, old_dtl.old_garbage_id as old_dtl_old_garbage_id"
 			+ ", address.uuid as address_uuid, address.address_type as address_address_type, address.address1 as address_address1, address.address2 as address_address2, address.city as address_city, address.state as address_state, address.pincode as address_pincode, address.is_active as address_is_active, address.zone as address_zone, address.ulb_name as address_ulb_name, address.ulb_type as address_ulb_type, address.ward_name as address_ward_name, address.additional_detail as address_additional_detail, address.garbage_id as address_garbage_id"
 			+ ", unit.uuid as unit_uuid, unit.unit_name as unit_unit_name, unit.unit_ward as unit_unit_ward, unit.ulb_name as unit_ulb_name, unit.type_of_ulb as unit_type_of_ulb, unit.garbage_id as unit_garbage_id, unit.unit_type as unit_unit_type, unit.category as unit_category, unit.sub_category as unit_sub_category, unit.sub_category_type as unit_sub_category_type, unit.is_active as unit_is_active,unit.isbplunit as unit_isbplunit,unit.isbulkgeneration as unit_isbulkgeneration,unit.isvariablecalculation as unit_isvariablecalculation,unit.no_of_units as unit_no_of_units,unit.ismonthlybilling as unit_is_monthly_billing"
-			+ ", sub_acc.id as sub_acc_id, sub_acc.uuid as sub_acc_uuid, sub_acc.garbage_id as sub_acc_garbage_id, sub_acc.system_property_id as sub_acc_system_property_id, sub_acc.ddp_verified as sub_acc_ddp_verified, sub_acc.property_id as sub_acc_property_id, sub_acc.type as sub_acc_type "
+			+ ", sub_acc.id as sub_acc_id, sub_acc.uuid as sub_acc_uuid, sub_acc.garbage_id as sub_acc_garbage_id, sub_acc.system_property_id as sub_acc_system_property_id, sub_acc.him_parivar_id as sub_acc_him_parivar_id, sub_acc.ddp_verified as sub_acc_ddp_verified, sub_acc.property_id as sub_acc_property_id, sub_acc.type as sub_acc_type "
 			+ ", sub_acc.name as sub_acc_name, sub_acc.mobile_number as sub_acc_mobile_number, sub_acc.gender as sub_acc_gender, sub_acc.email_id as sub_acc_email_id, sub_acc.is_owner as sub_acc_is_owner"
 			+ ", sub_acc.user_uuid as sub_acc_user_uuid, sub_acc.declaration_uuid as sub_acc_declaration_uuid, sub_acc.status as sub_acc_status, sub_acc.business_service as sub_acc_business_service"
 			+ ", sub_acc.approval_date as sub_acc_approval_date, sub_acc.channel as sub_acc_channel"
@@ -101,7 +101,7 @@ public class GarbageAccountRepository {
     		+ ", property_id = :propertyId, type = :type, name = :name, mobile_number = :mobileNumber, is_owner = :isOwner"
     		+ ", user_uuid = :userUuid, declaration_uuid = :declarationUuid, status = :status"
     		+ ", gender = :gender, email_id = :emailId, additional_detail = :additionalDetail :: JSONB, last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate,"
-    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel , system_property_id = :systemPropertyId , ddp_verified = :isDdpVerified WHERE id = :id";
+    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel , system_property_id = :systemPropertyId , ddp_verified = :isDdpVerified , him_parivar_id = :himParivarId WHERE id = :id";
 
 	public static final String SELECT_NEXT_SEQUENCE = "select nextval('seq_id_hpudd_grbg_account')";
 	
@@ -216,6 +216,7 @@ public class GarbageAccountRepository {
         accountInputs.put("propertyId", newGarbageAccount.getPropertyId());
         accountInputs.put("isDdpVerified", newGarbageAccount.getIsDdpVerified());
         accountInputs.put("systemPropertyId",newGarbageAccount.getSystemPropertyId());
+        accountInputs.put("himParivarId",newGarbageAccount.getHimParivarId());
         accountInputs.put("type", newGarbageAccount.getType());
         accountInputs.put("name", newGarbageAccount.getName());
         accountInputs.put("mobileNumber", newGarbageAccount.getMobileNumber());
