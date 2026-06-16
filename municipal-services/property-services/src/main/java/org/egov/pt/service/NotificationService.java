@@ -15,6 +15,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.PropertyAccount;
+import org.egov.pt.models.Address;
 //import org.egov.pt.models.PtBillTracker;
 import org.egov.pt.models.collection.Bill;
 import org.egov.mdms.model.MasterDetail;
@@ -75,7 +76,10 @@ public class NotificationService {
 	private static final String BILL_NO_PLACEHOLDER = "{bill_no}";
 	private static final String RECIPINTS_NAME_PLACEHOLDER = "{recipients_name}";
 	private static final String PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER = "{property_pay_now_bill_url}";
-
+	private static final String PROPERTY_ADDRESS_PLACEHOLDER = "{property_address}";
+	private static final String PROPERTY_WARD_PLACEHOLDER = "{ward}";
+	private static final String PROPERTY_FATHERS_NAME_PLACEHOLDER = "{fathers_name}";
+	
 //	private static final String SMS_BODY_GENERATE_BILL = "Dear "+RECIPINTS_NAME_PLACEHOLDER+", your "+PROPERTY_PLACEHOLDER+" bill vide  "+PROPERTY_PLACEHOLDER+" id "
 //			+ PROPERTY_ID_PLACEHOLDER+" for the period "+MONTH_PLACEHOLDER+" amounting to Rs "+AMOUNT_PLACEHOLDER+" has been generated on CitizenSeva portal. "
 //			+ "Please pay on CitizenSeva Portal or using link "+LINK_PLACEHOLDER+" .  CitizenSeva H.P.";
@@ -595,14 +599,16 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	}
 	
-	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName) {
+	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName, List<Property> propertyDetail) {
 		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
 		String emailBody = getContentAsString(resource);
 		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
-	
+		
+		Property property = propertyDetail.get(0);	
 		Property newproperty = new Property();
 		newproperty.setPropertyId(propertyTracker.getPropertyId());
 		newproperty.setTenantId(bill.getTenantId());
+		newproperty.setAddress(property.getAddress()); 
 		
 		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
 		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
@@ -707,9 +713,10 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		        + bill.getId()
 				+"/pt/";
 
-
-
 	    SimpleDateFormat monthFormat = new SimpleDateFormat("dd MMMM - yyyy");
+	    
+		JsonNode propertyAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+		String propertyAddress = propertyAdditionalDetails.path("propertyAddress").asText();
 
 	    body = body.replace(
 	            MONTH_PLACEHOLDER,
@@ -735,6 +742,16 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	    body = body.replace(
 	            AMOUNT_PLACEHOLDER,
 	            String.valueOf(bill.getTotalAmount())
+	    );
+	    
+	    body = body.replace(
+	    		PROPERTY_WARD_PLACEHOLDER,
+	    		tracker.getWard()
+	    		);
+	    
+	    body = body.replace(
+	            PROPERTY_ADDRESS_PLACEHOLDER,
+	            propertyAddress
 	    );
 
 		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
