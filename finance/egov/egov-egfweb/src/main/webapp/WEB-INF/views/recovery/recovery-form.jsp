@@ -98,7 +98,7 @@
 								<form:option value="">
 									<spring:message code="lbl.select" text="Select"/>
 								</form:option>
-								<c:forEach var="chartOfAccounts" items="${chartOfAccountss}">
+								<c:forEach var="chartOfAccounts" items="${chartOfAccounts}">
 									<option value="${chartOfAccounts.id}">
 										${chartOfAccounts.glcode}-${chartOfAccounts.name}</option>
 								</c:forEach>

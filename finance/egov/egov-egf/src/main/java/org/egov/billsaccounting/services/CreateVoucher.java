@@ -109,11 +109,9 @@ import org.egov.infra.admin.master.entity.HierarchyType;
 import org.egov.infra.admin.master.service.AppConfigService;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.BoundaryService;
-import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.admin.master.service.HierarchyTypeService;
-import org.egov.infra.admin.master.service.UserService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.config.core.EnvironmentSettings;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
@@ -151,6 +149,7 @@ import com.exilant.GLEngine.Transaxtion;
 import com.exilant.GLEngine.TransaxtionParameter;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import com.exilant.exility.common.TaskFailedException;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 /**
  * This Class will create voucher from bill <br>
@@ -275,6 +274,9 @@ public class CreateVoucher {
 	private AccountdetailtypeHibernateDAO accountdetailtypeHibernateDAO;
 	@Autowired
 	private FiscalPeriodHibernateDAO fiscalPeriodHibernateDAO;
+	
+    @Autowired
+    private EnvironmentSettings environmentSettings;
 
 	@Autowired
 	private ChartOfAccountDetailService chartOfAccountDetailService;
