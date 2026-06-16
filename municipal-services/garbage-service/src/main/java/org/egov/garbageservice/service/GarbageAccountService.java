@@ -2503,6 +2503,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 	public Map<String, Object> generateArrear(GenrateArrearRequest genrateArrearRequest) {
 		String message = null;
+		boolean isSuccess = true;
 		List<String> ListOfConsumerCode = new ArrayList<>();
 		ListOfConsumerCode.add(genrateArrearRequest.getDemands().get(0).getConsumerCode());
 		List<String> setOfStatuses = new ArrayList<>();
@@ -2590,11 +2591,13 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			    message = "Arrear Generated Successfully";
 			} else {
 			    message = "No arrear generated. Bill already exists for overlapping period.";
+			    isSuccess = false;
 			}
 		} else {
 			message = "Invalid Garbage Details";
+			isSuccess = false;
 		}
-		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), isSuccess);
 		Map<String, Object> response = new HashMap<>();
 		response.put("ResponseInfo", resInfo);
 		response.put("message", message);
