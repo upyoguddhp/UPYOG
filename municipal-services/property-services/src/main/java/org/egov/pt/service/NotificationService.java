@@ -609,6 +609,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		newproperty.setPropertyId(propertyTracker.getPropertyId());
 		newproperty.setTenantId(bill.getTenantId());
 		newproperty.setAddress(property.getAddress()); 
+		newproperty.setOwners(property.getOwners());
 		
 		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
 		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
@@ -717,6 +718,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	    
 		JsonNode propertyAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
 		String propertyAddress = propertyAdditionalDetails.path("propertyAddress").asText();
+		String fathersName = property.getOwners().get(0).getFatherOrHusbandName();
 
 	    body = body.replace(
 	            MONTH_PLACEHOLDER,
@@ -752,6 +754,11 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	    body = body.replace(
 	            PROPERTY_ADDRESS_PLACEHOLDER,
 	            propertyAddress
+	    );
+	    
+	    body = body.replace(
+	            PROPERTY_FATHERS_NAME_PLACEHOLDER,
+	            fathersName
 	    );
 
 		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
