@@ -718,7 +718,10 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	    
 		JsonNode propertyAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
 		String propertyAddress = propertyAdditionalDetails.path("propertyAddress").asText();
-		String fathersName = property.getOwners().get(0).getFatherOrHusbandName();
+		String fathersName = "";
+		if (property.getOwners() != null && !property.getOwners().isEmpty()) {
+		    fathersName = property.getOwners().get(0).getFatherOrHusbandName();
+		}
 
 	    body = body.replace(
 	            MONTH_PLACEHOLDER,
