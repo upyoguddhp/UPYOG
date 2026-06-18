@@ -69,6 +69,7 @@ import org.egov.garbageservice.contract.bill.BillAccountDetail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.egov.garbageservice.model.BillIdRequest;
 import org.egov.garbageservice.model.GenerateBillPreviewResponse;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -122,11 +123,12 @@ public class GarbageAccountSchedulerService {
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
+		AtomicInteger skippedCount = new AtomicInteger(0);
 		setFromDateToDate(generateBillRequest);
 		String message = null;
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
 
-		garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
+		//	garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
 		// create demand and bill for every account
 		if (null != garbageAccounts && !CollectionUtils.isEmpty(garbageAccounts)) {
 			garbageAccounts.stream().forEach(garbageAccount -> {
@@ -209,7 +211,16 @@ public class GarbageAccountSchedulerService {
 						        ? "MULTI_MONTH"
 						        : "MONTHLY";
 
-						validateExistingBillOverlap(generateBillRequest, garbageAccount);
+						if (validateExistingBillOverlap(generateBillRequest, garbageAccount)) {
+							skippedCount.incrementAndGet();
+							errorList.add(
+								    "Bill already exists for application "
+								    + garbageAccount.getGrbgApplicationNumber()
+								    + " for the selected period"
+								);
+							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+							return;
+						}
 		
 						        AtomicReference<String> demandId = new AtomicReference<>(null);
 						        
@@ -328,9 +339,19 @@ public class GarbageAccountSchedulerService {
 		}else {
 			message = "Garbage Acc Not Found";
 		}
+		int generatedCount = grbgBillTrackers.size();
+		int skipped = skippedCount.get();
 
-		if(!grbgBillTrackers.isEmpty())
-			message = "Bills Generated Successfully";
+		if (generatedCount > 0 && skipped > 0) {
+			message = "Bills generated successfully for " + generatedCount
+			        + " application(s). Failed for " + skipped
+			        + " application(s) due to overlapping bill periods.";
+		} else if (generatedCount > 0) {
+		    message = "Bills generated successfully for " + generatedCount + " application(s).";
+		} else if (skipped > 0) {
+			message = "No bills generated. " + skipped
+			        + " application(s) failed due to overlapping bill periods.";
+		}
 		
 		sanatizeFailureLog(generateBillRequest);
 		
@@ -338,7 +359,8 @@ public class GarbageAccountSchedulerService {
 
 	}
 	
-	private void validateExistingBillOverlap(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount) {
+	private boolean validateExistingBillOverlap(GenerateBillRequest generateBillRequest,
+			GarbageAccount garbageAccount) {
 
 		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
 				.consumerCode(Collections.singleton(garbageAccount.getGrbgApplicationNumber()))
@@ -347,25 +369,23 @@ public class GarbageAccountSchedulerService {
 		BillResponse billResponse = billService.searchBill(billSearchRequest, generateBillRequest.getRequestInfo());
 
 		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return;
+			return false;
 		}
 
-		Long newFrom = generateBillRequest.getFromDateTimestamp() != null
-		        ? generateBillRequest.getFromDateTimestamp()
-		        : generateBillRequest.getFromDate().getTime();
+		Long newFrom = generateBillRequest.getFromDateTimestamp() != null ? generateBillRequest.getFromDateTimestamp()
+				: generateBillRequest.getFromDate().getTime();
 
-		Long newTo = generateBillRequest.getToDateTimestamp() != null
-		        ? generateBillRequest.getToDateTimestamp()
-		        : generateBillRequest.getToDate().getTime();
+		Long newTo = generateBillRequest.getToDateTimestamp() != null ? generateBillRequest.getToDateTimestamp()
+				: generateBillRequest.getToDate().getTime();
 
 		for (Bill bill : billResponse.getBill()) {
 
 			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
 				continue;
 			}
-			
+
 			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
-			    continue;
+				continue;
 			}
 			for (BillDetail detail : bill.getBillDetails()) {
 
@@ -375,18 +395,13 @@ public class GarbageAccountSchedulerService {
 				if (existingFrom == null || existingTo == null) {
 					continue;
 				}
-				
-				log.info("newFrom {}",newFrom);
-				log.info("newTo {}",newTo);
-				log.info("existingFrom {}",existingFrom);
-				log.info("existingTo {}",existingTo);
-				log.info("Bill: {}", billResponse.getBill().get(0).getId());	
-				
+
 				if (isOverlapping(newFrom, newTo, existingFrom, existingTo)) {
-					throw new CustomException("BILL_PERIOD_OVERLAP", "Bill already exists for overlapping period");
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 	
 	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
