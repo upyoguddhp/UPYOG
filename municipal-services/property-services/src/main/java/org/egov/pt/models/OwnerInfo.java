@@ -150,7 +150,7 @@ public class OwnerInfo extends User {
 		this.ownerInfoUuid = ownerInfoUuid;
 		mobileNumber = mobileNumber2;
 		gender = gender2;
-		fatherOrHusbandName = fatherOrHusbandName2;
+		this.fatherOrHusbandName = fatherOrHusbandName2;
 		correspondenceAddress = correspondenceAddress2;
 		this.isPrimaryOwner = isPrimaryOwner;
 		this.ownerShipPercentage = ownerShipPercentage;
