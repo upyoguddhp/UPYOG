@@ -80,6 +80,7 @@ import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.BillIdRequest;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -139,6 +140,7 @@ public class PropertySchedulerService {
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
 		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
+		AtomicInteger skippedCount = new AtomicInteger(0);
 
 		Boolean isBilling = false;
 		JsonNode ulbModules = null;
@@ -188,7 +190,7 @@ public class PropertySchedulerService {
 		}
 
 		List<Property> properties = getProperties(calculateTaxRequest);
-		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+//		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
 
 		for (Property property : properties) {
 
@@ -417,6 +419,15 @@ public class PropertySchedulerService {
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
 				
+				if (validateExistingBillOverlap(calculateTaxRequest, property)) {
+					skippedCount.incrementAndGet();
+					Set<String> overlapErrors = new HashSet<>();
+					overlapErrors.add("Bill already exists for property " + property.getPropertyId()
+							+ " for the selected period");
+					createFailureLog(property, calculateTaxRequest, null, overlapErrors);
+					continue;
+				}
+				
 				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
 				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
@@ -560,7 +571,68 @@ public class PropertySchedulerService {
 			}
 		}
 
-		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).build();
+		int generatedCount = taxCalculatorTrackers.size();
+		int skipped = skippedCount.get();
+
+		String message = null;
+
+		if (generatedCount > 0 && skipped > 0) {
+			message = "Bills generated successfully for " + generatedCount + " property(s). Failed for " + skipped
+					+ " property(s) due to overlapping bill periods.";
+		} else if (generatedCount > 0) {
+			message = "Bills generated successfully for " + generatedCount + " property(s).";
+		} else if (skipped > 0) {
+			message = "No bills generated. " + skipped + " property(s) failed due to overlapping bill periods.";
+		}
+
+		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();
+	}
+	
+	private boolean validateExistingBillOverlap(CalculateTaxRequest calculateTaxRequest, Property property) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+				.consumerCode(Collections.singleton(property.getPropertyId())).tenantId(property.getTenantId())
+				.service("PROPERTY").build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, calculateTaxRequest.getRequestInfo());
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return false;
+		}
+
+		Long newFrom = calculateTaxRequest.getFromDate().getTime();
+		Long newTo = calculateTaxRequest.getToDate().getTime();
+
+		for (Bill bill : billResponse.getBill()) {
+
+			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+				continue;
+			}
+
+			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
+				continue;
+			}
+
+			for (BillDetail detail : bill.getBillDetails()) {
+
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+
+				if (existingFrom == null || existingTo == null) {
+					continue;
+				}
+
+				if (isOverlapping(newFrom, newTo, existingFrom, existingTo)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
 	}
 
 	public List<CalculateTaxPreviewResponse> taxCalculatorPreview(CalculateTaxRequest calculateTaxRequest) {
