@@ -191,12 +191,33 @@ public class PropertySchedulerService {
 
 		List<Property> properties = getProperties(calculateTaxRequest);
 //		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+		Set<String> propertyIds = properties.stream()
+				                            .map(Property::getPropertyId)
+				                            .collect(Collectors.toSet());
+		
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(propertyIds)
+				.build();
+
+		List<PtTaxCalculatorTracker> existingTrackers = propertyService.getTaxCalculatedProperties(criteria);
+		
+		Map<String, List<PtTaxCalculatorTracker>> trackerMap = existingTrackers.stream()
+				.collect(Collectors.groupingBy(PtTaxCalculatorTracker::getPropertyId));
 
 		for (Property property : properties) {
 
 			if (!Boolean.TRUE.equals(property.getIsBilling())) {
 				log.info("Skipping tax calculation for property {} as isBilling={}", property.getPropertyId(),
 						property.getIsBilling());
+				continue;
+			}
+			
+			if (validateExistingBillOverlap(calculateTaxRequest, property, trackerMap)) {
+				skippedCount.incrementAndGet();
+				Set<String> overlapErrors = new HashSet<>();
+				overlapErrors.add(
+						"Bill already exists for property " + property.getPropertyId() + " for the selected period");
+				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
 				continue;
 			}
 
@@ -419,15 +440,6 @@ public class PropertySchedulerService {
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
 				
-				if (validateExistingBillOverlap(calculateTaxRequest, property)) {
-					skippedCount.incrementAndGet();
-					Set<String> overlapErrors = new HashSet<>();
-					overlapErrors.add("Bill already exists for property " + property.getPropertyId()
-							+ " for the selected period");
-					createFailureLog(property, calculateTaxRequest, null, overlapErrors);
-					continue;
-				}
-				
 				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
 				if (billResponse != null && !CollectionUtils.isEmpty(billResponse.getBill())) {
@@ -588,52 +600,36 @@ public class PropertySchedulerService {
 		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();
 	}
 	
-	private boolean validateExistingBillOverlap(CalculateTaxRequest calculateTaxRequest, Property property) {
+	private boolean validateExistingBillOverlap(CalculateTaxRequest calculateTaxRequest, Property property,
+			Map<String, List<PtTaxCalculatorTracker>> trackerMap) {
 
-		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
-				.consumerCode(Collections.singleton(property.getPropertyId())).tenantId(property.getTenantId())
-				.service("PROPERTY").build();
+		List<PtTaxCalculatorTracker> trackers = trackerMap.get(property.getPropertyId());
 
-		BillResponse billResponse = billService.searchBill(billSearchRequest, calculateTaxRequest.getRequestInfo());
-
-		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+		if (CollectionUtils.isEmpty(trackers)) {
 			return false;
 		}
 
 		Long newFrom = calculateTaxRequest.getFromDate().getTime();
 		Long newTo = calculateTaxRequest.getToDate().getTime();
 
-		for (Bill bill : billResponse.getBill()) {
+		for (PtTaxCalculatorTracker tracker : trackers) {
 
-			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+			if (tracker.getBillStatus() == BillStatus.CANCELLED) {
 				continue;
 			}
 
-			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
-				continue;
-			}
+			Long existingFrom = tracker.getFromDate().getTime();
+			Long existingTo = tracker.getToDate().getTime();
 
-			for (BillDetail detail : bill.getBillDetails()) {
+			boolean overlap = !(existingTo < newFrom || existingFrom > newTo);
 
-				Long existingFrom = detail.getFromPeriod();
-				Long existingTo = detail.getToPeriod();
-
-				if (existingFrom == null || existingTo == null) {
-					continue;
-				}
-
-				if (isOverlapping(newFrom, newTo, existingFrom, existingTo)) {
-					return true;
-				}
+			if (overlap) {
+				return true;
 			}
 		}
 
 		return false;
-	}
-
-	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
-		return !(newTo < existingFrom || newFrom > existingTo);
-	}
+		}
 
 	public List<CalculateTaxPreviewResponse> taxCalculatorPreview(CalculateTaxRequest calculateTaxRequest) {
 
