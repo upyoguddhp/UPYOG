@@ -155,6 +155,15 @@ public class GarbageAccountSchedulerService {
 				}
 
 				if (null != garbageAccount.getUserUuid()) {
+					
+					if (validateExistingBillOverlap(generateBillRequest, garbageAccount, trackerMap)) {
+						skippedCount.incrementAndGet();
+						errorList.add("Bill already exists for application "
+								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
+						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+						return;
+					}
+					
 					Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
 							garbageAccount.getTenantId());
 					// calculate fees from mdms response
@@ -211,14 +220,6 @@ public class GarbageAccountSchedulerService {
 
 						String billType = Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
 								|| generateBillRequest.getMonths().size() > 1 ? "MULTI_MONTH" : "MONTHLY";
-
-						if (validateExistingBillOverlap(generateBillRequest, garbageAccount, trackerMap)) {
-							skippedCount.incrementAndGet();
-							errorList.add("Bill already exists for application "
-									+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
-							return;
-						}
 
 						AtomicReference<String> demandId = new AtomicReference<>(null);
 
