@@ -24,5 +24,7 @@ public class SearchCriteriaGarbageAccountRequest {
 	private Boolean isSchedulerCall = false;
 	
 	private Boolean isUserUuidNull;
+	
+	private Boolean isDdpVerified;
 
 }
