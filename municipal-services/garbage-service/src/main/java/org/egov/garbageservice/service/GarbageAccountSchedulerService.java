@@ -160,7 +160,7 @@ public class GarbageAccountSchedulerService {
 						skippedCount.incrementAndGet();
 						errorList.add("Bill already exists for application "
 								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+//						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 						return;
 					}
 					
@@ -337,12 +337,12 @@ public class GarbageAccountSchedulerService {
 		int skipped = skippedCount.get();
 
 		if (generatedCount > 0 && skipped > 0) {
-			message = "Bills generated successfully for " + generatedCount + " application(s). Failed for " + skipped
-					+ " application(s) due to overlapping bill periods.";
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + skipped
+					+ " Application Id(s) due to overlapping bill periods.";
 		} else if (generatedCount > 0) {
-			message = "Bills generated successfully for " + generatedCount + " application(s).";
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s).";
 		} else if (skipped > 0) {
-			message = "No bills generated. " + skipped + " application(s) failed due to overlapping bill periods.";
+			message = "No bills generated. " + skipped + " Application Id(s) failed due to overlapping bill periods.";
 		}
 
 		sanatizeFailureLog(generateBillRequest);

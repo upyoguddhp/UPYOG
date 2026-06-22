@@ -217,7 +217,7 @@ public class PropertySchedulerService {
 				Set<String> overlapErrors = new HashSet<>();
 				overlapErrors.add(
 						"Bill already exists for property " + property.getPropertyId() + " for the selected period");
-				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
+//				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
 				continue;
 			}
 
@@ -589,12 +589,12 @@ public class PropertySchedulerService {
 		String message = null;
 
 		if (generatedCount > 0 && skipped > 0) {
-			message = "Bills generated successfully for " + generatedCount + " property(s). Failed for " + skipped
-					+ " property(s) due to overlapping bill periods.";
+			message = "Bills generated successfully for " + generatedCount + " Property Id(s). Failed for " + skipped
+					+ " Property Id(s) due to overlapping bill periods.";
 		} else if (generatedCount > 0) {
-			message = "Bills generated successfully for " + generatedCount + " property(s).";
+			message = "Bills generated successfully for " + generatedCount + " Property Id(s).";
 		} else if (skipped > 0) {
-			message = "No bills generated. " + skipped + " property(s) failed due to overlapping bill periods.";
+			message = "No bills generated. " + skipped + " Property Id(s) failed due to overlapping bill periods.";
 		}
 
 		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();
