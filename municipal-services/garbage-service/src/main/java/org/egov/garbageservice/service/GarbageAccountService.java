@@ -98,6 +98,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.egov.garbageservice.model.DdpVerificationCount;
 
 import lombok.extern.slf4j.Slf4j;
@@ -2519,6 +2520,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 	public Map<String, Object> generateArrear(GenrateArrearRequest genrateArrearRequest) {
 		String message = null;
+		boolean isSuccess = true;
 		List<String> ListOfConsumerCode = new ArrayList<>();
 		ListOfConsumerCode.add(genrateArrearRequest.getDemands().get(0).getConsumerCode());
 		List<String> setOfStatuses = new ArrayList<>();
@@ -2535,10 +2537,15 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
+			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 
-				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount);
+				if (validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount)) {
+					log.warn("Skipping arrear generation for application {} due to overlapping bill period",
+							garbageAccount.getGrbgApplicationNumber());
+					return;
+				};
 				
 				Map<String, Object> additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
 
@@ -2592,22 +2599,29 @@ public GarbageAccountActionResponse openSearchPayPreview(
 							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
 					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
+					arrearGenerated.set(true);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
 							"Bill not generated due to no Demand found for the given consumerCode");				}
 			});
-			message = "Arear Generated Successfully";
+			if (arrearGenerated.get()) {
+			    message = "Arrear Generated Successfully";
+			} else {
+			    message = "No arrear generated. Bill already exists for overlapping period.";
+			    isSuccess = false;
+			}
 		} else {
 			message = "Invalid Garbage Details";
+			isSuccess = false;
 		}
-		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), isSuccess);
 		Map<String, Object> response = new HashMap<>();
 		response.put("ResponseInfo", resInfo);
 		response.put("message", message);
 		return response;
 	}
 	
-	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
+	private boolean validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
 			GarbageAccount garbageAccount) {
 
 		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
@@ -2619,7 +2633,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
 
 		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return;
+			return false;
 		}
 
 		for (Bill bill : billResponse.getBill()) {
@@ -2642,12 +2656,11 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
 						existingTo)) {
-
-					throw new CustomException("ARREAR_PERIOD_OVERLAP",
-							"Arrear period overlaps with existing bill period");
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 	
 	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {

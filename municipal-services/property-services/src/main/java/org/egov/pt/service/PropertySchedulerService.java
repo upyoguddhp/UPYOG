@@ -1715,6 +1715,19 @@ public class PropertySchedulerService {
 		String ulbName = request.getTenantId().replaceFirst("^hp\\.", "");
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+		
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder()
+		        .isSchedulerCall(true)
+		        .tenantId(request.getTenantId())
+		        .status(Collections.singleton(Status.APPROVED))
+		        .propertyIds(Collections.singleton(request.getPropertyId()))
+		        .isActiveUnit(true)
+		        .build();
+
+		List<Property> property = propertyService.searchProperty(
+		        propertyCriteria,
+		        request.getRequestInfo(),
+		        null);
 
 		if (CollectionUtils.isEmpty(billResponse.getBill())) {
 			throw new CustomException("BILL_NOT_FOUND", "No bill found for given billId and demandId");
@@ -1725,7 +1738,7 @@ public class PropertySchedulerService {
 				                         .billId(request.getBillId())
 				                         .build());
 
-		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName);
+		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
 
 
