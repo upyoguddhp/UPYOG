@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.egov.pt.models.enums.BillStatus;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 import org.egov.pt.service.DemandService;
@@ -98,6 +99,7 @@ import org.egov.pt.web.contracts.UpdatePropertyBillCriteria;
 import org.egov.pt.models.AuditDetails;
 import org.egov.pt.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.egov.common.contract.response.ResponseInfo;
 
 
 
@@ -1272,8 +1274,9 @@ public class PropertyService {
 		return result.get(0);
 	}
 
-	public String generateArrear(GenrateArrearRequest genrateArrearRequest) {
+	public Map<String, Object> generateArrear(GenrateArrearRequest genrateArrearRequest){
 		String message = null;
+		boolean isSuccess = true;
 		Set<String> setOfConsumerCode = new HashSet<>();
 		setOfConsumerCode.add(genrateArrearRequest.getDemands().get(0).getConsumerCode());
 		Set<Status> setOfStatuses = new HashSet<>();
@@ -1285,11 +1288,18 @@ public class PropertyService {
 		if (!CollectionUtils.isEmpty(properties)) {
 			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
+			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
 				
-				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), properties.get(0));
+				if (validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), properties.get(0))) {
+
+					log.warn("Skipping arrear generation for property {} due to overlapping bill period",
+							properties.get(0).getPropertyId());
+
+					return;
+				}
 
 				if (demand.getAdditionalDetails() instanceof Map) {
 				    Map<?, ?> map = (Map<?, ?>) demand.getAdditionalDetails();
@@ -1366,50 +1376,71 @@ public class PropertyService {
 					
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
+					arrearGenerated.set(true);
 				} else {
 					throw new CustomException("INVALID_CONSUMERCODE", "Bill not generated");
 				}
 			});
-			message = "Arear Generated Successfully";
+			if (arrearGenerated.get()) {
+			    message = "Arrear Generated Successfully";
+			} else {
+			    message = "No arrear generated. Bill already exists for overlapping period.";
+			    isSuccess = false;
+			}
 		} else {
 			message = "Invalid Property Details";
+			isSuccess = false;
 		}
-		return message;
+		ResponseInfo responseInfo = responseInfoFactory
+				.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), isSuccess);
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("ResponseInfo", responseInfo);
+		response.put("message", message);
+
+		return response;
 	}
 	
-	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo, Property property) {
+	private boolean validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo, Property property) {
 
 		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
-		        .consumerCode(Collections.singleton(property.getPropertyId()))
-		        .tenantId(property.getTenantId())
-		        .service(PTConstants.MODULE_PROPERTY)
-		        .build();
+				.consumerCode(Collections.singleton(property.getPropertyId())).tenantId(property.getTenantId())
+				.service(PTConstants.MODULE_PROPERTY).build();
 
 		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
-		
-		if (billResponse == null) {
-			return;
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return false;
 		}
 
 		for (Bill bill : billResponse.getBill()) {
-			if (bill.getBillDetails() == null) {
+
+			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
 				continue;
 			}
-			
+
 			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
-			    continue;
+				continue;
 			}
 
 			for (BillDetail detail : bill.getBillDetails()) {
+
 				Long existingFrom = detail.getFromPeriod();
 				Long existingTo = detail.getToPeriod();
+
+				if (existingFrom == null || existingTo == null) {
+					continue;
+				}
+
 				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
 						existingTo)) {
-					throw new CustomException("ARREAR_PERIOD_OVERLAP",
-							"Arrear period overlaps with existing bill period");
+
+					return true;
 				}
 			}
 		}
+
+		return false;
 	}
 
 	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {

@@ -80,6 +80,7 @@ import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.BillIdRequest;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -139,6 +140,7 @@ public class PropertySchedulerService {
 	public CalculateTaxResponse calculateTax(CalculateTaxRequest calculateTaxRequest) {
 
 		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
+		AtomicInteger skippedCount = new AtomicInteger(0);
 
 		Boolean isBilling = false;
 		JsonNode ulbModules = null;
@@ -188,13 +190,34 @@ public class PropertySchedulerService {
 		}
 
 		List<Property> properties = getProperties(calculateTaxRequest);
-		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+//		properties = removeAlreadyTaxCalculatedProperties(properties, calculateTaxRequest);
+		Set<String> propertyIds = properties.stream()
+				                            .map(Property::getPropertyId)
+				                            .collect(Collectors.toSet());
+		
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(propertyIds)
+				.build();
+
+		List<PtTaxCalculatorTracker> existingTrackers = propertyService.getTaxCalculatedProperties(criteria);
+		
+		Map<String, List<PtTaxCalculatorTracker>> trackerMap = existingTrackers.stream()
+				.collect(Collectors.groupingBy(PtTaxCalculatorTracker::getPropertyId));
 
 		for (Property property : properties) {
 
 			if (!Boolean.TRUE.equals(property.getIsBilling())) {
 				log.info("Skipping tax calculation for property {} as isBilling={}", property.getPropertyId(),
 						property.getIsBilling());
+				continue;
+			}
+			
+			if (validateExistingBillOverlap(calculateTaxRequest, property, trackerMap)) {
+				skippedCount.incrementAndGet();
+				Set<String> overlapErrors = new HashSet<>();
+				overlapErrors.add(
+						"Bill already exists for property " + property.getPropertyId() + " for the selected period");
+//				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
 				continue;
 			}
 
@@ -560,8 +583,53 @@ public class PropertySchedulerService {
 			}
 		}
 
-		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).build();
+		int generatedCount = taxCalculatorTrackers.size();
+		int skipped = skippedCount.get();
+
+		String message = null;
+
+		if (generatedCount > 0 && skipped > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Property Id(s). Failed for " + skipped
+					+ " Property Id(s) due to overlapping bill periods.";
+		} else if (generatedCount > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Property Id(s).";
+		} else if (skipped > 0) {
+			message = "No bills generated. " + skipped + " Property Id(s) failed due to overlapping bill periods.";
+		}
+
+		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();
 	}
+	
+	private boolean validateExistingBillOverlap(CalculateTaxRequest calculateTaxRequest, Property property,
+			Map<String, List<PtTaxCalculatorTracker>> trackerMap) {
+
+		List<PtTaxCalculatorTracker> trackers = trackerMap.get(property.getPropertyId());
+
+		if (CollectionUtils.isEmpty(trackers)) {
+			return false;
+		}
+
+		Long newFrom = calculateTaxRequest.getFromDate().getTime();
+		Long newTo = calculateTaxRequest.getToDate().getTime();
+
+		for (PtTaxCalculatorTracker tracker : trackers) {
+
+			if (tracker.getBillStatus() == BillStatus.CANCELLED) {
+				continue;
+			}
+
+			Long existingFrom = tracker.getFromDate().getTime();
+			Long existingTo = tracker.getToDate().getTime();
+
+			boolean overlap = !(existingTo < newFrom || existingFrom > newTo);
+
+			if (overlap) {
+				return true;
+			}
+		}
+
+		return false;
+		}
 
 	public List<CalculateTaxPreviewResponse> taxCalculatorPreview(CalculateTaxRequest calculateTaxRequest) {
 
