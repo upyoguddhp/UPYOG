@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Property Collection Bill</title>
+	<title>Property Tax  Bill</title>
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -60,10 +60,10 @@
 
 <body>
 	<div class="container">
-		<h1>Property Collection Bill</h1>
+		<h1>Property Tax Bill</h1>
 		<p>Dear {recipients_name},</p>
-		<p>We hope this message finds you well. We would like to inform you that your property collection bill for the
-			period of <strong>{month}</strong> has been generated. Below are the details of your bill:</p>
+		<p>This is to inform you that your Property Tax Bill for the
+			period <strong>{month}</strong> has been generated and is available for payment.</p>
 
 		<table class="bill-details">
 			<tr>
@@ -75,16 +75,35 @@
 				<td>{bill_no}</td>
 			</tr>
 			<tr>
-				<td>Name</td>
+				<td>Property Owner Name</td>
 				<td>{recipients_name}</td>
 			</tr>
 			<tr>
-				<td>Total Amount</td>
+				<td>Father's Name</td>
+				<td>{fathers_name}</td>
+			</tr>
+			<tr>
+				<td>Property ID</td>
+				<td>{property_id}</td>
+			</tr>
+			<tr>
+				<td>Amount Payable</td>
 				<td>{amount}</td>
 			</tr>
+			<tr>
+				<td>Ward</td>
+				<td>{ward}</td>
+			</tr>
+			<tr>
+				<td>Address</td>
+				<td>{property_address}</td>
+			</tr>
 		</table>
-
-		<p class="footer">Thank you for your cooperation and timely payment. <a href="{property_pay_now_bill_url}">CitizenSeva Portal</a></p>
+		
+		<p><strong>Please Note: </strong>A rebate is available if payment is made within 15 days from the date of bill generation. You are requested to make the payment within the stipulated period to avail the rebate.</p>
+		<p>To view and pay your bill, please visit: <a href="{property_pay_now_bill_url}">CitizenSeva Portal</a> </p>
+		<p class="footer">For any queries or assistance, please contact your respective Urban Local Body (ULB).
+		Thank you for your cooperation.</p>
 	</div>
 </body>
 

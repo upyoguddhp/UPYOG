@@ -56,5 +56,14 @@ public class GenerateBillRequest {
     
     @Builder.Default
     private Boolean isRebate = false;
+    
+    @Builder.Default
+    private Boolean isMultiMonth = false;
+    
+    @JsonProperty("fromDateTimestamp")
+    private Long fromDateTimestamp;
+
+    @JsonProperty("toDateTimestamp")
+    private Long toDateTimestamp;
 
 }

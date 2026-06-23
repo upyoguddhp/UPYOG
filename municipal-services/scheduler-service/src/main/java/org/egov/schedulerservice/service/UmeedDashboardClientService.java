@@ -31,15 +31,15 @@ public class UmeedDashboardClientService {
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
+			// Add the auth token from RequestInfo into the Authorization header
+			if (dashboardRequest.getRequestInfo() != null && dashboardRequest.getRequestInfo().getAuthToken() != null) {
+				headers.set("Authorization", "Bearer " + dashboardRequest.getRequestInfo().getAuthToken());
+			}
 
 			HttpEntity<UmeedDashboardRequest> requestEntity = new HttpEntity<>(dashboardRequest, headers);
 
-			log.info("National dahbboard URL: {}", dashboardUrl);
-			
+			// Make the POST call
 			String responseBody = restTemplate.postForObject(dashboardUrl, requestEntity, String.class);
-			
-
-			
 			if (responseBody != null) {
 				JsonNode root = objectMapper.readTree(responseBody);
 
@@ -61,10 +61,10 @@ public class UmeedDashboardClientService {
 			}
 
 		} catch (Exception e) {
-//			e.printStackTrace();
-			log.error("Error sending metrics: " + e.getMessage());
 			return ("Error sending metrics: " + e.getMessage());
 		}
 	}
+	
 
+	
 }

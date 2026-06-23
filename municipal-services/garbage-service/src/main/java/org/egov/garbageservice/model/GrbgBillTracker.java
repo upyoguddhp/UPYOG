@@ -25,6 +25,7 @@ public class GrbgBillTracker {
 	private String toDate;
 	private String ward;
 	private String billId;
+	private String demandId;
 	private String consumerCode;
 	private String status = "ACTIVE";
 	@Builder.Default

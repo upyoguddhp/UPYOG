@@ -98,6 +98,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.egov.garbageservice.model.DdpVerificationCount;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -1301,6 +1303,16 @@ public class GarbageAccountService {
 	private void updateChildGarbageAccounts(GarbageAccount newGarbageAccount) {
 		if (!CollectionUtils.isEmpty(newGarbageAccount.getChildGarbageAccounts())) {
 			newGarbageAccount.getChildGarbageAccounts().stream().forEach(child -> {
+				
+				if (child.getAdditionalDetail() == null) {
+	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
+	            }
+				if (child.getIsDdpVerified() == null) {
+					child.setIsDdpVerified(newGarbageAccount.getIsDdpVerified());
+				}
+				if (StringUtils.isBlank(child.getSystemPropertyId())) {
+					child.setSystemPropertyId(newGarbageAccount.getSystemPropertyId());
+				}
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
@@ -1428,6 +1440,11 @@ public class GarbageAccountService {
 			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex) {
 
 		searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setUserType(searchCriteriaGarbageAccountRequest.getRequestInfo().getUserInfo().getType());
+		
+		if (searchCriteriaGarbageAccountRequest.getIsDdpVerified() != null) {
+			searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setIsDdpVerified(searchCriteriaGarbageAccountRequest.getIsDdpVerified());
+		}
+		
 		// validate search criteria
 		validateAndEnrichSearchGarbageAccount(searchCriteriaGarbageAccountRequest);
 
@@ -1499,7 +1516,7 @@ public class GarbageAccountService {
 			grbgAccs = garbageAccountRepository.searchGarbageAccount(
 					searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount(), garbageCriteriaMap);
 
-		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs);
+		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest);
 
 		if (CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			garbageAccountResponse.setResponseInfo(responseInfoFactory
@@ -1531,11 +1548,16 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 
 
-	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
+	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
 				.build();
 
+		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
+		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
+		
 		processResponse(garbageAccountResponse);
 
 		return garbageAccountResponse;
@@ -2276,11 +2298,33 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			garbapplicationNos.add(childGrbgAccount.getGrbgApplicationNumber());
 
 		}
-		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
-				.type(grbgTaxCalculatorMonthTracker.getType()).grbgApplicationIds(garbapplicationNos).month(grbgTaxCalculatorMonthTracker.getMonth())
-				.build();
+		
+		GrbgBillTrackerSearchCriteria.GrbgBillTrackerSearchCriteriaBuilder trackerBuilder  =
+		        GrbgBillTrackerSearchCriteria.builder()
+		        .type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
+		        .grbgApplicationIds(garbapplicationNos);
+
+		if (!StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getMonth())
+		        && !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getYear())) {
+			trackerBuilder.month(grbgTaxCalculatorMonthTracker.getMonth())
+		           .year(grbgTaxCalculatorMonthTracker.getYear());
+		} else {
+			trackerBuilder.billIds(Collections.singleton(grbgTaxCalculatorMonthTracker.getBillId()));
+		}
+
+		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = trackerBuilder.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
+		
+		if ("ARREAR".equalsIgnoreCase(grbgTaxCalculatorMonthTracker.getType())) {
+			String referenceFromDate = grbgTaxCalculatorMonthTracker.getFromDate();
+			String referenceToDate = grbgTaxCalculatorMonthTracker.getToDate();
+
+			grbgTaxCalculatorTracker = grbgTaxCalculatorTracker.stream()
+					.filter(tracker -> Objects.equals(tracker.getFromDate(), referenceFromDate)
+							&& Objects.equals(tracker.getToDate(), referenceToDate))
+					.collect(Collectors.toList());
+		}
 
 		// If no records, return null or empty set
 		if (grbgTaxCalculatorTracker == null || grbgTaxCalculatorTracker.isEmpty()) {
@@ -2296,13 +2340,13 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		        .service(grbAccount.getBusinessService())
 		        .billId(billIds);
 
-		
-		if (status != null && !status.trim().isEmpty()) {
-		     
-		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
-		        builder.status(dynamicStatus);
-		   
-		}
+//		
+//		if (status != null && !status.trim().isEmpty()) {
+//		     
+//		        Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+//		        builder.status(dynamicStatus);
+//		   
+//		}
 
 
 		BillSearchCriteria billSearchCriteria = builder.build();
@@ -2315,6 +2359,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		}
 
 		List<Bill> bill = billResponse.getBill();
+		bill.removeIf(b -> b.getStatus() == Bill.StatusEnum.CANCELLED);
 
 		// return null;
 		PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequestForBill(requestInfoWrapper, grbAccount, bill,
@@ -2475,6 +2520,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 	public Map<String, Object> generateArrear(GenrateArrearRequest genrateArrearRequest) {
 		String message = null;
+		boolean isSuccess = true;
 		List<String> ListOfConsumerCode = new ArrayList<>();
 		ListOfConsumerCode.add(genrateArrearRequest.getDemands().get(0).getConsumerCode());
 		List<String> setOfStatuses = new ArrayList<>();
@@ -2491,9 +2537,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
+			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 
+				if (validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount)) {
+					log.warn("Skipping arrear generation for application {} due to overlapping bill period",
+							garbageAccount.getGrbgApplicationNumber());
+					return;
+				};
+				
 				Map<String, Object> additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
 
 				// if null, initialize
@@ -2538,20 +2591,80 @@ public GarbageAccountActionResponse openSearchPayPreview(
 					GrbgBillTrackerRequest grbgBillTrackerRequest = enrichGrbgBillTrackerCreateRequest(garbageAccount,
 							generateBillRequest, demand.getMinimumAmountPayable(), billResponse.getBill().get(0),
 							calculationBreakdown);
+					grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(savedDemands.get(0).getId());
+					
+					AuditDetails audit = grbgUtils.buildCreateAuditDetails(genrateArrearRequest.getRequestInfo());
+
+					garbageBillTrackerRepository
+							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
+					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
+					arrearGenerated.set(true);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
 							"Bill not generated due to no Demand found for the given consumerCode");				}
 			});
-			message = "Arear Generated Successfully";
+			if (arrearGenerated.get()) {
+			    message = "Arrear Generated Successfully";
+			} else {
+			    message = "No arrear generated. Bill already exists for overlapping period.";
+			    isSuccess = false;
+			}
 		} else {
 			message = "Invalid Garbage Details";
+			isSuccess = false;
 		}
-		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), isSuccess);
 		Map<String, Object> response = new HashMap<>();
 		response.put("ResponseInfo", resInfo);
 		response.put("message", message);
 		return response;
+	}
+	
+	private boolean validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
+			GarbageAccount garbageAccount) {
+
+		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
+				.consumerCode(Collections.singleton(garbageAccount.getGrbgApplicationNumber()))
+				.tenantId(garbageAccount.getTenantId())
+				.service("GB")
+				.build();
+
+		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return false;
+		}
+
+		for (Bill bill : billResponse.getBill()) {
+			
+			if (CollectionUtils.isEmpty(bill.getBillDetails())) {
+				continue;
+			}
+			
+			if (Bill.StatusEnum.CANCELLED.equals(bill.getStatus())) {
+			    continue;
+			}
+			 
+			for (BillDetail detail : bill.getBillDetails()) {
+				Long existingFrom = detail.getFromPeriod();
+				Long existingTo = detail.getToPeriod();
+
+				if (existingFrom == null || existingTo == null) {
+					continue;
+				}
+
+				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
+						existingTo)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
+		return !(newTo < existingFrom || newFrom > existingTo);
 	}
 
 	public static String getFinancialYearFromTimestamps(long timestamp1, long timestamp2) {
@@ -2587,7 +2700,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    GrbgBillTrackerSearchCriteria criteria =
 		        GrbgBillTrackerSearchCriteria.builder()
 		            .status(Collections.singleton("ACTIVE"))
-		            .type("MONTHLY")
+		            .type(Collections.singleton("MONTHLY"))
 		            .build();
 		
 		    List<GrbgBillTracker> trackers =

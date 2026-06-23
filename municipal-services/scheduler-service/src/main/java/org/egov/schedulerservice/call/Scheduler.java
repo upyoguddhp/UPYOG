@@ -70,6 +70,14 @@ public class Scheduler {
 		propertyService.generatePropertyTax(requestInfo);
 		log.info("generatePropertyTax CRON JOB Ends");
 	}
+	
+//	@scheduled(cron = "${cron.job.default.property.tax.generator}", zone="IST")testing
+	public void generatePropertyBulkBills() {
+		log.info("bill generating");	
+		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+		propertyService.generatePropertyBulkBill(requestInfo);
+		log.info("bill generated");
+	}
 
 	@Scheduled(cron = "${cron.job.default.pgr.request.escalator}", zone = "IST")
 	public void escalatePGRRequest() {
@@ -127,7 +135,7 @@ public class Scheduler {
 		log.info("updateTrackerBillStatus CRON JOB Ends");
 	}
 
-	//@Scheduled(cron = "${cron.job.default.property.tracker.rebate.amount.reverser}", zone = "IST")
+	@Scheduled(cron = "${cron.job.default.property.tracker.rebate.amount.reverser}", zone = "IST")
 	public void reverseRebateAmount() {
 		log.info("reverseRebateAmount CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
@@ -135,7 +143,7 @@ public class Scheduler {
 		log.info("reverseRebateAmount CRON JOB Ends");
 	}
 
-	//@Scheduled(cron = "${cron.job.default.property.tracker.penalty.amount.updater}", zone = "IST")
+	@Scheduled(cron = "${cron.job.default.property.tracker.penalty.amount.updater}", zone = "IST")
 	public void updatePenaltyAmount() {
 		log.info("updatePenaltyAmount CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
@@ -151,14 +159,23 @@ public class Scheduler {
 		log.info("pushUmeedDashboardMetricsForTL CRON JOB Ends");
 	}
 	
-	//@Scheduled(cron = "${cron.job.default.umeed.dashboard.tl.data.matrics.sender}", zone = "IST")
+	//PGR
+	@Scheduled(cron = "${cron.job.default.umeed.dashboard.pgr.data.matrics.sender}", zone = "IST")
 	public void pushUmeedDashboardMetricsForPGR() {
 		log.info("pushUmeedDashboardMetricsForPGR CRON JOB Starts");
 		RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
-//		umeedDashboardService.pushUmeedDashboardMetricsForPGR(requestInfo);
+		umeedDashboardService.pushUmeedDashboardMetricsForPGR(requestInfo);
 		log.info("pushUmeedDashboardMetricsForPGR CRON JOB Ends");
 	}
 	
+	//Property
+		@Scheduled(cron = "${cron.job.default.umeed.dashboard.property.data.matrics.sender}", zone = "IST")
+		public void pushUmeedDashboardMetricsForProperty() {
+			log.info("pushUmeedDashboardMetricsForProperty CRON JOB Starts");
+			RequestInfo requestInfo = requestInfoUtils.getSystemRequestInfo();
+			umeedDashboardService.pushUmeedDashboardMetricsForProperty(requestInfo);
+			log.info("pushUmeedDashboardMetricsForProperty CRON JOB Ends");
+		}
 	
 	@Scheduled(cron = "${cron.job.default.send.sms.notification}", zone = "IST")
 	public void sendSmsNotification() {
@@ -168,6 +185,7 @@ public class Scheduler {
 		log.info("sendSmsNotification CRON JOB Ends");
 	}
 	
+
 	@Scheduled(cron = "${cron.job.default.garbage.tracker.penalty.amount.updater}", zone = "IST")
     public void updateGarbagePenaltyAmount() {
         log.info("Garbage updatePenaltyAmount CRON JOB Starts");
@@ -183,5 +201,7 @@ public class Scheduler {
 		garbageService.reverseRebateAmount(requestInfo);
 		log.info("reverseRebateAmount CRON JOB Ends");
 	}
+
+	
 
 }

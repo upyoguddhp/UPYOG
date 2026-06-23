@@ -44,4 +44,6 @@ public class PtTaxCalculatorTracker {
 	private JsonNode additionalDetails;
 	private String billId;
 	private String type = "CYCLIC";
+	private String demandId;
+	private String ward;
 }

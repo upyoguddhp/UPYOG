@@ -30,6 +30,8 @@ public class BillSearchCriteria {
 	private String tenantId;
 
 	private Set<String> billId;
+	
+	private Set<String> demandId;
 
 	private Long fromPeriod;
 

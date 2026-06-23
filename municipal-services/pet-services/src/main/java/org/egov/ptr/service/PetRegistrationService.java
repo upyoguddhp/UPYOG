@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
+import org.egov.mdms.model.MdmsResponse;
 import org.egov.ptr.config.PetConfiguration;
 import org.egov.ptr.models.ApplicationDetail;
 import org.egov.ptr.models.Demand;
@@ -54,6 +55,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
@@ -101,6 +103,14 @@ public class PetRegistrationService {
 
 	@Autowired
 	private CommonUtils commonUtils;
+	
+	@Autowired
+	private MdmsService mdmsService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	
 
 	/**
 	 * Enriches the Request and pushes to the Queue
@@ -117,6 +127,23 @@ public class PetRegistrationService {
 		producer.push(config.getCreatePtrTopic(), petRegistrationRequest);
 
 		return petRegistrationRequest.getPetRegistrationApplications();
+	}
+	
+
+	public List<PetRegistrationApplication> registerPtrRequestRenewal(
+	        PetRegistrationRequest request) {
+
+	    validator.validatePetApplication(request);
+
+	    // Renewal-specific enrichment
+	    enrichmentService.enrichPetApplicationForRenewal(request);
+
+	    // Workflow (INITIATE only)
+	    wfService.updateWorkflowStatus(request);
+
+	    producer.push(config.getCreatePtrTopic(), request);
+
+	    return request.getPetRegistrationApplications();
 	}
 
 	public List<PetRegistrationApplication> searchPtrApplications(RequestInfo requestInfo,
@@ -180,13 +207,13 @@ public class PetRegistrationService {
 			}else if(StringUtils.equalsAnyIgnoreCase(role, PTRConstants.USER_ROLE_SUPERVISOR, PTRConstants.USER_ROLE_SECRETARY)) {
 				statusWithRoles.addAll(Arrays.asList(
 						PTRConstants.APPLICATION_STATUS_INITIATED,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
-					    PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
-					    PTRConstants.APPLICATION_STATUS_APPROVED,
-					    PTRConstants.APPLICATION_STATUS_REJECTED
-		            ));
+						PTRConstants.APPLICATION_STATUS_PENDINGFORVERIFICATION,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORAPPROVAL,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORMODIFICATION,
+						PTRConstants.APPLICATION_STATUS_PENDINGFORPAYMENT,
+						PTRConstants.APPLICATION_STATUS_APPROVED,
+						PTRConstants.APPLICATION_STATUS_REJECTED
+					));
 				if(StringUtils.equalsIgnoreCase(petApplicationSearchCriteria.getTenantId()
 						, PTRConstants.STATE_LEVEL_TENANT_ID)) {
 					tempTenantId.set(null);
@@ -315,26 +342,25 @@ public class PetRegistrationService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		String createdTime = dateFormat.format(new Date(petRegistrationApplication.getAuditDetails().getCreatedTime()));
 		String lastModifiedTime = dateFormat.format(new Date(System.currentTimeMillis()));
-
 		
 		String lastVaccineDateStr = petRegistrationApplication.getPetDetails().getLastVaccineDate().toString();
 		String lastVaccineDate = null; // Declare outside the try block
 
 		try {
 			if (lastVaccineDateStr != null) {
-			    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			    Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
+				SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date lastVaccineDateObj = inputDateFormat.parse(lastVaccineDateStr);
 
-			    SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-			    lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
+				SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				lastVaccineDate = outputDateFormat.format(lastVaccineDateObj);
 			} 
 //			else {
 //			    lastVaccineDate = null; // or assign a default value if needed
 //			}
 
 		} catch (Exception e) {
-		    System.err.println("Error parsing last vaccine date: " + e.getMessage());
-		    e.printStackTrace();
+			System.err.println("Error parsing last vaccine date: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 //		String lastVaccineDate = dateFormat.format(petRegistrationApplication.getPetDetails().getLastVaccineDate().toString());
@@ -346,7 +372,7 @@ public class PetRegistrationService {
 		tlObject.put("address", petRegistrationApplication.getAddress().getAddressLine1().concat(", ")
 			.concat(petRegistrationApplication.getAdditionalDetail().get("ulbName").toString().concat(", ")
 			.concat(petRegistrationApplication.getAddress().getPincode())));// Trade Premises Address
-		tlObject.put("createdTime", createdTime);// License created Date
+		tlObject.put("createdTime", createdTime);// License Issue Date
 		tlObject.put("modifiedTime", lastModifiedTime);// License Issue Date
 		tlObject.put("lastVaccineDate", lastVaccineDate);//License Validity
 		tlObject.put("applicantName", petRegistrationApplication.getApplicantName());
@@ -430,32 +456,50 @@ public class PetRegistrationService {
 			}
 	}
 
-	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest ) {
-		if (petRegistrationRequest.getPetRegistrationApplications().get(0).getWorkflow().getAction()
-				.equals(PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT)) {
-			
-			// fetch fees from MDMS
-			
-			
-			BigDecimal taxAmount = getFeesFromMdms(petRegistrationRequest);
-//			taxAmount = ;
-			// create demands
-			List<Demand> savedDemands = demandService.createDemand(petRegistrationRequest, taxAmount);
+	private void generateDemandAndBill(PetRegistrationRequest petRegistrationRequest) {
 
-	        if(CollectionUtils.isEmpty(savedDemands)) {
-	            throw new CustomException("INVALID_CONSUMERCODE","Bill not generated due to no Demand found for the given consumerCode");
-	        }
+	    if (!PTRConstants.WORKFLOW_ACTION_RETURN_TO_INITIATOR_FOR_PAYMENT.equals(
+	            petRegistrationRequest.getPetRegistrationApplications()
+	                    .get(0).getWorkflow().getAction())) {
+	        return;
+	    }
 
-			// fetch/create bill
-            GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
-            									.tenantId(petRegistrationRequest.getPetRegistrationApplications().get(0).getTenantId())
-            									.businessService("pet-services")
-            									.consumerCode(petRegistrationRequest.getPetRegistrationApplications().get(0).getApplicationNumber()).build();
-            BillResponse billResponse = billingService.generateBill(petRegistrationRequest.getRequestInfo(),billCriteria);
-            
-		}
+	    PetRegistrationApplication application =
+	            petRegistrationRequest.getPetRegistrationApplications().get(0);
+
+	    BigDecimal taxAmount;
+
+	    // Renewal
+	    if (PTRConstants.APPLICATION_TYPE_RENEWAL.equalsIgnoreCase(application.getApplicationType())) {
+	        taxAmount = getFeesFromMdmsv2(petRegistrationRequest);
+	    } else {
+	        taxAmount = getFeesFromMdms(petRegistrationRequest);
+	    }
+
+	    // create demand
+	    List<Demand> savedDemands =
+	            demandService.createDemand(petRegistrationRequest, taxAmount);
+
+	    if (CollectionUtils.isEmpty(savedDemands)) {
+	        throw new CustomException(
+	                "INVALID_CONSUMERCODE",
+	                "Bill not generated due to no Demand found for the given consumerCode"
+	        );
+	    }
+
+	    // generate bill
+	    GenerateBillCriteria billCriteria = GenerateBillCriteria.builder()
+	            .tenantId(application.getTenantId())
+	            .businessService("pet-services")
+	            .consumerCode(application.getApplicationNumber())
+	            .build();
+
+	    billingService.generateBill(
+	            petRegistrationRequest.getRequestInfo(),
+	            billCriteria
+	    );
 	}
-	
+
 
 	private BigDecimal getFeesFromMdms(PetRegistrationRequest petRegistrationRequest) {
 
@@ -482,6 +526,40 @@ public class PetRegistrationService {
 
 	}
 
+	private BigDecimal getFeesFromMdmsv2(PetRegistrationRequest request) {
+
+		PetRegistrationApplication app = request.getPetRegistrationApplications().get(0);
+		String tenantId = app.getTenantId();
+
+		MdmsResponse mdmsResponse = mdmsService.fetchPetRenewalData(request.getRequestInfo(),
+				tenantId);
+
+		JsonNode mdmsRes = objectMapper.valueToTree(mdmsResponse.getMdmsRes());
+
+		JsonNode feeArray = mdmsRes.path("ULBS").path("PetRenewal");
+
+		if (!feeArray.isArray() || feeArray.isEmpty()) {
+			throw new CustomException("MDMS_EMPTY_RESPONSE", "No renewal fee data found in MDMS");
+		}
+		for (JsonNode node : feeArray) {
+
+			String mdmsTenant = node.path("tenantId").asText();
+
+			if (tenantId.equalsIgnoreCase(mdmsTenant) || tenantId.startsWith(mdmsTenant)) {
+
+				JsonNode feeNode = node.path("renewalFees");
+
+				if (feeNode.isMissingNode() || feeNode.isNull()) {
+					throw new CustomException("RENEWAL_FEE_NOT_CONFIGURED",
+							"Renewal fee not configured for tenant " + tenantId);
+				}
+
+				return feeNode.decimalValue();
+			}
+		}
+
+		throw new CustomException("RENEWAL_FEE_NOT_FOUND", "No renewal fee configured for tenant " + tenantId);
+	}
 	public Object enrichResponseDetail(List<PetRegistrationApplication> applications) {
 		
 		Map<String, Object> responseDetail = new HashMap<>();
@@ -530,7 +608,23 @@ public class PetRegistrationService {
 			
 			mdmsrequest.setPetRegistrationApplications(petApplications);			
 
-			BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			//BigDecimal taxAmount = getFeesFromMdms(mdmsrequest);
+			
+			BigDecimal taxAmount;
+
+			String applicationType = petRegistrationApplication.getApplicationType();
+
+			if (PTRConstants.APPLICATION_TYPE_RENEWAL
+			        .equalsIgnoreCase(applicationType)) {
+
+			    //  Renewal → MDMS v2
+			    taxAmount = getFeesFromMdmsv2(mdmsrequest);
+
+			} else {
+
+			    //  NEW or null MDMS v1
+			    taxAmount = getFeesFromMdms(mdmsrequest);
+			}
 	        
 			ApplicationDetail applicationDetail = getApplicationBillUserDetail(petRegistrationApplication, ptradeLicenseActionRequest.getRequestInfo());
 			
@@ -685,8 +779,8 @@ public class PetRegistrationService {
 		                        .filter(Objects::nonNull) // Ensure no null entries
 		                        .filter(status -> StringUtils.isNotEmpty(status.toString())) // Validate non-empty entries
 		                        .collect(Collectors.toList())); // Collect the filtered list
-			  
-			  if (statusList.get(0).containsKey("total_applications")) {
+
+				if (statusList.get(0).containsKey("total_applications")) {
 		            Object totalApplicationsObj = statusList.get(0).get("total_applications");
 		            if (totalApplicationsObj instanceof Number) { // Ensure the value is a number
 		            	response.setApplicationTotalCount(((Number) totalApplicationsObj).longValue());

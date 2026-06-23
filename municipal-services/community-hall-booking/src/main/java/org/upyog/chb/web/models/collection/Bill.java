@@ -111,7 +111,9 @@ public class Bill {
 
 		PAID("PAID"),
 
-		EXPIRED("EXPIRED");
+		EXPIRED("EXPIRED"),
+		
+		REFUNDED("REFUNDED");
 
 		private String value;
 

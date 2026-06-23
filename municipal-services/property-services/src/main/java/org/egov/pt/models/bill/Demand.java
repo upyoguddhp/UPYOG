@@ -86,7 +86,9 @@ public class Demand {
 
 		EXPIRED("EXPIRED"),
 		
-		PAID("PAID");
+		PAID("PAID"),
+		
+		PARTIALLY_PAID("PARTIALLY_PAID");
 
 		private String value;
 

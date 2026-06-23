@@ -93,14 +93,24 @@ public class NotificationService {
 
 //		List<String> configuredChannelNames =  util.fetchChannelList(new RequestInfo(), challanRequest.getChallan().getTenantId(), MCOLLECT_BUSINESSSERVICE, action);
 //		if(configuredChannelNames.contains(CHANNEL_NAME_SMS)){
-			List<SMSRequest> smsRequests = new LinkedList<>();
-			if (null != config.getIsSMSEnabled()) {
-				if (config.getIsSMSEnabled()) {
-					enrichSMSRequest(challanRequest, smsRequests, code);
-					if (!CollectionUtils.isEmpty(smsRequests))
-						util.sendSMS(smsRequests, config.getIsSMSEnabled());
-				}
+//			List<SMSRequest> smsRequests = new LinkedList<>();
+//			if (null != config.getIsSMSEnabled()) {
+//				if (config.getIsSMSEnabled()) {
+//					enrichSMSRequest(challanRequest, smsRequests, code);
+//					if (!CollectionUtils.isEmpty(smsRequests))
+//						util.sendSMS(smsRequests, config.getIsSMSEnabled());
+//				}
+//			}
+
+		if (Boolean.TRUE.equals(config.getIsSMSEnabled()) && isSave) {
+			SMSRequest smsRequest = buildCreateChallanSmsRequest(challanRequest);
+			
+			if (smsRequest != null) {
+				List<SMSRequest> smsRequests = Collections.singletonList(smsRequest);
+				util.sendSMS(smsRequests, config.getIsSMSEnabled());
 			}
+		}
+		
 //		}
 
 //		if(configuredChannelNames.contains(CHANNEL_NAME_EVENT)){
@@ -123,6 +133,45 @@ public class NotificationService {
 //				}
 //			}
 //		}
+	}
+
+	private SMSRequest buildCreateChallanSmsRequest(ChallanRequest challanRequest) {
+
+		Challan challan = challanRequest.getChallan();
+		String mobileNumber = challan.getCitizen().getMobileNumber();
+
+		if (StringUtils.isEmpty(mobileNumber)) {
+			return null;
+		}
+
+		String message = populateCreateChallanTemplate(challan);
+		return SMSRequest.builder().mobileNumber(mobileNumber).message(message).build();
+	}
+	
+	private String populateCreateChallanTemplate(Challan challan) {
+
+		String body = SMS_BODY_CREATE_CHALLAN;
+		String citizenName = challan.getCitizen() != null ? challan.getCitizen().getName() : "";
+		String amount = challan.getAmount() != null ? challan.getAmount().toString() : "0";
+		String service = challan.getBusinessService();
+		String challanNo = challan.getChallanNo();
+		String date = "";
+
+		if (challan.getAuditDetails() != null && challan.getAuditDetails().getCreatedTime() != null) {
+			Date challanDate = new Date(challan.getAuditDetails().getCreatedTime());
+			date = new java.text.SimpleDateFormat("dd-MM-yyyy").format(challanDate);
+		}
+
+		String paymentUrl = config.getUiAppHost() + "/citizen/payment/my-bills/" + challan.getTenantId();
+
+		body = body.replace("{NAME}", citizenName);
+		body = body.replace("{AMOUNT}", amount);
+		body = body.replace("{SERVICE}", service);
+		body = body.replace("{CHALLANNO}", challanNo);
+		body = body.replace("{DATE}", date);
+		body = body.replace("{URL}", paymentUrl);
+
+		return body;
 	}
 
 	private EventRequest getEventsForChallan(ChallanRequest request,boolean isSave) {
@@ -255,7 +304,7 @@ public class NotificationService {
 	 *            Notification Template Code
 	 */
 	private void enrichSMSRequest(ChallanRequest challanRequest, List<SMSRequest> smsRequestslist, String code) {
-//		String message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challanRequest.getChallan(), code);
+		String message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challanRequest.getChallan(), code);
 		SMSRequest smsRequest = util.getMessageDetails(challanRequest.getRequestInfo(), challanRequest.getChallan(), code);
 		String mobilenumber = challanRequest.getChallan().getCitizen().getMobileNumber();
 

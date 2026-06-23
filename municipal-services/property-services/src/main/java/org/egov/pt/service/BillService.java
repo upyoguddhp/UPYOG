@@ -78,6 +78,10 @@ public class BillService {
 
 	    return billRepository.updateBill(requestInfo, bills);
 	}
+	
+	public void cancelBill(UpdatePropertyBillCriteria criteria, RequestInfo requestInfo) {
+		 billRepository.cancelBill(criteria, requestInfo);
+	}
 
 
 }

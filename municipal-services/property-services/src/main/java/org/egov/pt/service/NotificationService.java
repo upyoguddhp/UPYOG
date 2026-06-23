@@ -15,6 +15,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.PropertyAccount;
+import org.egov.pt.models.Address;
 //import org.egov.pt.models.PtBillTracker;
 import org.egov.pt.models.collection.Bill;
 import org.egov.mdms.model.MasterDetail;
@@ -56,12 +57,15 @@ import static org.egov.pt.util.PTConstants.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.JsonPath;
+import org.egov.pt.repository.RestCallRepository;
+import org.egov.pt.models.collection.BillDetail;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Slf4j
 @Service
 public class NotificationService {
 	
-	private static final String SMS_TEMPLATE_BILL_NOTIFICATION = "BILL-NOTIFICATION";
+	private static final String SMS_TEMPLATE_BILL_NOTIFICATION = "BILL-NOTIFICATION-PROP";
 	private static final String PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION = "templates/PropertyBillEmailTemplate.html";
 	private static final String PROPERTY_PLACEHOLDER = "property";
 	private static final String MONTH_PLACEHOLDER = "{month}";
@@ -72,11 +76,21 @@ public class NotificationService {
 	private static final String BILL_NO_PLACEHOLDER = "{bill_no}";
 	private static final String RECIPINTS_NAME_PLACEHOLDER = "{recipients_name}";
 	private static final String PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER = "{property_pay_now_bill_url}";
-
-	private static final String SMS_BODY_GENERATE_BILL = "Dear "+RECIPINTS_NAME_PLACEHOLDER+", your "+PROPERTY_PLACEHOLDER+" bill vide  "+PROPERTY_PLACEHOLDER+" id "
-			+ PROPERTY_ID_PLACEHOLDER+" for the period "+MONTH_PLACEHOLDER+" amounting to Rs "+AMOUNT_PLACEHOLDER+" has been generated on CitizenSeva portal. "
-			+ "Please pay on CitizenSeva Portal or using link "+LINK_PLACEHOLDER+" .  CitizenSeva H.P.";
+	private static final String PROPERTY_ADDRESS_PLACEHOLDER = "{property_address}";
+	private static final String PROPERTY_WARD_PLACEHOLDER = "{ward}";
+	private static final String PROPERTY_FATHERS_NAME_PLACEHOLDER = "{fathers_name}";
 	
+//	private static final String SMS_BODY_GENERATE_BILL = "Dear "+RECIPINTS_NAME_PLACEHOLDER+", your "+PROPERTY_PLACEHOLDER+" bill vide  "+PROPERTY_PLACEHOLDER+" id "
+//			+ PROPERTY_ID_PLACEHOLDER+" for the period "+MONTH_PLACEHOLDER+" amounting to Rs "+AMOUNT_PLACEHOLDER+" has been generated on CitizenSeva portal. "
+//			+ "Please pay on CitizenSeva Portal or using link "+LINK_PLACEHOLDER+" .  CitizenSeva H.P.";
+	
+private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLACEHOLDER + ", your Property Tax bill for FY " + MONTH_PLACEHOLDER +
+			" (Property ID " + PROPERTY_ID_PLACEHOLDER + ") " +
+		    "is generated for amount Rs." + AMOUNT_PLACEHOLDER +
+		    " after rebate valid for 15 days from bill date. " +
+		    "Pay: " + LINK_PLACEHOLDER +
+		    ". Citizen Seva H.P.";
+
 	private static final String EMAIL_SUBJECT_GENERATE_BILL = "Your Property Collection Bill for " + MONTH_PLACEHOLDER
 			+ "/" + " with " + PROPERTY_ID_PLACEHOLDER;
 	
@@ -106,6 +120,16 @@ public class NotificationService {
 
 	@Value("${frontend.base.uri}")
 	private String frontEndUri;
+	
+
+	@Value("${egov.mail.tracker.create.endpoint}")
+	private String mailTrackerCreateEndpoint;
+	
+	@Value("${egov.sms.host}")
+	private String mailHost;
+	
+	@Autowired
+	private RestCallRepository restCallRepository;
 	
 	public void sendNotificationForMutation(PropertyRequest propertyRequest) {
 
@@ -551,7 +575,7 @@ public class NotificationService {
 
 	}
 	
-	public void triggerNotificationsGenerateBill(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo) {
+	public void triggerNotificationsGenerateBill(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName) {
 		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
 		String emailBody = getContentAsString(resource);
 		String smsBody = SMS_BODY_GENERATE_BILL;
@@ -566,13 +590,77 @@ public class NotificationService {
 		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
 	
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
-			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
-					emailSubject);
+//			sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
+//					emailSubject, ulbName);
 		}
 		if (!StringUtils.isEmpty(bill.getMobileNumber())) {
 			//sendSms(smsBody, bill.getMobileNumber());
 		}
 
+	}
+	
+	public void triggerPropertyMail(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo, String ulbName, List<Property> propertyDetail) {
+		ClassPathResource resource = new ClassPathResource(PROPERTY_BILL_EMAIL_TEMPLATE_LOCATION);
+		String emailBody = getContentAsString(resource);
+		String emailSubject = EMAIL_SUBJECT_GENERATE_BILL;
+		
+		Property property = propertyDetail.get(0);	
+		Property newproperty = new Property();
+		newproperty.setPropertyId(propertyTracker.getPropertyId());
+		newproperty.setTenantId(bill.getTenantId());
+		newproperty.setAddress(property.getAddress()); 
+		newproperty.setOwners(property.getOwners());
+		
+		emailBody = populateNotificationPlaceholders(emailBody, newproperty, bill, propertyTracker);
+		emailSubject = populateNotificationPlaceholders(emailSubject, newproperty, bill, propertyTracker);
+	
+		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
+		sendEmailforGenerateBill(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null, emailSubject, ulbName);
+		}
+		
+		try {
+			StringBuilder mailTrackerUri = new StringBuilder();
+			mailTrackerUri.append(mailHost).append(mailTrackerCreateEndpoint);
+			BillDetail billDetail = bill.getBillDetails().get(0);
+			
+			Map<String, Object> mailTrackerRequest = new HashMap<>();
+			mailTrackerRequest.put("uuid", UUID.randomUUID().toString());
+			mailTrackerRequest.put("amount", bill.getTotalAmount());
+			mailTrackerRequest.put("applicationNo", propertyTracker.getPropertyId());
+			mailTrackerRequest.put("tenantId", bill.getTenantId());
+			mailTrackerRequest.put("service", bill.getBusinessService());
+			mailTrackerRequest.put("fromDate",new SimpleDateFormat("dd-MM-yyyy").format(new Date(billDetail.getFromPeriod())));
+			mailTrackerRequest.put("toDate",new SimpleDateFormat("dd-MM-yyyy").format(new Date(billDetail.getToPeriod())));
+			mailTrackerRequest.put("createdBy", propertyTracker.getAuditDetails().getCreatedBy());
+			mailTrackerRequest.put("createdTime", System.currentTimeMillis());
+			mailTrackerRequest.put("billId", bill.getId());
+
+			JsonNode additionalDetails = billDetail.getAdditionalDetails();
+			mailTrackerRequest.put("additionalDetail", additionalDetails);
+			mailTrackerRequest.put("ownerMobileNo", bill.getMobileNumber());
+			mailTrackerRequest.put("ownerName", bill.getPayerName());
+			mailTrackerRequest.put("ward", additionalDetails.has("ward") ? additionalDetails.get("ward").asText() : null);
+			mailTrackerRequest.put("status", true);
+			
+			mailTrackerRequest.put("financialYear", propertyTracker.getFinancialYear());
+			mailTrackerRequest.put("year", propertyTracker.getFinancialYear());
+			mailTrackerRequest.put("lastModifiedBy", propertyTracker.getAuditDetails().getLastModifiedBy());
+			mailTrackerRequest.put("lastModifiedTime",propertyTracker.getAuditDetails().getLastModifiedTime());
+
+			Map<String, Object> emailRequestMap = new HashMap<>();
+			emailRequestMap.put("emailTo", Collections.singletonList(bill.getPayerEmail()));
+			emailRequestMap.put("subject", emailSubject);
+			emailRequestMap.put("body", emailBody);
+			emailRequestMap.put("isHTML", true);
+			mailTrackerRequest.put("mailRequest", emailRequestMap);
+
+			restCallRepository.fetchResult(mailTrackerUri, mailTrackerRequest);
+
+			log.info("Mail tracker entry created for billId {}", bill.getId());
+		} catch (Exception e) {
+			log.error("Mail tracker creation failed for billId {}", bill.getId(), e);
+		}	
+		
 	}
 	
 	public ObjectNode buildGeneratePropertyBillSmsRequest(
@@ -626,9 +714,14 @@ public class NotificationService {
 		        + bill.getId()
 				+"/pt/";
 
-
-
 	    SimpleDateFormat monthFormat = new SimpleDateFormat("dd MMMM - yyyy");
+	    
+		JsonNode propertyAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+		String propertyAddress = propertyAdditionalDetails.path("propertyAddress").asText();
+		String fathersName = "";
+		if (property.getOwners() != null && !property.getOwners().isEmpty()) {
+		    fathersName = property.getOwners().get(0).getFatherOrHusbandName();
+		}
 
 	    body = body.replace(
 	            MONTH_PLACEHOLDER,
@@ -655,6 +748,21 @@ public class NotificationService {
 	            AMOUNT_PLACEHOLDER,
 	            String.valueOf(bill.getTotalAmount())
 	    );
+	    
+	    body = body.replace(
+	    		PROPERTY_WARD_PLACEHOLDER,
+	    		tracker.getWard()
+	    		);
+	    
+	    body = body.replace(
+	            PROPERTY_ADDRESS_PLACEHOLDER,
+	            propertyAddress
+	    );
+	    
+	    body = body.replace(
+	            PROPERTY_FATHERS_NAME_PLACEHOLDER,
+	            fathersName
+	    );
 
 		String shortUrl = notifUtil.getShortenedUrl(payNowUrl);
 
@@ -675,12 +783,13 @@ public class NotificationService {
 	}
 	
 	private void sendEmailforGenerateBill(String emailBody, List<String> emailIds, RequestInfo requestInfo,
-			List<String> attachmentDocRefIds, String emailSubject) {
+			List<String> attachmentDocRefIds, String emailSubject, String ulbName) {
 		Email email = new Email();
 		email.setEmailTo(new HashSet<>(emailIds));
 		email.setBody(emailBody);
 		email.setSubject(emailSubject);
-
+		email.setUlbName(ulbName);
+		
 		if (!CollectionUtils.isEmpty(attachmentDocRefIds)) {
 			email.setHTML(true);
 //			email.setFileStoreIds(attachmentDocRefIds);
@@ -690,6 +799,8 @@ public class NotificationService {
 
 		EmailRequest emailRequest = EmailRequest.builder().requestInfo(requestInfo).email(email).build();
 		kafkaTemplate.send(emailTopic, emailRequest);
+
+		
 	}
 	
 	public String getContentAsString(ClassPathResource resource) {

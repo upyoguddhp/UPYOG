@@ -242,7 +242,11 @@
             <table>
                <tr>
                   <td colspan="2">
-                     <h1>Property Tax - Bill Receipt</h1>
+					<h1 th:text="${paymentStatus == 'Success' or paymentStatus == 'Partially Paid'} 
+										    ? 'Property Tax - Bill Receipt' 
+										    : 'Property Collection Bill'">
+										    Property Tax - Bill Receipt
+					</h1>
                   </td>
                </tr>
                <tr>
@@ -296,11 +300,15 @@
                         </tr>
                         <tr>
                            <th>Total Tax</th>
-                           <td class="highlight"><span th:text="${totalTax}">NA</span></td>
+                           <td><span th:text="${totalTax}">NA</span></td>
                         </tr>
+						<tr>
+							<th>Amount Due</th>
+							<td class="highlight"><span th:text="${amountDue}">NA</span></td>
+						</tr>
                         <tr>
                            <th>Amount Paid</th>
-                           <td><span th:text="${amountPaid}">NA</span></td>
+                           <td class="highlight"><span th:text="${amountPaid}">NA</span></td>
                         </tr>
                         <tr>
                            <th>Payment Status</th>
@@ -355,6 +363,31 @@
                </td>
             </tr>
          </table>
+		 
+		 <table class="main">
+		    <thead>
+		       <tr>
+		          <th>#</th>
+		          <th>Financial Year</th>
+		          <th>Total Tax</th>
+		       </tr>
+		    </thead>
+			<tbody style="text-align: center;">
+			   <tr style="display:none">
+			      <td style="display:none"> ARREAR_BILL_TABLE_ROW_START </td>
+			   </tr>
+
+               <tr style="display:none">
+                  <td><span th:text="slNo">NA</span></td>
+                  <td><span th:text="financialYear">NA</span></td>
+                  <td><span th:text="totalTax">NA</span></td>
+               </tr>
+
+			   <tr style="display:none">
+			      <td style="display:none"> ARREAR_BILL_TABLE_ROW_END </td>
+			   </tr>
+			</tbody> 
+		 </table>
         
          <div class="totals">
             <table>

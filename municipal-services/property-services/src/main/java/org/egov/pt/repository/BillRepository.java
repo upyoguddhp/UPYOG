@@ -15,6 +15,8 @@ import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.egov.pt.web.contracts.UpdatePropertyBillCriteria;
+import org.egov.pt.web.contracts.UpdateBillRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,6 +67,13 @@ public class BillRepository {
 			uriBuilder.append(hasQueryParam ? "&" : "?").append("service=").append(billCriteria.getService());
 			hasQueryParam = true;
 		}
+		
+		if (billCriteria.getStatus() != null) {
+		    uriBuilder.append(hasQueryParam ? "&" : "?")
+		        .append("status=")
+		        .append(billCriteria.getStatus().name());
+		    hasQueryParam = true;
+		}
 
 		if (!CollectionUtils.isEmpty(billCriteria.getConsumerCode())) {
 			uriBuilder.append(hasQueryParam ? "&" : "?").append("consumerCode=")
@@ -106,6 +115,18 @@ public class BillRepository {
 		}
 
 		return response.getBill();
+	}
+	
+	public void cancelBill(UpdatePropertyBillCriteria updateBillCriteria, RequestInfo requestInfo){
+		String uri = config.getBillHost().concat(config.getCancleBillEndpoint());
+		
+		try {
+			log.info("Request: {}", updateBillCriteria);
+			restCallRepository.fetchResult(new StringBuilder(uri),UpdateBillRequest.builder()
+					.RequestInfo(requestInfo).UpdateBillCriteria(updateBillCriteria).build());
+		}catch(Exception e) {
+			log.error("Exception while fetching user: ", e);
+		}
 	}
 
 
