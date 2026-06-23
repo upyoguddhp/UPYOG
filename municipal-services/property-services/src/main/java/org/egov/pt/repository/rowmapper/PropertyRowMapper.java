@@ -235,6 +235,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			Object ownerAdditionalDetails = getadditionalDetail(rs, "oadditionaldetails");
 			JsonNode additionalDetails = mapper.valueToTree(ownerAdditionalDetails);
 			String fatherOrHusbandName = additionalDetails.path("fatherOrHusbandName").asText(null);
+			String coOwnerName = additionalDetails.path("coOwnerName").asText(null);
 		
 		OwnerInfo owner = OwnerInfo.builder()
 				.relationship(Relationship.fromValue(rs.getString("relationship")))
@@ -243,6 +244,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				.ownerInfoUuid(rs.getString("ownerInfoUuid"))
 				.propertyOwnerName(rs.getString("owname"))
 				.fatherOrHusbandName2(fatherOrHusbandName)
+				.coOwnerName(coOwnerName)
 				.ownerShipPercentage(ownerShipPercentage)
 				.tenantId(rs.getString("owntenantid"))
 				.ownerType(rs.getString("ownerType"))
