@@ -218,6 +218,12 @@ public class BillQueryBuilder {
 			selectQuery.append(" AND bd.consumercode IN (");
 			appendListToQuery(searchBill.getConsumerCode(), preparedStatementValues, selectQuery);
 		}
+		
+		if (Boolean.TRUE.equals(searchBill.getRetrieveDefaulters())) {
+			long thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000);
+			selectQuery.append(" AND b.createddate <= ?" + " AND UPPER(b.status) NOT IN ('PAID', 'CANCELLED')");
+			preparedStatementValues.add(thirtyDaysAgo);
+		}
 	}
 	
 	@SuppressWarnings({"rawtypes" })
