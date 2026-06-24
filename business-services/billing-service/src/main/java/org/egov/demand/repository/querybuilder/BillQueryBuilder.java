@@ -12,6 +12,9 @@ import org.egov.demand.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Component
 public class BillQueryBuilder {
@@ -220,7 +223,8 @@ public class BillQueryBuilder {
 		}
 		
 		if (Boolean.TRUE.equals(searchBill.getRetrieveDefaulters())) {
-			long thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000);
+			LocalDate cutoffDate = LocalDate.now().minusDays(30);
+			long thirtyDaysAgo = cutoffDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			selectQuery.append(" AND b.createddate <= ?" + " AND UPPER(b.status) NOT IN ('PAID', 'CANCELLED')");
 			preparedStatementValues.add(thirtyDaysAgo);
 		}

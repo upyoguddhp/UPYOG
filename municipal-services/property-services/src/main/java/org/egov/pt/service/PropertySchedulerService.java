@@ -51,6 +51,7 @@ import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.PtTaxCalculatorTrackerRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.pt.web.contracts.SendPropertyEmailRequest;
+import org.egov.pt.web.contracts.SendPropertyNoticeRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1808,7 +1809,42 @@ public class PropertySchedulerService {
 
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
+	
+	public void sendPropertyNotice(SendPropertyNoticeRequest request) {
 
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(request.getBillId()))
+				.demandId(Collections.singleton(request.getDemandId()))
+				.tenantId(request.getTenantId())
+				.skipValidation(true).build();
+		
+		String ulbName = request.getTenantId().replaceFirst("^hp\\.", "");
 
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+		
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder()
+		        .isSchedulerCall(true)
+		        .tenantId(request.getTenantId())
+		        .status(Collections.singleton(Status.APPROVED))
+		        .propertyIds(Collections.singleton(request.getPropertyId()))
+		        .isActiveUnit(true)
+		        .build();
+
+		List<Property> property = propertyService.searchProperty(
+		        propertyCriteria,
+		        request.getRequestInfo(),
+		        null);
+
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for given billId and demandId");
+		}
+
+		Bill bill = billResponse.getBill().get(0);
+		PtTaxCalculatorTracker tracker = getTrackerByBillId(BillIdRequest.builder()
+				                         .billId(request.getBillId())
+				                         .build());
+
+		notificationService.triggerPropertyNotice(tracker, bill, request.getRequestInfo(), ulbName, property);
+	}
 
 }
