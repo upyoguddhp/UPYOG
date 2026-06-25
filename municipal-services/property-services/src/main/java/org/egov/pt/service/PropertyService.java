@@ -1066,6 +1066,27 @@ public class PropertyService {
 
 		return reportService.createNoSavePDF(pdfRequest);
 	}
+	
+	public ResponseEntity<Resource> generatePropertyNoticePdf(RequestInfoWrapper requestInfoWrapper,
+			String propertyId) {
+
+		String html =
+		        "<html>" +
+		        "<body>" +
+		        "<h2>Property Notice</h2>" +
+		        "<p>Property notice has been generated.</p>" +
+		        "</body>" +
+		        "</html>";
+
+		PDFRequest pdfRequest = PDFRequest.builder()
+		        .RequestInfo(requestInfoWrapper.getRequestInfo())
+		        .tenantId("hp")
+		        .key("PropertyNotice")
+		        .htmlTemplateContent(html)
+		        .build();
+
+		return reportService.createNoSavePDF(pdfRequest);
+	}
 
 	public Boolean cancelPropertyBill(CancelPropertyBillRequest cancelRequest) {
 		

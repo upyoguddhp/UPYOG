@@ -328,6 +328,23 @@ public class PDFRequestGenerator {
 		}
 	}
 	
+	public PDFRequest generateNoticePdfRequest(RequestInfoWrapper requestInfoWrapper, Property property,
+			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap) {
+
+		Map<String, Object> dataObject = new HashMap<>();
+		Map<String, String> ptbr = new HashMap<>();
+
+		JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+
+		ptbr.put("ulbType", addressAdditionalDetails.get("ulbType").asText());
+		ptbr.put("ulbName", addressAdditionalDetails.get("ulbName").asText());
+		ptbr.put("billNo", bill.getBillNumber());
+		dataObject.put("ptbr", ptbr);
+
+		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("PropertyTaxBillReceipt")
+				.tenantId("hp").data(dataObject).build();
+	}
+	
 	private String escapeHtml(String input) {
 	    if (input == null) return null;
 	    return input.replace("&", "&amp;")
