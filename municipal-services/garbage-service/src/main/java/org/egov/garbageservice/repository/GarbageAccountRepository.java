@@ -123,12 +123,16 @@ public class GarbageAccountRepository {
 			+ ", grbg_account_details, auditcreatedtime) VALUES ((select nextval('seq_eg_grbg_account_audit')), :grbgApplicationNo, :status"
 			+ ", :type, :grbgAccountDetails, (SELECT extract(epoch from now())))";
 	
-	private static final String DDP_VERIFICATION_COUNT = "SELECT " + "COUNT(*) AS total_approved_accounts, "
-			+ "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, "
-			+ "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification "
-			+ "FROM eg_grbg_account acc " + "JOIN eg_grbg_address address ON address.garbage_id = acc.garbage_id "
-			+ "WHERE acc.parent_account IS NULL " + "AND acc.tenant_id = ? " + "AND acc.is_active = true "
-			+ "AND acc.status = 'APPROVED' ";
+	private static final String DDP_VERIFICATION_COUNT =
+	        "SELECT " +
+	        "COUNT(*) AS total_approved_accounts, " +
+	        "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, " +
+	        "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
+	        "FROM eg_grbg_account acc " +
+	        "WHERE acc.parent_account IS NULL " +
+	        "AND acc.tenant_id = ? " +
+	        "AND acc.is_active = true " +
+	        "AND acc.status = 'APPROVED'";
 	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
@@ -298,21 +302,10 @@ public class GarbageAccountRepository {
         return garbageAccounts;
     }
 	
-	public DdpVerificationCount getDdpVerificationCount(String tenantId, List<String> wardNames) {
+	public DdpVerificationCount getDdpVerificationCount(String tenantId) {
 
-		StringBuilder query = new StringBuilder(DDP_VERIFICATION_COUNT);
-	    List<Object> params = new ArrayList<>();
-	    params.add(tenantId);
-
-	    if (!CollectionUtils.isEmpty(wardNames)) {
-	        query.append(" AND address.ward_name IN (")
-	             .append(getQueryForCollection(wardNames, params))
-	             .append(")");
-	    }
-
-	    return jdbcTemplate.queryForObject(
-	            query.toString(),
-	            params.toArray(),
+	    String query = DDP_VERIFICATION_COUNT;
+	    return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
 	            (rs, rowNum) -> DdpVerificationCount.builder()
 	                    .totalApprovedAccounts(rs.getInt("total_approved_accounts"))
 	                    .totalDdpVerified(rs.getInt("total_ddp_verified"))

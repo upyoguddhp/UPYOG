@@ -1550,11 +1550,11 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 
-		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs).build();
-		String tenantId = searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId();
-		List<String> wardnames = searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getWardNames();
+		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
+				.build();
 
-		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(tenantId, wardnames);
+		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
 		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
 		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
 		garbageAccountResponse.setTotalApprovedAccounts(ddpCount.getTotalApprovedAccounts());
