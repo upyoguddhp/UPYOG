@@ -1,0 +1,49 @@
+{
+  "key": "PropertyNotice",
+  "DataConfigs": {
+    "version": "1.0.0",
+    "baseKeyPath": "$.notice",
+    "mappings": [
+      {
+        "direct": [
+          {
+            "variable": "ownerName",
+            "value": {
+              "path": "$.ownerName"
+            }
+          },
+          {
+            "variable": "address",
+            "value": {
+              "path": "$.address"
+            }
+          },
+          {
+            "variable": "mobileNumber",
+            "value": {
+              "path": "$.mobileNumber"
+            }
+          },
+          {
+            "variable": "propertyId",
+            "value": {
+              "path": "$.propertyId"
+            }
+          },
+          {
+            "variable": "noticeDate",
+            "value": {
+              "path": "$.noticeDate"
+            }
+          },
+          {
+            "variable": "amountDue",
+            "value": {
+              "path": "$.amountDue"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

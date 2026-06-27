@@ -388,8 +388,8 @@ public class PropertyController {
 	public ResponseEntity<Resource> generatePropertyNoticePdf(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@RequestParam String propertyId, @RequestParam(required = false) String billId,
 			@RequestParam(required = false) String status) {
-		ResponseEntity<Resource> response = propertyService.generatePropertyNoticePdf(requestInfoWrapper,
-				propertyId);
+		ResponseEntity<Resource> response = propertyService.generatePropertyNoticePdf(requestInfoWrapper, propertyId,
+				billId, status);
 		return response;
 	}
 

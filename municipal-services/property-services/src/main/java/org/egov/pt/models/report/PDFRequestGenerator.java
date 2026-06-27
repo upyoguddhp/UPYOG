@@ -332,18 +332,49 @@ public class PDFRequestGenerator {
 			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap) {
 
 		Map<String, Object> dataObject = new HashMap<>();
-		Map<String, String> ptbr = new HashMap<>();
+		Map<String, String> notice = new HashMap<>();
 
 		JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+		notice.put("ownerName", property.getOwners().stream().flatMap(owner -> {
+			List<String> names = new ArrayList<>();
 
-		ptbr.put("ulbType", addressAdditionalDetails.get("ulbType").asText());
-		ptbr.put("ulbName", addressAdditionalDetails.get("ulbName").asText());
-		ptbr.put("billNo", bill.getBillNumber());
-		dataObject.put("ptbr", ptbr);
+			if (owner.getPropertyOwnerName() != null) {
+				names.add(owner.getPropertyOwnerName());
+			}
 
-		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("PropertyTaxBillReceipt")
+			if (owner.getAdditionalDetails() != null && owner.getAdditionalDetails().has("coOwnerName")) {
+
+				String anyOtherCoWorker = owner.getAdditionalDetails().has("anyOtherCoWorker")
+						? owner.getAdditionalDetails().get("anyOtherCoWorker").asText()
+						: null;
+
+				if (!"No".equalsIgnoreCase(anyOtherCoWorker)) {
+					String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
+
+					if (coOwner != null && !coOwner.isEmpty()) {
+						names.add(coOwner);
+					}
+				}
+			}
+
+			return names.stream();
+		}).distinct().collect(Collectors.joining(" & ")));
+		notice.put("address",
+				Stream.of(addressAdditionalDetails.get("propertyAddress"), addressAdditionalDetails.get("wardNumber"),
+						addressAdditionalDetails.get("ulbType"), addressAdditionalDetails.get("ulbName"),
+						property.getAddress().getDistrict(), property.getAddress().getPincode())
+						.filter(Objects::nonNull).map(Object::toString).map(s -> s.replace("\"", ""))
+						.filter(s -> !s.isEmpty()).collect(Collectors.joining(", ")));
+
+		notice.put("mobileNumber", bill.getMobileNumber());
+		notice.put("propertyId", property.getPropertyId());
+		notice.put("noticeDate", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		notice.put("amountDue", bill.getTotalAmount() != null ? bill.getTotalAmount().toPlainString() : "0.00");
+		dataObject.put("notice", notice);
+
+		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("PropertyNotice")
 				.tenantId("hp").data(dataObject).build();
-	}
+		}
 	
 	private String escapeHtml(String input) {
 	    if (input == null) return null;
