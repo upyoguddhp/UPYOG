@@ -714,7 +714,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 		if (!StringUtils.isEmpty(bill.getPayerEmail())) {
 			sendEmailforPropertyNotice(emailBody, Collections.singletonList(bill.getPayerEmail()), requestInfo, null,
-					emailSubject, ulbName);
+					emailSubject, ulbName, pdfBytes);
 		}
 
 		try {
@@ -962,12 +962,14 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	}
 	
 	private void sendEmailforPropertyNotice(String emailBody, List<String> emailIds, RequestInfo requestInfo,
-			List<String> attachmentDocRefIds, String emailSubject, String ulbName) {
+			List<String> attachmentDocRefIds, String emailSubject, String ulbName, byte[] pdfBytes) {
 		Email email = new Email();
 		email.setEmailTo(new HashSet<>(emailIds));
 		email.setBody(emailBody);
 		email.setSubject(emailSubject);
 		email.setUlbName(ulbName);
+		email.setAttachment(pdfBytes);
+		email.setAttachmentFileName("PropertyNotice.pdf");
 
 		if (!CollectionUtils.isEmpty(attachmentDocRefIds)) {
 			email.setHTML(true);
