@@ -14,7 +14,7 @@ public class DataItem {
 	private String module;
 	private String ward;
 	private String ulb;
-	private String ulbCode;
+	//private String ulbCode;
 	private String region;
 	private String state;
 	private Metrics metrics;

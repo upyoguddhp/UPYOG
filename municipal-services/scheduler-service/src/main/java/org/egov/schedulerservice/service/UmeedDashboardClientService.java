@@ -64,7 +64,4 @@ public class UmeedDashboardClientService {
 			return ("Error sending metrics: " + e.getMessage());
 		}
 	}
-	
-
-	
 }
