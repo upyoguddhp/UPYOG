@@ -565,21 +565,6 @@ public class PropertyRepository {
 	}
 	//---------------metricData end  
 	
-
-	public List<Map<String, Object>> getUsageCategoryData() {
-
-		String query = "SELECT id, additional_details->>'useOfBuilding' AS useOfBuilding " + "FROM eg_pt_unit "
-				+ "WHERE additional_details IS NOT NULL ";
-		return jdbcTemplate.queryForList(query);
-	}
-
-	public void updateUsageCategory(String category, String id) {
-
-		String query = "UPDATE eg_pt_unit SET usagecategory = ? WHERE id = ?";
-
-		jdbcTemplate.update(query, category, id);
-	}
-
 	public List<Map<String, Object>> getActiveBills(String status, String ulbName, String isforce, String ward,
 			String created_at) {
 		List<Object> preparedStmtList = new ArrayList<>();

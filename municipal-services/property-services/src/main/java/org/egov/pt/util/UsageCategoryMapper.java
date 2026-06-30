@@ -1,163 +1,126 @@
 package org.egov.pt.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class UsageCategoryMapper {
 
-    public static String map(String value) {
-        if (value == null) {
-            return "Others";
-        }
+	public static String map(String value) {
+		if (value == null)
+			return "Others";
 
-        value = value.trim();
+		String v = value.trim();
+		if (v.isEmpty())
+			return "Others";
 
-        // Residential
-        if (value.equalsIgnoreCase("Resdential")
-                || value.equalsIgnoreCase("Resedential")
-                || value.equalsIgnoreCase("Residential")
-                || value.equalsIgnoreCase("Residencial")
-                || value.equalsIgnoreCase("residential")
-                || value.equalsIgnoreCase("RESIDENTIAL")
-                || value.equalsIgnoreCase("Residential Purpose")
-                || value.equalsIgnoreCase("Residential,Residential")
-                || value.equalsIgnoreCase("Residentialn")
-                || value.equalsIgnoreCase("Ressidential")
-                || value.equalsIgnoreCase("ressidential")
-                || value.equalsIgnoreCase("self")
-                || value.equalsIgnoreCase("Self Rersidential")
-                || value.equalsIgnoreCase("Self Residential")
-                || value.equalsIgnoreCase("Let-out Resedential")
-                || value.equalsIgnoreCase("Let out Residential")
-                || value.equalsIgnoreCase("Let Out Residential")
-                || value.equalsIgnoreCase("Value for Let out  residential")
-                || value.equalsIgnoreCase("Value for let out Residential")
-                || value.equalsIgnoreCase("Value for Let Out residential")
-                || value.equalsIgnoreCase("value for Let Out residential")
-                || value.equalsIgnoreCase("Value for self residential")
-                || value.equalsIgnoreCase("value for self residential")
-                || value.equalsIgnoreCase("Value for self Residential")
-                || value.equalsIgnoreCase("Value of self residential")) {
+		List<String> residential = Arrays.asList("Resdential", "Resedential", "Residential", "Residencial",
+				"residential", "RESIDENTIAL", "Residential Purpose", "Residential,Residential", "Residentialn",
+				"Ressidential", "ressidential", "self", "Self Rersidential", "Self Residential", "Let-out Resedential",
+				"Let out Residential", "Let Out Residential", "Value for Let out  residential",
+				"Value for let out Residential", "Value for Let Out residential", "value for Let Out residential",
+				"Value for self residential", "value for self residential", "Value for self Residential",
+				"Value of self residential", "govt. residences", "let-out residential", "self-residential");
 
-            return "Residential";
-        }
+		List<String> commercial = Arrays.asList(
+				//------------
+				"atms", "banks", "commercial (above 500 sq. mtr.)", "commercial (between 100 to 200 sq. mtr.)",
+				"commercial (less than 100 mtr. )", "commercial (less than 100 sq. mtr.)", "dhabas", "hotel", "hotels",
+				"gowdons", "hotel above built-up area of 2000 sq mtr show rooms, mnc, restaurants",
+				"non- residential commercial", "non -residential", "non residential", "non residential",
+				"other hotels, banks, atms, call centre, marriage hall, travel agency, gym, dharamshala, raray, covered parking, coaching centre, industries etc.",
+				"other hotels, bars, restaurants, bank,atms, show rooms, call center, marriage hall, travel agency, mobile towns, coaching less than 100 sq.mtr",
+				"other hotels, bars, restaurats, banks, atm''s, showrooms, call centers, marriage hall, travell agency, mobile towers, coaching centers",
+				"other hotels, bars, restaurats, banks, atm''s, Showrooms, Call centers, marriage hall, travell agency, mobile towers, coaching centers-up area between 1000-2000 sq mtr and show room above 1000 sq mtr ",
+				"private guest houses/home stay", "non- residential commercial", "store", "shop", "workshops",
+				"restaurants", "restaurant", "private offices", "private insurance companies",
+				//-----
+				
+				"A. Hotel above builtup area of 2000 sqm MNC Show Room, Restaurants, Industries & Factory",
+				"B. Hotel having builtup area between 1000-2000sqm and show room above 1000 sqmMNC Show Room, Restaurants, Industries & Factory",
+				"C- Other Hotels, Bars, Restaurant, Banks, ATMs, Show Rooms, Cell Centre, Marriage Hall, Travel Agency, Mobile Tower, Coaching Centre, Shops.",
+				"C. Other hotels, Bars, Restaurant, Banks, ATM,Show Room, Call Centre, Marrige hall, Travel Agency, Mobile tower, Coaching centre, Shops",
+				"COMMERCIAAL", "commercial", "Commercial", "COMMERCIAL", "Commercial Let Out", "Commercial Self",
+				"Commerial",
+				"E-Godowns, Dhaba, Stall, Commercial used plot of land and other types of properties not covered under (A to D).",
+				"E. Godowns, Dhaba,Stall, Commercial used plot of land and other types of properties not covered under (A to D)",
+				"Godowns, Dhaba, stall and other types of properties not covered under (A to D)",
+				"Godowns, Dhabas, Stall and Other types of properties not covered under (A to D)",
+				"Godowns, Dhabas, Stall and Other types of Properties not covered under (A to D)",
+				"Gowdowns, Dhabas, Stall and other types of properties not covered under (A to D) less then 100qm.mtr",
+				"Hotel having built-up area between 1 to 300 sq.mtr and show room 1 sq.mtr.to 300 sq. mtr.",
+				"Hotel having built-up area between 500 to 1000 Sq. mtr. and Show Room above 1000 Sq. Mtr.",
+				"Hotel having built-up area of 300 sq. mtr, MNC shows Rooms and Restaurant.",
+				"Hotel having buit-up area between 1000-2000 Sq mtr and show room above 1000 Sq mtr",
+				"Hotels above built-up area of 1000 Sq.  mtr., MNC Show Rooms and Restaurant", "Let-out Commercial",
+				"Non- Residential", "Non-Residential",
+				"Non-Residential (Dhabas, Gowdowns, Stalls, Offices, Dharamshala, Sarai, Factory)",
+				"Non-Residential (Hotels, Restaurtants, Guest House, Banks, ATMs, Parking, Telecom Tower",
+				"Non-residential purpose & utility", "Non - Residential", "Non Rersidential",
+				"Non Residential (A) Hotels above built-up-area of 2000Sq. mtr., MNC Show Rooms and Restaurat",
+				"Non Residential (A) Hotels above Built up area of 300 Sq mtr , MNC Show Rooms and restaurant",
+				"Non Residential (B) Hotel having built-up area between 100 to 300 sq. mtr. and showroom 100 sq. mtr. to 300 sq. mtr.",
+				"Non Residential (C) Other hotels, bars, restaurant, banks, ATMs, show rooms, call centre, marriage hall, theatre, travel agency, mobile tower, coaching less than 100 sq. mtr.",
+				"Non Residential (E) Godowns, stores, dhabas, stall and other types of properties not covered under (A to D) less than 100 sq. mtrs.",
+				"Non Residential occupancy (C) Other Hotals, Bars,Restaurant, Banks, ATMs,Show Rooms, Call Centre, Marriage Hall, Travel Agency, Mobile Towers, Coaching");
 
-        // Commercial
-        else if (value.equalsIgnoreCase("A. Hotel above builtup area of 2000 sqm MNC Show Room, Restaurants, Industries & Factory")
-                || value.equalsIgnoreCase("B. Hotel having builtup area between 1000-2000sqm and show room above 1000 sqmMNC Show Room, Restaurants, Industries & Factory")
-                || value.equalsIgnoreCase("C- Other Hotels, Bars, Restaurant, Banks, ATMs, Show Rooms, Cell Centre, Marriage Hall, Travel Agency, Mobile Tower, Coaching Centre, Shops.")
-                || value.equalsIgnoreCase("C. Other hotels, Bars, Restaurant, Banks, ATM,Show Room, Call Centre, Marrige hall, Travel Agency, Mobile tower, Coaching centre, Shops")
-                || value.equalsIgnoreCase("COMMERCIAAL")
-                || value.equalsIgnoreCase("commercial")
-                || value.equalsIgnoreCase("Commercial")
-                || value.equalsIgnoreCase("COMMERCIAL")
-                || value.equalsIgnoreCase("Commercial Let Out")
-                || value.equalsIgnoreCase("Commercial Self")
-                || value.equalsIgnoreCase("Commerial")
-                || value.equalsIgnoreCase("E-Godowns, Dhaba, Stall, Commercial used plot of land and other types of properties not covered under (A to D).")
-                || value.equalsIgnoreCase("E. Godowns, Dhaba,Stall, Commercial used plot of land and other types of properties not covered under (A to D)")
-                || value.equalsIgnoreCase("Godowns, Dhaba, stall and other types of properties not covered under (A to D)")
-                || value.equalsIgnoreCase("Godowns, Dhabas, Stall and Other types of properties not covered under (A to D)")
-                || value.equalsIgnoreCase("Godowns, Dhabas, Stall and Other types of Properties not covered under (A to D)")
-                || value.equalsIgnoreCase("Gowdowns, Dhabas, Stall and other types of properties not covered under (A to D) less then 100qm.mtr")
-                || value.equalsIgnoreCase("Hotel having built-up area between 1 to 300 sq.mtr and show room 1 sq.mtr.to 300 sq. mtr.")
-                || value.equalsIgnoreCase("Hotel having built-up area between 500 to 1000 Sq. mtr. and Show Room above 1000 Sq. Mtr.")
-                || value.equalsIgnoreCase("Hotel having built-up area of 300 sq. mtr, MNC shows Rooms and Restaurant.")
-                || value.equalsIgnoreCase("Hotel having buit-up area between 1000-2000 Sq mtr and show room above 1000 Sq mtr")
-                || value.equalsIgnoreCase("Hotels above built-up area of 1000 Sq.  mtr., MNC Show Rooms and Restaurant")
-                || value.equalsIgnoreCase("Let-out Commercial")
-                || value.equalsIgnoreCase("Non- Residential")
-                || value.equalsIgnoreCase("Non-Residential")
-                || value.equalsIgnoreCase("Non-Residential (Dhabas, Gowdowns, Stalls, Offices, Dharamshala, Sarai, Factory)")
-                || value.equalsIgnoreCase("Non-Residential (Hotels, Restaurtants, Guest House, Banks, ATMs, Parking, Telecom Tower")
-                || value.equalsIgnoreCase("Non-residential purpose & utility")
-                || value.equalsIgnoreCase("Non - Residential")
-                || value.equalsIgnoreCase("Non Rersidential")
-                || value.equalsIgnoreCase("Non Residential (A) Hotels above built-up-area of 2000Sq. mtr., MNC Show Rooms and Restaurat")
-                || value.equalsIgnoreCase("Non Residential (A) Hotels above Built up area of 300 Sq mtr , MNC Show Rooms and restaurant")
-                || value.equalsIgnoreCase("Non Residential (B) Hotel having built-up area between 100 to 300 sq. mtr. and showroom 100 sq. mtr. to 300 sq. mtr.")
-                || value.equalsIgnoreCase("Non Residential (C) Other hotels, bars, restaurant, banks, ATMs, show rooms, call centre, marriage hall, theatre, travel agency, mobile tower, coaching less than 100 sq. mtr.")
-                || value.equalsIgnoreCase("Non Residential (E) Godowns, stores, dhabas, stall and other types of properties not covered under (A to D) less than 100 sq. mtrs.")
-                || value.equalsIgnoreCase("Non Residential occupancy (C) Other Hotals, Bars,Restaurant, Banks, ATMs,Show Rooms, Call Centre, Marriage Hall, Travel Agency, Mobile Towers, Coaching")) {
+		List<String> mixed = Arrays.asList("Mixed Property", "Residential  n commercial", "Residential/Commercial",
+				"Self Residential and Commercial", "Let out Residential and Commercial", "Shop & Residentialt",
+				"Hotel/Guest house/Rest House/ Restaurant/ Banks/ Industries/Hospital/Clinic/Hostel/Collage/School/Office",
+				"Non-Residential (Shops, Colleges, Showrooms, Edu. Institution, Ropeway, Lift, Hospital)");
 
-            return "Commercial";
-        }
+		List<String> institutional = Arrays.asList(
+				"oaching centre",
+				"educational institutions",
+				"private hospitals (100-500 sq. mtrs.)",
+				"private hospitals (1-99 sq. mtrs.)",
+				
+				"D-Schools, Colleges, Education Institutions, Offices, Hostel, Hospital, Theater, Clubs, Paying Guest House (PGs).",
+				"D. School, Colleges, Education Institutions, Offices, Hostel,Hospital,Theatre, Clubs, Paying Guest (PG), Guest House",
+				"Non Residential (D) Shops, school, colleges, educational institutions, offices, hotel, hospital, clubs, paying guest house(PGs), guest house less than 100 sq. mtr.",
+				"Non Residential (D) Shops, School, Colleges, Eductional Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs), Guest House",
+				"office use",
+				"Shop, Schools, Colleges, Education institute ,Offices, Hostel, Hospital, theatre, Clubs, paying Guest House (PGs) Guest House less then 100 sq.mtr.",
+				"Shops, Hostel, Hospital, Theatre, Clubs, Paying, Guest  Houses",
+				"Shops, school, collage, Education institutions, offices, hostels, hospitals, theater, clubs, paying guest house (PG's), Guest house",
+				"Shops, School, Colleges, Educational Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs) Guest House",
+				"Shops, Schools, Colleges, Educational Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs), Open Parking");
 
-        // Mixed Use
-        else if (value.equalsIgnoreCase("Mixed Property")
-                || value.equalsIgnoreCase("Residential  n commercial")
-                || value.equalsIgnoreCase("Residential/Commercial")
-                || value.equalsIgnoreCase("Self Residential and Commercial")
-                || value.equalsIgnoreCase("Let out Residential and Commercial")
-                || value.equalsIgnoreCase("Shop & Residentialt")
-                || value.equalsIgnoreCase("Hotel/Guest house/Rest House/ Restaurant/ Banks/ Industries/Hospital/Clinic/Hostel/Collage/School/Office")
-                || value.equalsIgnoreCase("Non-Residential (Shops, Colleges, Showrooms, Edu. Institution, Ropeway, Lift, Hospital)")) {
+		List<String> publicSemi = Arrays.asList("Government", "tGovt-Office", "ULB",
+				"govt. hospitals (100-500 sq. mtrs.)",
+			    "govt. offices",
+			    "	govt-office",
+			    "govt. schools (1-299 sq. mtrs.)");
+		List<String> industrial = Arrays.asList("factory");
+		List<String> vacant = Arrays.asList("OPEN", "PLOT");
+		List<String> heritage = Arrays.asList("Heritage");
+		List<String> religious = Arrays.asList("Religious");
+		List<String> recreational = Arrays.asList("Recreational");
+		List<String> others = Arrays.asList("Cowshed/Dhara", "Let Out Property", "NU", "NULL",
+				"RCC FRAME STRUCTURE AND LANTER", "Under Construction", "self parking", "");
 
-            return "Mixed Use";
-        }
+		if (residential.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Residential";
+		if (commercial.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Commercial";
+		if (mixed.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Mixed Use";
+		if (institutional.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Institutional";
+		if (publicSemi.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Public and Semi Public";
+		if (industrial.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Industrial";
+		if (vacant.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Vacant land";
+		if (heritage.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Heritage";
+		if (religious.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Religious";
+		if (recreational.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Recreational";
+		if (others.stream().anyMatch(s -> s.equalsIgnoreCase(v)))
+			return "Others";
 
-        // Institutional
-        else if (value.equalsIgnoreCase("D-Schools, Colleges, Education Institutions, Offices, Hostel, Hospital, Theater, Clubs, Paying Guest House (PGs).")
-                || value.equalsIgnoreCase("D. School, Colleges, Education Institutions, Offices, Hostel,Hospital,Theatre, Clubs, Paying Guest (PG), Guest House")
-                || value.equalsIgnoreCase("Non Residential (D) Shops, school, colleges, educational institutions, offices, hotel, hospital, clubs, paying guest house(PGs), guest house less than 100 sq. mtr.")
-                || value.equalsIgnoreCase("Non Residential (D) Shops, School, Colleges, Eductional Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs), Guest House")
-                || value.equalsIgnoreCase("office use")
-                || value.equalsIgnoreCase("Shop, Schools, Colleges, Education institute ,Offices, Hostel, Hospital, theatre, Clubs, paying Guest House (PGs) Guest House less then 100 sq.mtr.")
-                || value.equalsIgnoreCase("Shops, Hostel, Hospital, Theatre, Clubs, Paying, Guest  Houses")
-                || value.equalsIgnoreCase("Shops, school, collage, Education institutions, offices, hostels, hospitals, theater, clubs, paying guest house (PG's), Guest house")
-                || value.equalsIgnoreCase("Shops, School, Colleges, Educational Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs) Guest House")
-                || value.equalsIgnoreCase("Shops, Schools, Colleges, Educational Institutions, Offices, Hostel, Hospital, Theatre, Clubs, Paying Guest House (PGs), Open Parking")) {
-
-            return "Institutional";
-        }
-
-        // Public and Semi Public
-        else if (value.equalsIgnoreCase("Government")
-                || value.equalsIgnoreCase("tGovt-Office")
-                || value.equalsIgnoreCase("ULB")) {
-
-            return "Public and Semi Public";
-        }
-
-        // Industrial
-        else if (value.equalsIgnoreCase("factory")) {
-
-            return "Industrial";
-        }
-
-        // Vacant land
-        else if (value.equalsIgnoreCase("OPEN")
-                || value.equalsIgnoreCase("PLOT")) {
-
-            return "Vacant land";
-        }
-
-        // Heritage
-        else if (value.equalsIgnoreCase("Heritage")) {
-
-            return "Heritage";
-        }
-
-        // Religious
-        else if (value.equalsIgnoreCase("Religious")) {
-
-            return "Religious";
-        }
-
-        // Recreational
-        else if (value.equalsIgnoreCase("Recreational")) {
-
-            return "Recreational";
-        }
-
-        // Others
-        else if (value.equalsIgnoreCase("Cowshed/Dhara")
-                || value.equalsIgnoreCase("Let Out Property")
-                || value.equalsIgnoreCase("NU")
-                || value.equalsIgnoreCase("NULL")
-                || value.equalsIgnoreCase("RCC FRAME STRUCTURE AND LANTER")
-                || value.equalsIgnoreCase("Under Construction")) {
-
-            return "Others";
-        }
-
-        return "Others";
-    }
+		return "Others";
+	}
 }

@@ -63,13 +63,16 @@ public class UmeedDashboardService {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 //------Single Date 
-		LocalDate startDate = LocalDate.parse("19-07-2025", formatter);
-		LocalDate endDate = startDate;
+//		LocalDate startDate = LocalDate.parse("05-05-2025", formatter);
+//		LocalDate endDate = startDate;
 		
 // -----Fetch data between From Date and To Date
-//		LocalDate startDate = LocalDate.parse("07-05-2025", formatter);
-//		LocalDate endDate = LocalDate.parse("20-05-2025", formatter);
+		
+		LocalDate startDate = LocalDate.parse("16-05-2026", formatter);
+		LocalDate endDate = LocalDate.parse("15-05-2026", formatter);
+		
 
+		
 		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
 
 			String formattedDate = date.format(formatter);
@@ -262,3 +265,4 @@ public class UmeedDashboardService {
 		return buildPropertiesMetrics(data, "usageCategory");
 	}
 }
+
