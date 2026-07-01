@@ -41,7 +41,13 @@
             "value": {
               "path": "$.amountDue"
             }
-          }
+          },
+		  {
+		    "variable": "approverName",
+		    "value": {
+		      "path": "$.approverName"
+		    }
+		  }
         ]
       }
     ]

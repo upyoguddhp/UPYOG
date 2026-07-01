@@ -29,6 +29,13 @@ import org.egov.pt.models.collection.BillAccountDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import java.util.Collections;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.repository.PropertyRepository;
+import org.egov.pt.util.CommonUtils;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.CollectionUtils;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +46,31 @@ public class PDFRequestGenerator {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private PropertyRepository repository;
+
+	@Autowired
+	@Qualifier("propertyUtil")
+	private CommonUtils commonUtils;
+
+	private String getApproverNameFromMdms(RequestInfo requestInfo, String tenantId) {
+		Map<String, List<String>> signatureValues = commonUtils.getAttributeValues(
+				tenantId,
+				"Signature",
+				Collections.singletonList("Signature"),
+				null,
+				"$.MdmsRes.Signature.Signature[*].userName",
+				requestInfo);
+
+		if (CollectionUtils.isEmpty(signatureValues) || CollectionUtils.isEmpty(signatureValues.get("Signature"))) {
+			log.error("No approver userName found in MDMS Signature master for tenant {}", tenantId);
+			throw new CustomException("MDMS_APPROVER_NOT_FOUND",
+					"No Signature master entry found for tenant " + tenantId);
+		}
+
+		return signatureValues.get("Signature").get(0);
+	}
 
 	public PDFRequest generatePdfRequest(RequestInfoWrapper requestInfoWrapper, Property property,
 			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap) {
@@ -333,6 +365,9 @@ public class PDFRequestGenerator {
 
 		Map<String, Object> dataObject = new HashMap<>();
 		Map<String, String> notice = new HashMap<>();
+		
+		String approverName = getApproverNameFromMdms(requestInfoWrapper.getRequestInfo(), property.getTenantId());
+		notice.put("approverName", approverName);
 
 		JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
 		notice.put("ownerName", property.getOwners().stream().flatMap(owner -> {
