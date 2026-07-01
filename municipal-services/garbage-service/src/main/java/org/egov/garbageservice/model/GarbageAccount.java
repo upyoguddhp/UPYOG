@@ -59,6 +59,9 @@ public class GarbageAccount {
 	
 	@Builder.Default
 	private Boolean isOnlyWorkflowCall = false;
+	
+	@Builder.Default
+	private Boolean isDdpUpdateCall = false;
 
 	private String status;
 	
