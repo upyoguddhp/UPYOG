@@ -656,9 +656,13 @@ public class GarbageAccountService {
 	}
 
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
+		
+		Boolean isDdpUpdateCall = updateGarbageRequest.getGarbageAccounts().get(0).getIsDdpUpdateCall();
 
-		// remove child garbage account if not in request
-		removeChildGarbageAccount(updateGarbageRequest);
+		// remove child garbage account if not in request and if not a Ddp Update Call
+		if (!isDdpUpdateCall) {
+			removeChildGarbageAccount(updateGarbageRequest);
+		}
 
 		// create child garbage account if new in request
 		createChildGarbageAccount(updateGarbageRequest);
@@ -1557,6 +1561,7 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
 		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
 		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
+		garbageAccountResponse.setTotalApprovedAccounts(ddpCount.getTotalApprovedAccounts());
 		
 		processResponse(garbageAccountResponse);
 

@@ -123,14 +123,16 @@ public class GarbageAccountRepository {
 			+ ", grbg_account_details, auditcreatedtime) VALUES ((select nextval('seq_eg_grbg_account_audit')), :grbgApplicationNo, :status"
 			+ ", :type, :grbgAccountDetails, (SELECT extract(epoch from now())))";
 	
-	private static final String DDP_VERIFICATION_COUNT =  "SELECT " +
-            "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, " +
-            "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
-            "FROM eg_grbg_account acc " +
-            "WHERE acc.parent_account IS NULL " +
-            "AND acc.tenant_id = ? " +
-            "AND acc.is_active = true " +
-            "AND acc.status = 'APPROVED'";
+	private static final String DDP_VERIFICATION_COUNT =
+	        "SELECT " +
+	        "COUNT(*) AS total_approved_accounts, " +
+	        "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, " +
+	        "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
+	        "FROM eg_grbg_account acc " +
+	        "WHERE acc.parent_account IS NULL " +
+	        "AND acc.tenant_id = ? " +
+	        "AND acc.is_active = true " +
+	        "AND acc.status = 'APPROVED'";
 	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
@@ -302,10 +304,13 @@ public class GarbageAccountRepository {
 	
 	public DdpVerificationCount getDdpVerificationCount(String tenantId) {
 
-		String query = DDP_VERIFICATION_COUNT;
-		return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
-				(rs, rowNum) -> DdpVerificationCount.builder().totalDdpVerified(rs.getInt("total_ddp_verified"))
-						.remainingForDdpVerification(rs.getInt("remaining_for_ddp_verification")).build());
+	    String query = DDP_VERIFICATION_COUNT;
+	    return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
+	            (rs, rowNum) -> DdpVerificationCount.builder()
+	                    .totalApprovedAccounts(rs.getInt("total_approved_accounts"))
+	                    .totalDdpVerified(rs.getInt("total_ddp_verified"))
+	                    .remainingForDdpVerification(rs.getInt("remaining_for_ddp_verification"))
+	                    .build());
 	}
 	
 	public List<GarbageAccount> searchGarbageAccountIndex(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
