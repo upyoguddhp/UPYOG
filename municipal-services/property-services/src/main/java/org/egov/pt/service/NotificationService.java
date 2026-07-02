@@ -680,7 +680,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	}
 	
 	public void triggerPropertyNotice(PtTaxCalculatorTracker propertyTracker, Bill bill, RequestInfo requestInfo,
-			String ulbName, List<Property> propertyDetail) {
+			String ulbName, List<Property> propertyDetail, String tenantId) {
 		ClassPathResource resource = new ClassPathResource(PROPERTY_NOTICE_TEMPLATE_LOCATION);
 		
 		RequestInfoWrapper requestInfoWrapper = new RequestInfoWrapper();
@@ -700,7 +700,7 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		emailSubject = populateNoticePlaceholders(emailSubject, newproperty, bill, propertyTracker);
 
 		ResponseEntity<Resource> pdfResponse = propertyService.generatePropertyNoticePdf(requestInfoWrapper,
-				propertyTracker.getPropertyId(), bill.getId(), null);
+				propertyTracker.getPropertyId(), bill.getId(), null, tenantId);
 
 		byte[] pdfBytes = null;
 

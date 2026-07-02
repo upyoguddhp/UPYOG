@@ -1819,6 +1819,8 @@ public class PropertySchedulerService {
 				.skipValidation(true).build();
 		
 		String ulbName = request.getTenantId().replaceFirst("^hp\\.", "");
+		
+		String tenantId = request.getTenantId();
 
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
 		
@@ -1844,7 +1846,7 @@ public class PropertySchedulerService {
 				                         .billId(request.getBillId())
 				                         .build());
 
-		notificationService.triggerPropertyNotice(tracker, bill, request.getRequestInfo(), ulbName, property);
+		notificationService.triggerPropertyNotice(tracker, bill, request.getRequestInfo(), ulbName, property, tenantId);
 	}
 
 }

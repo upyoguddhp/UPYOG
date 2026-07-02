@@ -794,4 +794,15 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
+		
+		public String getPropertyApproverCode(String tenantId) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			preparedStmtList.add(tenantId);
+			try {
+				return jdbcTemplate.queryForObject(queryBuilder.getPropertyApproverUserNameQuery(),
+						preparedStmtList.toArray(), String.class);
+			} catch (Exception ex) {
+				return null;
+			}
+		}
 	}

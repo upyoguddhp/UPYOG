@@ -215,6 +215,10 @@ public class PropertyQueryBuilder {
 			+ "(additionaldetails::jsonb)->>'wardNumber' AS ward, " + "(additionaldetails::jsonb)->>'ulbName' AS ulb, "
 			+ "district AS region " + "FROM eg_pt_address " + "WHERE TO_TIMESTAMP(createdtime / 1000)::date = "
 			+ "TO_DATE(?, 'DD-MM-YYYY')";
+	
+	private static final String PROPERTY_APPROVER_QUERY = "SELECT e.code " + "FROM eg_userrole_v1 r "
+			+ "INNER JOIN eg_hrms_employee e ON r.user_id = e.id " + "WHERE r.role_tenantid = ? "
+			+ "AND r.role_code = 'PROPERTY_APPROVER'";
 
 	public String getUniqueWardsSearchQuery(String stringDate, List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(UNIQUE_WARDS_SEARCH_QUERY);
@@ -1341,6 +1345,10 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 	public String getExpireActiveTrackersByPropertyIdQuery() {
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
+	}
+	
+	public String getPropertyApproverUserNameQuery() {
+		return PROPERTY_APPROVER_QUERY;
 	}
 
 }

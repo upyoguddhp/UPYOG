@@ -58,7 +58,7 @@
         }
 
         .signature{
-            margin-top:200px;
+            margin-top:100px;
             width:100%;
         }
 
@@ -66,6 +66,13 @@
             float:right;
             text-align:left;
         }
+		
+		.signature .right img {
+		    display: block;
+		    margin-bottom: 1px;
+			max-height: 70px;
+			margin: 0 0 -8px 0;
+		}
 
     </style>
 
@@ -137,7 +144,7 @@ Whereas, a tax bill was previously served to you online in the manner as laid do
 <p>
 
 You are hereby strictly directed to pay the total demanded with interest sum of
-<b>Rs. <span th:text="${amountWithInterest}"></span></b>
+<b>Rs. <span th:text="${amountDue}"></span></b>
 in the office of MC Solan, either through online or offline mode within 15 days from the date of service of this notice, and also convey the payment compliance.
 
 </p>
@@ -207,13 +214,12 @@ Now therefore, in view of the aforesaid provisions of the HPMC Act 1994, you are
 </p>
 
 <div class="signature">
-	<img th:src="${signature}" alt="signature" />
-    <div>
+    <div class="right">
+        <img th:src="${signature}" alt="signature" />
         <b>Joint Commissioner</b><br/>
         Municipal Corporation,<br/>
         Solan
     </div>
-
 </div>
 
 </body>

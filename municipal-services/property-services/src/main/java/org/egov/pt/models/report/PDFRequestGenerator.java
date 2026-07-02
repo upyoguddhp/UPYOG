@@ -54,24 +54,6 @@ public class PDFRequestGenerator {
 	@Qualifier("propertyUtil")
 	private CommonUtils commonUtils;
 
-	private String getApproverNameFromMdms(RequestInfo requestInfo, String tenantId) {
-		Map<String, List<String>> signatureValues = commonUtils.getAttributeValues(
-				tenantId,
-				"Signature",
-				Collections.singletonList("Signature"),
-				null,
-				"$.MdmsRes.Signature.Signature[*].userName",
-				requestInfo);
-
-		if (CollectionUtils.isEmpty(signatureValues) || CollectionUtils.isEmpty(signatureValues.get("Signature"))) {
-			log.error("No approver userName found in MDMS Signature master for tenant {}", tenantId);
-			throw new CustomException("MDMS_APPROVER_NOT_FOUND",
-					"No Signature master entry found for tenant " + tenantId);
-		}
-
-		return signatureValues.get("Signature").get(0);
-	}
-
 	public PDFRequest generatePdfRequest(RequestInfoWrapper requestInfoWrapper, Property property,
 			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap) {
 
@@ -361,12 +343,12 @@ public class PDFRequestGenerator {
 	}
 	
 	public PDFRequest generateNoticePdfRequest(RequestInfoWrapper requestInfoWrapper, Property property,
-			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap) {
+			PtTaxCalculatorTracker ptTaxCalculatorTracker, Bill bill, Map<String, Integer> tenantIdDaysMap, String tenantId) {
 
 		Map<String, Object> dataObject = new HashMap<>();
 		Map<String, String> notice = new HashMap<>();
 		
-		String approverName = getApproverNameFromMdms(requestInfoWrapper.getRequestInfo(), property.getTenantId());
+		String approverName = getApproverNameFromMdms(requestInfoWrapper.getRequestInfo(), property.getTenantId());		
 		notice.put("approverName", approverName);
 
 		JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
@@ -407,9 +389,13 @@ public class PDFRequestGenerator {
 		notice.put("amountDue", bill.getTotalAmount() != null ? bill.getTotalAmount().toPlainString() : "0.00");
 		dataObject.put("notice", notice);
 
-		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("PropertyNotice")
-				.tenantId("hp").data(dataObject).build();
-		}
+		return PDFRequest.builder()
+				.RequestInfo(requestInfoWrapper.getRequestInfo())
+				.key("PropertyNotice")
+				.tenantId(tenantId)
+				.data(dataObject)
+				.build();
+	}
 	
 	private String escapeHtml(String input) {
 	    if (input == null) return null;
@@ -418,6 +404,25 @@ public class PDFRequestGenerator {
 	                .replace(">", "&gt;")
 	                .replace("\"", "&quot;")
 	                .replace("'", "&#39;");
+	}
+	
+	private String getApproverNameFromMdms(RequestInfo requestInfo, String tenantId) {
+
+		List<String> approverNames = commonUtils.getAttributeValueList(tenantId, "Signature",
+				Collections.singletonList("Signature"), null, "$.MdmsRes.Signature.Signature[*].userName", requestInfo);
+
+		if (CollectionUtils.isEmpty(approverNames)) {
+			throw new CustomException("MDMS_APPROVER_NOT_FOUND", "No Signature found for tenant " + tenantId);
+		}
+
+		String approverNameHrms = repository.getPropertyApproverCode(tenantId);
+
+		if (approverNames.contains(approverNameHrms)) {
+			return approverNameHrms;
+		}
+
+		throw new CustomException("MDMS_APPROVER_NOT_FOUND",
+				"No Signature found for PROPERTY_APPROVER " + approverNameHrms);
 	}
 
 }

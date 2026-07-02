@@ -1068,7 +1068,7 @@ public class PropertyService {
 	}
 	
 	public ResponseEntity<Resource> generatePropertyNoticePdf(RequestInfoWrapper requestInfoWrapper,
-			@Valid String propertyId, @Valid String billId, String status) {
+			@Valid String propertyId, @Valid String billId, String status, String tenantId) {
 
 		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
 				.propertyIds(Collections.singleton(propertyId)).build();
@@ -1120,7 +1120,7 @@ public class PropertyService {
 		Map<String, Integer> tenantIdDaysMap = getUlbDaysMap(mdmsResponse);
 
 		PDFRequest pdfRequest = pdfRequestGenerator.generateNoticePdfRequest(requestInfoWrapper, property,
-				ptTaxCalculatorTracker, bill, tenantIdDaysMap);
+				ptTaxCalculatorTracker, bill, tenantIdDaysMap, tenantId);
 
 		return reportService.createNoSavePDF(pdfRequest);
 	}

@@ -387,9 +387,9 @@ public class PropertyController {
 	@PostMapping("/_generatePropertyNoticePdf")
 	public ResponseEntity<Resource> generatePropertyNoticePdf(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@RequestParam String propertyId, @RequestParam(required = false) String billId,
-			@RequestParam(required = false) String status) {
+			@RequestParam(required = false) String status, @RequestParam String tenantId) {
 		ResponseEntity<Resource> response = propertyService.generatePropertyNoticePdf(requestInfoWrapper, propertyId,
-				billId, status);
+				billId, status, tenantId);
 		return response;
 	}
 
