@@ -1559,9 +1559,14 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
 				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
+		Integer totalApprovedAccounts = garbageAccountRepository.getTotalApprovedActiveAccounts(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
 		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
 		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
-		garbageAccountResponse.setTotalApprovedAccounts(ddpCount.getTotalApprovedAccounts());
+		garbageAccountResponse.setTotalApprovedOwnerAccounts(ddpCount.getTotalApprovedOwnerAccounts());
+		garbageAccountResponse.setTotalApprovedAccounts(totalApprovedAccounts);
 		
 		processResponse(garbageAccountResponse);
 

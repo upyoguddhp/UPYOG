@@ -134,6 +134,13 @@ public class GarbageAccountRepository {
 	        "AND acc.is_active = true " +
 	        "AND acc.status = 'APPROVED'";
 	
+	private static final String TOTAL_APPROVED_ACTIVE_ACCOUNTS =
+	        "SELECT COUNT(*) " +
+	        "FROM eg_grbg_account " +
+	        "WHERE tenant_id = ? " +
+	        "AND is_active = true " +
+	        "AND status = 'APPROVED'";
+	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
 	public static final String WITH_SUB_QUERY = " WITH filtered_acc AS ({replace}) "
@@ -307,10 +314,14 @@ public class GarbageAccountRepository {
 	    String query = DDP_VERIFICATION_COUNT;
 	    return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
 	            (rs, rowNum) -> DdpVerificationCount.builder()
-	                    .totalApprovedAccounts(rs.getInt("total_approved_accounts"))
+	                    .totalApprovedOwnerAccounts(rs.getInt("total_approved_accounts"))
 	                    .totalDdpVerified(rs.getInt("total_ddp_verified"))
 	                    .remainingForDdpVerification(rs.getInt("remaining_for_ddp_verification"))
 	                    .build());
+	}
+	
+	public Integer getTotalApprovedActiveAccounts(String tenantId) {
+		return jdbcTemplate.queryForObject(TOTAL_APPROVED_ACTIVE_ACCOUNTS, new Object[] { tenantId }, Integer.class);
 	}
 	
 	public List<GarbageAccount> searchGarbageAccountIndex(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
