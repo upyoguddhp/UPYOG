@@ -1387,6 +1387,10 @@ public class GarbageAccountService {
 		// update garbage account
 		garbageAccountRepository.update(newGarbageAccount);
 
+		if (Boolean.TRUE.equals(newGarbageAccount.getIsDdpUpdateCall())) {
+			garbageAccountRepository.updateDdpDetails(newGarbageAccount);
+		}
+
 	}
 
 	private Map<Long, GarbageAccount> searchGarbageAccountMap(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
