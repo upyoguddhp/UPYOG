@@ -703,7 +703,12 @@ public class GarbageAccountRepository {
 		    whereClause.append(" acc.ddp_verified = ? ");
 		    preparedStatementValues.add(searchCriteriaGarbageAccount.getIsDdpVerified());
 		}
-
+		
+		if (searchCriteriaGarbageAccount.getDdpPrintVerified() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" acc.ddp_print_verified = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getDdpPrintVerified());
+		}
 		 
         return whereClause.toString();
 	}
