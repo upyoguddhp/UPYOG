@@ -100,6 +100,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.egov.garbageservice.model.DdpVerificationCount;
+import java.time.temporal.ChronoUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -681,6 +682,14 @@ public class GarbageAccountService {
 					Collectors.toMap(a -> a.getValue().getGrbgApplication().getApplicationNo(), b -> b.getValue()));
 		} catch (Exception e) {
 			throw new CustomException("FAILED_SEARCH_GARBAGE_ACCOUNTS", "Search Garbage account details failed.");
+		}
+		
+		if (Boolean.TRUE.equals(isDdpUpdateCall)) {
+		    Set<Long> validGarbageIds = validateDdpUpdateWindow(existingGarbageIdAccountsMap);
+		    updateGarbageRequest.getGarbageAccounts().removeIf(account -> !validGarbageIds.contains(account.getGarbageId()));
+		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
+		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
+		    }
 		}
 
 		// load garbage account from backend if workflow = true
@@ -2889,5 +2898,23 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    );
 		
 		    garbageBillTrackerRepository.updatePenalty(tracker);
+		}
+		
+		private Set<Long> validateDdpUpdateWindow(Map<Long, GarbageAccount> existingGarbageAccountsMap) {
+
+			Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+			Set<Long> validGarbageIds = new HashSet<>();
+
+			for (GarbageAccount garbageAccount : existingGarbageAccountsMap.values()) {
+				Long ddpModifiedDate = garbageAccount.getDdpModifiedDate();
+				if (ddpModifiedDate == null || ddpModifiedDate <= 0) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+					continue;
+				}
+				if (!Instant.ofEpochMilli(ddpModifiedDate).isBefore(sevenDaysAgo)) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+				}
+			}
+			return validGarbageIds;
 		}
 }
