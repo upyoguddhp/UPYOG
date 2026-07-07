@@ -426,7 +426,7 @@ public class PropertySchedulerService {
 
 				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
 				finalPropertyTax = oneDayPropertyTax.multiply(days);
-				propertyTaxWithoutRebate = finalPropertyTax;
+				propertyTaxWithoutRebate = finalPropertyTax.setScale(0, RoundingMode.HALF_UP);
 
 				// early payment rebate
 				BigDecimal epRebatePercentage = null;
@@ -436,9 +436,12 @@ public class PropertySchedulerService {
 					}
 				}
 				if (epRebatePercentage != null) {
-					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
+					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)))
+							.setScale(0, RoundingMode.HALF_UP);
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
+				
+				finalPropertyTax = finalPropertyTax.setScale(0, RoundingMode.HALF_UP);
 				
 				BillResponse billResponse = generateDemandAndBill(calculateTaxRequest, property, finalPropertyTax);
 
@@ -1420,7 +1423,8 @@ public class PropertySchedulerService {
 
 			if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_PENALTY) && tenantIdPenaltyRateMap != null
 					&& tenantIdPenaltyRateMap.containsKey(tracker.getTenantId())) {
-				penaltyAmount = calculatePenalty(tracker, tenantIdPenaltyRateMap.get(tracker.getTenantId()));
+				penaltyAmount = calculatePenalty(tracker, tenantIdPenaltyRateMap.get(tracker.getTenantId())).setScale(0,
+						RoundingMode.HALF_UP);
 				newAmount = tracker.getPropertyTax().add(penaltyAmount);
 
 				tracker.setPenaltyAmount(
