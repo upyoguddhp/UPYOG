@@ -34,6 +34,10 @@ public class GarbageAccount {
 	private String himParivarId;
 	
 	private Boolean isDdpVerified;
+	
+	private Boolean ddpPrintVerified;
+	
+	private Long ddpModifiedDate;
 
 	private String type;
 
