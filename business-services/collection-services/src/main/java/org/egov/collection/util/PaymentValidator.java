@@ -431,9 +431,9 @@ public class PaymentValidator {
             errorMap.put("INVALID_PAYMENTDETAIL", "Bill has already been paid");
             return;
         }
-        if (paymentDetail.getTotalAmountPaid().compareTo(remainingDue) == 1) {
-            errorMap.put("INVALID_PAYMENTDETAIL", "The amount to be paid is more than remaining amount to be paid");
-        }
+//        if (paymentDetail.getTotalAmountPaid().compareTo(remainingDue) == 1) {
+//            errorMap.put("INVALID_PAYMENTDETAIL", "The amount to be paid is more than remaining amount to be paid");
+//        }
 
         // In case of partial payment checks if it is allowed in bill
         if ((bill.getPartPaymentAllowed() == null || !bill.getPartPaymentAllowed())
