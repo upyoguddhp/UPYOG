@@ -704,7 +704,8 @@ public class BillServicev2 {
 	private void addOrUpdateBillAccDetailInTaxCodeAccDetailMap(Map<String, BillAccountDetailV2> taxCodeAccDetailMap,
 			DemandDetail demandDetail, TaxHeadMaster taxHead, String billDetailId) {
 
-		BigDecimal newAmountForAccDeatil = demandDetail.getTaxAmount().subtract(demandDetail.getCollectionAmount());
+		BigDecimal grossAmountForAccDetail = demandDetail.getTaxAmount();
+		BigDecimal adjustedAmountForAccDetail = demandDetail.getCollectionAmount();
 		/*
 		 * BAD - BillAccountDetail
 		 * 
@@ -720,7 +721,9 @@ public class BillServicev2 {
 
 			BillAccountDetailV2 existingAccDetail = taxCodeAccDetailMap.get(taxHead.getCode());
 			BigDecimal existingAmtForAccDetail = existingAccDetail.getAmount();
-			existingAccDetail.setAmount(existingAmtForAccDetail.add(newAmountForAccDeatil));
+			BigDecimal existingAdjustedAmountForAccDetail = existingAccDetail.getAdjustedAmount();
+			existingAccDetail.setAmount(existingAmtForAccDetail.add(grossAmountForAccDetail));
+			existingAccDetail.setAdjustedAmount(existingAdjustedAmountForAccDetail.add(adjustedAmountForAccDetail));
 
 		} else {
 
@@ -728,9 +731,9 @@ public class BillServicev2 {
 					.demandDetailId(demandDetail.getId())
 					.tenantId(demandDetail.getTenantId())
 					.id(UUID.randomUUID().toString())
-					.adjustedAmount(BigDecimal.ZERO)
+					.adjustedAmount(adjustedAmountForAccDetail)
 					.taxHeadCode(taxHead.getCode())
-					.amount(newAmountForAccDeatil)
+					.amount(grossAmountForAccDetail)
 					.order(taxHead.getOrder())
 					.billDetailId(billDetailId)
 					.build();
