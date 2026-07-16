@@ -47,6 +47,9 @@ public class OwnerInfo extends User {
 	@SafeHtml
 	@JsonProperty("fatherOrHusbandName")
 	private String fatherOrHusbandName;
+	
+	@JsonProperty("coOwnerName")
+	private String coOwnerName;
 
 	@SafeHtml
 	@JsonProperty("correspondenceAddress")
@@ -139,7 +142,7 @@ public class OwnerInfo extends User {
 					 Long dob, Long pwdExpiryDate, String locale, String type, String signature, Boolean accountLocked,
 					 List<Role> roles, String fatherOrHusbandName, String bloodGroup, String identificationMark, String photo,
 					 String createdBy, Long createdDate, String lastModifiedBy, Long lastModifiedDate, String tenantId,
-					 String ownerInfoUuid,String propertyOwnerName, String mobileNumber2, String gender2, String fatherOrHusbandName2,
+					 String ownerInfoUuid,String propertyOwnerName, String mobileNumber2, String gender2, String fatherOrHusbandName2, String coOwnerName,
 					 String correspondenceAddress2, Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType,
 					 String institutionId, Status status, List<Document> documents, Relationship relationship, String alternatemobilenumber, JsonNode additionalDetails) {
 		super(id, uuid, userName, password, salutation, name, gender, mobileNumber, emailId, altContactNumber, pan,
@@ -151,6 +154,7 @@ public class OwnerInfo extends User {
 		mobileNumber = mobileNumber2;
 		gender = gender2;
 		this.fatherOrHusbandName = fatherOrHusbandName2;
+		this.coOwnerName = coOwnerName;
 		correspondenceAddress = correspondenceAddress2;
 		this.isPrimaryOwner = isPrimaryOwner;
 		this.ownerShipPercentage = ownerShipPercentage;
@@ -179,6 +183,7 @@ public class OwnerInfo extends User {
 
 		this.ownerInfoUuid = ownerInfo.getOwnerInfoUuid();
 		this.fatherOrHusbandName = ownerInfo.getFatherOrHusbandName();
+		this.coOwnerName = ownerInfo.getCoOwnerName();
 		this.correspondenceAddress = ownerInfo.getCorrespondenceAddress();
 		this.isPrimaryOwner = ownerInfo.getIsPrimaryOwner();
 		this.ownerShipPercentage = ownerInfo.getOwnerShipPercentage();
@@ -269,7 +274,7 @@ public class OwnerInfo extends User {
 	@Override
 	public String toString() {
 		return "OwnerInfo [ownerInfoUuid=" + ownerInfoUuid + ", gender=" + gender + ", fatherOrHusbandName="
-				+ fatherOrHusbandName + ", correspondenceAddress=" + correspondenceAddress + ", isPrimaryOwner="
+				+ fatherOrHusbandName + ", coOwnerName=" + coOwnerName + ", correspondenceAddress=" + correspondenceAddress + ", isPrimaryOwner="
 				+ isPrimaryOwner + ", ownerShipPercentage=" + ownerShipPercentage + ", ownerType=" + ownerType
 				+ ", institutionId=" + institutionId + ", status=" + status + ", documents=" + documents
 				+ ", relationship=" + relationship + ", hashCode=" + hashCode() + ", Id=" + getId()

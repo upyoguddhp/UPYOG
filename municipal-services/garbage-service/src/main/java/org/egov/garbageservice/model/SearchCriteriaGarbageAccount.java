@@ -65,6 +65,10 @@ public class SearchCriteriaGarbageAccount {
     
     private Boolean isUserUuidNull;
     
+    private Boolean isDdpVerified;
+    
+    private Boolean ddpPrintVerified;
+    
     private Boolean isMonthlyBilling;
     
 	@Builder.Default
@@ -91,7 +95,10 @@ public class SearchCriteriaGarbageAccount {
 				.channels(copyList(this.channels)).wardNames(copyList(this.wardNames))
 				.oldGarbageIds(copyList(this.oldGarbageIds)).unitTypes(copyList(this.unitTypes))
 				.unitCategories(copyList(this.unitCategories))
-				.isUserUuidNull(this.isUserUuidNull).build();
+				.isUserUuidNull(this.isUserUuidNull)
+				.isDdpVerified(this.isDdpVerified)
+				.ddpPrintVerified(this.ddpPrintVerified)
+				.build();
 	}
 
 	private <T> List<T> copyList(List<T> originalList) {
