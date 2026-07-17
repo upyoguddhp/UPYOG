@@ -59,7 +59,8 @@ public class EnrichmentService {
         transaction.setUser(userService.createOrSearchUser(transactionRequest));
         transaction.setTxnStatus(Transaction.TxnStatusEnum.PENDING);
         transaction.setTxnStatusMsg(PgConstants.TXN_INITIATED);
-
+        transaction.setService(mapProductInfo(transactionRequest.getTransaction().getProductInfo()));
+        
         if(Objects.isNull(transaction.getAdditionalDetails())){
             transaction.setAdditionalDetails(objectMapper.createObjectNode());
             ((ObjectNode) transaction.getAdditionalDetails()).set("taxAndPayments",
@@ -188,6 +189,19 @@ public class EnrichmentService {
 				 .transaction(transaction)
 				.build();
 		 return request;
+	}
+	
+	private String mapProductInfo(String productInfo) {
+	    switch (productInfo) {
+	        case "PROPERTY": return "PT";
+	        case "ADVT": return "ADV";
+	        case "NewTL": return "TL";
+	        case "pet-service": return "PTR";
+	        case "garbage-bill": return "GB";
+	        case "chb-services": return "CHB";
+	        case "GB": return "GB";
+	        default: return productInfo; // fallback
+	    }
 	}
 
 }

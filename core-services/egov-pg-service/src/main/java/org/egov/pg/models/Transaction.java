@@ -205,6 +205,13 @@ public class Transaction {
 	
 	@JsonProperty("razorpayResponse")
 	private Object razorpayResponse;
+	
+	@JsonProperty("payTo")
+	private String payTo=null;
+	
+	@JsonProperty("service")
+	@Size(min = 1, max = 512)
+	private String service;
 
 	/**
 	 * Current status of the transaction
