@@ -43,6 +43,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.egov.pg.models.DemandAmountInfo;
+import org.egov.pg.models.BankAccount;
+import org.egov.pg.models.BankAccountResponse;
+import org.egov.pg.models.BankAccountSearchCriteria;
 import org.egov.pg.models.Bill;
 import org.egov.pg.models.BillResponse;
 import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
@@ -94,6 +97,10 @@ public class TransactionServiceV2 {
 	private RazorpayGateway RazorpayGateway;
 	
 	private ObjectMapper ObjectMapper;
+	
+	@Autowired
+	private BankAccountService bankAccountService;
+
 
 	/**
 	 * Initiates a transaction by generating a gateway redirect URI for the request
@@ -157,6 +164,18 @@ public class TransactionServiceV2 {
 			    );
 			}
 			else {
+	
+				Set<String> tenantIds = Collections.singleton(transaction.getTenantId());;
+				BankAccountResponse bankAccountResponse = null;
+				BankAccountSearchCriteria bankAccountSearchCriteria = BankAccountSearchCriteria.builder()
+						.requestInfo(requestInfo).tenantIds(tenantIds).active(true).build();
+		
+				// fetch all bank account
+				bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
+				 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
+				        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
+				        transaction.setPayTo(bankAccount.getPayTo());
+				    }
 				URI uri = gatewayService.initiateTxn(transaction);
 				transaction.setRedirectUrl(uri.toString());
 
