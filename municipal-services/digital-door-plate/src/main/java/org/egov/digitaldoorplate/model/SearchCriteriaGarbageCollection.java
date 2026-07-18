@@ -27,6 +27,8 @@ public class SearchCriteriaGarbageCollection {
 
 	private List<String> propertyId;
 
+	private List<String> wardNumber;
+
 	private List<String> wasteType;
 
 	private List<String> clientRefId;

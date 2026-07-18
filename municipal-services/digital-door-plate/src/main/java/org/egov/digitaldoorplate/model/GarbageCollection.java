@@ -31,6 +31,8 @@ public class GarbageCollection {
 
 	private String propertyId;
 
+	private String wardNumber;
+
 	private Boolean isResidentAvailable;
 
 	private String wasteType;
@@ -52,6 +54,8 @@ public class GarbageCollection {
 	private String syncBatchUuid;
 
 	private String remarks;
+
+	private Object additionalDetails;
 
 	private Boolean isActive;
 

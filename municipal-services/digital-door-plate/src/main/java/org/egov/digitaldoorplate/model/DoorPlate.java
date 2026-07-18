@@ -25,6 +25,8 @@ public class DoorPlate {
 
 	private String propertyId;
 
+	private String wardNumber;
+
 	private String plateStatus;
 
 	private Boolean isQrGenerated;
@@ -54,6 +56,8 @@ public class DoorPlate {
 	private BigDecimal installationLongitude;
 
 	private String remarks;
+
+	private Object additionalDetails;
 
 	private Boolean isActive;
 

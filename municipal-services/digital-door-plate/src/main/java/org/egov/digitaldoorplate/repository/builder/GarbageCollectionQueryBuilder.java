@@ -10,14 +10,14 @@ import org.springframework.util.CollectionUtils;
 public class GarbageCollectionQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_garbage_collection "
-			+ "(uuid, tenant_id, attendance_uuid, staff_uuid, garbage_account_uuid, sub_account_uuid, garbage_id, application_no, property_id, "
-			+ "is_resident_available, waste_type, is_waste_kept_outside, is_collected, applied_to_all_tenants, collection_time, latitude, longitude, client_ref_id, sync_batch_uuid, remarks, is_active, "
+			+ "(uuid, tenant_id, attendance_uuid, staff_uuid, garbage_account_uuid, sub_account_uuid, garbage_id, application_no, property_id, ward_number, "
+			+ "is_resident_available, waste_type, is_waste_kept_outside, is_collected, applied_to_all_tenants, collection_time, latitude, longitude, client_ref_id, sync_batch_uuid, remarks, additional_details, is_active, "
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String UPDATE_QUERY = "UPDATE eg_ddp_garbage_collection "
 			+ "SET is_resident_available = ?, waste_type = ?, is_waste_kept_outside = ?, is_collected = ?, applied_to_all_tenants = ?, "
-			+ "collection_time = ?, latitude = ?, longitude = ?, remarks = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
+			+ "collection_time = ?, latitude = ?, longitude = ?, remarks = ?, additional_details = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
 			+ "WHERE uuid = ?";
 
 	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_garbage_collection WHERE 1=1 ";
@@ -56,6 +56,11 @@ public class GarbageCollectionQueryBuilder {
 		if (!CollectionUtils.isEmpty(criteria.getPropertyId())) {
 			query.append(" AND property_id IN (").append(getPlaceholders(criteria.getPropertyId().size())).append(")");
 			preparedStatementValues.addAll(criteria.getPropertyId());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getWardNumber())) {
+			query.append(" AND ward_number IN (").append(getPlaceholders(criteria.getWardNumber().size()))
+					.append(")");
+			preparedStatementValues.addAll(criteria.getWardNumber());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getClientRefId())) {
 			query.append(" AND client_ref_id IN (").append(getPlaceholders(criteria.getClientRefId().size()))

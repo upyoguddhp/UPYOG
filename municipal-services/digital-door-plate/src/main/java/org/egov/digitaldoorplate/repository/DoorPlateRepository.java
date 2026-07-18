@@ -7,6 +7,7 @@ import org.egov.digitaldoorplate.model.DoorPlate;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlate;
 import org.egov.digitaldoorplate.repository.builder.DoorPlateQueryBuilder;
 import org.egov.digitaldoorplate.repository.rowmapper.DoorPlateRowMapper;
+import org.egov.digitaldoorplate.util.JsonbUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,9 @@ public class DoorPlateRepository {
 	@Autowired
 	private DoorPlateRowMapper rowMapper;
 
+	@Autowired
+	private JsonbUtil jsonbUtil;
+
 	public void create(DoorPlate doorPlate) {
 		jdbcTemplate.update(DoorPlateQueryBuilder.CREATE_QUERY,
 				doorPlate.getUuid(),
@@ -31,6 +35,7 @@ public class DoorPlateRepository {
 				doorPlate.getGarbageId(),
 				doorPlate.getApplicationNo(),
 				doorPlate.getPropertyId(),
+				doorPlate.getWardNumber(),
 				doorPlate.getPlateStatus(),
 				doorPlate.getIsQrGenerated(),
 				doorPlate.getQrGeneratedTime(),
@@ -46,6 +51,7 @@ public class DoorPlateRepository {
 				doorPlate.getInstallationLatitude(),
 				doorPlate.getInstallationLongitude(),
 				doorPlate.getRemarks(),
+				jsonbUtil.toPGobject(doorPlate.getAdditionalDetails()),
 				doorPlate.getIsActive(),
 				doorPlate.getCreatedBy(),
 				doorPlate.getCreatedDate(),

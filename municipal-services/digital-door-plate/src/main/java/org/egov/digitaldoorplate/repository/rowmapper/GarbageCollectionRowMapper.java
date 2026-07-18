@@ -4,11 +4,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.egov.digitaldoorplate.model.GarbageCollection;
+import org.egov.digitaldoorplate.util.JsonbUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GarbageCollectionRowMapper implements RowMapper<GarbageCollection> {
+
+	@Autowired
+	private JsonbUtil jsonbUtil;
 
 	@Override
 	public GarbageCollection mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -22,6 +27,7 @@ public class GarbageCollectionRowMapper implements RowMapper<GarbageCollection> 
 				.garbageId(rs.getString("garbage_id"))
 				.applicationNo(rs.getString("application_no"))
 				.propertyId(rs.getString("property_id"))
+				.wardNumber(rs.getString("ward_number"))
 				.isResidentAvailable(getBoolean(rs, "is_resident_available"))
 				.wasteType(rs.getString("waste_type"))
 				.isWasteKeptOutside(getBoolean(rs, "is_waste_kept_outside"))
@@ -33,6 +39,7 @@ public class GarbageCollectionRowMapper implements RowMapper<GarbageCollection> 
 				.clientRefId(rs.getString("client_ref_id"))
 				.syncBatchUuid(rs.getString("sync_batch_uuid"))
 				.remarks(rs.getString("remarks"))
+				.additionalDetails(jsonbUtil.parse(rs.getString("additional_details")))
 				.isActive(rs.getBoolean("is_active"))
 				.createdBy(rs.getString("createdby"))
 				.createdDate(getLong(rs, "createddate"))

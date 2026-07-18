@@ -10,12 +10,12 @@ import org.springframework.util.CollectionUtils;
 public class DoorPlateQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_door_plate "
-			+ "(uuid, tenant_id, garbage_account_uuid, garbage_id, application_no, property_id, plate_status, "
+			+ "(uuid, tenant_id, garbage_account_uuid, garbage_id, application_no, property_id, ward_number, plate_status, "
 			+ "is_qr_generated, qr_generated_time, qr_generated_by, "
 			+ "is_print_verified, print_verified_time, print_verified_by, verification_latitude, verification_longitude, "
 			+ "is_installed, installed_time, installed_by, installation_latitude, installation_longitude, "
-			+ "remarks, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "remarks, additional_details, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String VERIFY_PRINT_QUERY = "UPDATE eg_ddp_door_plate "
 			+ "SET plate_status = ?, is_print_verified = ?, print_verified_time = ?, print_verified_by = ?, "
@@ -49,6 +49,11 @@ public class DoorPlateQueryBuilder {
 		if (!CollectionUtils.isEmpty(criteria.getPropertyId())) {
 			query.append(" AND property_id IN (").append(getPlaceholders(criteria.getPropertyId().size())).append(")");
 			preparedStatementValues.addAll(criteria.getPropertyId());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getWardNumber())) {
+			query.append(" AND ward_number IN (").append(getPlaceholders(criteria.getWardNumber().size()))
+					.append(")");
+			preparedStatementValues.addAll(criteria.getWardNumber());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getPlateStatus())) {
 			query.append(" AND plate_status IN (").append(getPlaceholders(criteria.getPlateStatus().size()))

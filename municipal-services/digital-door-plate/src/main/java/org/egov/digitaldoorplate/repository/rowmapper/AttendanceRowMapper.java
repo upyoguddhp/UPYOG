@@ -1,17 +1,24 @@
 package org.egov.digitaldoorplate.repository.rowmapper;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.egov.digitaldoorplate.model.Attendance;
+import org.egov.digitaldoorplate.util.JsonbUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AttendanceRowMapper implements RowMapper<Attendance> {
 
+	@Autowired
+	private JsonbUtil jsonbUtil;
+
 	@Override
 	public Attendance mapRow(ResultSet rs, int rowNum) throws SQLException {
+		Date dutyDate = rs.getDate("duty_date");
 		return Attendance.builder()
 				.uuid(rs.getString("uuid"))
 				.tenantId(rs.getString("tenant_id"))
@@ -19,11 +26,13 @@ public class AttendanceRowMapper implements RowMapper<Attendance> {
 				.staffName(rs.getString("staff_name"))
 				.mobileNumber(rs.getString("mobile_number"))
 				.dutyStatus(rs.getString("duty_status"))
+				.dutyDate(null != dutyDate ? dutyDate.toString() : null)
 				.startTime(getLong(rs, "start_time"))
 				.endTime(getLong(rs, "end_time"))
 				.latitude(rs.getBigDecimal("latitude"))
 				.longitude(rs.getBigDecimal("longitude"))
 				.remarks(rs.getString("remarks"))
+				.additionalDetails(jsonbUtil.parse(rs.getString("additional_details")))
 				.isActive(rs.getBoolean("is_active"))
 				.createdBy(rs.getString("createdby"))
 				.createdDate(getLong(rs, "createddate"))

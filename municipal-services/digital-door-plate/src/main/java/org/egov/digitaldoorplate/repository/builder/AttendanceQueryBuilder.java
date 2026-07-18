@@ -10,8 +10,8 @@ import org.springframework.util.CollectionUtils;
 public class AttendanceQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_attendance "
-			+ "(uuid, tenant_id, staff_uuid, staff_name, mobile_number, duty_status, start_time, end_time, latitude, longitude, remarks, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "(uuid, tenant_id, staff_uuid, staff_name, mobile_number, duty_status, duty_date, start_time, end_time, latitude, longitude, remarks, additional_details, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String END_DUTY_QUERY = "UPDATE eg_ddp_attendance "
 			+ "SET duty_status = ?, end_time = ?, remarks = ?, lastmodifiedby = ?, lastmodifieddate = ? "

@@ -21,6 +21,8 @@ public class SearchCriteriaDoorPlate {
 
 	private List<String> propertyId;
 
+	private List<String> wardNumber;
+
 	private List<String> plateStatus;
 
 	private String tenantId;

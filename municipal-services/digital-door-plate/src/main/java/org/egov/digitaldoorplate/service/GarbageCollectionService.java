@@ -23,6 +23,7 @@ import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollectionRequest;
 import org.egov.digitaldoorplate.model.SyncBatch;
 import org.egov.digitaldoorplate.model.SyncRecordResult;
+import org.egov.digitaldoorplate.producer.DdpProducer;
 import org.egov.digitaldoorplate.repository.GarbageCollectionRepository;
 import org.egov.digitaldoorplate.repository.SyncBatchRepository;
 import org.egov.digitaldoorplate.util.DdpConstants;
@@ -50,6 +51,12 @@ public class GarbageCollectionService {
 
 	@Autowired
 	private SyncBatchRepository syncBatchRepository;
+
+	@Autowired
+	private DdpProducer ddpProducer;
+
+	@Autowired
+	private DdpConstants ddpConfig;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
@@ -101,7 +108,12 @@ public class GarbageCollectionService {
 				.build();
 	}
 
-	@Transactional
+	/**
+	 * Validates and enriches the collection records and publishes them to
+	 * kafka; the actual DB write happens asynchronously in
+	 * GarbageCollectionPersistConsumer so the API stays fast during the
+	 * morning collection peak across all ULBs.
+	 */
 	public GarbageCollectionResponse create(GarbageCollectionRequest garbageCollectionRequest) {
 
 		validateCreateRequest(garbageCollectionRequest);
@@ -128,9 +140,9 @@ public class GarbageCollectionService {
 			garbageCollection.setCreatedDate(now);
 			garbageCollection.setLastModifiedBy(userUuid);
 			garbageCollection.setLastModifiedDate(now);
-
-			garbageCollectionRepository.create(garbageCollection);
 		});
+
+		ddpProducer.push(ddpConfig.getSaveGarbageCollectionTopic(), garbageCollectionRequest);
 
 		return GarbageCollectionResponse.builder()
 				.responseInfo(responseInfoFactory
@@ -172,6 +184,9 @@ public class GarbageCollectionService {
 			}
 			if (null == garbageCollection.getLongitude()) {
 				garbageCollection.setLongitude(existingCollections.get(0).getLongitude());
+			}
+			if (null == garbageCollection.getAdditionalDetails()) {
+				garbageCollection.setAdditionalDetails(existingCollections.get(0).getAdditionalDetails());
 			}
 			garbageCollection.setLastModifiedBy(userUuid);
 			garbageCollection.setLastModifiedDate(now);
@@ -233,6 +248,7 @@ public class GarbageCollectionService {
 		}
 
 		List<SyncRecordResult> recordResults = new ArrayList<>();
+		List<GarbageCollection> queuedRecords = new ArrayList<>();
 		int created = 0, duplicate = 0, failed = 0;
 
 		for (GarbageCollection garbageCollection : syncRequest.getGarbageCollections()) {
@@ -278,12 +294,12 @@ public class GarbageCollectionService {
 				garbageCollection.setLastModifiedBy(userUuid);
 				garbageCollection.setLastModifiedDate(now);
 
-				garbageCollectionRepository.create(garbageCollection);
+				queuedRecords.add(garbageCollection);
 				existingClientRefIds.add(garbageCollection.getClientRefId());
 
 				created++;
 				recordResults.add(SyncRecordResult.builder().clientRefId(garbageCollection.getClientRefId())
-						.uuid(garbageCollection.getUuid()).status(DdpConstants.SYNC_STATUS_CREATED).build());
+						.uuid(garbageCollection.getUuid()).status(DdpConstants.SYNC_STATUS_QUEUED).build());
 			} catch (Exception e) {
 				log.error("Failed to sync garbage collection record with clientRefId {}.",
 						garbageCollection.getClientRefId(), e);
@@ -291,6 +307,14 @@ public class GarbageCollectionService {
 				recordResults.add(SyncRecordResult.builder().clientRefId(garbageCollection.getClientRefId())
 						.status(DdpConstants.SYNC_STATUS_FAILED).errorMessage(e.getMessage()).build());
 			}
+		}
+
+		// accepted records go to kafka in one message; the consumer persists
+		// them with the DB unique index on client_ref_id as the final
+		// duplicate guard
+		if (!queuedRecords.isEmpty()) {
+			ddpProducer.push(ddpConfig.getSaveGarbageCollectionTopic(), GarbageCollectionRequest.builder()
+					.requestInfo(syncRequest.getRequestInfo()).garbageCollections(queuedRecords).build());
 		}
 
 		syncBatchRepository.create(SyncBatch.builder()

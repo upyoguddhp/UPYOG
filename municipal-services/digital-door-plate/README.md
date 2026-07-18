@@ -11,7 +11,13 @@ verification → installation).
 | Via gateway (zuul) | `http://<gateway-host>:8080/digital-door-plate/...` |
 | Direct (dev) | `http://localhost:1239/digital-door-plate/...` |
 | Database | `hp_udd_dev` (tables `eg_ddp_attendance`, `eg_ddp_garbage_collection`, `eg_ddp_door_plate`, `eg_ddp_sync_batch`) |
-| Dependencies | `egov-enc-service` (QR decrypt), `garbage-service` (account search) |
+| Dependencies | `egov-enc-service` (QR decrypt), `garbage-service` (account search), Kafka (async persistence of collection records) |
+
+**Peak load design**: collection happens in a statewide morning window across all ULBs, so the
+write path is asynchronous — `_create` and `_sync` validate/enrich and publish to the kafka
+topic `save-ddp-garbage-collection`; `GarbageCollectionPersistConsumer` drains it into
+`eg_ddp_garbage_collection` at the DB's pace. The DB unique index on `client_ref_id` is the
+final duplicate guard, so kafka redeliveries and re-synced device queues are safe.
 
 ## Conventions
 
@@ -20,6 +26,9 @@ verification → installation).
 - Every response carries `ResponseInfo` with `status: "successful"`.
 - Timestamps are **epoch milliseconds** (`Asia/Kolkata` for day boundaries).
 - Latitude/longitude are decimals (`numeric(10,7)`).
+- Every entity (`attendance`, `garbageCollections[]`, `doorPlates[]`) accepts an optional
+  free-form **`additionalDetails`** json object, stored as `jsonb` and returned as-is on
+  search — use it for future fields without schema changes.
 - Errors are thrown as UPYOG `CustomException` and returned by the tracer error handler:
 
 ```json
@@ -37,6 +46,7 @@ verification → installation).
 | `INVALID_QR` | Scanned data empty, undecryptable/unparseable, or missing the account id |
 | `INVALID_SEARCH` | Search called without criteria |
 | `ATTENDANCE_NOT_FOUND` | `_endDuty` without a running duty |
+| `ATTENDANCE_ALREADY_MARKED` | `_startDuty` when attendance was already marked (and ended) today — one attendance per staff per day, enforced by a DB unique index on `(staff_uuid, tenant_id, duty_date)` |
 | `GARBAGE_ACCOUNT_NOT_FOUND` | `_scan` found no active garbage account for the QR |
 | `COLLECTION_NOT_FOUND` | `_update` for an unknown collection uuid |
 | `DOOR_PLATE_NOT_FOUND` | `_verifyPrint`/`_install` before `_generate` |
@@ -51,8 +61,9 @@ verification → installation).
 ## 1.1 Start duty — `POST /digital-door-plate/attendance/_startDuty`
 
 Marks attendance. `latitude`/`longitude` are **mandatory**. `staffUuid`, `staffName` and
-`tenantId` default from `RequestInfo.userInfo`. If a duty is already running today for the
-staff, the existing record is returned (no duplicate).
+`tenantId` default from `RequestInfo.userInfo`. **One attendance per staff per day**: if a
+duty is already running today the existing record is returned (idempotent); if today's duty
+was already ended, the call fails with `ATTENDANCE_ALREADY_MARKED`.
 
 ```json
 {
@@ -61,7 +72,8 @@ staff, the existing record is returned (no duplicate).
     "tenantId": "hp.GB",
     "latitude": 31.1048200,
     "longitude": 77.1734400,
-    "remarks": "optional"
+    "remarks": "optional",
+    "additionalDetails": { "deviceId": "optional-free-form-json" }
   }
 }
 ```
@@ -213,6 +225,7 @@ mandatory per record; `staffUuid` defaults to the logged-in user, `collectionTim
     "garbageId": "GB/HP/SML/2026/50",
     "applicationNo": "GB/HP/Shimla/Shimla/052026/50",
     "propertyId": "optional",
+    "wardNumber": "W-07",
     "isResidentAvailable": true,
     "wasteType": "WET",
     "isWasteKeptOutside": false,
@@ -226,6 +239,9 @@ mandatory per record; `staffUuid` defaults to the logged-in user, `collectionTim
 
 `wasteType`: `WET` | `DRY` | `MIXED`. Response:
 `{ "ResponseInfo": ..., "garbageCollections": [ ...enriched with uuid, audit... ] }`
+
+The response returns the enriched records immediately; the DB write itself happens
+asynchronously via kafka (see peak load design above).
 
 ## 2.3 Offline sync — `POST /digital-door-plate/garbage-collection/_sync`
 
@@ -245,6 +261,7 @@ Same record shape as `_create` **plus a mandatory device-generated `clientRefId`
     "clientRefId": "dev-9f31-0001",
     "tenantId": "hp.GB",
     "garbageAccountUuid": "7fe1d1ba-...",
+    "wardNumber": "W-07",
     "isResidentAvailable": true,
     "wasteType": "DRY",
     "isWasteKeptOutside": true,
@@ -266,14 +283,16 @@ Response — the app clears its local queue based on `recordResults`:
   "duplicateRecords": 1,
   "failedRecords": 0,
   "recordResults": [
-    { "clientRefId": "dev-9f31-0001", "uuid": "31aa...", "status": "CREATED" },
+    { "clientRefId": "dev-9f31-0001", "uuid": "31aa...", "status": "QUEUED" },
     { "clientRefId": "dev-9f31-0002", "status": "DUPLICATE" },
-    { "clientRefId": "dev-9f31-0003", "uuid": "42bb...", "status": "CREATED" }
+    { "clientRefId": "dev-9f31-0003", "uuid": "42bb...", "status": "QUEUED" }
   ]
 }
 ```
 
-Record statuses: `CREATED` | `DUPLICATE` | `FAILED` (with `errorMessage`).
+Record statuses: `QUEUED` (accepted, persisted asynchronously via kafka) | `DUPLICATE` |
+`FAILED` (validation error, with `errorMessage`). The app can clear `QUEUED` and `DUPLICATE`
+records from its local queue; only `FAILED` ones need attention.
 
 ## 2.4 Update — `POST /digital-door-plate/garbage-collection/_update`
 
@@ -293,6 +312,7 @@ Corrects a submitted record. `uuid` mandatory per record; updatable fields:
     "attendanceUuid": ["..."],
     "applicationNo": ["..."],
     "propertyId": ["..."],
+    "wardNumber": ["W-07"],
     "wasteType": ["WET"],
     "clientRefId": ["..."],
     "tenantId": "hp.GB",
@@ -331,7 +351,8 @@ Records that the QR code has been generated against the garbage id/account. Acce
     "garbageAccountUuid": "7fe1d1ba-...",
     "garbageId": "GB/HP/SML/2026/50",
     "applicationNo": "GB/HP/Shimla/Shimla/052026/50",
-    "propertyId": "optional"
+    "propertyId": "optional",
+    "wardNumber": "W-07"
   } ]
 }
 ```
@@ -393,6 +414,7 @@ Response: the plate with `plateStatus: "INSTALLED"`, `isInstalled: true`,
     "garbageAccountUuid": ["7fe1d1ba-..."],
     "applicationNo": ["..."],
     "propertyId": ["..."],
+    "wardNumber": ["W-07"],
     "plateStatus": ["QR_GENERATED", "PRINT_VERIFIED", "INSTALLED"],
     "tenantId": "hp.GB",
     "isQrGenerated": true,
@@ -444,4 +466,9 @@ Response: `{ "ResponseInfo": ..., "doorPlates": [ ... ] }` ordered by `createdda
   Flyway creates/updates the four `eg_ddp_*` tables on startup
   (history table `hp_ddp_schema_version`).
 - **Config** (`application.properties`): `egov.enc.host` (dev `localhost:1234`),
-  `egov.garbage.service.host` (dev `localhost:1235`), datasource for `hp_udd_dev`.
+  `egov.garbage.service.host` (dev `localhost:1235`), datasource for `hp_udd_dev`,
+  `kafka.config.bootstrap_server_config` + `spring.kafka.*` (dev `localhost:9092`),
+  topic `kafka.topics.save.garbage.collection=save-ddp-garbage-collection`.
+- **Kafka**: the topic `save-ddp-garbage-collection` must exist (or auto-create enabled).
+  For statewide scale, create it with multiple partitions and key messages per tenant if
+  ordering per ULB is needed; consumer group `egov-ddp-services`.

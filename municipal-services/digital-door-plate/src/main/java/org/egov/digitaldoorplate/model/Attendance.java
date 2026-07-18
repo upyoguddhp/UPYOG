@@ -25,6 +25,8 @@ public class Attendance {
 
 	private String dutyStatus;
 
+	private String dutyDate;
+
 	private Long startTime;
 
 	private Long endTime;
@@ -34,6 +36,8 @@ public class Attendance {
 	private BigDecimal longitude;
 
 	private String remarks;
+
+	private Object additionalDetails;
 
 	private Boolean isActive;
 

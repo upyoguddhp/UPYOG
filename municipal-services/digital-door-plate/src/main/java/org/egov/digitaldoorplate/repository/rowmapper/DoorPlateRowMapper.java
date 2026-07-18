@@ -4,11 +4,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.egov.digitaldoorplate.model.DoorPlate;
+import org.egov.digitaldoorplate.util.JsonbUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DoorPlateRowMapper implements RowMapper<DoorPlate> {
+
+	@Autowired
+	private JsonbUtil jsonbUtil;
 
 	@Override
 	public DoorPlate mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -19,6 +24,7 @@ public class DoorPlateRowMapper implements RowMapper<DoorPlate> {
 				.garbageId(rs.getString("garbage_id"))
 				.applicationNo(rs.getString("application_no"))
 				.propertyId(rs.getString("property_id"))
+				.wardNumber(rs.getString("ward_number"))
 				.plateStatus(rs.getString("plate_status"))
 				.isQrGenerated(rs.getBoolean("is_qr_generated"))
 				.qrGeneratedTime(getLong(rs, "qr_generated_time"))
@@ -34,6 +40,7 @@ public class DoorPlateRowMapper implements RowMapper<DoorPlate> {
 				.installationLatitude(rs.getBigDecimal("installation_latitude"))
 				.installationLongitude(rs.getBigDecimal("installation_longitude"))
 				.remarks(rs.getString("remarks"))
+				.additionalDetails(jsonbUtil.parse(rs.getString("additional_details")))
 				.isActive(rs.getBoolean("is_active"))
 				.createdBy(rs.getString("createdby"))
 				.createdDate(getLong(rs, "createddate"))

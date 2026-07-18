@@ -29,6 +29,7 @@ import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -53,13 +54,24 @@ public class AttendanceService {
 					"Latitude and longitude of the garbage collector are mandatory to start the duty.");
 		}
 
-		// return the already running duty instead of creating a duplicate
-		List<Attendance> openAttendances = findOpenAttendancesForToday(attendance);
-		if (!CollectionUtils.isEmpty(openAttendances)) {
-			return AttendanceResponse.builder()
-					.responseInfo(responseInfoFactory
-							.createResponseInfoFromRequestInfo(attendanceRequest.getRequestInfo(), true))
-					.attendances(openAttendances).build();
+		// attendance can be marked only once per day: a running duty is
+		// returned as-is (idempotent), an already ended duty is rejected
+		List<Attendance> todaysAttendances = attendanceRepository.search(SearchCriteriaAttendance.builder()
+				.staffUuid(Collections.singletonList(attendance.getStaffUuid()))
+				.tenantId(attendance.getTenantId())
+				.fromDate(getStartOfDay())
+				.isActive(Boolean.TRUE)
+				.build());
+		if (!CollectionUtils.isEmpty(todaysAttendances)) {
+			Attendance existingAttendance = todaysAttendances.get(0);
+			if (DdpConstants.DUTY_STATUS_STARTED.equals(existingAttendance.getDutyStatus())) {
+				return AttendanceResponse.builder()
+						.responseInfo(responseInfoFactory
+								.createResponseInfoFromRequestInfo(attendanceRequest.getRequestInfo(), true))
+						.attendances(Collections.singletonList(existingAttendance)).build();
+			}
+			throw new CustomException("ATTENDANCE_ALREADY_MARKED",
+					"Attendance is already marked for today. It cannot be marked again for the same day.");
 		}
 
 		Long now = System.currentTimeMillis();
@@ -67,6 +79,7 @@ public class AttendanceService {
 
 		attendance.setUuid(UUID.randomUUID().toString());
 		attendance.setDutyStatus(DdpConstants.DUTY_STATUS_STARTED);
+		attendance.setDutyDate(LocalDate.now(ZoneId.of(DdpConstants.TIMEZONE)).toString());
 		attendance.setStartTime(now);
 		attendance.setEndTime(null);
 		attendance.setIsActive(Boolean.TRUE);
@@ -75,7 +88,14 @@ public class AttendanceService {
 		attendance.setLastModifiedBy(userUuid);
 		attendance.setLastModifiedDate(now);
 
-		attendanceRepository.create(attendance);
+		try {
+			attendanceRepository.create(attendance);
+		} catch (DuplicateKeyException e) {
+			// unique index (staff_uuid, tenant_id, duty_date) hit by a
+			// concurrent request
+			throw new CustomException("ATTENDANCE_ALREADY_MARKED",
+					"Attendance is already marked for today. It cannot be marked again for the same day.");
+		}
 
 		return AttendanceResponse.builder()
 				.responseInfo(

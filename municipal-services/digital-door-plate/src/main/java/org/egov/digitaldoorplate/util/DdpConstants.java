@@ -29,12 +29,17 @@ public class DdpConstants {
 
 	public static final String SYNC_STATUS_CREATED = "CREATED";
 
+	public static final String SYNC_STATUS_QUEUED = "QUEUED";
+
 	public static final String SYNC_STATUS_DUPLICATE = "DUPLICATE";
 
 	public static final String SYNC_STATUS_FAILED = "FAILED";
 
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
+
+	@Value("${kafka.topics.save.garbage.collection}")
+	private String saveGarbageCollectionTopic;
 
 	@Value("${egov.enc.host}")
 	private String encServiceHostUrl;

@@ -7,6 +7,7 @@ import org.egov.digitaldoorplate.model.GarbageCollection;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
 import org.egov.digitaldoorplate.repository.builder.GarbageCollectionQueryBuilder;
 import org.egov.digitaldoorplate.repository.rowmapper.GarbageCollectionRowMapper;
+import org.egov.digitaldoorplate.util.JsonbUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,9 @@ public class GarbageCollectionRepository {
 	@Autowired
 	private GarbageCollectionRowMapper rowMapper;
 
+	@Autowired
+	private JsonbUtil jsonbUtil;
+
 	public void create(GarbageCollection garbageCollection) {
 		jdbcTemplate.update(GarbageCollectionQueryBuilder.CREATE_QUERY,
 				garbageCollection.getUuid(),
@@ -34,6 +38,7 @@ public class GarbageCollectionRepository {
 				garbageCollection.getGarbageId(),
 				garbageCollection.getApplicationNo(),
 				garbageCollection.getPropertyId(),
+				garbageCollection.getWardNumber(),
 				garbageCollection.getIsResidentAvailable(),
 				garbageCollection.getWasteType(),
 				garbageCollection.getIsWasteKeptOutside(),
@@ -45,6 +50,7 @@ public class GarbageCollectionRepository {
 				garbageCollection.getClientRefId(),
 				garbageCollection.getSyncBatchUuid(),
 				garbageCollection.getRemarks(),
+				jsonbUtil.toPGobject(garbageCollection.getAdditionalDetails()),
 				garbageCollection.getIsActive(),
 				garbageCollection.getCreatedBy(),
 				garbageCollection.getCreatedDate(),
@@ -63,6 +69,7 @@ public class GarbageCollectionRepository {
 				garbageCollection.getLatitude(),
 				garbageCollection.getLongitude(),
 				garbageCollection.getRemarks(),
+				jsonbUtil.toPGobject(garbageCollection.getAdditionalDetails()),
 				garbageCollection.getIsActive(),
 				garbageCollection.getLastModifiedBy(),
 				garbageCollection.getLastModifiedDate(),
