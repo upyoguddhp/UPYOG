@@ -240,6 +240,7 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
+							syncTrackerWithDemandStatus(grbgBillTracker, generateBillRequest.getRequestInfo());
 
 							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
 									.grbgApplicationIds(Collections
@@ -1054,6 +1055,30 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
 		}
 		return trackers.get(0);
+	}
+	
+	private void syncTrackerWithDemandStatus(GrbgBillTracker tracker, RequestInfo requestInfo) {
+
+		List<Demand> demands = demandService.searchDemandbyDemandId(
+				tracker.getTenantId(),
+				Collections.singleton(tracker.getDemandId()), 
+				Collections.singleton(tracker.getGrbgApplicationId()), 
+				requestInfo, 
+				"GB"
+				);
+
+		if (CollectionUtils.isEmpty(demands)) {
+			return;
+		}
+
+		Demand demand = demands.get(0);
+
+		if (!Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
+			return;
+		}
+
+		tracker.setStatus("PAID");
+		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
 	}
 
 }
