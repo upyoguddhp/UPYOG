@@ -15,4 +15,6 @@ public class DdpVerificationCount {
     private Integer totalDdpVerified;
 
     private Integer remainingForDdpVerification;
+    
+    private Integer totalApprovedOwnerAccounts;
 }

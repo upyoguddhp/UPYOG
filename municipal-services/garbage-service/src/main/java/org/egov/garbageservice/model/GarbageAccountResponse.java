@@ -47,4 +47,10 @@ public class GarbageAccountResponse {
 
 	@JsonProperty("remainingForDdpVerification")
 	private Integer remainingForDdpVerification;
+	
+	@JsonProperty("totalApprovedOwnerAccounts")
+	private Integer totalApprovedOwnerAccounts;
+	
+	@JsonProperty("totalApprovedAccounts")
+	private Integer totalApprovedAccounts;
 }

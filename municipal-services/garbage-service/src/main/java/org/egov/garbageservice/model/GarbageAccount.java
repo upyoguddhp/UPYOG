@@ -34,6 +34,10 @@ public class GarbageAccount {
 	private String himParivarId;
 	
 	private Boolean isDdpVerified;
+	
+	private Boolean ddpPrintVerified;
+	
+	private Long ddpModifiedDate;
 
 	private String type;
 
@@ -59,6 +63,9 @@ public class GarbageAccount {
 	
 	@Builder.Default
 	private Boolean isOnlyWorkflowCall = false;
+	
+	@Builder.Default
+	private Boolean isDdpUpdateCall = false;
 
 	private String status;
 	
