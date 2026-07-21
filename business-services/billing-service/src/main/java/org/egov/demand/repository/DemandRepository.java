@@ -432,4 +432,15 @@ public class DemandRepository {
 
 		return paymentId;
 	}
+	
+	public void updateAdvanceCollectionAmount(DemandDetail advanceDetail) {
+
+	    String query = DemandQueryBuilder.DEMAND_DETAIL_COLLECTION_AMOUNT_UPDATE;
+
+	    jdbcTemplate.update(query,
+	            advanceDetail.getCollectionAmount(),
+	            advanceDetail.getAuditDetails().getLastModifiedBy(),
+	            advanceDetail.getAuditDetails().getLastModifiedTime(),
+	            advanceDetail.getId());
+	}
 }

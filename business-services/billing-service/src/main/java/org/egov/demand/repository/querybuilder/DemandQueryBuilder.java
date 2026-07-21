@@ -131,6 +131,12 @@ public class DemandQueryBuilder {
             "SET adjustedamount = amount " +
             "WHERE demanddetailid IN (" +
             "SELECT id FROM egbs_demanddetail_v1 WHERE demandid = ?)";
+	
+	public static final String DEMAND_DETAIL_COLLECTION_AMOUNT_UPDATE = "UPDATE egbs_demanddetail_v1 " +
+            "SET collectionamount = ?, " +
+            "    lastmodifiedby = ?, " +
+            "    lastmodifiedtime = ? " +
+            "WHERE id = ?";
 
 	public String getDemandQueryForConsumerCodes(Map<String,Set<String>> businessConsumercodeMap,List<Object> preparedStmtList, String tenantId){
 		
