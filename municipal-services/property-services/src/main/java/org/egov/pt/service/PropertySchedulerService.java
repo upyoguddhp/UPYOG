@@ -79,6 +79,7 @@ import org.egov.pt.web.contracts.alfresco.DmsResponse;
 import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.bill.DemandDetail;
 import org.egov.pt.models.BillIdRequest;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -1825,12 +1826,29 @@ public class PropertySchedulerService {
 		}
 
 		Demand demand = demands.get(0);
+		
+		BigDecimal totalTax = BigDecimal.ZERO;
+        BigDecimal totalCollection = BigDecimal.ZERO;
+       
+        for (DemandDetail detail : demand.getDemandDetails()) {
+            if (detail.getTaxAmount() != null) {
+                totalTax = totalTax.add(detail.getTaxAmount());
+            }
+ 
+            if (detail.getCollectionAmount() != null) {
+                totalCollection = totalCollection.add(detail.getCollectionAmount());
+            }
+        }
 
-		if (!Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
-			return;
-		}
+		if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
+            tracker.setBillStatus(BillStatus.PAID);
+        } else if (totalCollection.compareTo(BigDecimal.ZERO) > 0
+                && totalCollection.compareTo(totalTax) < 0) {
+            tracker.setBillStatus(BillStatus.ADVANCE_ADJUSTED);
+        } else {
+            return;
+        }
 
-		tracker.setBillStatus(BillStatus.PAID);
 		PtTaxCalculatorTrackerRequest updateRequest = enrichmentService.enrichTaxCalculatorTrackerUpdateRequest(tracker,requestInfo);
 		propertyService.updatePtTaxCalculatorTracker(updateRequest);
 	}

@@ -564,6 +564,7 @@ public class BillServicev2 {
 				BigDecimal minimumAmtPayableForBill = BigDecimal.ZERO;
 				List<Demand> demandsForSingleCode = consumerCodeAndDemands.getValue();
 				BusinessServiceDetail business = businessMap.get(demandsForSingleCode.get(0).getBusinessService());
+				BillStatus billStatus = BillStatus.ACTIVE;
 				
 				String billId = UUID.randomUUID().toString();
 				String billNumber = getBillNumbers(requestInfo, tenantId, demandForOneTenant.get(0).getBusinessService(), 1).get(0);
@@ -577,6 +578,11 @@ public class BillServicev2 {
 					billDetail.setId(billDetailId);
 					billDetails.add(billDetail);
 					billAmount = billAmount.add(billDetail.getAmount());
+					if (Boolean.FALSE.equals(demand.getIsPaymentCompleted()) && demand.getDemandDetails() != null
+							&& demand.getDemandDetails().stream().anyMatch(detail -> detail.getCollectionAmount() != null
+									&& detail.getCollectionAmount().compareTo(BigDecimal.ZERO) > 0)) {
+						billStatus = BillStatus.ADVANCE_ADJUSTED;
+					}
 				}
 				
 				if ((billAmount.compareTo(BigDecimal.ZERO) >= 0) || (billAmount.compareTo(BigDecimal.ZERO) < 0 && ADVANCE_ALLOWED_BUSINESS_SERVICES.contains(demands.get(0).getBusinessService()))) {
@@ -590,7 +596,7 @@ public class BillServicev2 {
 						.businessService(business.getCode())
 						.payerName(payer.getName())
 						.consumerCode(consumerCode)
-						.status(BillStatus.ACTIVE)
+						.status(billStatus)
 						.billDetails(billDetails)
 						.totalAmount(billAmount)
 						.userId(payer.getUuid())

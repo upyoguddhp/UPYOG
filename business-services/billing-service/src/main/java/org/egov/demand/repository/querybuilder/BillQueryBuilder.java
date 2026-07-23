@@ -21,7 +21,7 @@ public class BillQueryBuilder {
 	
 	public static final String REPLACE_STRING = "{replace}";
 	
-	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID') AND tenantId = ? ";
+	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID','ADVANCE_ADJUSTED') AND tenantId = ? ";
 	
 	public static final String BILL_CANCEL_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN('ACTIVE','EXPIRED') AND tenantId = ? ";
 
@@ -108,7 +108,7 @@ public class BillQueryBuilder {
 	        "status = ?, lastmodifiedby = ?, lastmodifieddate = ? " +
 	        "WHERE tenantid = ? " +
 	        "AND consumercode = ? " +
-	        "AND status = ?";
+	        "AND status IN (?, ?)";
 
 	public String getBillQuery(BillSearchCriteria billSearchCriteria, List<Object> preparedStatementValues){
 		

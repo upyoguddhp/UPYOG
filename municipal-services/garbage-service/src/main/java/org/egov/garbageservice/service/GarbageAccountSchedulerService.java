@@ -1073,11 +1073,28 @@ public class GarbageAccountSchedulerService {
 
 		Demand demand = demands.get(0);
 
-		if (!Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
-			return;
-		}
+		BigDecimal totalTax = BigDecimal.ZERO;
+        BigDecimal totalCollection = BigDecimal.ZERO;
+       
+        for (DemandDetail detail : demand.getDemandDetails()) {
+            if (detail.getTaxAmount() != null) {
+                totalTax = totalTax.add(detail.getTaxAmount());
+            }
+ 
+            if (detail.getCollectionAmount() != null) {
+                totalCollection = totalCollection.add(detail.getCollectionAmount());
+            }
+        }
 
-		tracker.setStatus("PAID");
+        if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
+            tracker.setStatus("PAID");
+        } else if (totalCollection.compareTo(BigDecimal.ZERO) > 0
+                && totalCollection.compareTo(totalTax) < 0) {
+            tracker.setStatus("ADVANCE_ADJUSTED");
+        } else {
+            return;
+        }
+        
 		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
 	}
 
