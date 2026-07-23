@@ -1,8 +1,5 @@
 package org.egov.hrms.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +7,6 @@ import org.egov.hrms.model.*;
 import org.egov.hrms.model.enums.EmployeeDocumentReferenceType;
 import org.egov.hrms.web.contract.User;
 import org.egov.tracer.model.CustomException;
-import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -49,11 +45,6 @@ public class EmployeeRowMapper implements ResultSetExtractor<List<Employee>> {
 						.employeeStatus(rs.getString("employee_status")).employeeType(rs.getString("employee_type")).auditDetails(auditDetails).reActivateEmployee(rs.getBoolean("employee_reactive"))
 						.jurisdictions(new ArrayList<Jurisdiction>()).assignments(new ArrayList<Assignment>()).user(new User())
 						.build();
-				
-				
-				JsonNode additionalDetail = fetchAdditionalDetailJson(rs, "employee_additionaldetail");
-				currentEmployee.setAdditionalDetail(additionalDetail);
-				
 			}
 			addChildrenToEmployee(rs, currentEmployee);
 			employeeMap.put(currentid, currentEmployee);
@@ -61,25 +52,6 @@ public class EmployeeRowMapper implements ResultSetExtractor<List<Employee>> {
 		
 		return new ArrayList<>(employeeMap.values());
 
-	}
-
-	private JsonNode fetchAdditionalDetailJson(ResultSet rs, String columnName) throws SQLException {
-		JsonNode additionalDetail = null;
-		PGobject pgObj = (PGobject) rs.getObject(columnName);
-		if(pgObj!=null){
-		    
-			try {
-				additionalDetail = mapper.readTree(pgObj.getValue());
-			} catch (JsonMappingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		    
-		}
-		return additionalDetail;
 	}
 	
 	/**

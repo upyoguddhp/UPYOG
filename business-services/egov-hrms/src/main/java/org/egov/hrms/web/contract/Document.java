@@ -1,6 +1,6 @@
 package org.egov.hrms.web.contract;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.egov.hrms.model.AuditDetails;
 

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -249,14 +249,14 @@ public class UserController {
 	
 	@PostMapping("/_login")
 	
-	public Object employeeUserLogin(@RequestBody LoginRequest loginRequest) {
-		if (StringUtils.isEmpty(loginRequest.getUserType())) {
-			throw new RuntimeException("Employee login failed.");
-		}
-
-		Object response = loginService.employeeUserLogin(loginRequest);
-		return response;
-	}
+//	public Object employeeUserLogin(@RequestBody LoginRequest loginRequest) {
+//		if (StringUtils.isEmpty(loginRequest.getUserType())) {
+//			throw new RuntimeException("Employee login failed.");
+//		}
+//
+//		Object response = loginService.employeeUserLogin(loginRequest);
+//		return response;
+//	}
 	
 	
 	@GetMapping("/login/_uuid")

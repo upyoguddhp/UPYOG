@@ -42,7 +42,7 @@ public class NonLoggedInUserUpdatePasswordRequest {
         return isEmpty(otpReference);
     }
 
-    public boolean isUsernameAbsent() {
+    public boolean isUserNameAbsent() {
         return isEmpty(userName);
     }
 
@@ -60,6 +60,6 @@ public class NonLoggedInUserUpdatePasswordRequest {
 
 
     private boolean isModelInvalid() {
-        return isOtpReferenceAbsent() || isUsernameAbsent() || isTenantIdAbsent() || isUserTypeAbsent() || isNewPasswordAbsent();
+        return isOtpReferenceAbsent() || isUserNameAbsent() || isTenantIdAbsent() || isUserTypeAbsent() || isNewPasswordAbsent();
     }
 }

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.user.domain.model.AuditDetails;
@@ -160,7 +159,7 @@ public class SsoService {
 			}
 		}
 
-		User user = User.builder().username(hpSsoValidateTokenResponse.getUsername())
+		User user = User.builder().userName(hpSsoValidateTokenResponse.getUsername())
 				.name(hpSsoValidateTokenResponse.getName()).mobileNumber(hpSsoValidateTokenResponse.getMobile())
 				.emailId(hpSsoValidateTokenResponse.getEmail())
 				.gender(Gender.valueOf(hpSsoValidateTokenResponse.getGender().toUpperCase())).dob(dob)
@@ -190,8 +189,8 @@ public class SsoService {
 
 			newUser = userInDb.get(0);
 			Boolean update = false;
-			if (!user.getUsername().equals(newUser.getUsername())) {
-				newUser.setUsername(user.getUsername());
+			if (!user.getUserName().equals(newUser.getUserName())) {
+				newUser.setUserName(user.getUserName());
 				update = true;
 			}
 			if (!Objects.equals(newUser.getName(), user.getName())) {
@@ -203,7 +202,7 @@ public class SsoService {
 				update = true;
 			}
 			if (update) {
-				userService.updateUsernameWithoutOtpValidation(newUser, null);
+				userService.updateUserNameWithoutOtpValidation(newUser, null);
 			}
 		}
 		if (userSso == null || userSso.getUserUuid() == null) {

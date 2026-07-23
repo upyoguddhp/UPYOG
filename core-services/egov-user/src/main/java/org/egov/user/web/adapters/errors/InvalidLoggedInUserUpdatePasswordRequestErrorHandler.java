@@ -82,7 +82,7 @@ public class InvalidLoggedInUserUpdatePasswordRequestErrorHandler implements
     }
 
     private void addUserIdMandatoryError(LoggedInUserUpdatePasswordRequest model, ArrayList<ErrorField> errorFields) {
-        if (!model.isUsernameAbsent()) {
+        if (!model.isUserNameAbsent()) {
             return;
         }
         final ErrorField errorField = ErrorField.builder()

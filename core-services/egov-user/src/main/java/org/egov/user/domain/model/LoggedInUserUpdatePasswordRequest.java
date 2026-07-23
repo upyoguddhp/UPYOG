@@ -22,13 +22,13 @@ public class LoggedInUserUpdatePasswordRequest {
     private String newPassword;
 
     public void validate() {
-        if (isUsernameAbsent() || isTenantAbsent() || isUserTypeAbsent() || isExistingPasswordAbsent() ||
+        if (isUserNameAbsent() || isTenantAbsent() || isUserTypeAbsent() || isExistingPasswordAbsent() ||
                 isNewPasswordAbsent()) {
             throw new InvalidLoggedInUserUpdatePasswordRequestException(this);
         }
     }
 
-    public boolean isUsernameAbsent() {
+    public boolean isUserNameAbsent() {
         return isEmpty(userName);
     }
 

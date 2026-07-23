@@ -1,28 +1,27 @@
 package org.egov.infra.mdms.config;
 
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-public class TLInterceptor extends HandlerInterceptorAdapter{
-	 @Override
-	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+@Component
+public class TLInterceptor implements HandlerInterceptor {
 
-	        String theMethod = request.getMethod();
+    @Override
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
 
-	        if (HttpMethod.GET.matches(theMethod) || HttpMethod.POST.matches(theMethod)) {
-	            // GET, POST methods are allowed
-	            return true;
-	        }
-	        else {
-	            // everything else is not allowed
-	            response.sendError(HttpStatus.METHOD_NOT_ALLOWED.value());
-	            return false;
-	        }
-	    }
+        String method = request.getMethod();
 
+        if (HttpMethod.GET.matches(method) || HttpMethod.POST.matches(method)) {
+            return true;
+        }
+
+        response.sendError(HttpStatus.METHOD_NOT_ALLOWED.value());
+        return false;
+    }
 }

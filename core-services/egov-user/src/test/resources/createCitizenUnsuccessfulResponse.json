@@ -17,7 +17,7 @@
       },
       {
         "code": "core-user.005",
-        "message": "Username is required",
+        "message": "UserName is required",
         "field": "User.username"
       },
       {

@@ -43,7 +43,7 @@ package org.egov.hrms.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.hrms.service.EmployeeService;
@@ -93,7 +93,7 @@ public class EmployeeController {
 	@PostMapping(value = "/_create")
 	@ResponseBody
 	public ResponseEntity<?> create(@RequestBody @Valid EmployeeRequest employeeRequest) {
-		validator.validateCreateEmployee(employeeRequest);
+//		validator.validateCreateEmployee(employeeRequest);
 		EmployeeResponse employeeResponse = employeeService.create(employeeRequest);
         return new ResponseEntity<>(employeeResponse, HttpStatus.ACCEPTED);
 	}

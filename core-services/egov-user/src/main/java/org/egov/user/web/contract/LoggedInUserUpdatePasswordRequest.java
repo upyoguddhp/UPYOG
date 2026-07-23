@@ -6,11 +6,13 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.user.config.UserServiceConstants;
 import org.egov.user.domain.model.enums.UserType;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
+
+
 @Builder
 @Getter
 @Setter
@@ -21,6 +23,7 @@ LoggedInUserUpdatePasswordRequest {
     private String existingPassword;
     private String newPassword;
 
+    
     @Pattern(regexp = UserServiceConstants.PATTERN_TENANT)
     @Size(max = 256)
     private String tenantId;
@@ -30,13 +33,13 @@ LoggedInUserUpdatePasswordRequest {
         return org.egov.user.domain.model.LoggedInUserUpdatePasswordRequest.builder()
                 .existingPassword(existingPassword)
                 .newPassword(newPassword)
-                .userName(getUsername())
+                .userName(getUserName())
                 .tenantId(tenantId)
                 .type(type)
                 .build();
     }
 
-    private String getUsername() {
+    private String getUserName() {
         return requestInfo == null || requestInfo.getUserInfo() == null ? null : requestInfo.getUserInfo().getUserName();
     }
 }

@@ -7,17 +7,13 @@ import org.egov.user.config.*;
 import org.egov.user.domain.model.Address;
 import org.egov.user.domain.model.Role;
 import org.egov.user.domain.model.User;
-import org.egov.user.domain.model.enums.*;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.SafeHtml;
-
+import org.egov.user.domain.model.enums.*; 
+import jakarta.validation.constraints.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 @Setter
 @Getter
@@ -28,11 +24,11 @@ public class UserRequest {
 
     private Long id;
 
-    @SafeHtml
+    
     @Size(max = 64)
     private String userName;
 
-    @SafeHtml
+   
     @Size(max = 5)
     private String salutation;
 
@@ -54,33 +50,32 @@ public class UserRequest {
     @Size(max = 128)
     private String emailId;
 
-    @SafeHtml
+    
     @Size(max = 50)
     private String altContactNumber;
 
-    @SafeHtml
     @Size(max = 10)
     private String pan;
 
-    @SafeHtml
+    
     @Size(max = 20)
     private String aadhaarNumber;
 
-    @SafeHtml
+
     @Size(max = 300)
     private String permanentAddress;
 
-    @SafeHtml
+
     @Pattern(regexp = UserServiceConstants.PATTERN_CITY)
     @Size(max = 50)
     private String permanentCity;
 
-    @SafeHtml
+    
     @Pattern(regexp = UserServiceConstants.PATTERN_PINCODE)
     @Size(max = 10)
     private String permanentPinCode;
 
-    @SafeHtml
+    
     @Size(max = 300)
     private String correspondenceAddress;
 
@@ -92,8 +87,8 @@ public class UserRequest {
     @Size(max = 10)
     private String correspondencePinCode;
     private Boolean active;
-
-    @SafeHtml
+    
+    
     @Size(max = 16)
     private String locale;
 
@@ -106,19 +101,19 @@ public class UserRequest {
     private String fatherOrHusbandName;
     private GuardianRelation relationship;
 
-    @SafeHtml
+    
     @Size(max = 36)
     private String signature;
 
-    @SafeHtml
+ 
     @Size(max = 32)
     private String bloodGroup;
 
-    @SafeHtml
+ 
     @Size(max = 36)
     private String photo;
 
-    @SafeHtml
+
     @Size(max = 300)
     private String identificationMark;
     private Long createdBy;
@@ -126,7 +121,7 @@ public class UserRequest {
     @Size(max = 64)
     private String password;
 
-    @SafeHtml
+
     private String otpReference;
     private Long lastModifiedBy;
 
@@ -136,7 +131,7 @@ public class UserRequest {
 
     private Set<RoleRequest> roles;
 
-    @SafeHtml
+
     @Size(max = 36)
     private String uuid;
 
@@ -153,7 +148,7 @@ public class UserRequest {
     public UserRequest(User user) {
 
         this.id = user.getId();
-        this.userName = user.getUsername();
+        this.userName = user.getUserName();
         this.salutation = user.getSalutation();
         this.name = user.getName();
         this.gender = user.getGender() != null ? user.getGender().toString() : null;
@@ -221,7 +216,7 @@ public class UserRequest {
                 .uuid(this.uuid)
                 .id(this.id)
                 .name(this.name)
-                .username(this.userName)
+                .userName(this.userName)
                 .salutation(this.salutation)
                 .mobileNumber(this.mobileNumber)
                 .emailId(this.emailId)

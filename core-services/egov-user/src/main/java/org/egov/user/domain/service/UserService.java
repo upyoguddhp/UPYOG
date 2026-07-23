@@ -31,9 +31,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+//import org.springframework.security.oauth2.common.OAuth2AccessToken;
+//import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+//import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -64,7 +64,7 @@ public class UserService {
     private boolean isEmployeeLoginOtpBased;
     private FileStoreRepository fileRepository;
     private EncryptionDecryptionUtil encryptionDecryptionUtil;
-    private TokenStore tokenStore;
+   // private TokenStore tokenStore;
 
     @Value("${egov.user.host}")
     private String userHost;
@@ -97,7 +97,7 @@ public class UserService {
     @Autowired
     private NotificationUtil notificationUtil;
 
-    public UserService(UserRepository userRepository, OtpRepository otpRepository, FileStoreRepository fileRepository,
+  /*  public UserService(UserRepository userRepository, OtpRepository otpRepository, FileStoreRepository fileRepository,
                        PasswordEncoder passwordEncoder, EncryptionDecryptionUtil encryptionDecryptionUtil, TokenStore tokenStore,
                        @Value("${default.password.expiry.in.days}") int defaultPasswordExpiryInDays,
                        @Value("${citizen.login.password.otp.enabled}") boolean isCitizenLoginOtpBased,
@@ -118,7 +118,7 @@ public class UserService {
         this.pwdMaxLength = pwdMaxLength;
         this.pwdMinLength = pwdMinLength;
 
-    }
+    }*/
 
     /**
      * get user By UserName And TenantId
@@ -246,9 +246,9 @@ public class UserService {
     }
 
     private void validateUserUniqueness(User user) {
-        if (userRepository.isUserPresent(user.getUsername(), getStateLevelTenantForCitizen(user.getTenantId(), user
+        if (userRepository.isUserPresent(user.getUserName(), getStateLevelTenantForCitizen(user.getTenantId(), user
                 .getType()), user.getType()))
-            throw new DuplicateUserNameException(UserSearchCriteria.builder().userName(user.getUsername()).type(user
+            throw new DuplicateUserNameException(UserSearchCriteria.builder().userName(user.getUserName()).type(user
                     .getType()).tenantId(user.getTenantId()).build());
     }
 
@@ -278,10 +278,10 @@ public class UserService {
 
     private void validateAndEnrichCitizen(User user) {
         log.info("Validating User........");
-        if (isCitizenLoginOtpBased && !StringUtils.isNumeric(user.getUsername()))
+        if (isCitizenLoginOtpBased && !StringUtils.isNumeric(user.getUserName()))
             throw new UserNameNotValidException();
         else if (isCitizenLoginOtpBased)
-            user.setMobileNumber(user.getUsername());
+            user.setMobileNumber(user.getUserName());
         if (!isCitizenLoginOtpBased)
             validatePassword(user.getPassword());
         user.setRoleToCitizen();
@@ -307,7 +307,7 @@ public class UserService {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.set("Authorization", "Basic ZWdvdi11c2VyLWNsaWVudDo=");
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("username", user.getUsername());
+            map.add("username", user.getUserName());
             if (!isEmpty(password))
                 map.add("password", password);
             else
@@ -317,7 +317,7 @@ public class UserService {
             map.add("tenantId", user.getTenantId());
             map.add("isInternal", "true");
             map.add("userType", user.getType().name());
-            log.info("Request " + user.getUsername(), user.getUsername());
+            log.info("Request " + user.getUserName(), user.getUserName());
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map,
                     headers);
             return restTemplate.postForEntity(userHost + "/user/oauth/token", request, Map.class).getBody();
@@ -384,7 +384,7 @@ public class UserService {
         return decryptedupdatedUserfromDB;
     }
 
-    public User updateUsernameWithoutOtpValidation(User user, RequestInfo requestInfo) {
+    public User updateUserNameWithoutOtpValidation(User user, RequestInfo requestInfo) {
         final User existingUser = getUserByUuid(user.getUuid());
 //        user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
 //        validateUserRoles(user);
@@ -393,20 +393,20 @@ public class UserService {
 //        user.setPassword(encryptPwd(user.getPassword()));
         /* encrypt */
         user = encryptionDecryptionUtil.encryptObject(user, "User", User.class);
-        userRepository.updateUsername(user, existingUser);
+        userRepository.updateUserName(user, existingUser);
 
         // If user is being unlocked via update, reset failed login attempts
-//        if (user.getAccountLocked() != null && !user.getAccountLocked() && existingUser.getAccountLocked())
-//            resetFailedLoginAttempts(user);
+       if (user.getAccountLocked() != null && !user.getAccountLocked() && existingUser.getAccountLocked())
+            resetFailedLoginAttempts(user);
 
         User encryptedUpdatedUserfromDB = getUserByUuid(user.getUuid());
         User decryptedupdatedUserfromDB = encryptionDecryptionUtil.decryptObject(encryptedUpdatedUserfromDB, "UserSelf", User.class, requestInfo);
         return decryptedupdatedUserfromDB;
     }
 
-    public void removeTokensByUser(User user) {
+/*    public void removeTokensByUser(User user) {
         Collection<OAuth2AccessToken> tokens = tokenStore.findTokensByClientIdAndUserName(USER_CLIENT_ID,
-                user.getUsername());
+                user.getUserName());
 
         for (OAuth2AccessToken token : tokens) {
             if (token.getAdditionalInformation() != null && token.getAdditionalInformation().containsKey("UserRequest")) {
@@ -414,7 +414,7 @@ public class UserService {
                     org.egov.user.web.contract.auth.User userInfo =
                             (org.egov.user.web.contract.auth.User) token.getAdditionalInformation().get(
                                     "UserRequest");
-                    if (user.getUsername().equalsIgnoreCase(userInfo.getUserName()) && user.getTenantId().equalsIgnoreCase(userInfo.getTenantId())
+                    if (user.getUserName().equalsIgnoreCase(userInfo.getUserName()) && user.getTenantId().equalsIgnoreCase(userInfo.getTenantId())
                             && user.getType().equals(UserType.fromValue(userInfo.getType())))
                         tokenStore.removeAccessToken(token);
                 }
@@ -422,7 +422,7 @@ public class UserService {
         }
 
     }
-
+*/
     /**
      * this api will validate whether user roles exist in Database or not
      *
@@ -557,6 +557,17 @@ public class UserService {
         } else
             return true;
     }
+    
+    /**
+     * Deactivate failed login attempts for provided user (contract User version)
+     *
+     * @param user whose failed login attempts are to be reset
+     */
+    public void resetFailedLoginAttempts(org.egov.user.web.contract.auth.User user) {
+        if (user != null && user.getUuid() != null)
+            userRepository.resetFailedLoginAttemptsForUser(user.getUuid());
+    }
+
 
     /**
      * Perform actions where a user login fails
@@ -569,14 +580,14 @@ public class UserService {
      * @param user      user whose failed login attempt to be handled
      * @param ipAddress IP address of remote
      */
-    public void handleFailedLogin(User user, String ipAddress, RequestInfo requestInfo) {
+    /*public void handleFailedLogin(User user, String ipAddress, RequestInfo requestInfo) {
         if (!Objects.isNull(user.getUuid())) {
             List<FailedLoginAttempt> failedLoginAttempts =
                     userRepository.fetchFailedAttemptsByUserAndTime(user.getUuid(),
                             System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(maxInvalidLoginAttemptsPeriod));
 
             if (failedLoginAttempts.size() + 1 >= maxInvalidLoginAttempts) {
-                User userToBeUpdated = user.toBuilder()
+                User userToBeUpdated = user.s()
                         .accountLocked(true)
                         .password(null)
                         .accountLockedDate(System.currentTimeMillis())
@@ -594,6 +605,7 @@ public class UserService {
                     System.currentTimeMillis(), true));
         }
     }
+    */
 
 
     /**
@@ -665,8 +677,8 @@ public class UserService {
             Map<String, String> fileStoreUrlList = null;
             try {
                 fileStoreUrlList = fileRepository.getUrlByFileStoreId(userList.get(0).getTenantId(), fileStoreIds);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
+            } catch (Exception e){
+                /// TODO Auto-generated catch block
 
                 log.error("Error while fetching fileStore url list: " + e.getMessage());
             }
@@ -699,5 +711,128 @@ public class UserService {
     public Object getLoginAccess(User user, String password) {
     	return getAccess(user, password);
     }
+    
+    /**
+     * Decrypt a user with proper user context for token generation
+     * CRITICAL FIX: Don't include encrypted fields in RequestInfo.userInfo for ABAC to work
+     */
+    public User decryptUserWithContext(User encryptedUser, org.egov.user.web.contract.auth.User authenticatedUser) {
+        if (encryptedUser == null) {
+            return null;
+        }
+
+        try {
+            // CRITICAL FIX: Create RequestInfo without encrypted fields
+            // The RequestInfo.userInfo should NOT contain encrypted data (userName, mobileNumber, emailId, name)
+            // because the egov-enc-service ABAC policy evaluator cannot work with encrypted data in RequestInfo.
+            // For CITIZEN users, userName and mobileNumber come from encrypted Redis token data.
+            // For EMPLOYEE users, these are already decrypted (which is why EMPLOYEE searches work).
+            // By only including non-encrypted identifiers (uuid, id, type, tenantId, roles),
+            // the ABAC policy can properly identify the user and validate "Self" purpose decryption.
+            RequestInfo requestInfo = RequestInfo.builder()
+                .action("token_generation")
+                .ts(System.currentTimeMillis())
+                .userInfo(org.egov.common.contract.request.User.builder()
+                    .uuid(authenticatedUser.getUuid())        // ✓ Not encrypted
+                    .id(authenticatedUser.getId())            // ✓ Not encrypted
+                    .type(authenticatedUser.getType())        // ✓ Not encrypted
+                    .tenantId(authenticatedUser.getTenantId()) // ✓ Not encrypted
+                    // REMOVED: .userName() - Can be encrypted for CITIZEN, causes ABAC to fail
+                    // REMOVED: .mobileNumber() - Can be encrypted for CITIZEN, causes ABAC to fail
+                    // REMOVED: .emailId() - Can be encrypted, causes ABAC to fail
+                    // REMOVED: .name() - Can be encrypted, causes ABAC to fail
+                    .roles(authenticatedUser.getRoles() != null ?
+                        authenticatedUser.getRoles().stream()
+                            .map(role -> org.egov.common.contract.request.Role.builder()
+                                .code(role.getCode())
+                                .name(role.getName())
+                                .tenantId(role.getTenantId()) // Added for proper ABAC evaluation
+                                .build())
+                            .collect(Collectors.toList()) : new ArrayList<>())
+                    .build())
+                .build();
+
+            // The encryption service expects a List<User>, not a single User
+            // Wrap in list, decrypt, then extract the single user (same pattern as searchUsers)
+            List<User> userList = Collections.singletonList(encryptedUser);
+            try {
+                log.info("Attempting decryption with null key using List<User> (same as searchUsers)");
+                List<User> decryptedUserList = encryptionDecryptionUtil.decryptObject(userList, "User", User.class, requestInfo);
+                User decryptedUser = decryptedUserList.get(0);
+                log.info("Successfully decrypted user with \"User\" key: {}", decryptedUser.getUserName());
+                return decryptedUser;
+            } catch (Exception e1) {
+                log.warn("Decryption with null key failed, trying with \"User\" key: {}", e1.getMessage());
+                try {
+                    List<User> decryptedUserList = encryptionDecryptionUtil.decryptObject(userList, null, User.class, requestInfo);
+                    User decryptedUser = decryptedUserList.get(0);
+                    return decryptedUser;
+                } catch (Exception e2) {
+                    log.warn("Both decryption attempts failed. User key error: {}, Auto-detect error: {}",
+                             e1.getMessage(), e2.getMessage());
+                    throw e2;
+                }
+            }
+
+        } catch (Exception e) {
+            log.warn("Failed to decrypt user with context, returning encrypted user: {}", e.getMessage());
+            return encryptedUser;
+        }
+    }
+    
+    /**
+     * get user By UserName And TenantId
+     *
+     * @param userName
+     * @param tenantId
+     * @return
+     */
+    public User getUniqueUser(String userName, String tenantId, UserType userType, RequestInfo requestInfo) {
+
+        UserSearchCriteria userSearchCriteria = UserSearchCriteria.builder()
+                .userName(userName)
+                .tenantId(getStateLevelTenantForCitizen(tenantId, userType))
+                .type(userType)
+                .build();
+
+        if (isEmpty(userName) || isEmpty(tenantId) || isNull(userType)) {
+            log.error("Invalid lookup, mandatory fields are absent");
+            throw new UserNotFoundException(userSearchCriteria);
+        }
+
+        /* encrypt here */
+
+        userSearchCriteria = encryptionDecryptionUtil.encryptObject(userSearchCriteria, "User", UserSearchCriteria.class);
+        log.info("userSearchCriteria"+ userSearchCriteria);
+        List<User> users = userRepository.findAll(userSearchCriteria);
+        log.info("users"+users);
+
+        if (users.isEmpty())
+            throw new UserNotFoundException(userSearchCriteria);
+        if (users.size() > 1)
+            throw new DuplicateUserNameException(userSearchCriteria);
+
+        /* decrypt here */
+        User user = users.get(0);
+
+        // Check if this is an authentication context where RequestInfo doesn't have user info
+        if (requestInfo != null && requestInfo.getUserInfo() == null) {
+            // For authentication scenarios, skip decryption to avoid circular dependency
+            // The user will be decrypted later in the process when we have proper context
+            log.info("Skipping decryption during authentication - no user context available");
+            return user;
+        }
+
+        try {
+            User decryptedUser = encryptionDecryptionUtil.decryptObject(user, "User", User.class, requestInfo);
+            log.info("decrypted user: {}", decryptedUser);
+            return decryptedUser;
+        } catch (Exception e) {
+            log.warn("Failed to decrypt user, returning encrypted user: {}", e.getMessage());
+            return user;
+        }
+    }
+    
+  
 
 }

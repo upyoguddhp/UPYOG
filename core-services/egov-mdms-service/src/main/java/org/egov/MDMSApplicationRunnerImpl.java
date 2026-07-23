@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import com.fasterxml.jackson.core.type.*;
 import org.apache.commons.io.*;
@@ -162,7 +162,7 @@ public class MDMSApplicationRunnerImpl {
 
     public void readMdmsConfigFiles(String masterConfigUrl) throws Exception {
         log.info("Loading master configs from: " + masterConfigUrl);
-        Resource resource = resourceLoader.getResource(masterConfigUrl);
+        Resource resource = resourceLoader.getResource("file:" + masterConfigUrl);
         InputStream inputStream = null;
         try {
             inputStream = resource.getInputStream();

@@ -8,7 +8,7 @@ public class EmployeeQueries {
 	public static final String HRMS_GET_EMPLOYEES = "SELECT employee.id as employee_id, employee.uuid as employee_uuid, employee.code as employee_code, "
 			+ "employee.dateOfAppointment as employee_doa, employee.employeestatus as employee_status, employeetype as employee_type, employee.active as employee_active, employee.reactivateemployee as employee_reactive, "
 			+ "employee.tenantid as employee_tenantid, employee.createdby as employee_createdby, employee.createddate as employee_createddate, "
-			+ "employee.lastmodifiedby as employee_lastmodifiedby, employee.lastmodifieddate as employee_lastmodifieddate, employee.additionaldetail as employee_additionaldetail, assignment.uuid as assignment_uuid, "
+			+ "employee.lastmodifiedby as employee_lastmodifiedby, employee.lastmodifieddate as employee_lastmodifieddate, assignment.uuid as assignment_uuid, "
 			+ "assignment.position as assignment_position, assignment.department as assignment_department, assignment.designation as assignment_designation, "
 			+ "assignment.fromdate as assignment_fromdate, assignment.todate as assignment_todate, assignment.govtordernumber as assignment_govtordernumber, "
 			+ "assignment.reportingto as assignment_reportingto, assignment.ishod as assignment_ishod, assignment.iscurrentassignment as assignment_iscurrentassignment, "
@@ -52,4 +52,6 @@ public class EmployeeQueries {
 	public static final String HRMS_GET_ASSIGNMENT = "select distinct(employeeid)  from eg_hrms_assignment assignment where assignment.tenantid notnull  ";
 
 	public static final String HRMS_COUNT_EMP_QUERY = "SELECT active, count(*) FROM eg_hrms_employee WHERE tenantid ";
+
+	public static final String HRMS_GET_UNASSIGNED_EMPLOYEES = "SELECT employee.uuid from eg_hrms_employee employee LEFT JOIN eg_hrms_assignment assignment ON employee.uuid = assignment.employeeid where assignment.employeeid is null";
 }

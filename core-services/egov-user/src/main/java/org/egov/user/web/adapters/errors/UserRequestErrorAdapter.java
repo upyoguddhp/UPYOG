@@ -27,7 +27,7 @@ public class UserRequestErrorAdapter implements ErrorAdapter<User> {
 
     private static final String USERNAME_MISSING_CODE = "core-user.005";
     private static final String USER_USERNAME = "User.username";
-    private static final String USERNAME_MISSING_ERROR = "Username is required";
+    private static final String USERNAME_MISSING_ERROR = "UserName is required";
 
     private static final String TENANT_MISSING_CODE = "core-user.TENANT_MANDATORY";
     private static final String TENANT_FIELD = "tenantId";
@@ -73,7 +73,7 @@ public class UserRequestErrorAdapter implements ErrorAdapter<User> {
         List<ErrorField> errorFields = new ArrayList<>();
         addTypeMissingError(user, errorFields);
         addMobileNumberMissingError(user, errorFields);
-        addUsernameMissingError(user, errorFields);
+        addUserNameMissingError(user, errorFields);
         addNameMissingError(user, errorFields);
         addTenantMissingError(user, errorFields);
         //addPasswordMissingError(user, errorFields);
@@ -142,8 +142,8 @@ public class UserRequestErrorAdapter implements ErrorAdapter<User> {
 		}
 	}*/
 
-    private void addUsernameMissingError(User user, List<ErrorField> errorFields) {
-        if (user.isUsernameAbsent()) {
+    private void addUserNameMissingError(User user, List<ErrorField> errorFields) {
+        if (user.isUserNameAbsent()) {
             errorFields.add(ErrorField.builder()
                     .code(USERNAME_MISSING_CODE).field(USER_USERNAME).message(USERNAME_MISSING_ERROR).build());
         }

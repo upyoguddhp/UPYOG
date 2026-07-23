@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.validator.routines.EmailValidator;
+//import org.apache.commons.collections.CollectionUtils;
+//import org.apache.commons.validator.routines.EmailValidator;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.internal.http2.ErrorCode;
@@ -63,12 +63,12 @@ public class LoginService {
 //		return authenticateUser(mobileNumber, password, tenantId, UserType.ENTERPRISE.name());
 //	}
 
-	public Object employeeUserLogin(LoginRequest loginRequest) {
+/*	public Object employeeUserLogin(LoginRequest loginRequest) {
 		String password = loginRequest.getPassword();
 		String emailId = StringUtils.EMPTY;
 		String mobileNumber = StringUtils.EMPTY;
-		String usernameValue = loginRequest.getUsername();
-		String finalUsername = StringUtils.EMPTY ;
+		String usernameValue = loginRequest.getUserName();
+		String finalUserName = StringUtils.EMPTY ;
 		UserType userType = UserType.fromValue(loginRequest.getUserType());
 		String tenantId = loginRequest.getTenantId();
 		List<User> users = null;
@@ -83,7 +83,7 @@ public class LoginService {
 					.skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
 			if (CollectionUtils.isNotEmpty(users)) {
-				finalUsername = users.get(0).getUsername();
+				finalUserName = users.get(0).getUserName();
 			}
 		} else if (usernameValue.matches(UserServiceConstants.PATTERN_MOBILE)) {
 			mobileNumber = usernameValue;
@@ -91,21 +91,21 @@ public class LoginService {
 					.tenantId(tenantId).skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
 			if (CollectionUtils.isNotEmpty(users)) {
-				finalUsername = users.get(0).getUsername();
+				finalUserName = users.get(0).getUserName();
 			}
 		} else {
 			UserSearchCriteria searchCriteria = UserSearchCriteria.builder().userName(usernameValue).tenantId(tenantId).type(userType)
 					.skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
 			if (CollectionUtils.isNotEmpty(users)) {
-				finalUsername = users.get(0).getUsername();
+				finalUserName = users.get(0).getUserName();
 			} else {
 				throw new RuntimeException("Unauthorized login.");
 			}
 		}
 
 		LinkedHashMap<String, LinkedHashMap<String, String>> authenticateUserResponse = (LinkedHashMap<String, LinkedHashMap<String, String>>) authenticateUser(
-				finalUsername, password, tenantId, userType.name(), skipTenantCheck);
+				finalUserName, password, tenantId, userType.name(), skipTenantCheck);
 
 		if (authenticateUserResponse.get("access_token") != null) {
 			User user = users.get(0);
@@ -116,7 +116,7 @@ public class LoginService {
 
 		return authenticateUserResponse;
 	}
-
+*/
 	private Object authenticateUser(String username, String password, String tenantId, String userType, Boolean skipTenantCheck) {
 
 		log.info("Fetch access token for register with login flow");

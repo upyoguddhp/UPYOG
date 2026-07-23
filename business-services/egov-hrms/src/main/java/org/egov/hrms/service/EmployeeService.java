@@ -43,8 +43,6 @@ package org.egov.hrms.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
@@ -126,7 +124,7 @@ public class EmployeeService {
 			employee.getUser().setPassword(null);
 		});
 		hrmsProducer.push(propertiesManager.getSaveEmployeeTopic(), employeeRequest);
-//		notificationService.sendNotification(employeeRequest, pwdMap);
+		notificationService.sendNotification(employeeRequest, pwdMap);
 		return generateResponse(employeeRequest);
 	}
 	
@@ -144,13 +142,18 @@ public class EmployeeService {
 		else
 			criteria.setIsActive(false);*/
         Map<String, User> mapOfUsers = new HashMap<String, User>();
-		if(!StringUtils.isEmpty(criteria.getPhone()) || !CollectionUtils.isEmpty(criteria.getRoles())) {
+		if(!StringUtils.isEmpty(criteria.getPhone())
+				|| !CollectionUtils.isEmpty(criteria.getRoles())
+				|| !CollectionUtils.isEmpty(criteria.getCodes())) {
             Map<String, Object> userSearchCriteria = new HashMap<>();
             userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_TENANTID,criteria.getTenantId());
             if(!StringUtils.isEmpty(criteria.getPhone()))
                 userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_MOBILENO,criteria.getPhone());
             if( !CollectionUtils.isEmpty(criteria.getRoles()) )
                 userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_ROLECODES,criteria.getRoles());
+			if (!CollectionUtils.isEmpty(criteria.getCodes())) {
+				userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_USERNAME, criteria.getCodes().get(0));
+			}
             UserResponse userResponse = userService.getUser(requestInfo, userSearchCriteria);
 			userChecked =true;
             if(!CollectionUtils.isEmpty(userResponse.getUser())) {
@@ -196,10 +199,13 @@ public class EmployeeService {
         log.info("Active employees are::" + employees.size() + "uuids are :::" + uuids);
 
 		if(!CollectionUtils.isEmpty(uuids)){
-            Map<String, Object> UserSearchCriteria = new HashMap<>();
-            UserSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_UUID,uuids);
+            Map<String, Object> userSearchCriteria = new HashMap<>();
+            userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_UUID,uuids);
+			userSearchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_TENANTID, criteria.getTenantId());
+			log.info("uuid is available {}", userSearchCriteria);
             if(mapOfUsers.isEmpty()){
-            UserResponse userResponse = userService.getUser(requestInfo, UserSearchCriteria);
+				log.info("searching in user service");
+            UserResponse userResponse = userService.getUser(requestInfo, userSearchCriteria);
 			if(!CollectionUtils.isEmpty(userResponse.getUser())) {
 				mapOfUsers = userResponse.getUser().stream()
 						.collect(Collectors.toMap(User :: getUuid, Function.identity()));
@@ -227,9 +233,11 @@ public class EmployeeService {
 			UserResponse response = userService.createUser(request);
 			User user = response.getUser().get(0);
 			employee.setId(user.getId());
+			//employee.setId(UUID.fromString(user.getUuid()).getMostSignificantBits());
 			employee.setUuid(user.getUuid());
 			employee.getUser().setId(user.getId());
 			employee.getUser().setUuid(user.getUuid());
+			employee.getUser().setUserServiceUuid(user.getUserServiceUuid());
 		}catch(Exception e) {
 			log.error("Exception while creating user: ",e);
 			log.error("request: "+request);
@@ -244,19 +252,15 @@ public class EmployeeService {
 	 * @param employee
 	 */
 	private void enrichUser(Employee employee) {
-		
-		if(StringUtils.isEmpty(employee.getCode())) {
-			employee.setCode(RandomStringUtils.randomAlphanumeric(8));
-		}
 		List<String> pwdParams = new ArrayList<>();
 		pwdParams.add(employee.getCode());
 		pwdParams.add(employee.getUser().getMobileNumber());
 		pwdParams.add(employee.getTenantId());
 		pwdParams.add(employee.getUser().getName().toUpperCase());
-		if (StringUtils.isEmpty(employee.getUser().getPassword())) {
+		if (propertiesManager.isAutoGeneratePassword()) {
 			employee.getUser().setPassword(hrmsUtils.generatePassword(pwdParams));
 		}
-		employee.getUser().setUsername(employee.getCode());
+		employee.getUser().setUserName(employee.getCode());
 		employee.getUser().setActive(true);
 		employee.getUser().setType(UserType.EMPLOYEE.toString());
 	}
@@ -280,11 +284,13 @@ public class EmployeeService {
 			if(null == jurisdiction.getIsActive())
 				jurisdiction.setIsActive(true);
 		});
-		employee.getAssignments().stream().forEach(assignment -> {
-			assignment.setId(UUID.randomUUID().toString());
-			assignment.setAuditDetails(auditDetails);
-			assignment.setPosition(getPosition());
-		});
+		if (employee.getAssignments() != null && !employee.getAssignments().isEmpty()) {
+			employee.getAssignments().stream().forEach(assignment -> {
+				assignment.setId(UUID.randomUUID().toString());
+				assignment.setAuditDetails(auditDetails);
+				assignment.setPosition(getPosition());
+			});
+		}
 		if(!CollectionUtils.isEmpty(employee.getServiceHistory())) {
 			employee.getServiceHistory().stream().forEach(serviceHistory -> {
 				serviceHistory.setId(UUID.randomUUID().toString());
@@ -384,7 +390,7 @@ public class EmployeeService {
 				.build();
 		Employee existingEmpData = existingEmployeesData.stream().filter(existingEmployee -> existingEmployee.getUuid().equals(employee.getUuid())).findFirst().get();
 
-		employee.getUser().setUsername(employee.getCode());
+		employee.getUser().setUserName(employee.getCode());
 		if(!employee.getIsActive())
 			employee.getUser().setActive(false);
 		else

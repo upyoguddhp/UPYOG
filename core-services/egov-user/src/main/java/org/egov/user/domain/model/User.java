@@ -1,4 +1,4 @@
-package org.egov.user.domain.model;
+	package org.egov.user.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -21,8 +21,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -40,7 +40,7 @@ public class User {
     @Pattern(regexp = UserServiceConstants.PATTERN_TENANT)
     @Size(max = 50)
     private String tenantId;
-    private String username;
+    private String userName;
     private String title;
     private String password;
     private String salutation;
@@ -108,7 +108,7 @@ public class User {
     }
 
     public void validateNewUser(boolean createUserValidateName) {
-        if (isUsernameAbsent()
+        if (isUserNameAbsent()
                 || (createUserValidateName && isNameAbsent())
                 || isMobileNumberAbsent()
                 || isActiveIndicatorAbsent()
@@ -167,8 +167,8 @@ public class User {
     }
 
     @JsonIgnore
-    public boolean isUsernameAbsent() {
-        return isEmpty(username);
+    public boolean isUserNameAbsent() {
+        return isEmpty(userName);
     }
 
     @JsonIgnore
@@ -192,7 +192,7 @@ public class User {
     }
 
     public void nullifySensitiveFields() {
-        username = null;
+        userName = null;
         type = null;
         mobileNumber = null;
         password = null;
