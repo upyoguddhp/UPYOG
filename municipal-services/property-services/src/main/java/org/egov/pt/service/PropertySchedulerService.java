@@ -481,13 +481,14 @@ public class PropertySchedulerService {
 
 						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
 						taxCalculatorTrackers.add(tracker);
-						syncTrackerWithDemandStatus(tracker, calculateTaxRequest.getRequestInfo());
+						syncTrackerWithBillStatus(tracker, billResponse.getBill().get(0), calculateTaxRequest.getRequestInfo());
 						try {
 							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
 									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
 									.billStatus(new HashSet<>(Arrays.asList(
 										    BillStatus.ACTIVE, 
-										    BillStatus.PARTIALLY_PAID
+										    BillStatus.PARTIALLY_PAID,
+										    BillStatus.ADVANCE_ADJUSTED
 										)))
 									.build();
 
@@ -1811,44 +1812,13 @@ public class PropertySchedulerService {
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
 	
-	private void syncTrackerWithDemandStatus(PtTaxCalculatorTracker tracker, RequestInfo requestInfo) {
+	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, Bill bill, RequestInfo requestInfo) {
 
-		List<Demand> demands = demandService.searchDemand(
-				tracker.getTenantId(),
-				Collections.singleton(tracker.getDemandId()), 
-				Collections.singleton(tracker.getPropertyId()),
-				requestInfo, 
-				"PROPERTY"
-				);
-
-		if (CollectionUtils.isEmpty(demands)) {
+		if (bill == null || bill.getStatus() == null) {
 			return;
 		}
-
-		Demand demand = demands.get(0);
 		
-		BigDecimal totalTax = BigDecimal.ZERO;
-        BigDecimal totalCollection = BigDecimal.ZERO;
-       
-        for (DemandDetail detail : demand.getDemandDetails()) {
-            if (detail.getTaxAmount() != null) {
-                totalTax = totalTax.add(detail.getTaxAmount());
-            }
- 
-            if (detail.getCollectionAmount() != null) {
-                totalCollection = totalCollection.add(detail.getCollectionAmount());
-            }
-        }
-
-		if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
-            tracker.setBillStatus(BillStatus.PAID);
-        } else if (totalCollection.compareTo(BigDecimal.ZERO) > 0
-                && totalCollection.compareTo(totalTax) < 0) {
-            tracker.setBillStatus(BillStatus.ADVANCE_ADJUSTED);
-        } else {
-            return;
-        }
-
+		tracker.setBillStatus(BillStatus.valueOf(bill.getStatus().name()));
 		PtTaxCalculatorTrackerRequest updateRequest = enrichmentService.enrichTaxCalculatorTrackerUpdateRequest(tracker,requestInfo);
 		propertyService.updatePtTaxCalculatorTracker(updateRequest);
 	}

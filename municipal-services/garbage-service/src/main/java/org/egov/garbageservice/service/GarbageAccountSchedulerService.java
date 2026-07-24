@@ -240,12 +240,12 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
-							syncTrackerWithDemandStatus(grbgBillTracker, generateBillRequest.getRequestInfo());
+							syncTrackerWithBillStatus(grbgBillTracker, billResponse.getBill().get(0));
 
 							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
-									.grbgApplicationIds(Collections
-											.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
-									.status(Collections.singleton("ACTIVE")).tenantId(garbageAccount.getTenantId())
+									.grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
+									.status(new HashSet<>(Arrays.asList("ACTIVE", "ADVANCE_ADJUSTED")))
+									.tenantId(garbageAccount.getTenantId())
 									.build();
 
 							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository
@@ -1057,44 +1057,12 @@ public class GarbageAccountSchedulerService {
 		return trackers.get(0);
 	}
 	
-	private void syncTrackerWithDemandStatus(GrbgBillTracker tracker, RequestInfo requestInfo) {
-
-		List<Demand> demands = demandService.searchDemandbyDemandId(
-				tracker.getTenantId(),
-				Collections.singleton(tracker.getDemandId()), 
-				Collections.singleton(tracker.getGrbgApplicationId()), 
-				requestInfo, 
-				"GB"
-				);
-
-		if (CollectionUtils.isEmpty(demands)) {
+	private void syncTrackerWithBillStatus(GrbgBillTracker tracker, Bill bill) {
+		if (bill == null || bill.getStatus() == null) {
 			return;
 		}
 
-		Demand demand = demands.get(0);
-
-		BigDecimal totalTax = BigDecimal.ZERO;
-        BigDecimal totalCollection = BigDecimal.ZERO;
-       
-        for (DemandDetail detail : demand.getDemandDetails()) {
-            if (detail.getTaxAmount() != null) {
-                totalTax = totalTax.add(detail.getTaxAmount());
-            }
- 
-            if (detail.getCollectionAmount() != null) {
-                totalCollection = totalCollection.add(detail.getCollectionAmount());
-            }
-        }
-
-        if (Boolean.TRUE.equals(demand.getIsPaymentCompleted())) {
-            tracker.setStatus("PAID");
-        } else if (totalCollection.compareTo(BigDecimal.ZERO) > 0
-                && totalCollection.compareTo(totalTax) < 0) {
-            tracker.setStatus("ADVANCE_ADJUSTED");
-        } else {
-            return;
-        }
-        
+		tracker.setStatus(bill.getStatus().name());
 		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
 	}
 

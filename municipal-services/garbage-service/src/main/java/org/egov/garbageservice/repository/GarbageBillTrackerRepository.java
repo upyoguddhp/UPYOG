@@ -210,7 +210,7 @@ public class GarbageBillTrackerRepository {
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
 		StringBuilder builder = new StringBuilder(UPDATE_BILL_TRACKER_STATUS);
-		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID') ");
+		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID' OR status = 'ADVANCE_ADJUSTED') ");
 
         Map<String, Object> updateTrackerStatus = new HashMap<>();
 
