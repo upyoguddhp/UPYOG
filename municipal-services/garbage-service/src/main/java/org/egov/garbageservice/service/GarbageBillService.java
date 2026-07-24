@@ -234,7 +234,7 @@ public class GarbageBillService {
 
 		GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria = GrbgBillTrackerSearchCriteria.builder()
 				.demandIds(Collections.singleton(demandId))
-				.status(new HashSet<>(Arrays.asList("ACTIVE")))
+				.status(new HashSet<>(Arrays.asList("ACTIVE", "ADVANCE_ADJUSTED")))
 				.build();
 
 		List<GrbgBillTracker> trackers = garbageAccountService.getBillCalculatedGarbageAccounts(grbgBillTrackerSearchCriteria);
@@ -256,7 +256,6 @@ public class GarbageBillService {
 				.billId(Collections.singleton(tracker.getBillId()))
 				.tenantId(cancleBillRequest.getTenantId())
 				.consumerCode(cancleBillRequest.getConsumerCode())
-				.status(StatusEnum.ACTIVE)
 				.build();
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, cancleBillRequest.getRequestInfo());
 

@@ -1078,7 +1078,7 @@ public class PropertyService {
 		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
 		        PtTaxCalculatorTrackerSearchCriteria.builder()
 		        .demandIds(Collections.singleton(demandId))
-		        .billStatus(Collections.singleton(BillStatus.ACTIVE))
+				.billStatus(new HashSet<>(Arrays.asList(BillStatus.ACTIVE, BillStatus.ADVANCE_ADJUSTED)))
 				.build();
 
 		List<PtTaxCalculatorTracker> trackers = repository.getTaxCalculatedProperties(trackerSearchCriteria);
