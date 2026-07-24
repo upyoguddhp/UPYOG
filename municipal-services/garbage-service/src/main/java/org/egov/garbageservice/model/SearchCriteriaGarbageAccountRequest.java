@@ -26,5 +26,7 @@ public class SearchCriteriaGarbageAccountRequest {
 	private Boolean isUserUuidNull;
 	
 	private Boolean isDdpVerified;
+	
+	private Boolean ddpPrintVerified;
 
 }

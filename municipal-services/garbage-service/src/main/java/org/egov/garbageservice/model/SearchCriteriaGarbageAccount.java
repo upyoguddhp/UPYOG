@@ -67,6 +67,8 @@ public class SearchCriteriaGarbageAccount {
     
     private Boolean isDdpVerified;
     
+    private Boolean ddpPrintVerified;
+    
     private Boolean isMonthlyBilling;
     
 	@Builder.Default
@@ -95,6 +97,7 @@ public class SearchCriteriaGarbageAccount {
 				.unitCategories(copyList(this.unitCategories))
 				.isUserUuidNull(this.isUserUuidNull)
 				.isDdpVerified(this.isDdpVerified)
+				.ddpPrintVerified(this.ddpPrintVerified)
 				.build();
 	}
 
