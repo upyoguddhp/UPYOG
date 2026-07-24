@@ -481,7 +481,6 @@ public class PropertySchedulerService {
 
 						PtTaxCalculatorTracker tracker = propertyService.saveToPtTaxCalculatorTracker(trackerRequest);
 						taxCalculatorTrackers.add(tracker);
-						syncTrackerWithBillStatus(tracker, billResponse.getBill().get(0), calculateTaxRequest.getRequestInfo());
 						try {
 							PtTaxCalculatorTrackerSearchCriteria prevCriteria = PtTaxCalculatorTrackerSearchCriteria
 									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
@@ -1810,17 +1809,6 @@ public class PropertySchedulerService {
 				                         .build());
 
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
-	}
-	
-	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, Bill bill, RequestInfo requestInfo) {
-
-		if (bill == null || bill.getStatus() == null) {
-			return;
-		}
-		
-		tracker.setBillStatus(BillStatus.valueOf(bill.getStatus().name()));
-		PtTaxCalculatorTrackerRequest updateRequest = enrichmentService.enrichTaxCalculatorTrackerUpdateRequest(tracker,requestInfo);
-		propertyService.updatePtTaxCalculatorTracker(updateRequest);
 	}
 
 }

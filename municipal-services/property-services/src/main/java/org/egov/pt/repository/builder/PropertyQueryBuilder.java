@@ -1320,7 +1320,7 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
 		builder.append(" WHERE 1 = 1 ");
-		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID' OR eptct.bill_status = 'ADVANCE_ADJUSTED') ");
 	
 		preparedStmtList.add(tracker.getBillStatus().name());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());

@@ -395,6 +395,12 @@ public class EnrichmentService {
 		AuditDetails createAuditDetails = propertyutil
 				.getAuditDetails(calculateTaxRequest.getRequestInfo().getUserInfo().getUuid().toString(), true);
 		Bill bill = bills.stream().findFirst().orElse(null);
+		BillStatus trackerStatus = BillStatus.ACTIVE;
+		
+		if (bill != null && bill.getStatus() != null) {
+		    trackerStatus = BillStatus.valueOf(bill.getStatus().name());
+		}
+		
 		PtTaxCalculatorTracker ptTaxCalculatorTracker = PtTaxCalculatorTracker.builder()
 				.uuid(UUID.randomUUID().toString()).propertyId(property.getPropertyId())
 				.tenantId(property.getTenantId()).financialYear(calculateTaxRequest.getFinancialYear())
@@ -404,7 +410,7 @@ public class EnrichmentService {
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
 				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
 				.type(calculateTaxRequest.getType())
-				.propertyTaxWithoutRebate(propertyTaxWithoutRebate).billStatus(BillStatus.ACTIVE)
+				.billStatus(trackerStatus)
 				.demandId(demandId)
 				.ward(ward)
 				.build();
