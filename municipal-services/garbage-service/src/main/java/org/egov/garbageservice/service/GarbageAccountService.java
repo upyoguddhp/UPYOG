@@ -99,6 +99,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.egov.garbageservice.model.DdpVerificationCount;
+import java.time.temporal.ChronoUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -655,9 +657,13 @@ public class GarbageAccountService {
 	}
 
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
+		
+		Boolean isDdpUpdateCall = updateGarbageRequest.getGarbageAccounts().get(0).getIsDdpUpdateCall();
 
-		// remove child garbage account if not in request
-		removeChildGarbageAccount(updateGarbageRequest);
+		// remove child garbage account if not in request and if not a Ddp Update Call
+		if (!isDdpUpdateCall) {
+			removeChildGarbageAccount(updateGarbageRequest);
+		}
 
 		// create child garbage account if new in request
 		createChildGarbageAccount(updateGarbageRequest);
@@ -676,6 +682,14 @@ public class GarbageAccountService {
 					Collectors.toMap(a -> a.getValue().getGrbgApplication().getApplicationNo(), b -> b.getValue()));
 		} catch (Exception e) {
 			throw new CustomException("FAILED_SEARCH_GARBAGE_ACCOUNTS", "Search Garbage account details failed.");
+		}
+		
+		if (Boolean.TRUE.equals(isDdpUpdateCall)) {
+		    Set<Long> validGarbageIds = validateDdpUpdateWindow(existingGarbageIdAccountsMap);
+		    updateGarbageRequest.getGarbageAccounts().removeIf(account -> !validGarbageIds.contains(account.getGarbageId()));
+		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
+		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
+		    }
 		}
 
 		// load garbage account from backend if workflow = true
@@ -1306,6 +1320,12 @@ public class GarbageAccountService {
 				if (child.getAdditionalDetail() == null) {
 	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
 	            }
+				if (child.getIsDdpVerified() == null) {
+					child.setIsDdpVerified(newGarbageAccount.getIsDdpVerified());
+				}
+				if (StringUtils.isBlank(child.getSystemPropertyId())) {
+					child.setSystemPropertyId(newGarbageAccount.getSystemPropertyId());
+				}
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
@@ -1376,6 +1396,10 @@ public class GarbageAccountService {
 		// update garbage account
 		garbageAccountRepository.update(newGarbageAccount);
 
+		if (Boolean.TRUE.equals(newGarbageAccount.getIsDdpUpdateCall())) {
+			garbageAccountRepository.updateDdpDetails(newGarbageAccount);
+		}
+
 	}
 
 	private Map<Long, GarbageAccount> searchGarbageAccountMap(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
@@ -1433,6 +1457,11 @@ public class GarbageAccountService {
 			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex) {
 
 		searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setUserType(searchCriteriaGarbageAccountRequest.getRequestInfo().getUserInfo().getType());
+		
+		if (searchCriteriaGarbageAccountRequest.getIsDdpVerified() != null) {
+			searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setIsDdpVerified(searchCriteriaGarbageAccountRequest.getIsDdpVerified());
+		}
+		
 		// validate search criteria
 		validateAndEnrichSearchGarbageAccount(searchCriteriaGarbageAccountRequest);
 
@@ -1504,7 +1533,7 @@ public class GarbageAccountService {
 			grbgAccs = garbageAccountRepository.searchGarbageAccount(
 					searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount(), garbageCriteriaMap);
 
-		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs);
+		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest);
 
 		if (CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			garbageAccountResponse.setResponseInfo(responseInfoFactory
@@ -1536,11 +1565,22 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 
 
-	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
+	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
 				.build();
 
+		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
+		Integer totalApprovedAccounts = garbageAccountRepository.getTotalApprovedActiveAccounts(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
+		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
+		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
+		garbageAccountResponse.setTotalApprovedOwnerAccounts(ddpCount.getTotalApprovedOwnerAccounts());
+		garbageAccountResponse.setTotalApprovedAccounts(totalApprovedAccounts);
+		
 		processResponse(garbageAccountResponse);
 
 		return garbageAccountResponse;
@@ -2858,5 +2898,23 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    );
 		
 		    garbageBillTrackerRepository.updatePenalty(tracker);
+		}
+		
+		private Set<Long> validateDdpUpdateWindow(Map<Long, GarbageAccount> existingGarbageAccountsMap) {
+
+			Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+			Set<Long> validGarbageIds = new HashSet<>();
+
+			for (GarbageAccount garbageAccount : existingGarbageAccountsMap.values()) {
+				Long ddpModifiedDate = garbageAccount.getDdpModifiedDate();
+				if (ddpModifiedDate == null || ddpModifiedDate <= 0) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+					continue;
+				}
+				if (!Instant.ofEpochMilli(ddpModifiedDate).isBefore(sevenDaysAgo)) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+				}
+			}
+			return validGarbageIds;
 		}
 }

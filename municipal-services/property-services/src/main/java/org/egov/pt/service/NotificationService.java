@@ -75,6 +75,7 @@ public class NotificationService {
 	private static final String AMOUNT_PLACEHOLDER = "{amount}";
 	private static final String BILL_NO_PLACEHOLDER = "{bill_no}";
 	private static final String RECIPINTS_NAME_PLACEHOLDER = "{recipients_name}";
+	private static final String FULL_OWNER_NAME_PLACEHOLDER = "{full_owner_name}";
 	private static final String PROPERTY_PAY_NOW_BILL_URL_PLACEHOLDER = "{property_pay_now_bill_url}";
 	private static final String PROPERTY_ADDRESS_PLACEHOLDER = "{property_address}";
 	private static final String PROPERTY_WARD_PLACEHOLDER = "{ward}";
@@ -719,8 +720,11 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 		JsonNode propertyAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
 		String propertyAddress = propertyAdditionalDetails.path("propertyAddress").asText();
 		String fathersName = "";
+		String coOwnerName = "";
+		
 		if (property.getOwners() != null && !property.getOwners().isEmpty()) {
 		    fathersName = property.getOwners().get(0).getFatherOrHusbandName();
+		    coOwnerName = property.getOwners().get(0).getCoOwnerName();
 		}
 
 	    body = body.replace(
@@ -729,15 +733,20 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	                    + monthFormat.format(tracker.getToDate())
 	    );
 
-	    String ownerName = bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText();
-	     
-	     body = body.replace(
-	             RECIPINTS_NAME_PLACEHOLDER,ownerName);
+		String ownerName = bill.getBillDetails().get(0).getAdditionalDetails().get("ownerName").asText();
+		
+		String fullOwnerName = ownerName;
 
-	    body = body.replace(
-	            PROPERTY_ID_PLACEHOLDER,
-	            property.getPropertyId()
-	    );
+		if (coOwnerName != null && !coOwnerName.trim().isEmpty()
+		        && !"null".equalsIgnoreCase(coOwnerName.trim())) {
+			fullOwnerName = ownerName + " & " + coOwnerName.trim();
+		}
+
+		body = body.replace(RECIPINTS_NAME_PLACEHOLDER, ownerName);
+		
+		body = body.replace(FULL_OWNER_NAME_PLACEHOLDER, fullOwnerName);
+
+		body = body.replace(PROPERTY_ID_PLACEHOLDER, property.getPropertyId());
 
 	    body = body.replace(
 	            BILL_NO_PLACEHOLDER,
@@ -772,7 +781,6 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 
 	    return body;
 	}
-
 	
 	public void sendSms(String message, String mobileNumber) {
 

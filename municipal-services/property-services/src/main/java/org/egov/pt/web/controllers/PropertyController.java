@@ -400,13 +400,7 @@ public class PropertyController {
 	@PostMapping("/_createArear")
 	public ResponseEntity<Map<String, Object>> createArear(
 			@Valid @RequestBody GenrateArrearRequest genrateArrearRequest) {
-
-		String message = propertyService.generateArrear(genrateArrearRequest);
-		ResponseInfo resInfo = responseInfoFactory
-				.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
-		Map<String, Object> response = new HashMap<>();
-		response.put("ResponseInfo", resInfo);
-		response.put("message", message);
+		Map<String, Object> response = propertyService.generateArrear(genrateArrearRequest);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	

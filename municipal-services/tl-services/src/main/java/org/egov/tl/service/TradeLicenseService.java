@@ -1484,10 +1484,7 @@ public class TradeLicenseService {
 		tlObject.put("userName",
 				null != requestInfo.getUserInfo() ? requestInfo.getUserInfo().getName() : null);// User Name
 		tlObject.put("approvalTime", approvalTime);// Approval Time
-		tlObject.put("ownerName",
-				!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getOwners())
-						? tradeLicense.getTradeLicenseDetail().getOwners().get(0).getName().toUpperCase()
-						: null);// Owner Name
+		tlObject.put("ownerName",tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("tradeOwnerName").asText());// Owner Name
 		// generate QR code from attributes
 		StringBuilder qr = new StringBuilder();
 		getQRCodeForPdfCreate(tlObject, qr);
