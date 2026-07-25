@@ -29,5 +29,11 @@ public class Constants {
 
     @Value(("${egov.sso.hp.validate.token.endpoint}"))
     private String ssoHpEndpoint;
+    
+    @Value(("${egov.csc.host}"))
+    private String cscHost;
+    
+    @Value(("${egov.csc.validate.token.endpoint}"))
+    private String cscEndpoint;
 
 }

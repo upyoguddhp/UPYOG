@@ -3,10 +3,10 @@ package org.egov.user.web.controller;
 import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -17,14 +17,15 @@ import org.egov.common.contract.response.ResponseInfo;
 import org.egov.user.domain.model.UpdateRequest;
 import org.egov.user.domain.model.UpdateResponse;
 import org.egov.user.domain.model.User;
-import org.egov.user.domain.model.enums.UserType;
 import org.egov.user.domain.model.UserDetail;
 import org.egov.user.domain.model.UserSearchCriteria;
+import org.egov.user.domain.service.CscConnectService;
 import org.egov.user.domain.service.LoginService;
 import org.egov.user.domain.service.SsoService;
 import org.egov.user.domain.service.TokenService;
 import org.egov.user.domain.service.UserService;
 import org.egov.user.web.contract.CreateUserRequest;
+import org.egov.user.web.contract.CscValidateToken;
 import org.egov.user.web.contract.LoginRequest;
 import org.egov.user.web.contract.UserDetailResponse;
 import org.egov.user.web.contract.UserRequest;
@@ -37,9 +38,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,6 +74,9 @@ public class UserController {
 
     @Autowired
     private LoginService loginService;
+    
+    @Autowired
+    private CscConnectService cscConnectService;
 
     @Autowired
     public UserController(UserService userService, TokenService tokenService) {
@@ -275,5 +278,13 @@ public class UserController {
 		Object loginResponse = userService.getLoginAccess(userModels.get(0), userModels.get(0).getPassword());
 		return new ResponseEntity<Object>(loginResponse, HttpStatus.OK);
 	}
+	
+	@PostMapping("/_cscLandingPage")
+	
+    private ResponseEntity<?> cscLandingPage(CscValidateToken token){
+ 
+    	ResponseEntity<?> response = cscConnectService.getCscValidateTokenResponse(token);
+    	return response;
+    }
 
 }
