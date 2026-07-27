@@ -240,7 +240,7 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
-							syncTrackerWithBillStatus(grbgBillTracker, billResponse.getBill().get(0));
+							syncTrackerWithBillStatus(grbgBillTracker, generateBillRequest);
 
 							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
 									.grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
@@ -1057,12 +1057,23 @@ public class GarbageAccountSchedulerService {
 		return trackers.get(0);
 	}
 	
-	private void syncTrackerWithBillStatus(GrbgBillTracker tracker, Bill bill) {
-		if (bill == null || bill.getStatus() == null) {
+	private void syncTrackerWithBillStatus(GrbgBillTracker tracker, GenerateBillRequest generateBillRequest) {
+		
+		if (tracker == null || tracker.getBillId() == null) {
 			return;
 		}
-
-		tracker.setStatus(bill.getStatus().name());
+		
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+                .tenantId(tracker.getTenantId())
+                .consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+                .billId(Collections.singleton(tracker.getBillId()))
+                .build();
+		
+		List<Bill> bill = billService
+							.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo())
+							.getBill();
+		
+		tracker.setStatus(bill.get(0).getStatus().name());
 		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
 	}
 

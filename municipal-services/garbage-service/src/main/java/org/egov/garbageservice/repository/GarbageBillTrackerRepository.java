@@ -51,7 +51,7 @@ public class GarbageBillTrackerRepository {
 			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:demandId,:type,:additionaldetail::JSONB)";
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
-		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
+		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime, advance_paid = :advancePaid ";
 
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
@@ -232,6 +232,7 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
         updateTrackerStatus.put("lastModifiedTime", grbgBillTracker.getAuditDetails().getLastModifiedDate());
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
+        updateTrackerStatus.put("advancePaid", grbgBillTracker.getAdvancePaid());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
 	}

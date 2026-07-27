@@ -1318,13 +1318,14 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
 	
-		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ?, advance_paid = ? ");
 		builder.append(" WHERE 1 = 1 ");
 		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID' OR eptct.bill_status = 'ADVANCE_ADJUSTED') ");
 	
 		preparedStmtList.add(tracker.getBillStatus().name());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+		preparedStmtList.add(tracker.getAdvancePaid());
 	
 		if (tracker.getDemandId() != null) {
 			builder.append(" AND eptct.demand_id = ? ");

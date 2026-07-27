@@ -46,4 +46,5 @@ public class PtTaxCalculatorTracker {
 	private String type = "CYCLIC";
 	private String demandId;
 	private String ward;
+	private BigDecimal advancePaid;
 }

@@ -39,5 +39,6 @@ public class GrbgBillTracker {
 	private BigDecimal penaltyAmount;
 	private BigDecimal rebateAmount;
 	private BigDecimal garbageBillWithoutRebate;
+	private BigDecimal advancePaid;
 
 }
