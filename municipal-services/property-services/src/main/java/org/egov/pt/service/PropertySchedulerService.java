@@ -521,6 +521,7 @@ public class PropertySchedulerService {
 							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(),
 									ex);
 						}
+						syncTrackerWithBillStatus(tracker, calculateTaxRequest);
 
 						// Notification
 						try {
@@ -1809,6 +1810,28 @@ public class PropertySchedulerService {
 				                         .build());
 
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
+	}
+	
+	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, CalculateTaxRequest calculateTaxRequest) {
+		
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+		
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+                .tenantId(tracker.getTenantId())
+                .consumerCode(Collections.singleton(tracker.getPropertyId()))
+                .service("PROPERTY")
+                .billId(Collections.singleton(tracker.getBillId()))
+                .build();
+		
+		List<Bill> bill = billService
+							.searchBill(billSearchCriteria, calculateTaxRequest.getRequestInfo())
+							.getBill();
+		
+		tracker.setBillStatus(BillStatus.valueOf(bill.get(0).getStatus().name()));
+		
+     	propertyService.UpdatePtTrackerStatus(tracker);
 	}
 
 }

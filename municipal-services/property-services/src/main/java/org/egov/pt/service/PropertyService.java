@@ -1713,6 +1713,9 @@ public class PropertyService {
 	    return ResponseEntity.ok(response);
 	}
 
+	public void UpdatePtTrackerStatus(PtTaxCalculatorTracker tracker) {
+		repository.updateStatus(tracker);
+	}
 
 
 }
