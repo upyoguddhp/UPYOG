@@ -521,7 +521,6 @@ public class PropertySchedulerService {
 							log.error("Failed to expire previous trackers for property {}", property.getPropertyId(),
 									ex);
 						}
-						syncTrackerWithBillStatus(tracker, calculateTaxRequest);
 
 						// Notification
 						try {
@@ -575,6 +574,7 @@ public class PropertySchedulerService {
 						} catch (Exception e) {
 							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
 						}
+						syncTrackerWithBillStatus(tracker, calculateTaxRequest);
 					}
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
@@ -590,6 +590,7 @@ public class PropertySchedulerService {
 		int skipped = skippedCount.get();
 
 		String message = null;
+		
 
 		if (generatedCount > 0 && skipped > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Property Id(s). Failed for " + skipped
