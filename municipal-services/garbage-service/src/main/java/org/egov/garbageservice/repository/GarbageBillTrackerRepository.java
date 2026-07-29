@@ -52,6 +52,10 @@ public class GarbageBillTrackerRepository {
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
 		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime, advance_paid = :advancePaid ";
+	
+	private static final String UPDATE_TRACKER_ADDITIONAL_DETAIL = "UPDATE eg_grbg_bill_tracker "
+			+ "SET additionaldetail = CAST(:additionalDetail AS jsonb), " + "last_modified_by = :lastModifiedBy, "
+			+ "last_modified_time = :lastModifiedTime " + "WHERE bill_id = :billId";
 
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
@@ -237,12 +241,24 @@ public class GarbageBillTrackerRepository {
 //		return builder.toString();
 	}
 	
-	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {
+	public int updateTrackerAdditionalDetails(GrbgBillTracker tracker) {
+
+	    Map<String, Object> params = new HashMap<>();
+
+	    params.put("billId", tracker.getBillId());
+	    params.put("additionalDetail", tracker.getAdditionaldetail().toString());
+	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
+	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(UPDATE_TRACKER_ADDITIONAL_DETAIL,params);
+	}
+	
+	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails, String status) {
 
 		String query = ACTIVATE_PREVIOUS_TRACKER;
 
 		Map<String, Object> params = new HashMap<>();
-		params.put("status", "ACTIVE");
+		params.put("status", status);
 		params.put("billId", billId);
 		params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
 		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());

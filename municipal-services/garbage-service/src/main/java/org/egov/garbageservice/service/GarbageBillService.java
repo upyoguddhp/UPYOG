@@ -300,10 +300,16 @@ public class GarbageBillService {
 					.status(StatusEnum.EXPIRED)
 					.consumerCode(cancleBillRequest.getConsumerCode())
 					.build();
+			
+			boolean wasAdvanceAdjusted = previousTracker.getAdditionaldetail() != null
+					&& previousTracker.getAdditionaldetail().path("advanceAdjusted").asBoolean(false);
+			
+			Bill.StatusEnum billStatus = wasAdvanceAdjusted ? Bill.StatusEnum.ADVANCE_ADJUSTED : Bill.StatusEnum.ACTIVE;
+			
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancleBillRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
-				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				prevBill.setStatus(billStatus);
 				
 				long newExpiryDate = java.time.Instant.now()
 				        .plus(30, java.time.temporal.ChronoUnit.DAYS)
@@ -317,16 +323,11 @@ public class GarbageBillService {
 
 				billService.updateBill(cancleBillRequest.getRequestInfo(), Collections.singletonList(prevBill));
 			}
-			
-			GrbgBillTracker updatedPrevTracker = GrbgBillTracker.builder()
-					.billId(previousTracker.getBillId())
-		            .status("ACTIVE")
-		            .auditDetails(grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo()))
-		            .build();
 
 			trackerRepository.activatePreviousTrackerByBillId(
 			        previousTracker.getBillId(),
-			        grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo())
+			        grbgUtils.buildCreateAuditDetails(cancleBillRequest.getRequestInfo()),
+			        billStatus.name()
 			);
 		}
 
