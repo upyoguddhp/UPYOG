@@ -1830,8 +1830,22 @@ public class PropertySchedulerService {
 							.searchBill(billSearchCriteria, calculateTaxRequest.getRequestInfo())
 							.getBill();
 		
-		tracker.setBillStatus(BillStatus.valueOf(bill.get(0).getStatus().name()));
+		Bill currentBill = bill.get(0);
 		
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+			JsonNode additionalDetails = tracker.getAdditionalDetails();
+
+			if (additionalDetails != null && additionalDetails.isArray() && additionalDetails.size() > 0) {
+
+				ObjectNode firstObject = (ObjectNode) additionalDetails.get(0);
+				firstObject.put("advanceAdjusted", true);
+
+				tracker.setAdditionalDetails(additionalDetails);
+				repository.updateTrackerAdditionalDetails(tracker);
+			}
+		}
+		
+		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
      	propertyService.UpdatePtTrackerStatus(tracker);
 	}
 

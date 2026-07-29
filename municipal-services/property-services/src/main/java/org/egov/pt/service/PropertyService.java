@@ -1155,17 +1155,24 @@ public class PropertyService {
 					.tenantId(cancelRequest.getTenantId())
 					.status(StatusEnum.EXPIRED)
 					.build();
+			
+			boolean wasAdvanceAdjusted = previousTracker.getAdditionalDetails() != null
+					&& previousTracker.getAdditionalDetails().isArray() && previousTracker.getAdditionalDetails().size() > 0
+					&& previousTracker.getAdditionalDetails().get(0).path("advanceAdjusted").asBoolean(false);
+
+			Bill.StatusEnum billStatus = wasAdvanceAdjusted ? Bill.StatusEnum.ADVANCE_ADJUSTED : Bill.StatusEnum.ACTIVE;
+			
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
 
-				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				prevBill.setStatus(billStatus);
 				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
 
 				AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 				PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
 					    .uuid(previousTracker.getUuid())
-					    .billStatus(BillStatus.ACTIVE)
+					    .billStatus(BillStatus.valueOf(billStatus.name()))
 					    .auditDetails(prevAudit)
 					    .rebateAmount(previousTracker.getRebateAmount())           
 					    .penaltyAmount(previousTracker.getPenaltyAmount())         

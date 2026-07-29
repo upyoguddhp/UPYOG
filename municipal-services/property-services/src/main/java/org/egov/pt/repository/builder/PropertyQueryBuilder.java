@@ -1340,6 +1340,27 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 		return builder.toString();
 	}
 	
+	public String getUpdateAdditionalDetailsQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+
+		builder.append(" SET additionaldetails = CAST(? AS jsonb), ");
+		builder.append(" lastmodifiedby = ?, ");
+		builder.append(" lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+
+		preparedStmtList.add(tracker.getAdditionalDetails().toString());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+
+		if (tracker.getBillId() != null) {
+			builder.append(" AND eptct.bill_id = ? ");
+			preparedStmtList.add(tracker.getBillId());
+		}
+
+		return builder.toString();
+	}
+	
 	public String getExpireActiveTrackersByPropertyIdQuery() {
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
 	}
