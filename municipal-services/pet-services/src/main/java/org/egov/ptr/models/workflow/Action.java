@@ -3,11 +3,11 @@ package org.egov.ptr.models.workflow;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import org.egov.ptr.models.AuditDetails;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +23,7 @@ import lombok.ToString;
 
 @ApiModel(description = "A Object holds the basic data for a Action in workflow")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
 
 @Getter
 @Setter
@@ -35,27 +35,27 @@ import lombok.ToString;
 public class Action {
 
 	@Size(max = 256)
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("uuid")
 	private String uuid;
 
 	@Size(max = 256)
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("tenantId")
 	private String tenantId;
 
 	@Size(max = 256)
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("currentState")
 	private String currentState;
 
 	@Size(max = 256)
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("action")
 	private String action;
 
 	@Size(max = 256)
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("nextState")
 	private String nextState;
 

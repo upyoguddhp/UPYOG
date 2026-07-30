@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.asset.config.AssetConfiguration;
 import org.egov.asset.repository.ServiceRequestRepository;

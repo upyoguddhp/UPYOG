@@ -1,6 +1,6 @@
 package org.egov.wf.web.controllers;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.wf.service.WorkflowInboxService;
 import org.egov.wf.web.models.RequestInfoWrapper;

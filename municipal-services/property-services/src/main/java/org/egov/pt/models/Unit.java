@@ -2,10 +2,10 @@ package org.egov.pt.models;
 
 import java.math.BigDecimal;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 
 /**
  * Unit
@@ -31,11 +31,11 @@ import org.hibernate.validator.constraints.SafeHtml;
 @EqualsAndHashCode(of = { "id" })
 public class Unit {
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("id")
 	private String id;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("tenantId")
 	private String tenantId;
 
@@ -43,16 +43,16 @@ public class Unit {
 	@JsonProperty("floorNo")
 	private Integer floorNo;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("unitType")
 	private String unitType;
 
 	@JsonProperty("usageCategory")
-	@SafeHtml
+	@CustomSafeHtml
 	@NotNull
 	private String usageCategory;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("occupancyType")
 	private String occupancyType;
 

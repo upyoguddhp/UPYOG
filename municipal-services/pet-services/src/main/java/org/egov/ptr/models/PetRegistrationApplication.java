@@ -14,8 +14,8 @@ import org.egov.ptr.models.Applicant;
 import org.egov.ptr.models.AuditDetails;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.Builder;
  */
 @ApiModel(description = "A Object holds the basic data for a Pet Registration Application")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2023-08-20T09:30:27.617+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2023-08-20T09:30:27.617+05:30")
 
 @Getter
 @Setter

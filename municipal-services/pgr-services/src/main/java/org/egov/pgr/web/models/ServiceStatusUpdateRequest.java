@@ -1,10 +1,10 @@
 package org.egov.pgr.web.models;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +21,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "Request object to fetch the report data")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-15T11:35:33.568+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-15T11:35:33.568+05:30")
 
 @Getter
 @Setter
@@ -35,17 +35,17 @@ public class ServiceStatusUpdateRequest {
 	private RequestInfo requestInfo;
 
 	@NotNull
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("tenantId")
 	private String tenantId;
 
 	@NotNull
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("serviceRequestId")
 	private String serviceRequestId;
 
 	@NotNull
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("applicationStatus")
 	private String applicationStatus;
 	

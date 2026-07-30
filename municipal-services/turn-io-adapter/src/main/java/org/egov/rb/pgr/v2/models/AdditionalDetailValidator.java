@@ -1,8 +1,8 @@
 package org.egov.rb.pgr.v2.models;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 
 public class AdditionalDetailValidator  implements ConstraintValidator<CharacterConstraint, Object> {
 

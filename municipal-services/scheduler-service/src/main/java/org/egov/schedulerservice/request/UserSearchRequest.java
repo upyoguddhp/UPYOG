@@ -3,7 +3,7 @@ package org.egov.schedulerservice.request;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.egov.common.contract.request.RequestInfo;
 

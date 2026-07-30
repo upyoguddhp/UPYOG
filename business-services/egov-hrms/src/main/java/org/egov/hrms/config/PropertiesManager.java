@@ -71,6 +71,18 @@ public class PropertiesManager {
 	@Value("${egov.user.update.endpoint}")
 	public String userUpdateEndpoint;
 
+	@Value("${egov.individual.host}")
+	public String individualHost;
+
+	@Value("${egov.individual.create.endpoint}")
+	public String individualCreateEndpoint;
+
+	@Value("${egov.individual.update.endpoint}")
+	public String individualUpdateEndpoint;
+
+	@Value("${egov.individual.search.endpoint}")
+	public String individualSearchEndpoint;
+
 	@Value("${egov.localization.host}")
 	public String localizationHost;
 	
@@ -117,21 +129,6 @@ public class PropertiesManager {
 	@Value("${decryption.abac.enable}")
 	private Boolean isDecryptionEnable;
 
-//	@Value("${egov.individual.host}")
-//	private String individualHost;
-//
-//	@Value("${egov.individual.create.endpoint}")
-//	private String individualCreateEndpoint;
-//
-//	@Value("${egov.individual.update.endpoint}")
-//	private String individualUpdateEndpoint;
-//
-//	@Value("${egov.individual.delete.endpoint}")
-//	private String individualDeleteEndpoint;
-//
-//	@Value("${egov.individual.search.endpoint}")
-//	private String individualSearchEndpoint;
-	
 	@Value("${egov.wf.host}")
 	private String wfHost;
 

@@ -2,7 +2,7 @@ package org.egov.pt.web.contracts;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.pt.models.bill.Demand.StatusEnum;
 

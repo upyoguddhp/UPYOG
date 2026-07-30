@@ -1,6 +1,6 @@
 package org.egov.garbageservice.model.contract;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.garbageservice.enums.Status;
 import org.egov.garbageservice.model.AuditDetails;

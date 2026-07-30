@@ -2,7 +2,7 @@ package org.egov.pgr.web.models.workflow;
 
 import java.util.List;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.egov.common.contract.request.RequestInfo;
 

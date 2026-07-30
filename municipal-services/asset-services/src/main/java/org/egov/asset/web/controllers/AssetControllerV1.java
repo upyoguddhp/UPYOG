@@ -3,7 +3,7 @@ package org.egov.asset.web.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.asset.dto.AssetDTO;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import digit.models.coremodels.RequestInfoWrapper;
 import io.swagger.annotations.ApiParam;
 
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
 
 @Controller
 @RequestMapping("/v1/assets")

@@ -3,7 +3,7 @@ package org.egov.asset.web.models;
 import java.util.List;
 
 import javax.persistence.Transient;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.asset.dto.AssetDTO;
 import org.egov.asset.web.models.workflow.ProcessInstance;

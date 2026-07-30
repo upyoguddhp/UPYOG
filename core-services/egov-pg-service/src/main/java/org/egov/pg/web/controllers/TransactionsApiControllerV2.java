@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.pg.models.Transaction;
 import org.egov.pg.service.GatewayService;

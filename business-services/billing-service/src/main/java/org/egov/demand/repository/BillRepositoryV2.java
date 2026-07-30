@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.egov.common.contract.request.RequestInfo;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.demand.model.AuditDetails;
 import org.egov.demand.model.BillAccountDetailV2;

@@ -3,7 +3,7 @@ package org.egov.fsm.plantmapping.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.fsm.plantmapping.service.PlantMappingService;
 import org.egov.fsm.plantmapping.web.model.PlantMapping;

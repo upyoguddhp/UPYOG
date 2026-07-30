@@ -4,7 +4,7 @@ package org.egov.swcalculation.web.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.swcalculation.service.DemandService;
 import org.egov.swcalculation.service.SWCalculationService;

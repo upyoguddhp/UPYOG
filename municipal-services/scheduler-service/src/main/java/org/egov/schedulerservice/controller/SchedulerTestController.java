@@ -2,7 +2,7 @@ package org.egov.schedulerservice.controller;
 
 import java.lang.reflect.Method;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.schedulerservice.call.Scheduler;

@@ -2,9 +2,9 @@ package org.egov.demand.model;
 
 import java.util.Set;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import org.egov.demand.model.BillV2.BillStatus;
 

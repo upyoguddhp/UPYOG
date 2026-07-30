@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.6.RELEASE</version>
+		<version>3.2.2</version>
 	</parent>
 	<groupId>org.egov</groupId>
 	<artifactId>fsm-calculator</artifactId>
@@ -16,7 +16,7 @@
 
 	<properties>
 		<log4j2.version>2.17.1</log4j2.version>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
@@ -86,10 +86,10 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-		</dependency>
+		 <dependency> 
+			<groupId>org.springframework.boot</groupId> 
+			<artifactId>spring-boot-starter-validation</artifactId> 
+		</dependency> 
 		<!--#SM-1275 Vulnerability alert for the egovernments organization,So replace 
 			the current version with existing version -->
 

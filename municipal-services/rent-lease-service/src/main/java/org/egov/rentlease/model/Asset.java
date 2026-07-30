@@ -3,7 +3,7 @@ package org.egov.rentlease.model;
 import java.beans.Transient;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +23,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "An object representing an asset")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
 
 @Getter
 @Setter

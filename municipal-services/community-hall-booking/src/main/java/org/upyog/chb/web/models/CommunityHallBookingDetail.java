@@ -3,9 +3,9 @@ package org.upyog.chb.web.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 import org.upyog.chb.web.models.workflow.ProcessInstance;
@@ -24,7 +24,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "Details for new booking of community halls")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-19T11:17:29.419+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-19T11:17:29.419+05:30")
 @Getter
 @Setter
 @AllArgsConstructor

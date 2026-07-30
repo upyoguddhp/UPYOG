@@ -9,9 +9,9 @@ import org.egov.domain.model.MessageIdentity;
 import org.egov.domain.model.Tenant;
 import org.hibernate.validator.constraints.SafeHtml;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 

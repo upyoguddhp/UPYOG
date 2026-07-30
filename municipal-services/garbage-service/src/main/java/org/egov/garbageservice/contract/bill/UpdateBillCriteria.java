@@ -2,7 +2,7 @@ package org.egov.garbageservice.contract.bill;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.garbageservice.contract.bill.Demand.StatusEnum;
 

@@ -1,8 +1,8 @@
 package org.egov.pdf.model;
 
 import java.util.List;
-import javax.validation.Valid;
-import org.hibernate.validator.constraints.SafeHtml;
+import jakarta.validation.Valid;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -20,19 +20,19 @@ import lombok.NoArgsConstructor;
 public class BuildingDownloadSearchCriteria {
 
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("Status")
 	private List<String> Status = null;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("businessService")
 	private String businessService = null;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("applicationType")
 	private String applicationType = null; 
 

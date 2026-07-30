@@ -1,6 +1,6 @@
 package org.egov.rentlease.contract.bill;
 
-//import javax.validation.constraints.Size;
+//import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 import javax.xml.crypto.KeySelector.Purpose;

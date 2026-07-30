@@ -2,7 +2,7 @@ package org.egov.vendor.driver.repository.querybuilder;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.vendor.config.VendorConfiguration;
 import org.egov.vendor.driver.web.model.DriverSearchCriteria;

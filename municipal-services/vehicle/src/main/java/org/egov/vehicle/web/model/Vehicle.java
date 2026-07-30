@@ -1,6 +1,6 @@
 package org.egov.vehicle.web.model;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.egov.vehicle.web.model.user.User;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:37:21.257Z[GMT]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:37:21.257Z[GMT]")
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter

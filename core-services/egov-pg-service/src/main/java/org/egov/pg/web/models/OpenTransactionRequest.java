@@ -4,7 +4,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.pg.models.Transaction;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +22,7 @@ import lombok.Setter;
  * payment and the request body metadata
  */
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-06-05T12:58:12.679+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-06-05T12:58:12.679+05:30")
 
 @Getter
 @Setter

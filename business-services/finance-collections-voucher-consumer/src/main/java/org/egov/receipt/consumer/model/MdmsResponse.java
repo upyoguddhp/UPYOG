@@ -53,7 +53,7 @@ import net.minidev.json.JSONArray;
 
 @Component
 @Setter
-@Getter
+@Getter 
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

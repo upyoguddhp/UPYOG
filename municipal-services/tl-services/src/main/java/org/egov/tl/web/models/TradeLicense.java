@@ -2,14 +2,14 @@ package org.egov.tl.web.models;
 
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import lombok.*;
 import org.egov.tl.util.TLConstants;
 import org.egov.tl.web.models.calculation.Calculation;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
  */
 @ApiModel(description = "A Object holds the basic data for a Trade License")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
 
 @Getter
 @Setter
@@ -34,12 +34,12 @@ import io.swagger.annotations.ApiModel;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class  TradeLicense   {
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("id")
         private String id = null;
 
         @NotNull
-        @SafeHtml
+        @CustomSafeHtml
         @Size(max=64)
         @JsonProperty("tenantId")
         private String tenantId = null;
@@ -110,7 +110,7 @@ public class  TradeLicense   {
         }
     }
 
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("businessService")
         private String businessService = "TL";
 
@@ -120,43 +120,43 @@ public class  TradeLicense   {
         @JsonProperty("applicationType")
         private String applicationType;
 
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("workflowCode")
         private String workflowCode = null;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("licenseNumber")
         private String licenseNumber = null;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("applicationNumber")
         private String applicationNumber;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("oldLicenseNumber")
         private String oldLicenseNumber = null;
 
 
         @Size(max=256)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("propertyId")
         private String propertyId = null;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("oldPropertyId")
         private String oldPropertyId = null;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("accountId")
         private String accountId = null;
 
         @Size(max=256)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("tradeName")
         private String tradeName = null;
 
@@ -170,7 +170,7 @@ public class  TradeLicense   {
         private Long issuedDate = null;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("financialYear")
         private String financialYear = null;
 
@@ -186,7 +186,7 @@ public class  TradeLicense   {
 
 //        @NotNull
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("action")
         private String action = null;
 
@@ -198,7 +198,7 @@ public class  TradeLicense   {
         private List<Document> wfDocuments;
 
         @Size(max=64)
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("status")
         private String status = null;
 
@@ -214,10 +214,10 @@ public class  TradeLicense   {
         private AuditDetails auditDetails = null;
 
         @Size(max=128)
-        @SafeHtml
+        @CustomSafeHtml
         private String comment;
 
-        @SafeHtml
+        @CustomSafeHtml
         @JsonProperty("fileStoreId")
         private String fileStoreId = null;
         

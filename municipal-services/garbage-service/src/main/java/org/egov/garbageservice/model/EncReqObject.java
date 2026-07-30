@@ -1,7 +1,7 @@
 package org.egov.garbageservice.model;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -19,7 +19,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "Encryption / Decryption Request Meta-data and Values")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-10-11T17:31:52.360+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-10-11T17:31:52.360+05:30")
 
 @Getter
 @Setter

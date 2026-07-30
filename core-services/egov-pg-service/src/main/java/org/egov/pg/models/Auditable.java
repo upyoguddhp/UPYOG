@@ -2,7 +2,7 @@ package org.egov.pg.models;
 
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.User;
 import org.hibernate.validator.constraints.Length;

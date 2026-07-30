@@ -2,7 +2,7 @@ package org.upyog.chb.web.models.collection;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.upyog.chb.web.models.collection.Bill.StatusEnum;
 

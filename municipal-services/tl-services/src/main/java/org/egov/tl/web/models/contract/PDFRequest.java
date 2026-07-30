@@ -2,7 +2,7 @@ package org.egov.tl.web.models.contract;
 
 import java.util.Map;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 import org.egov.common.contract.request.RequestInfo;
 

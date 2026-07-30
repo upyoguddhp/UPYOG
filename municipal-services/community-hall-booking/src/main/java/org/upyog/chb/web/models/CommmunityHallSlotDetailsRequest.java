@@ -1,8 +1,8 @@
 package org.upyog.chb.web.models;
 
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import org.egov.common.contract.request.RequestInfo;
 

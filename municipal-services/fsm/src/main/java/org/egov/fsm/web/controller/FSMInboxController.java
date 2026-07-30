@@ -2,7 +2,7 @@ package org.egov.fsm.web.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.fsm.service.FSMInboxService;
 import org.egov.fsm.util.ResponseInfoFactory;

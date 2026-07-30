@@ -6,7 +6,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
 import org.egov.pdf.model.HtmlContentResponse;

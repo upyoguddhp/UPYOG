@@ -3,7 +3,7 @@ package org.upyog.chb.web.models.collection;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -7,7 +7,7 @@ import org.egov.encryption.util.JacksonUtils;
 import org.reflections.Reflections;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 
 @Service

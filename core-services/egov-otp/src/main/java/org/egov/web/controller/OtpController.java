@@ -16,7 +16,7 @@ import org.egov.web.contract.GetUserTokenRequest;
 import org.egov.web.contract.GetUserTokenResponse;
 
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RestController
 public class OtpController {

@@ -1,9 +1,9 @@
 package org.egov.pg.models;
 
 import lombok.*;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Getter
@@ -20,7 +20,7 @@ public class TaxAndPayment {
 	@NotNull
 	private BigDecimal amountPaid;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@NotNull
 	private String billId;
 }

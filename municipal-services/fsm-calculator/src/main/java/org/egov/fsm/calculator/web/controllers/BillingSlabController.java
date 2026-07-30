@@ -3,7 +3,7 @@ package org.egov.fsm.calculator.web.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.fsm.calculator.services.BillingSlabService;
 import org.egov.fsm.calculator.utils.BillingSlabUtil;

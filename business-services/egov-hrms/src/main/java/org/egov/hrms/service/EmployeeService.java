@@ -77,6 +77,9 @@ public class EmployeeService {
 	private UserService userService;
 
 	@Autowired
+	private IndividualService individualService;
+
+	@Autowired
 	private IdGenService idGenService;
 
 	@Autowired
@@ -119,6 +122,7 @@ public class EmployeeService {
 		idGenService.setIds(employeeRequest);
 		employeeRequest.getEmployees().stream().forEach(employee -> {
 			enrichCreateRequest(employee, requestInfo);
+			upsertIndividual(employee, requestInfo);
 			createUser(employee, requestInfo);
 			pwdMap.put(employee.getUuid(), employee.getUser().getPassword());
 			employee.getUser().setPassword(null);
@@ -230,7 +234,13 @@ public class EmployeeService {
 		enrichUser(employee);
 		UserRequest request = UserRequest.builder().requestInfo(requestInfo).user(employee.getUser()).build();
 		try {
-			UserResponse response = userService.createUser(request);
+			Map<String, Object> searchCriteria = new HashMap<>();
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_TENANTID, employee.getTenantId());
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_MOBILENO, employee.getUser().getMobileNumber());
+			UserResponse response = userService.getUser(requestInfo, searchCriteria);
+			if (CollectionUtils.isEmpty(response.getUser())) {
+				response = userService.createUser(request);
+			}
 			User user = response.getUser().get(0);
 			employee.setId(user.getId());
 			//employee.setId(UUID.fromString(user.getUuid()).getMostSignificantBits());
@@ -244,6 +254,28 @@ public class EmployeeService {
 			throw new CustomException(ErrorConstants.HRMS_USER_CREATION_FAILED_CODE, ErrorConstants.HRMS_USER_CREATION_FAILED_MSG);
 		}
 
+	}
+
+	private void upsertIndividual(Employee employee, RequestInfo requestInfo) {
+		UserRequest request = UserRequest.builder().requestInfo(requestInfo).user(employee.getUser()).build();
+		try {
+			Map<String, Object> searchCriteria = new HashMap<>();
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_TENANTID, employee.getTenantId());
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_MOBILENO, employee.getUser().getMobileNumber());
+			UserResponse response = individualService.getUser(requestInfo, searchCriteria);
+			if (CollectionUtils.isEmpty(response.getUser())) {
+				response = individualService.createUser(request);
+			} else {
+				response = individualService.updateUser(request);
+			}
+			if (!CollectionUtils.isEmpty(response.getUser())) {
+				employee.getUser().setUserServiceUuid(response.getUser().get(0).getUserServiceUuid());
+			}
+		} catch (Exception e) {
+			log.error("Exception while syncing individual: ", e);
+			log.error("request: {}", request);
+			throw new CustomException(ErrorConstants.HRMS_USER_CREATION_FAILED_CODE, ErrorConstants.HRMS_USER_CREATION_FAILED_MSG);
+		}
 	}
 
 	/**
@@ -351,6 +383,7 @@ public class EmployeeService {
 		List <Employee> existingEmployees = existingEmployeeResponse.getEmployees();
 		employeeRequest.getEmployees().stream().forEach(employee -> {
 			enrichUpdateRequest(employee, requestInfo, existingEmployees);
+			upsertIndividual(employee, requestInfo);
 			updateUser(employee, requestInfo);
 		});
 		hrmsProducer.push(propertiesManager.getUpdateTopic(), employeeRequest);
@@ -367,7 +400,25 @@ public class EmployeeService {
 	private void updateUser(Employee employee, RequestInfo requestInfo) {
 		UserRequest request = UserRequest.builder().requestInfo(requestInfo).user(employee.getUser()).build();
 		try {
-			userService.updateUser(request);
+			Map<String, Object> searchCriteria = new HashMap<>();
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_TENANTID, employee.getTenantId());
+			searchCriteria.put(HRMSConstants.HRMS_USER_SEARCH_CRITERA_MOBILENO, employee.getUser().getMobileNumber());
+			UserResponse response = userService.getUser(requestInfo, searchCriteria);
+			if (CollectionUtils.isEmpty(response.getUser())) {
+				response = userService.createUser(request);
+				User createdUser = response.getUser().get(0);
+				employee.setId(createdUser.getId());
+				employee.setUuid(createdUser.getUuid());
+				employee.getUser().setId(createdUser.getId());
+				employee.getUser().setUuid(createdUser.getUuid());
+				employee.getUser().setUserServiceUuid(createdUser.getUserServiceUuid());
+			} else {
+				User user = response.getUser().get(0);
+				employee.getUser().setId(user.getId());
+				employee.getUser().setUuid(user.getUuid());
+				employee.getUser().setUserServiceUuid(user.getUserServiceUuid());
+				userService.updateUser(request);
+			}
 		}catch(Exception e) {
 			log.error("Exception while updating user: ",e);
 			log.error("request: "+request);

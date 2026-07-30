@@ -3,7 +3,7 @@ package org.egov.asset.web.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.asset.dto.AssetDTO;
 import org.egov.common.contract.response.ResponseInfo;
@@ -24,7 +24,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "Contract class to send response. Array of items are used in case of search results or response for create, whereas single item is used for update")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

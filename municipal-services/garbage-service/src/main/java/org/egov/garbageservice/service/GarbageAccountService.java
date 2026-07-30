@@ -28,7 +28,7 @@ import org.egov.garbageservice.contract.bill.DemandRepository;
 import org.egov.garbageservice.model.ApplicationBillDTO;
 import org.egov.garbageservice.model.ApplicationDetails;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

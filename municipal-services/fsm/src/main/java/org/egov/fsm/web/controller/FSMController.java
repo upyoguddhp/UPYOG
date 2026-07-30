@@ -3,7 +3,7 @@ package org.egov.fsm.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.fsm.service.FSMService;
 import org.egov.fsm.util.FSMUtil;

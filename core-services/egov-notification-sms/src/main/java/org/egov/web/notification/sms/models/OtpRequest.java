@@ -1,6 +1,6 @@
 package org.egov.web.notification.sms.models;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

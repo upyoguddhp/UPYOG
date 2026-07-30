@@ -41,7 +41,7 @@ package org.egov.pg.models;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.pg.models.enums.BankAccountType;
 import org.hibernate.validator.constraints.Length;

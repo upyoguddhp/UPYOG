@@ -2,7 +2,7 @@ package org.egov.asset.web.models;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.asset.dto.AssetDTO;
 import org.egov.common.contract.request.RequestInfo;

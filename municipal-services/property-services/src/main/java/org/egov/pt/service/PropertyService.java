@@ -21,7 +21,7 @@ import org.egov.pt.models.enums.BillStatus;
 
 
 import org.egov.pt.service.DemandService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.egov.pt.models.bill.Demand.StatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;

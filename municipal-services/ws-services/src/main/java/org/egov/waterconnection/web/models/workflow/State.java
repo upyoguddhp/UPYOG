@@ -1,7 +1,7 @@
 package org.egov.waterconnection.web.models.workflow;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import org.egov.waterconnection.web.models.AuditDetails;
 import org.hibernate.validator.constraints.SafeHtml;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @ApiModel(description = "A Object holds the basic data for a Trade License")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
 
 @Getter
 @Setter

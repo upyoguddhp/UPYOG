@@ -3,7 +3,7 @@ package org.egov.asset.web.models;
 import java.util.List;
 
 import javax.persistence.Transient;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.asset.dto.AssetDTO;
 import org.egov.asset.web.models.workflow.ProcessInstance;
@@ -25,7 +25,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "An object representing an asset")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-12T12:56:34.514+05:30")
 
 
 @Getter

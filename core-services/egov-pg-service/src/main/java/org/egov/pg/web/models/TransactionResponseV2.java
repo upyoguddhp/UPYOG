@@ -3,7 +3,7 @@ package org.egov.pg.web.models;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.pg.models.Transaction;
 

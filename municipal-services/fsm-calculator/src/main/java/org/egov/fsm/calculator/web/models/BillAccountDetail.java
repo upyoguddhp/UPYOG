@@ -2,7 +2,7 @@ package org.egov.fsm.calculator.web.models;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import javax.xml.crypto.KeySelector.Purpose;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

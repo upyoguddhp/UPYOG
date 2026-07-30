@@ -2,7 +2,7 @@ package org.egov.swcalculation.web.models;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.hibernate.validator.constraints.SafeHtml;

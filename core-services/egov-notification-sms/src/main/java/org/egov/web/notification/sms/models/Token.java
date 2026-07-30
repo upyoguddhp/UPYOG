@@ -3,7 +3,7 @@ package org.egov.web.notification.sms.models;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 

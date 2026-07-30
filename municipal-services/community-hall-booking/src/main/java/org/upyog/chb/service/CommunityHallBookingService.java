@@ -3,7 +3,7 @@ package org.upyog.chb.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.upyog.chb.enums.BookingStatusEnum;

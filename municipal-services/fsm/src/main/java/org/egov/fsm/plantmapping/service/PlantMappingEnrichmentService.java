@@ -2,7 +2,7 @@ package org.egov.fsm.plantmapping.service;
 
 import java.util.UUID;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.plantmapping.web.model.PlantMapping;

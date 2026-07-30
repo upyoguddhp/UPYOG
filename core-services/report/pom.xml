@@ -15,8 +15,8 @@
     <description>Report Infra</description>
     <properties>
         <log4j2.version>2.17.1</log4j2.version>
-        <java.version>1.8</java.version>
-        <lombok.version>1.18.8</lombok.version>
+        <java.version>17</java.version>
+        <lombok.version>1.18.22</lombok.version>
     </properties>
     <dependencies>
 		<dependency>
@@ -51,12 +51,16 @@
         <dependency>
             <groupId>org.egov.services</groupId>
             <artifactId>tracer</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>2.9.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+         <dependency> 
+			<groupId>org.springframework.boot</groupId> 
+			<artifactId>spring-boot-starter-validation</artifactId> 
+		</dependency> 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>

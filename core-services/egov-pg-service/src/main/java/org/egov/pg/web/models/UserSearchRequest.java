@@ -3,8 +3,8 @@ package org.egov.pg.web.models;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pg.constants.UserServiceConstants;

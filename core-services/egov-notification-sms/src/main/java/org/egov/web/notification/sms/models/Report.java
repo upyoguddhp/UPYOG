@@ -1,7 +1,7 @@
 package org.egov.web.notification.sms.models;
 
 
-import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.CustomSafeHtml;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,15 +15,15 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Report {
-    @SafeHtml
+    @CustomSafeHtml
     private String jobno;
 
-    @SafeHtml
+    @CustomSafeHtml
     private int messagestatus;
 
-    @SafeHtml
+    @CustomSafeHtml
     private String DoneTime;
 
-    @SafeHtml
+    @CustomSafeHtml
     private String usernameHash;
 }

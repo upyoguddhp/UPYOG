@@ -2,8 +2,8 @@ package org.egov.fsm.web.model.collection;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.egov.fsm.web.model.AuditDetails;
 

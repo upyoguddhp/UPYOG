@@ -3,7 +3,7 @@ package org.egov.vendor.driver.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.egov.vendor.driver.service.DriverService;
 import org.egov.vendor.driver.web.model.Driver;
