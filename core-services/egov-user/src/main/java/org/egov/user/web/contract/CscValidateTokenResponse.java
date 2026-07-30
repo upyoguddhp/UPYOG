@@ -1,7 +1,11 @@
 package org.egov.user.web.contract;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CscValidateTokenResponse {
 	
 	 private Long id;
@@ -12,28 +16,39 @@ public class CscValidateTokenResponse {
 
 	    private String email;
 
+	    @JsonProperty("csc_id")
 	    private String cscId;
 
+	    @JsonProperty("fullname")
 	    private String fullName;
 
 	    private String owner;
 
+	    @JsonProperty("vle_check")
 	    private String vleCheck;
 
+	    @JsonProperty("state_code")
 	    private String stateCode;
 
+	    @JsonProperty("active_status")
 	    private String activeStatus;
 
+	    @JsonProperty("user_type")
 	    private String userType;
 
-	    private LocalDate lastActive;
+	    @JsonProperty("last_active")
+	    private String lastActive;
 
+	    @JsonProperty("lg_state_code")
 	    private String lgStateCode;
 
+	    @JsonProperty("lg_district_code")
 	    private String lgDistrictCode;
 
+	    @JsonProperty("RAP")
 	    private String rap;
 
+	    @JsonProperty("POS")
 	    private String pos;
 
 	    private Long createdBy;

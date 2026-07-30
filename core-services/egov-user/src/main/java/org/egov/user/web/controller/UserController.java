@@ -281,9 +281,9 @@ public class UserController {
 	
 	@PostMapping("/_cscLandingPage")
 	
-    private ResponseEntity<?> cscLandingPage(CscValidateToken token){
+    private ResponseEntity<?> cscLandingPage(@RequestBody Map<String, String> tokenMap){
  
-    	ResponseEntity<?> response = cscConnectService.getCscValidateTokenResponse(token);
+    	ResponseEntity<?> response = cscConnectService.getCscValidateTokenResponse(tokenMap.get("token"));
     	return response;
     }
 
