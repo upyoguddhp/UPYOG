@@ -112,7 +112,7 @@ public class GarbageBillTrackerRepository {
             "last_modified_by = :lastModifiedBy, " +
             "last_modified_time = :lastModifiedTime " +
             "WHERE grbg_application_id = :grbgApplicationId " +
-            "AND status = 'ACTIVE'";
+            "AND status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
 	
 	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
