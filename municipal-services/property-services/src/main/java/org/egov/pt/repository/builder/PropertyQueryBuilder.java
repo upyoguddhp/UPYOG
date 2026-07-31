@@ -559,7 +559,7 @@ public class PropertyQueryBuilder {
             "lastmodifiedby = ?, " +
             "lastmodifiedtime = ? " +
             "WHERE propertyid = ? " +
-            "AND bill_status = 'ACTIVE'";
+            "AND bill_status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
