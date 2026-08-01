@@ -410,6 +410,7 @@ public class EnrichmentService {
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
 				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
 				.type(calculateTaxRequest.getType())
+				.propertyTaxWithoutRebate(propertyTaxWithoutRebate)
 				.billStatus(trackerStatus)
 				.demandId(demandId)
 				.ward(ward)
