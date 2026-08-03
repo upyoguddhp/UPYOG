@@ -11,12 +11,12 @@ public class GarbageCollectionQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_garbage_collection "
 			+ "(uuid, tenant_id, attendance_uuid, staff_uuid, garbage_account_uuid, sub_account_uuid, garbage_id, application_no, property_id, ward_number, "
-			+ "is_resident_available, waste_type, is_waste_kept_outside, is_collected, applied_to_all_tenants, collection_time, latitude, longitude, client_ref_id, sync_batch_uuid, remarks, additional_details, is_active, "
+			+ "is_resident_available, waste_type, is_waste_kept_outside, dry_wet_segregated, next_retry_time, is_collected, applied_to_all_tenants, collection_time, latitude, longitude, client_ref_id, sync_batch_uuid, remarks, additional_details, is_active, "
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String UPDATE_QUERY = "UPDATE eg_ddp_garbage_collection "
-			+ "SET is_resident_available = ?, waste_type = ?, is_waste_kept_outside = ?, is_collected = ?, applied_to_all_tenants = ?, "
+			+ "SET is_resident_available = ?, waste_type = ?, is_waste_kept_outside = ?, dry_wet_segregated = ?, next_retry_time = ?, is_collected = ?, applied_to_all_tenants = ?, "
 			+ "collection_time = ?, latitude = ?, longitude = ?, remarks = ?, additional_details = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
 			+ "WHERE uuid = ?";
 

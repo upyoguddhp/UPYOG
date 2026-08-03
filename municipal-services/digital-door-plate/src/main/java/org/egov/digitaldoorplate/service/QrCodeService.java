@@ -14,20 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 public class QrCodeService {
 
 	@Autowired
-	private EncryptionService encryptionService;
+	private QrCryptoService qrCryptoService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	/**
-	 * Decrypts the scanned QR payload via egov-enc-service and parses the
-	 * embedded json ({"id": ..., "useruuid": ...}). Falls back to parsing the
-	 * raw payload when it is not encrypted.
+	 * Decrypts the scanned QR payload with the certificate based RSA+AES
+	 * envelope (see {@link QrCryptoService}) and parses the embedded json
+	 * ({"id": ..., "useruuid": ...}). Falls back to parsing the raw payload
+	 * when it is not encrypted.
 	 */
 	public QrCodeData parseQrCodeData(String scannedData) {
 		String decryptedData;
 		try {
-			decryptedData = encryptionService.decryptString(scannedData);
+			decryptedData = qrCryptoService.decrypt(scannedData);
 		} catch (Exception e) {
 			log.warn("Decryption of scanned QR data failed, trying to parse raw data. Message: {}", e.getMessage());
 			decryptedData = scannedData;

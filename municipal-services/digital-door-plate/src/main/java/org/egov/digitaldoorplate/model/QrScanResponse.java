@@ -24,7 +24,8 @@ public class QrScanResponse {
 
 	private QrCodeData qrData;
 
-	private Object garbageAccounts;
+	@JsonProperty("GarbageAccounts")
+	private List<GarbageAccountScanInfo> garbageAccounts;
 
 	private Boolean alreadyCollectedToday;
 

@@ -39,6 +39,10 @@ public class GarbageCollection {
 
 	private Boolean isWasteKeptOutside;
 
+	private Boolean dryWetSegregated;
+
+	private Long nextRetryTime;
+
 	private Boolean isCollected;
 
 	private Boolean appliedToAllTenants;

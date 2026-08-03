@@ -11,7 +11,7 @@ verification → installation).
 | Via gateway (zuul) | `http://<gateway-host>:8080/digital-door-plate/...` |
 | Direct (dev) | `http://localhost:1239/digital-door-plate/...` |
 | Database | `hp_udd_dev` (tables `eg_ddp_attendance`, `eg_ddp_garbage_collection`, `eg_ddp_door_plate`, `eg_ddp_sync_batch`) |
-| Dependencies | `egov-enc-service` (QR decrypt), `garbage-service` (account search), Kafka (async persistence of collection records) |
+| Dependencies | certificate based RSA+AES QR decryption (citizenseva key pair, see `QrCryptoService`), `garbage-service` (account search), Kafka (async persistence of collection records) |
 
 **Peak load design**: collection happens in a statewide morning window across all ULBs, so the
 write path is asynchronous — `_create` and `_sync` validate/enrich and publish to the kafka
@@ -51,7 +51,7 @@ final duplicate guard, so kafka redeliveries and re-synced device queues are saf
 | `COLLECTION_NOT_FOUND` | `_update` for an unknown collection uuid |
 | `DOOR_PLATE_NOT_FOUND` | `_verifyPrint`/`_install` before `_generate` |
 | `INVALID_PLATE_STATUS` | `_verifyPrint` before QR generation, or `_install` before print verification |
-| `DECRYPTION ERROR` | egov-enc-service call failed |
+| `QR_DECRYPTION_ERROR` | certificate based QR decryption failed |
 | `GARBAGE_SEARCH_FAILED` | garbage-service returned no response |
 
 ---
@@ -180,33 +180,76 @@ boundaries); multiple duties in a day are merged (earliest start, latest end, du
 
 ## 2.1 Scan QR — `POST /digital-door-plate/garbage-collection/_scan`
 
-Called when the collector scans the QR on a property. `scannedData` is the encrypted QR
-payload; the service decrypts it via egov-enc-service (falls back to plain JSON for testing),
-parses `{"id": "<garbage account uuid>", "useruuid": "<user uuid>"}` and searches the active
-garbage account (with active sub accounts) from garbage-service.
+Called when the collector scans the QR on a property. `scannedData` is the QR payload
+encrypted with the same certificate based RSA+AES envelope used by `/qr/_generate` and
+`/qr/_decrypt` (see `QrCryptoService`, citizenseva key pair — falls back to plain JSON for
+testing/legacy codes), parses `{"id": "<garbage account uuid>", "useruuid": "<user uuid>"}`
+and searches the active garbage account (with active sub accounts) from garbage-service.
 
 ```json
 {
   "RequestInfo": { "authToken": "<token>" },
   "tenantId": "hp.GB",
-  "scannedData": "<encrypted-qr-payload>"
+  "scannedData": "<certificate-encrypted-qr-payload>"
 }
 ```
 
-Response:
+Response: the owner account and each active sub account are merged with today's collection
+status (if the collector has already scanned/submitted for that account/sub-account today);
+`latitude`/`longitude`, `wardNumber`, `ulbName` and `propertyAddress` are only present at the
+owner level, since that's what the door plate QR was generated for.
 
 ```json
 {
   "ResponseInfo": { "status": "successful" },
   "qrData": { "id": "7fe1d1ba-...", "useruuid": "a2b4c6d8-..." },
-  "garbageAccounts": [ { "... full garbage-service account object ..." } ],
+  "GarbageAccounts": [
+    {
+      "latitude": 31.1048200,
+      "longitude": 77.1734400,
+      "wardNumber": "12",
+      "ulbName": "Shimla",
+      "uuid": "7fe1d1ba-...",
+      "userUuid": "a2b4c6d8-...",
+      "garbageApplicationNo": "OWN001",
+      "garbageId": "1024",
+      "Name": "Rajesh Kumar",
+      "mobileNumber": "9876543210",
+      "propertyId": "PROP001",
+      "propertyAddress": "House No. 12, Green Valley",
+      "garbageCollected": false,
+      "residentAvailable": null,
+      "isWasteKeptOutside": null,
+      "dryWetSegregated": null,
+      "wasteType": null,
+      "nextRetryTime": null,
+      "childAccounts": [
+        {
+          "uuid": "8ab2...",
+          "userUuid": "b3c5...",
+          "garbageApplicationNo": "SUB001",
+          "garbageId": "1025",
+          "Name": "Tenant A",
+          "mobileNumber": "9876500001",
+          "garbageCollected": false,
+          "residentAvailable": null,
+          "isWasteKeptOutside": null,
+          "dryWetSegregated": null,
+          "wasteType": null,
+          "nextRetryTime": null
+        }
+      ]
+    }
+  ],
   "alreadyCollectedToday": false,
   "todaysCollections": []
 }
 ```
 
-The frontend renders the account/owner/sub-account (tenant) details from `garbageAccounts`
-and can warn via `alreadyCollectedToday`.
+The frontend renders the account/owner/sub-account (tenant) details from `GarbageAccounts`
+and can warn via `alreadyCollectedToday`. `garbageId` here is garbage-service's numeric
+account id as a string — not to be confused with `eg_ddp_garbage_collection.garbage_id`,
+which the mobile app sets separately on `_create`/`_sync`.
 
 ## 2.2 Submit collection (online) — `POST /digital-door-plate/garbage-collection/_create`
 
@@ -229,6 +272,8 @@ mandatory per record; `staffUuid` defaults to the logged-in user, `collectionTim
     "isResidentAvailable": true,
     "wasteType": "WET",
     "isWasteKeptOutside": false,
+    "dryWetSegregated": true,
+    "nextRetryTime": null,
     "appliedToAllTenants": true,
     "latitude": 31.1048200,
     "longitude": 77.1734400,
@@ -465,10 +510,12 @@ Response: `{ "ResponseInfo": ..., "doorPlates": [ ... ] }` ordered by `createdda
 
   Flyway creates/updates the four `eg_ddp_*` tables on startup
   (history table `hp_ddp_schema_version`).
-- **Config** (`application.properties`): `egov.enc.host` (dev `localhost:1234`),
-  `egov.garbage.service.host` (dev `localhost:1235`), datasource for `hp_udd_dev`,
-  `kafka.config.bootstrap_server_config` + `spring.kafka.*` (dev `localhost:9092`),
-  topic `kafka.topics.save.garbage.collection=save-ddp-garbage-collection`.
+- **Config** (`application.properties`): `qr.crypto.public.cert.path` / `qr.crypto.private.key.path`
+  (citizenseva certificate/key used to decrypt scanned QR payloads, shared with the
+  `/qr/_generate` and `/qr/_decrypt` secure QR APIs), `egov.garbage.service.host` (dev
+  `localhost:1235`), datasource for `hp_udd_dev`, `kafka.config.bootstrap_server_config` +
+  `spring.kafka.*` (dev `localhost:9092`), topic
+  `kafka.topics.save.garbage.collection=save-ddp-garbage-collection`.
 - **Kafka**: the topic `save-ddp-garbage-collection` must exist (or auto-create enabled).
   For statewide scale, create it with multiple partitions and key messages per tenant if
   ordering per ULB is needed; consumer group `egov-ddp-services`.

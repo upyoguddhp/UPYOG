@@ -41,15 +41,6 @@ public class DdpConstants {
 	@Value("${kafka.topics.save.garbage.collection}")
 	private String saveGarbageCollectionTopic;
 
-	@Value("${egov.enc.host}")
-	private String encServiceHostUrl;
-
-	@Value("${egov.enc.encrypt.endpoint}")
-	private String encEncryptEndpoint;
-
-	@Value("${egov.enc.decrypt.endpoint}")
-	private String encDecryptEndpoint;
-
 	@Value("${egov.garbage.service.host}")
 	private String garbageServiceHostUrl;
 

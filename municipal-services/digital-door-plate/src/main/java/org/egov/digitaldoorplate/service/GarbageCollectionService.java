@@ -10,8 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.digitaldoorplate.model.ChildAccountScanInfo;
+import org.egov.digitaldoorplate.model.GarbageAccountScanInfo;
 import org.egov.digitaldoorplate.model.GarbageCollection;
 import org.egov.digitaldoorplate.model.GarbageCollectionRequest;
 import org.egov.digitaldoorplate.model.GarbageCollectionResponse;
@@ -19,6 +22,8 @@ import org.egov.digitaldoorplate.model.GarbageCollectionSyncResponse;
 import org.egov.digitaldoorplate.model.QrCodeData;
 import org.egov.digitaldoorplate.model.QrScanRequest;
 import org.egov.digitaldoorplate.model.QrScanResponse;
+import org.egov.digitaldoorplate.model.RemoteGarbageAccount;
+import org.egov.digitaldoorplate.model.RemoteGrbgAddress;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollectionRequest;
 import org.egov.digitaldoorplate.model.SyncBatch;
@@ -33,6 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +69,9 @@ public class GarbageCollectionService {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	/**
 	 * Decrypts the QR code scanned on the door plate, resolves the garbage
 	 * account from garbage-service and returns the account details along with
@@ -84,11 +95,15 @@ public class GarbageCollectionService {
 		Map<String, Object> garbageSearchResponse = garbageAccountService.searchGarbageAccountByUuid(
 				qrScanRequest.getRequestInfo(), qrScanRequest.getTenantId(), qrCodeData.getId());
 
-		Object garbageAccounts = garbageSearchResponse.get("garbageAccounts");
-		if (null == garbageAccounts || (garbageAccounts instanceof List && ((List<?>) garbageAccounts).isEmpty())) {
+		Object rawGarbageAccounts = garbageSearchResponse.get("garbageAccounts");
+		if (null == rawGarbageAccounts
+				|| (rawGarbageAccounts instanceof List && ((List<?>) rawGarbageAccounts).isEmpty())) {
 			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
 					"No active garbage account found for the scanned QR code.");
 		}
+		List<RemoteGarbageAccount> remoteGarbageAccounts = objectMapper.convertValue(rawGarbageAccounts,
+				new TypeReference<List<RemoteGarbageAccount>>() {
+				});
 
 		List<GarbageCollection> todaysCollections = garbageCollectionRepository
 				.search(SearchCriteriaGarbageCollection.builder()
@@ -98,6 +113,10 @@ public class GarbageCollectionService {
 						.isActive(Boolean.TRUE)
 						.build());
 
+		List<GarbageAccountScanInfo> garbageAccounts = remoteGarbageAccounts.stream()
+				.map(remoteAccount -> toGarbageAccountScanInfo(remoteAccount, todaysCollections))
+				.collect(Collectors.toList());
+
 		return QrScanResponse.builder()
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(qrScanRequest.getRequestInfo(), true))
@@ -106,6 +125,90 @@ public class GarbageCollectionService {
 				.alreadyCollectedToday(!CollectionUtils.isEmpty(todaysCollections))
 				.todaysCollections(todaysCollections)
 				.build();
+	}
+
+	/**
+	 * Builds the scan response entry for one owner account: its own today's
+	 * collection status (matched on garbageAccountUuid with no subAccountUuid)
+	 * plus one entry per child/sub account (matched on subAccountUuid).
+	 * Location, ward and ulb are only meaningful at the parent level, since
+	 * that is what the door plate QR was generated for.
+	 */
+	private GarbageAccountScanInfo toGarbageAccountScanInfo(RemoteGarbageAccount account,
+			List<GarbageCollection> todaysCollections) {
+
+		GarbageCollection parentCollection = findTodaysCollection(todaysCollections, null);
+		RemoteGrbgAddress address = CollectionUtils.isEmpty(account.getAddresses()) ? null
+				: account.getAddresses().get(0);
+
+		List<ChildAccountScanInfo> childAccounts = CollectionUtils.isEmpty(account.getChildGarbageAccounts())
+				? Collections.emptyList()
+				: account.getChildGarbageAccounts().stream()
+						.map(child -> toChildAccountScanInfo(child, findTodaysCollection(todaysCollections, child.getUuid())))
+						.collect(Collectors.toList());
+
+		return GarbageAccountScanInfo.builder()
+				.latitude(null == parentCollection ? null : parentCollection.getLatitude())
+				.longitude(null == parentCollection ? null : parentCollection.getLongitude())
+				.wardNumber(null == address ? null : address.getWardName())
+				.ulbName(null == address ? null : address.getUlbName())
+				.uuid(account.getUuid())
+				.userUuid(account.getUserUuid())
+				.garbageApplicationNo(account.getGrbgApplicationNumber())
+				.garbageId(null == account.getGarbageId() ? null : String.valueOf(account.getGarbageId()))
+				.name(account.getName())
+				.mobileNumber(account.getMobileNumber())
+				.propertyId(account.getPropertyId())
+				.propertyAddress(toPropertyAddress(address))
+				.garbageCollected(Boolean.TRUE.equals(null == parentCollection ? null : parentCollection.getIsCollected()))
+				.residentAvailable(null == parentCollection ? null : parentCollection.getIsResidentAvailable())
+				.isWasteKeptOutside(null == parentCollection ? null : parentCollection.getIsWasteKeptOutside())
+				.dryWetSegregated(null == parentCollection ? null : parentCollection.getDryWetSegregated())
+				.wasteType(null == parentCollection ? null : parentCollection.getWasteType())
+				.nextRetryTime(null == parentCollection ? null : parentCollection.getNextRetryTime())
+				.childAccounts(childAccounts)
+				.build();
+	}
+
+	private ChildAccountScanInfo toChildAccountScanInfo(RemoteGarbageAccount child, GarbageCollection childCollection) {
+		return ChildAccountScanInfo.builder()
+				.uuid(child.getUuid())
+				.userUuid(child.getUserUuid())
+				.garbageApplicationNo(child.getGrbgApplicationNumber())
+				.garbageId(null == child.getGarbageId() ? null : String.valueOf(child.getGarbageId()))
+				.name(child.getName())
+				.mobileNumber(child.getMobileNumber())
+				.garbageCollected(Boolean.TRUE.equals(null == childCollection ? null : childCollection.getIsCollected()))
+				.residentAvailable(null == childCollection ? null : childCollection.getIsResidentAvailable())
+				.isWasteKeptOutside(null == childCollection ? null : childCollection.getIsWasteKeptOutside())
+				.dryWetSegregated(null == childCollection ? null : childCollection.getDryWetSegregated())
+				.wasteType(null == childCollection ? null : childCollection.getWasteType())
+				.nextRetryTime(null == childCollection ? null : childCollection.getNextRetryTime())
+				.build();
+	}
+
+	/**
+	 * Today's collections are all keyed on the same garbageAccountUuid (the
+	 * scanned owner account); subAccountUuid distinguishes the owner's own
+	 * record (null) from a particular child account's record. The search
+	 * query orders by collection_time DESC, so the first match is the latest.
+	 */
+	private GarbageCollection findTodaysCollection(List<GarbageCollection> todaysCollections, String subAccountUuid) {
+		return todaysCollections.stream()
+				.filter(collection -> StringUtils.isEmpty(subAccountUuid)
+						? StringUtils.isEmpty(collection.getSubAccountUuid())
+						: subAccountUuid.equals(collection.getSubAccountUuid()))
+				.findFirst()
+				.orElse(null);
+	}
+
+	private String toPropertyAddress(RemoteGrbgAddress address) {
+		if (null == address) {
+			return null;
+		}
+		return Stream.of(address.getAddress1(), address.getAddress2(), address.getCity())
+				.filter(StringUtils::isNotEmpty)
+				.collect(Collectors.joining(", "));
 	}
 
 	/**
@@ -184,6 +287,12 @@ public class GarbageCollectionService {
 			}
 			if (null == garbageCollection.getLongitude()) {
 				garbageCollection.setLongitude(existingCollections.get(0).getLongitude());
+			}
+			if (null == garbageCollection.getDryWetSegregated()) {
+				garbageCollection.setDryWetSegregated(existingCollections.get(0).getDryWetSegregated());
+			}
+			if (null == garbageCollection.getNextRetryTime()) {
+				garbageCollection.setNextRetryTime(existingCollections.get(0).getNextRetryTime());
 			}
 			if (null == garbageCollection.getAdditionalDetails()) {
 				garbageCollection.setAdditionalDetails(existingCollections.get(0).getAdditionalDetails());

@@ -31,6 +31,8 @@ public class GarbageCollectionRowMapper implements RowMapper<GarbageCollection> 
 				.isResidentAvailable(getBoolean(rs, "is_resident_available"))
 				.wasteType(rs.getString("waste_type"))
 				.isWasteKeptOutside(getBoolean(rs, "is_waste_kept_outside"))
+				.dryWetSegregated(getBoolean(rs, "dry_wet_segregated"))
+				.nextRetryTime(getLong(rs, "next_retry_time"))
 				.isCollected(getBoolean(rs, "is_collected"))
 				.appliedToAllTenants(getBoolean(rs, "applied_to_all_tenants"))
 				.collectionTime(getLong(rs, "collection_time"))
