@@ -11,4 +11,8 @@ public class CscValidateTokenApiResponse {
 
     @JsonProperty("User")
     private CscValidateTokenResponse user;
+
+    private String error;
+
+    private Integer code;
 }

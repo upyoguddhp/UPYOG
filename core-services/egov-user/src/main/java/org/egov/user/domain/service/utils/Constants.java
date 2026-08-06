@@ -18,8 +18,12 @@ public class Constants {
     public static final String SERVICE_ID = "10000078";
 
     public static final String CITIZEN_ROLE = "CITIZEN";
+    
+    public static final String LMK_ROLE = "LMK";
 
     public static final String CITIZEN_PASSWORD = "P@ssw0rd";
+    
+    public static final String LMK_PASSWORD = "Vle@123#";
     
     @Value(("${state.level.tenant.id}"))
     private String stateLevelTenantId;

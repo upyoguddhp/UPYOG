@@ -7,14 +7,17 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CscValidateTokenResponse {
-	
-	 private Long id;
 
-	    private Long userId;
+	    private String pager;
 
 	    private String username;
 
 	    private String email;
+
+	    @JsonProperty("mobileno")
+	    private String mobileNumber;
+
+	    private String address;
 
 	    @JsonProperty("csc_id")
 	    private String cscId;
@@ -50,13 +53,5 @@ public class CscValidateTokenResponse {
 
 	    @JsonProperty("POS")
 	    private String pos;
-
-	    private Long createdBy;
-
-	    private Long createdTime;
-
-	    private Long lastModifiedBy;
-
-	    private Long lastModifiedTime;
 
 }

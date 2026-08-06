@@ -43,7 +43,7 @@ package org.egov.user.domain.model.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum UserType {
-    CITIZEN, EMPLOYEE, SYSTEM, BUSINESS;
+    CITIZEN, EMPLOYEE, SYSTEM, BUSINESS,LMK;
 
     @JsonCreator
     public static UserType fromValue(String text) {

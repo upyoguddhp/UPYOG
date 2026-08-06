@@ -75,6 +75,8 @@ public class PTRConstants {
 	public static final String BUSINESS_SERVICE = "PTR";
 
 	public static final String WORKFLOW_BUSINESS_SERVICE = "pet-services";
+	
+	public static final String WORKFLOW_BUSINESS_SERVICE_LMK = "pet-services_lmk";
 
 	public static final String WORKFLOW_ACTION_INITIATE = "INITIATE";
 
