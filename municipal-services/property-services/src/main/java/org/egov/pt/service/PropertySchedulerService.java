@@ -386,7 +386,7 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 						if (isShimlaAreaAbove100) {
 
-							if (isAreaWithinRange(propertyAreaString, newAreaunitPropertyArea)) {
+							if (isAreaWithinRange(propertyAreaString, BigDecimal.valueOf(100))) {
 								rateUpto100 = new BigDecimal(propertyTaxRate.get("rate").asText());
 							}
 
@@ -923,7 +923,7 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 						if (isShimlaAreaAbove100) {
 
-							if (isAreaWithinRange(propertyAreaString, newAreaunitPropertyArea)) {
+							if (isAreaWithinRange(propertyAreaString, BigDecimal.valueOf(100))) {
 								rateUpto100 = new BigDecimal(propertyTaxRate.get("rate").asText());
 							}
 
