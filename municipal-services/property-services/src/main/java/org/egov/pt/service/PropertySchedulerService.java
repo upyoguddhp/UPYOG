@@ -1980,7 +1980,9 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 		        propertyCriteria,
 		        request.getRequestInfo(),
 		        null);
-
+		
+		Property propertyDetail = property.get(0);
+		
 		if (CollectionUtils.isEmpty(billResponse.getBill())) {
 			throw new CustomException("BILL_NOT_FOUND", "No bill found for given billId and demandId");
 		}
@@ -1991,6 +1993,44 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 				                         .build());
 
 		notificationService.triggerPropertyNotice(tracker, bill, request.getRequestInfo(), ulbName, property, tenantId);
+		
+		try {
+			if (CollectionUtils.isEmpty(property.get(0).getOwners())) {
+				throw new RuntimeException("No owners found for property " + propertyDetail.getPropertyId());
+			}
+
+			ObjectNode smsRequestJson = notificationService.buildGeneratePropertyBillSmsRequest(propertyDetail, bill, tracker);
+			Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,Map.class);
+
+			StringBuilder smsTrackerUri = new StringBuilder();
+			smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+
+			Map<String, Object> smsTrackerRequest = new HashMap<>();
+			smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
+			smsTrackerRequest.put("amount", bill.getTotalAmount());
+			smsTrackerRequest.put("applicationNo", propertyDetail.getPropertyId());
+			smsTrackerRequest.put("tenantId", propertyDetail.getTenantId());
+			smsTrackerRequest.put("service", "PROPERTY");
+			smsTrackerRequest.put("fromDate",tracker.getFromDate());
+			smsTrackerRequest.put("toDate", tracker.getToDate());
+			smsTrackerRequest.put("createdBy", "system");
+			smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+			smsTrackerRequest.put("billId", bill.getId());
+			smsTrackerRequest.put("demandId", tracker.getDemandId());
+			smsTrackerRequest.put("smsStatus", false);
+			smsTrackerRequest.put("additionalDetail", tracker.getAdditionalDetails());
+			smsTrackerRequest.put("ownerMobileNo", propertyDetail.getOwners().get(0).getMobileNumber());
+			smsTrackerRequest.put("ownerName", propertyDetail.getOwners().get(0).getName());
+			smsTrackerRequest.put("smsRequest", smsRequestMap);
+			smsTrackerRequest.put("smsResponse", null);
+			smsTrackerRequest.put("ward", tracker.getWard());
+
+			restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+			log.info("Notice SMS tracker entry created for billId {} demandId {}", bill.getId(), tracker.getDemandId());
+
+		} catch (Exception e) {
+			log.error("Notice SMS tracker creation failed for billId {}", bill.getId(), e);
+		}
 	}
 
 }
