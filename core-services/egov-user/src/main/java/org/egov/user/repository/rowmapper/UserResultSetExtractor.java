@@ -37,6 +37,7 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
 
             Long userId = rs.getLong("id");
             User user;
+            Boolean accepted = rs.getObject("isdataprotectionaccepted", Boolean.class);
 
             if (!usersMap.containsKey(userId)) {
 
@@ -49,7 +50,9 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
                                 lastModifiedBy(rs.getLong("lastmodifiedby")).lastModifiedDate(rs.getTimestamp("lastmodifieddate"))
                         .pan(rs.getString("pan")).aadhaarNumber(rs.getString("aadhaarnumber")).createdBy(rs.getLong("createdby"))
                         .createdDate(rs.getTimestamp("createddate")).guardian(rs.getString("guardian")).signature(rs.getString("signature"))
-                        .accountLocked(rs.getBoolean("accountlocked")).photo(rs.getString("photo"))
+                        .accountLocked(rs.getBoolean("accountlocked"))
+                        .isdataprotectionaccepted(accepted)
+                        .photo(rs.getString("photo"))
                         .identificationMark(rs.getString("identificationmark")).uuid(rs.getString("uuid"))
                         .accountLockedDate(rs.getLong("accountlockeddate")).alternateMobileNumber(rs.getString("alternatemobilenumber"))
                         .build();
