@@ -72,6 +72,10 @@ public class Demand {
 	@Builder.Default
 	@JsonProperty("minimumAmountPayable")
 	private BigDecimal minimumAmountPayable = BigDecimal.ZERO;
+	
+	@Builder.Default
+	@JsonProperty("ispaymentcompleted")
+	private Boolean ispaymentcompleted = false;
 
 	/**
 	 * Gets or Sets status
