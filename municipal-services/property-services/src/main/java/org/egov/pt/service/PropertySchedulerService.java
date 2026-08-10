@@ -351,11 +351,15 @@ public class PropertySchedulerService {
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
-
+				
+				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
+						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				
 				// Net rateable value after rebate
-if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
-					
-					
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
 					if (isShimlaAreaAbove100) {
 
 						oAndMRebateUpto100Amount = upto100RateableValue
@@ -890,11 +894,15 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
+				
+				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
+						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
 
 				// Net rateable value after rebate
-				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
-					
-					
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
 					if (isShimlaAreaAbove100) {
 
 						oAndMRebateUpto100Amount = upto100RateableValue
