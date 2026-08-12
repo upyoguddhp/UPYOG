@@ -2724,6 +2724,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		        GrbgBillTrackerSearchCriteria.builder()
 		            .status(Collections.singleton("ACTIVE"))
 		            .type(Collections.singleton("MONTHLY"))
+		            //hard-coded Shimla for testing remove this.
+		            .tenantId("hp.Shimla")
 		            .build();
 		
 		    List<GrbgBillTracker> trackers =
