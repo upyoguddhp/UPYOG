@@ -855,17 +855,19 @@ public class GarbageAccountSchedulerService {
 	                .map(DemandDetail::getTaxAmount)
 	                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-	            Long expiry = tracker.getExpiryDate();
-	            if (expiry == null || expiry >= System.currentTimeMillis()) {
-	                continue; 
-	            }
-	
-	            LocalDate expiryDate = Instant.ofEpochMilli(expiry)
-	                                          .atZone(ZoneId.systemDefault())
-	                                          .toLocalDate();
-	
-	            long monthsOverdue = ChronoUnit.MONTHS.between(expiryDate, LocalDate.now());
-	            if (monthsOverdue <= 0) monthsOverdue = 1;
+				Long createdTime = tracker.getAuditDetails().getCreatedDate();
+
+				if (createdTime == null) {
+					continue;
+				}
+
+				LocalDate createdDate = Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate();
+				long diffDays = ChronoUnit.DAYS.between(createdDate, LocalDate.now());
+				long monthsOverdue = diffDays / 30;
+
+				if (monthsOverdue <= 0) {
+					continue;
+				}
 	
 	            BigDecimal penalty = baseAmount
 	                    .multiply(penaltyRate)

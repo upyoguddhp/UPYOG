@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -19,14 +21,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.egov.garbageservice.model.GenrateArrearRequest;
-import org.egov.garbageservice.contract.bill.DemandRepository;
-import org.egov.garbageservice.model.ApplicationBillDTO;
-import org.egov.garbageservice.model.ApplicationDetails;
 
 import javax.validation.Valid;
 
@@ -38,9 +37,13 @@ import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.garbageservice.contract.bill.Bill;
 import org.egov.garbageservice.contract.bill.Bill.StatusEnum;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
+import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.contract.bill.BillResponse;
 import org.egov.garbageservice.contract.bill.BillSearchCriteria;
 import org.egov.garbageservice.contract.bill.Demand;
+import org.egov.garbageservice.contract.bill.DemandDetail;
+import org.egov.garbageservice.contract.bill.DemandRepository;
 import org.egov.garbageservice.contract.bill.GenerateBillCriteria;
 import org.egov.garbageservice.contract.workflow.BusinessServiceResponse;
 import org.egov.garbageservice.contract.workflow.ProcessInstance;
@@ -49,6 +52,7 @@ import org.egov.garbageservice.contract.workflow.ProcessInstanceResponse;
 import org.egov.garbageservice.contract.workflow.State;
 import org.egov.garbageservice.contract.workflow.WorkflowService;
 import org.egov.garbageservice.model.AuditDetails;
+import org.egov.garbageservice.model.DdpVerificationCount;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
 import org.egov.garbageservice.model.GarbageAccountActionResponse;
@@ -56,6 +60,7 @@ import org.egov.garbageservice.model.GarbageAccountDetail;
 import org.egov.garbageservice.model.GarbageAccountRequest;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.GenerateBillRequest;
+import org.egov.garbageservice.model.GenrateArrearRequest;
 import org.egov.garbageservice.model.GrbgAddress;
 import org.egov.garbageservice.model.GrbgApplication;
 import org.egov.garbageservice.model.GrbgBillFailure;
@@ -90,17 +95,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.egov.garbageservice.contract.bill.BillDetail;
-import org.egov.garbageservice.contract.bill.BillAccountDetail;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.egov.garbageservice.contract.bill.DemandDetail;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.egov.garbageservice.model.DdpVerificationCount;
-import java.time.temporal.ChronoUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -2729,8 +2727,6 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    List<GrbgBillTracker> trackers =
 		        garbageBillTrackerRepository.getBillTracker(criteria);
 		
-		    long now = System.currentTimeMillis();
-		
 		    List<GrbgBillTracker> expiredTrackers = new ArrayList<>();
 		
 		    for (GrbgBillTracker tracker : trackers) {
@@ -2759,15 +2755,24 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		            continue;
 		        }
 		
-		        BillDetail billDetail = bill.getBillDetails().get(0);
-		        Long expiry = billDetail.getExpiryDate();
-		
-		        if (expiry == null || expiry >= now) {
-		            continue;
-		        }
-		        tracker.setExpiryDate(expiry);
-		
-		        expiredTrackers.add(tracker);
+		        Long createdTime = tracker.getAuditDetails().getCreatedDate();
+
+				if (createdTime == null) {
+					continue;
+				}
+
+				LocalDate createdDate = Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate();
+				long diffDays = ChronoUnit.DAYS.between(createdDate, LocalDate.now());
+
+				if (diffDays < 30) {
+					continue;
+				}
+
+				if (diffDays % 30 != 0) {
+					continue;
+				}
+
+				expiredTrackers.add(tracker);
 		    }
 		
 		    return expiredTrackers;
