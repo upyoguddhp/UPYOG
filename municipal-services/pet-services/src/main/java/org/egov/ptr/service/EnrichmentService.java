@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 public class EnrichmentService {
+	private static final String PET_BUSINESS_SERVICE = "pet-service";
 
 	@Autowired
 	private PetConfiguration config;
@@ -49,6 +50,7 @@ public class EnrichmentService {
 				config.getPetIdGenFormat(), petRegistrationRequest.getPetRegistrationApplications().size());
 		Integer index = 0;
 		for (PetRegistrationApplication application : petRegistrationRequest.getPetRegistrationApplications()) {
+			application.setBusinessService(PET_BUSINESS_SERVICE);
 
 			AuditDetails auditDetails = AuditDetails.builder()
 					.createdBy(petRegistrationRequest.getRequestInfo().getUserInfo().getUuid())
@@ -83,6 +85,7 @@ public class EnrichmentService {
 
 	    for (PetRegistrationApplication app :
 	            request.getPetRegistrationApplications()) {
+	        app.setBusinessService(PET_BUSINESS_SERVICE);
 
 	        List<PetRegistrationApplication> oldApps =
 	                petRegistrationRepository.getApplications(
@@ -161,6 +164,8 @@ public class EnrichmentService {
 
 
 	public void enrichPetApplicationUponUpdate(PetRegistrationRequest petRegistrationRequest, PetRegistrationApplication existingApplication) {
+		petRegistrationRequest.getPetRegistrationApplications().get(0).setBusinessService(PET_BUSINESS_SERVICE);
+		existingApplication.setBusinessService(PET_BUSINESS_SERVICE);
 		
 		existingApplication.setWorkflow(petRegistrationRequest.getPetRegistrationApplications().get(0).getWorkflow());
 		existingApplication.setIsOnlyWorkflowCall(petRegistrationRequest.getPetRegistrationApplications().get(0).getIsOnlyWorkflowCall());

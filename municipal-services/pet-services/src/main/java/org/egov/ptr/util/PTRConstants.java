@@ -76,7 +76,7 @@ public class PTRConstants {
 
 	public static final String WORKFLOW_BUSINESS_SERVICE = "pet-services";
 	
-	public static final String WORKFLOW_BUSINESS_SERVICE_LMK = "pet-services_lmk";
+	public static final String WORKFLOW_BUSINESS_SERVICE_LMK = "pet-services-lmk";
 
 	public static final String WORKFLOW_ACTION_INITIATE = "INITIATE";
 
@@ -290,6 +290,8 @@ public class PTRConstants {
 	
 	public static final String USER_TYPE_CITIZEN = "CITIZEN";
 	
+	public static final String USER_TYPE_LMK = "LMK";
+
 	public static final String USER_TYPE_EMPLOYEE = "EMPLOYEE";
 	
 	public static final String USER_ROLE_PTR_VERIFIER = "PTR_VERIFIER";

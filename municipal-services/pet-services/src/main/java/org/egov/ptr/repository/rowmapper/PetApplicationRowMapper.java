@@ -57,7 +57,8 @@ public class PetApplicationRowMapper implements ResultSetExtractor<List<PetRegis
 						.fatherName(rs.getString("pfathername")).emailId(rs.getString("pemailId"))
 						.mobileNumber(rs.getString("pmobileNumber")).petDetails(petdetails).auditDetails(auditdetails)
 						.aadharNumber(rs.getString("paadharnumber")).status(rs.getString("pstatus"))
-						.applicationType(rs.getString("papplicationtype")).isBannedPet(rs.getBoolean("pis_banned_pet"))
+						.applicationType(rs.getString("papplicationtype"))
+						.businessService(rs.getString("pbusinessservice")).isBannedPet(rs.getBoolean("pis_banned_pet"))
 						.build();
 
 				petRegistrationApplication.setDocuments(new ArrayList<>());
