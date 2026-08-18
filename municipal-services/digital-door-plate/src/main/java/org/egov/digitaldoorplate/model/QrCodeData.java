@@ -20,10 +20,4 @@ public class QrCodeData {
 
 	@JsonProperty("useruuid")
 	private String userUuid;
-	
-	@JsonProperty("latitude")
-	private Double latitude;
-	
-	@JsonProperty("longitude")
-	private Double longitude;
 }

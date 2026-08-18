@@ -1,5 +1,7 @@
 package org.egov.digitaldoorplate.model;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -28,4 +30,6 @@ public class RemoteGrbgAddress {
 	private String wardName;
 
 	private String ulbName;
+	
+	private Map<String, Object> additionalDetail;
 }

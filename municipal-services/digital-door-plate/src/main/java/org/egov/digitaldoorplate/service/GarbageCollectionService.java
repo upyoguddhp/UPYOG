@@ -1,5 +1,6 @@
 package org.egov.digitaldoorplate.service;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -140,6 +141,14 @@ public class GarbageCollectionService {
 		GarbageCollection parentCollection = findTodaysCollection(todaysCollections, null);
 		RemoteGrbgAddress address = CollectionUtils.isEmpty(account.getAddresses()) ? null
 				: account.getAddresses().get(0);
+		
+		Map<String, Object> additionalDetail = address == null ? null : address.getAdditionalDetail();
+		
+		BigDecimal latitude = additionalDetail == null || additionalDetail.get("latitude") == null ? null
+				: new BigDecimal(String.valueOf(additionalDetail.get("latitude")));
+
+		BigDecimal longitude = additionalDetail == null || additionalDetail.get("longitude") == null ? null
+				: new BigDecimal(String.valueOf(additionalDetail.get("longitude")));
 
 		List<ChildAccountScanInfo> childAccounts = CollectionUtils.isEmpty(account.getChildGarbageAccounts())
 				? Collections.emptyList()
@@ -148,8 +157,8 @@ public class GarbageCollectionService {
 						.collect(Collectors.toList());
 
 		return GarbageAccountScanInfo.builder()
-				.latitude(null == parentCollection ? null : parentCollection.getLatitude())
-				.longitude(null == parentCollection ? null : parentCollection.getLongitude())
+				.latitude(latitude)
+				.longitude(longitude)
 				.wardNumber(null == address ? null : address.getWardName())
 				.ulbName(null == address ? null : address.getUlbName())
 				.uuid(account.getUuid())
