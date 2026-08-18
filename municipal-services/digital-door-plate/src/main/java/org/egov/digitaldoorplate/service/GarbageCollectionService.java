@@ -144,11 +144,13 @@ public class GarbageCollectionService {
 		
 		Map<String, Object> additionalDetail = address == null ? null : address.getAdditionalDetail();
 		
-		BigDecimal latitude = additionalDetail == null || additionalDetail.get("latitude") == null ? null
-				: new BigDecimal(String.valueOf(additionalDetail.get("latitude")));
+		BigDecimal latitude = additionalDetail == null || additionalDetail.get("latitude") == null
+				|| StringUtils.isEmpty(String.valueOf(additionalDetail.get("latitude"))) ? null
+						: new BigDecimal(String.valueOf(additionalDetail.get("latitude")));
 
-		BigDecimal longitude = additionalDetail == null || additionalDetail.get("longitude") == null ? null
-				: new BigDecimal(String.valueOf(additionalDetail.get("longitude")));
+		BigDecimal longitude = additionalDetail == null || additionalDetail.get("longitude") == null
+				|| StringUtils.isEmpty(String.valueOf(additionalDetail.get("longitude"))) ? null
+						: new BigDecimal(String.valueOf(additionalDetail.get("longitude")));
 
 		List<ChildAccountScanInfo> childAccounts = CollectionUtils.isEmpty(account.getChildGarbageAccounts())
 				? Collections.emptyList()
