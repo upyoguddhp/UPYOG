@@ -352,8 +352,13 @@ public class PropertySchedulerService {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
 				
-				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
-						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
 				
 				// Net rateable value after rebate
 				if (isShimlaPlotOfLand) {
@@ -895,8 +900,13 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
 				
-				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
-						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
 
 				// Net rateable value after rebate
 				if (isShimlaPlotOfLand) {
