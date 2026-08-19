@@ -171,11 +171,11 @@ public class TransactionServiceV2 {
 						.requestInfo(requestInfo).tenantIds(tenantIds).active(true).build();
 		
 				// fetch all bank account
-//				bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
-//				 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
-//				        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
-//				        transaction.setPayTo(bankAccount.getPayTo());
-//				    }
+				bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
+				 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
+				        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
+				        transaction.setPayTo(bankAccount.getPayTo());
+				    }
 				transaction.setPayTo("");
 				URI uri = gatewayService.initiateTxn(transaction);
 				transaction.setRedirectUrl(uri.toString());
