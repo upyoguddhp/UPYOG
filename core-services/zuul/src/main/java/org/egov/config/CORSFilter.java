@@ -27,14 +27,15 @@ public class CORSFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) res;
 
 		response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-		response.setHeader("Access-Control-Allow-Credentials", "true");
-		response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
-		response.setHeader("X-Content-Type-Options", "nosniff");
-		response.setHeader("X-Frame-Options", "SAMEORIGIN");
-		response.setHeader("Content-Security-Policy", "default-src 'self';");
-		response.setHeader("Cache-Control", "public, max-age=3600"); // Customize the Cache-Control header
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        response.setHeader("X-Frame-Options", "SAMEORIGIN");
+        response.setHeader("Content-Security-Policy", "default-src 'self';");
+        response.setHeader("Cache-Control", "public, max-age=3600"); // Customize the Cache-Control header
+ 
 
 
 		if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {
