@@ -138,7 +138,11 @@ public class TransactionServiceV2 {
 			
 			log.info("***PG SERVICE Request*** ==> Amount: {}, billId: {}",transaction.getTxnAmount(),transaction.getBillId());
 
-			if (validator.skipGateway(transaction)) {
+			if ("CHEQUE".equalsIgnoreCase(transaction.getGatewayPaymentMode())) {
+				transaction.setTxnStatus(Transaction.TxnStatusEnum.PROCESSING);
+				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+			}
+			else if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
 				paymentsService.registerPayment(
