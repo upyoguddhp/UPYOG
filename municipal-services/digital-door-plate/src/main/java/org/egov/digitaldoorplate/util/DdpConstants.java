@@ -35,6 +35,16 @@ public class DdpConstants {
 
 	public static final String SYNC_STATUS_FAILED = "FAILED";
 
+	public static final String CONTRACTOR_STATUS_ONBOARDED = "ONBOARDED";
+
+	public static final String CONTRACTOR_STATUS_ACTIVE = "ACTIVE";
+
+	public static final String CONTRACTOR_STATUS_INACTIVE = "INACTIVE";
+
+	public static final String COLLECTOR_ASSIGNMENT_STATUS_ASSIGNED = "ASSIGNED";
+
+	public static final String COLLECTOR_ASSIGNMENT_STATUS_UNASSIGNED = "UNASSIGNED";
+
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
 
