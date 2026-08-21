@@ -21,8 +21,6 @@ public class SearchCriteriaContractor {
 
 	private String ulb;
 
-	private String ward;
-
 	private String organisationContact;
 
 	private List<String> status;

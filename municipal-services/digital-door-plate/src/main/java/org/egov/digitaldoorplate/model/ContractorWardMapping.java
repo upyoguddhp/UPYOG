@@ -17,8 +17,6 @@ public class ContractorWardMapping {
 
 	private String contractorUuid;
 
-	private String district;
-
 	private String ulb;
 
 	private String wardNumber;

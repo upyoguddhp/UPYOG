@@ -10,12 +10,12 @@ import org.springframework.util.CollectionUtils;
 public class ContractorQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_contractor "
-			+ "(uuid, tenant_id, type, organisation_name, organisation_contact, district, ulb, ward, "
-			+ "organisation_address, organisation_pincode, man_power, start_date, end_date, "
+			+ "(uuid, tenant_id, type, organisation_name, organisation_contact, ulb, "
+			+ "organisation_address, organisation_pincode, gender, start_date, end_date, "
 			+ "contractor_name, contractor_father_name, contractor_contact_number, contractor_email, "
-			+ "contractor_address, contractor_pincode, additional_details, status, is_active, "
+			+ "contractor_address, contractor_pincode, contractor_dob, additional_details, status, is_active, "
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_contractor WHERE 1=1 ";
 
@@ -41,10 +41,6 @@ public class ContractorQueryBuilder {
 		if (null != criteria.getUlb()) {
 			query.append(" AND ulb = ?");
 			preparedStatementValues.add(criteria.getUlb());
-		}
-		if (null != criteria.getWard()) {
-			query.append(" AND ward = ?");
-			preparedStatementValues.add(criteria.getWard());
 		}
 		if (null != criteria.getOrganisationContact()) {
 			query.append(" AND organisation_contact = ?");

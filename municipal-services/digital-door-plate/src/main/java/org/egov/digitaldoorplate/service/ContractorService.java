@@ -37,10 +37,10 @@ public class ContractorService {
 	private ResponseInfoFactory responseInfoFactory;
 
 	/**
-	 * Onboards a contractor/NGO. Each contractor is also auto-mapped to its
-	 * registration ward (district/ulb/ward on the payload) so it is
-	 * immediately assignable without a separate ward-mapping call; further
-	 * wards can be added later via {@code ContractorWardMappingService}.
+	 * Onboards a contractor/NGO. Each contractor is also auto-mapped to every
+	 * ward listed on the payload (ulb/ward) so it is immediately assignable
+	 * without a separate ward-mapping call; further wards can be added later
+	 * via {@code ContractorWardMappingService}.
 	 */
 	@Transactional
 	public ContractorResponse create(ContractorRequest contractorRequest) {
@@ -58,7 +58,9 @@ public class ContractorService {
 
 			contractor.setUuid(UUID.randomUUID().toString());
 			contractor.setStatus(DdpConstants.CONTRACTOR_STATUS_ONBOARDED);
-			contractor.setIsActive(Boolean.TRUE);
+			if (null == contractor.getIsActive()) {
+				contractor.setIsActive(Boolean.TRUE);
+			}
 			contractor.setCreatedBy(userUuid);
 			contractor.setCreatedDate(now);
 			contractor.setLastModifiedBy(userUuid);
@@ -66,13 +68,13 @@ public class ContractorService {
 
 			contractorRepository.create(contractor);
 
-			contractorWardMappingService.createOrGetMapping(ContractorWardMapping.builder()
-					.tenantId(contractor.getTenantId())
-					.contractorUuid(contractor.getUuid())
-					.district(contractor.getDistrict())
-					.ulb(contractor.getUlb())
-					.wardNumber(contractor.getWard())
-					.build(), userUuid);
+			contractor.getWard().forEach(wardNumber -> contractorWardMappingService.createOrGetMapping(
+					ContractorWardMapping.builder()
+							.tenantId(contractor.getTenantId())
+							.contractorUuid(contractor.getUuid())
+							.ulb(contractor.getUlb())
+							.wardNumber(wardNumber)
+							.build(), userUuid));
 
 			return contractor;
 		}).collect(Collectors.toList());
@@ -111,14 +113,11 @@ public class ContractorService {
 		if (StringUtils.isEmpty(contractor.getOrganisationContact())) {
 			throw new CustomException("INVALID_REQUEST", "OrganisationContact is mandatory in contractor details.");
 		}
-		if (StringUtils.isEmpty(contractor.getDistrict())) {
-			throw new CustomException("INVALID_REQUEST", "District is mandatory in contractor details.");
-		}
 		if (StringUtils.isEmpty(contractor.getUlb())) {
 			throw new CustomException("INVALID_REQUEST", "Ulb is mandatory in contractor details.");
 		}
-		if (StringUtils.isEmpty(contractor.getWard())) {
-			throw new CustomException("INVALID_REQUEST", "Ward is mandatory in contractor details.");
+		if (CollectionUtils.isEmpty(contractor.getWard())) {
+			throw new CustomException("INVALID_REQUEST", "At least one ward is mandatory in contractor details.");
 		}
 		if (null == contractor.getContractorDetails()
 				|| StringUtils.isEmpty(contractor.getContractorDetails().getName())) {

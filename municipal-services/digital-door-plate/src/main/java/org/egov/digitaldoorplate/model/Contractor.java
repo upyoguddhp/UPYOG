@@ -1,5 +1,7 @@
 package org.egov.digitaldoorplate.model;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,17 +23,15 @@ public class Contractor {
 
 	private String organisationContact;
 
-	private String district;
-
 	private String ulb;
 
-	private String ward;
+	private List<String> ward;
 
 	private String organisationAddress;
 
 	private String organisationPincode;
 
-	private Integer manPower;
+	private String gender;
 
 	private Long startDate;
 

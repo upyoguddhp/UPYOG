@@ -16,7 +16,6 @@ public class ContractorWardMappingRowMapper implements RowMapper<ContractorWardM
 				.uuid(rs.getString("uuid"))
 				.tenantId(rs.getString("tenant_id"))
 				.contractorUuid(rs.getString("contractor_uuid"))
-				.district(rs.getString("district"))
 				.ulb(rs.getString("ulb"))
 				.wardNumber(rs.getString("ward_number"))
 				.isActive(rs.getBoolean("is_active"))

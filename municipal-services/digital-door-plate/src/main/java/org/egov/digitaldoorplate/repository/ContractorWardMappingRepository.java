@@ -28,7 +28,6 @@ public class ContractorWardMappingRepository {
 				mapping.getUuid(),
 				mapping.getTenantId(),
 				mapping.getContractorUuid(),
-				mapping.getDistrict(),
 				mapping.getUlb(),
 				mapping.getWardNumber(),
 				mapping.getIsActive(),

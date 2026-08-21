@@ -22,4 +22,6 @@ public class ContractorDetails {
 	private String address;
 
 	private String pincode;
+
+	private Long dob;
 }

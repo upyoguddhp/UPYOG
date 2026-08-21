@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS eg_ddp_contractor_ward_mapping (
     uuid                        character varying(64) NOT NULL,
     tenant_id                   character varying(64) NOT NULL,
     contractor_uuid             character varying(64) NOT NULL,
-    district                    character varying(128) NOT NULL,
     ulb                         character varying(128) NOT NULL,
     ward_number                 character varying(64) NOT NULL,
     is_active                   boolean DEFAULT true,

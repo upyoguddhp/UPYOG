@@ -24,12 +24,10 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 				.type(rs.getString("type"))
 				.organisationName(rs.getString("organisation_name"))
 				.organisationContact(rs.getString("organisation_contact"))
-				.district(rs.getString("district"))
 				.ulb(rs.getString("ulb"))
-				.ward(rs.getString("ward"))
 				.organisationAddress(rs.getString("organisation_address"))
 				.organisationPincode(rs.getString("organisation_pincode"))
-				.manPower(getInteger(rs, "man_power"))
+				.gender(rs.getString("gender"))
 				.startDate(getLong(rs, "start_date"))
 				.endDate(getLong(rs, "end_date"))
 				.contractorDetails(ContractorDetails.builder()
@@ -39,6 +37,7 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 						.email(rs.getString("contractor_email"))
 						.address(rs.getString("contractor_address"))
 						.pincode(rs.getString("contractor_pincode"))
+						.dob(getLong(rs, "contractor_dob"))
 						.build())
 				.additionalDetails(jsonbUtil.parse(rs.getString("additional_details")))
 				.status(rs.getString("status"))
@@ -52,11 +51,6 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 
 	private Long getLong(ResultSet rs, String columnName) throws SQLException {
 		long value = rs.getLong(columnName);
-		return rs.wasNull() ? null : value;
-	}
-
-	private Integer getInteger(ResultSet rs, String columnName) throws SQLException {
-		int value = rs.getInt(columnName);
 		return rs.wasNull() ? null : value;
 	}
 }
