@@ -229,20 +229,34 @@ public class PropertySchedulerService {
 			BigDecimal propertyTaxWithoutRebate = BigDecimal.ZERO;
 			String ulbName = property.getTenantId().split("\\.")[1];
 			JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+			
+			boolean previousBillUnpaid = false;
+
+			if ("Shimla".equalsIgnoreCase(ulbName)) {
+				previousBillUnpaid = hasPreviousUnpaidBill(calculateTaxRequest.getRequestInfo(),property.getPropertyId());
+			}
 
 			for (Unit unit : property.getUnits()) {
 				BigDecimal totalRateableValue = BigDecimal.ZERO;
+				BigDecimal upto100RateableValue = BigDecimal.ZERO;
+				BigDecimal above100RateableValue = BigDecimal.ZERO;
 				BigDecimal netRateableValue = BigDecimal.ZERO;
+				BigDecimal netUpto100RateableValue = BigDecimal.ZERO;
+				BigDecimal netAbove100RateableValue = BigDecimal.ZERO;
 				BigDecimal structuralFactor = null;
 				BigDecimal ageFactor = null;
 				BigDecimal occupancyFactor = null;
 				BigDecimal useFactor = null;
 				BigDecimal locationFactor = null;
 				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
+				BigDecimal oAndMRebateUpto100Amount = BigDecimal.ZERO;
+				BigDecimal oAndMRebateAbove100Amount = BigDecimal.ZERO;
 				BigDecimal oAndMRebatePercentage = null;
 				BigDecimal propertyTaxRatePercentage = null;
 				BigDecimal propertyTaxLandRatePercentage = null;
 				BigDecimal propertyTax = BigDecimal.ZERO;
+				BigDecimal propertyTaxUpto100 = BigDecimal.ZERO;
+				BigDecimal propertyTaxAbove100 = BigDecimal.ZERO;
 
 				Set<String> errorSet = new HashSet<>();
 				JsonNode unitAdditionalDetails = objectMapper.valueToTree(unit.getAdditionalDetails());
@@ -302,27 +316,71 @@ public class PropertySchedulerService {
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
 				if (oAndMRebatePercentage == null)
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
+				
+				BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+				BigDecimal newAreaunitPropertyArea = unitPropertyArea;
+				newAreaunitPropertyArea = unitPropertyArea.subtract(BigDecimal.valueOf(100));
+				    
+				boolean isShimlaAreaAbove100 = unitPropertyArea.compareTo(BigDecimal.valueOf(100)) > 0
+						&& ulbName.equalsIgnoreCase("Shimla")
+						&& unitAdditionalDetails.get("propType").asText().equalsIgnoreCase("Self Residential")
+					&& unitAdditionalDetails.get("useOfBuilding").asText().equalsIgnoreCase("Residential");
 
 				// Calculate totalRateableValue
 				if (structuralFactor != null && ageFactor != null && occupancyFactor != null && useFactor != null
 						&& locationFactor != null && property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
-					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
-							.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
-							.multiply(useFactor).multiply(locationFactor);
+					
+					if (isShimlaAreaAbove100) {
+
+						upto100RateableValue = BigDecimal.valueOf(100).multiply(structuralFactor).multiply(ageFactor)
+								.multiply(occupancyFactor).multiply(useFactor).multiply(locationFactor);
+
+						above100RateableValue = newAreaunitPropertyArea.multiply(structuralFactor).multiply(ageFactor)
+								.multiply(occupancyFactor).multiply(useFactor).multiply(locationFactor);
+
+					} else {
+
+						totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+								.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
+								.multiply(useFactor).multiply(locationFactor);
+					}
+					
 				} else if (property.getPropertyType().equalsIgnoreCase("VACANT") && locationFactor != null) {
 					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
 							.multiply(locationFactor);
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
-
+				
+				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
+						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				
 				// Net rateable value after rebate
-				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null) {
-					oAndMRebateAmount = totalRateableValue
-							.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
-					netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
+					if (isShimlaAreaAbove100) {
+
+						oAndMRebateUpto100Amount = upto100RateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netUpto100RateableValue = upto100RateableValue.subtract(oAndMRebateUpto100Amount);
+
+						oAndMRebateAbove100Amount = above100RateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netAbove100RateableValue = above100RateableValue.subtract(oAndMRebateAbove100Amount);
+
+					} else {
+						oAndMRebateAmount = totalRateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+					}
 				}
 
+
+BigDecimal rateUpto100 = BigDecimal.ZERO;
+BigDecimal rateAbove100 = BigDecimal.ZERO;
+				
 				// Find property tax rate
 				for (JsonNode propertyTaxRate : propertyTaxRates) {
 					if (ulbName.equalsIgnoreCase(propertyTaxRate.get("ulbName").asText())
@@ -334,10 +392,22 @@ public class PropertySchedulerService {
 									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
 
 						String propertyAreaString = propertyTaxRate.get("propertyArea").asText();
-						BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+						
 
-						if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
-							propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+						if (isShimlaAreaAbove100) {
+
+							if (isAreaWithinRange(propertyAreaString, BigDecimal.valueOf(100))) {
+								rateUpto100 = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+
+							if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+								rateAbove100 = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+						} else {
+							if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+								propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+
 						}
 					}
 				}
@@ -353,13 +423,26 @@ public class PropertySchedulerService {
 					}
 				}
 
-				if (!BigDecimal.ZERO.equals(netRateableValue) 
-				        && propertyTaxRatePercentage != null 
+				if ((!BigDecimal.ZERO.equals(netRateableValue)  ||  !BigDecimal.ZERO.equals(netUpto100RateableValue) && !BigDecimal.ZERO.equals(netAbove100RateableValue))
+				        && (propertyTaxRatePercentage != null || (rateUpto100 !=null && rateAbove100 !=null))
 				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
 
 				    // Case 1: NOT VACANT
-				    propertyTax = netRateableValue.multiply(
+					if (isShimlaAreaAbove100) {
+
+						propertyTaxUpto100 = netUpto100RateableValue
+								.multiply(rateUpto100.divide(BigDecimal.valueOf(100)));
+
+						propertyTaxAbove100 = netAbove100RateableValue
+								.multiply(rateAbove100.divide(BigDecimal.valueOf(100)));
+
+						propertyTax = propertyTaxUpto100.add(propertyTaxAbove100);
+
+					} else {
+						
+						 propertyTax = netRateableValue.multiply(
 				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+					}
 
 				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
 				        && propertyTaxLandRatePercentage != null 
@@ -435,7 +518,7 @@ public class PropertySchedulerService {
 						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
 					}
 				}
-				if (epRebatePercentage != null) {
+				if (epRebatePercentage != null && !previousBillUnpaid) {
 					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
@@ -650,8 +733,8 @@ public class PropertySchedulerService {
 		BigDecimal days = calculateDays(calculateTaxRequest);
 
 		Map<String, Set<String>> errorMap = new HashMap<>();
-
-		MdmsResponse mdmsResponse = mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), null);
+		String u = "[?(@.ulbName == \"" + calculateTaxRequest.getUlbNames().iterator().next() + "\")]";
+		MdmsResponse mdmsResponse = mdmsService.getMdmsData(calculateTaxRequest.getRequestInfo(), u );
 		if (mdmsResponse != null && mdmsResponse.getMdmsRes() != null
 				&& mdmsResponse.getMdmsRes().get(PTConstants.MDMS_MODULE_ULBS) != null) {
 
@@ -699,17 +782,25 @@ public class PropertySchedulerService {
 
 			for (Unit unit : property.getUnits()) {
 				BigDecimal totalRateableValue = BigDecimal.ZERO;
+				BigDecimal upto100RateableValue = BigDecimal.ZERO;
+				BigDecimal above100RateableValue = BigDecimal.ZERO;
 				BigDecimal netRateableValue = BigDecimal.ZERO;
+				BigDecimal netUpto100RateableValue = BigDecimal.ZERO;
+				BigDecimal netAbove100RateableValue = BigDecimal.ZERO;
 				BigDecimal structuralFactor = null;
 				BigDecimal ageFactor = null;
 				BigDecimal occupancyFactor = null;
 				BigDecimal useFactor = null;
 				BigDecimal locationFactor = null;
 				BigDecimal oAndMRebateAmount = BigDecimal.ZERO;
+				BigDecimal oAndMRebateUpto100Amount = BigDecimal.ZERO;
+				BigDecimal oAndMRebateAbove100Amount = BigDecimal.ZERO;
 				BigDecimal oAndMRebatePercentage = null;
 				BigDecimal propertyTaxRatePercentage = null;
 				BigDecimal propertyTaxLandRatePercentage = null;
 				BigDecimal propertyTax = BigDecimal.ZERO;
+				BigDecimal propertyTaxUpto100 = BigDecimal.ZERO;
+				BigDecimal propertyTaxAbove100 = BigDecimal.ZERO;
 
 				Set<String> errorSet = new HashSet<>();
 				JsonNode unitAdditionalDetails = objectMapper.valueToTree(unit.getAdditionalDetails());
@@ -769,26 +860,68 @@ public class PropertySchedulerService {
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_ZONES + " (F1) is missing in mdms");
 				if (oAndMRebatePercentage == null)
 					errorSet.add(PTConstants.MDMS_MASTER_DETAILS_OVERALLREBATE + " is missing in mdms");
+				BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
+				BigDecimal newAreaunitPropertyArea = unitPropertyArea;
+				 newAreaunitPropertyArea =
+				            unitPropertyArea.subtract(BigDecimal.valueOf(100));
+				    
+					boolean isShimlaAreaAbove100 = unitPropertyArea.compareTo(BigDecimal.valueOf(100)) > 0
+							&& ulbName.equalsIgnoreCase("Shimla")
+							&& unitAdditionalDetails.get("propType").asText().equalsIgnoreCase("Self Residential")
+						&& unitAdditionalDetails.get("useOfBuilding").asText().equalsIgnoreCase("Residential");
 
 				// Calculate totalRateableValue
 				if (structuralFactor != null && ageFactor != null && occupancyFactor != null && useFactor != null
 						&& locationFactor != null && property.getPropertyType().equalsIgnoreCase("BUILTUP")) {
-					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
-							.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
-							.multiply(useFactor).multiply(locationFactor);
+
+					if (isShimlaAreaAbove100) {
+
+						upto100RateableValue = BigDecimal.valueOf(100).multiply(structuralFactor).multiply(ageFactor)
+								.multiply(occupancyFactor).multiply(useFactor).multiply(locationFactor);
+
+						above100RateableValue = newAreaunitPropertyArea.multiply(structuralFactor).multiply(ageFactor)
+								.multiply(occupancyFactor).multiply(useFactor).multiply(locationFactor);
+
+					} else {
+
+						totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
+								.multiply(structuralFactor).multiply(ageFactor).multiply(occupancyFactor)
+								.multiply(useFactor).multiply(locationFactor);
+					}
 				} else if (property.getPropertyType().equalsIgnoreCase("VACANT") && locationFactor != null) {
 					totalRateableValue = new BigDecimal(unitAdditionalDetails.get("propArea").asText())
 							.multiply(locationFactor);
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
+				
+				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
+						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
 
 				// Net rateable value after rebate
-				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null) {
-					oAndMRebateAmount = totalRateableValue
-							.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
-					netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
+					if (isShimlaAreaAbove100) {
+
+						oAndMRebateUpto100Amount = upto100RateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netUpto100RateableValue = upto100RateableValue.subtract(oAndMRebateUpto100Amount);
+
+						oAndMRebateAbove100Amount = above100RateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netAbove100RateableValue = above100RateableValue.subtract(oAndMRebateAbove100Amount);
+
+					} else {
+						oAndMRebateAmount = totalRateableValue
+								.multiply(oAndMRebatePercentage.divide(BigDecimal.valueOf(100)));
+						netRateableValue = totalRateableValue.subtract(oAndMRebateAmount);
+					}
 				}
+
+				BigDecimal rateUpto100 = BigDecimal.ZERO;
+				BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 				// Find property tax rate
 				for (JsonNode propertyTaxRate : propertyTaxRates) {
@@ -801,11 +934,23 @@ public class PropertySchedulerService {
 									ulbName + "." + unitAdditionalDetails.get("useOfBuilding").asText())) {
 
 						String propertyAreaString = propertyTaxRate.get("propertyArea").asText();
-						BigDecimal unitPropertyArea = new BigDecimal(unitAdditionalDetails.get("propArea").asText());
 
-						if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
-							propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+						if (isShimlaAreaAbove100) {
+
+							if (isAreaWithinRange(propertyAreaString, BigDecimal.valueOf(100))) {
+								rateUpto100 = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+
+							if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+								rateAbove100 = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+						} else {
+							if (isAreaWithinRange(propertyAreaString, unitPropertyArea)) {
+								propertyTaxRatePercentage = new BigDecimal(propertyTaxRate.get("rate").asText());
+							}
+
 						}
+
 					}
 				}
 
@@ -820,13 +965,26 @@ public class PropertySchedulerService {
 						
 					}
 				}
-				if (!BigDecimal.ZERO.equals(netRateableValue) 
-				        && propertyTaxRatePercentage != null 
+				if ((!BigDecimal.ZERO.equals(netRateableValue)  ||  !BigDecimal.ZERO.equals(netUpto100RateableValue) && !BigDecimal.ZERO.equals(netAbove100RateableValue))
+				        && (propertyTaxRatePercentage != null || (rateUpto100 !=null && rateAbove100 !=null))
 				        && !property.getPropertyType().equalsIgnoreCase("VACANT")) {
 
 				    // Case 1: NOT VACANT
-				    propertyTax = netRateableValue.multiply(
+					if (isShimlaAreaAbove100) {
+
+						propertyTaxUpto100 = netUpto100RateableValue
+								.multiply(rateUpto100.divide(BigDecimal.valueOf(100)));
+
+						propertyTaxAbove100 = netAbove100RateableValue
+								.multiply(rateAbove100.divide(BigDecimal.valueOf(100)));
+
+						propertyTax = propertyTaxUpto100.add(propertyTaxAbove100);
+
+					} else {
+						
+						 propertyTax = netRateableValue.multiply(
 				            propertyTaxRatePercentage.divide(BigDecimal.valueOf(100)));
+					}
 
 				} else if (!BigDecimal.ZERO.equals(netRateableValue) 
 				        && propertyTaxLandRatePercentage != null 
@@ -937,7 +1095,14 @@ public class PropertySchedulerService {
 						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
 					}
 				}
-				if (epRebatePercentage != null) {
+				
+				boolean previousBillUnpaid = false;
+
+				if ("Shimla".equalsIgnoreCase(ulbName)) {
+					previousBillUnpaid = hasPreviousUnpaidBill(calculateTaxRequest.getRequestInfo(),property.getPropertyId());
+				}
+
+				if (epRebatePercentage != null  && !previousBillUnpaid) {
 					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
@@ -958,6 +1123,28 @@ public class PropertySchedulerService {
 
 		return previewResponses;
 	}
+	
+	private boolean hasPreviousUnpaidBill(RequestInfo requestInfo, String propertyId) {
+
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(Collections.singleton(propertyId)).build();
+		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
+		if (CollectionUtils.isEmpty(trackers)) {
+			return false;
+		}
+
+		for (PtTaxCalculatorTracker tracker : trackers) {
+			if (StringUtils.isBlank(tracker.getDemandId())) {
+				continue;
+			}
+			List<Demand> demand = demandService.searchDemand(tracker.getTenantId(),
+					Collections.singleton(tracker.getDemandId()), null, requestInfo, "PROPERTY");
+			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIspaymentcompleted())) {
+				return true;
+			}
+		}
+		return false;
+		}
 
 	private void createFailureLog(Property property, CalculateTaxRequest generateBillRequest, BillResponse billResponse,
 			Set<String> errorMap) {
