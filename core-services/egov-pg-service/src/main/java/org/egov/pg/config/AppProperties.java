@@ -20,6 +20,10 @@ public class AppProperties {
     
     private final String saveTxnDetailsTopic;
 
+    private final String saveFeePaymentTxnTopic;
+
+    private final String updateFeePaymentTxnTopic;
+
     private final String updateTxnTopic;
 
     private final String saveTxnDumpTopic;
@@ -123,6 +127,8 @@ public class AppProperties {
         this.earlyReconcileJobRunInterval = Integer.valueOf(environment.getRequiredProperty("pg.earlyReconcileJobRunInterval.mins"));
         this.saveTxnTopic = environment.getRequiredProperty("persister.save.pg.txns");
         this.saveTxnDetailsTopic = environment.getRequiredProperty("persister.save.pg.txns.details");
+        this.saveFeePaymentTxnTopic = environment.getRequiredProperty("persister.save.pg.fee.txns");
+        this.updateFeePaymentTxnTopic = environment.getRequiredProperty("persister.update.pg.fee.txns");
         this.updateTxnTopic = environment.getRequiredProperty("persister.update.pg.txns");
         this.saveTxnDumpTopic = environment.getRequiredProperty("persister.save.pg.txnsDump");
         this.updateTxnDumpTopic = environment.getRequiredProperty("persister.update.pg.txnsDump");
