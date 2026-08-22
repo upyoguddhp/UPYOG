@@ -51,6 +51,7 @@ import org.egov.pg.models.BillResponse;
 import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
 import org.egov.pg.service.gateways.razorpay.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.pg.web.models.ChequeTransactionRequest;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -446,8 +447,52 @@ public class TransactionServiceV2 {
 	
 	    return new DemandAmountInfo(taxAmount, collectionAmount);
 	}
+	
+	public String updateChequeTransaction(ChequeTransactionRequest request) {
 
+		TransactionCriteriaV2 transactionSearchCriteria = TransactionCriteriaV2.builder()
+				.billIds(Collections.singleton(request.getBillId())).build();
 
+		List<Transaction> transactions = getTransactions(transactionSearchCriteria);
+		if (CollectionUtils.isEmpty(transactions)) {
+			throw new CustomException("TRANSACTION_NOT_FOUND", "Transaction not found");
+		}
+		Transaction txn = transactions.get(0);
 
+		if (!"CHEQUE".equalsIgnoreCase(txn.getGatewayPaymentMode())) {
+			throw new CustomException("INVALID_TRANSACTION", "Transaction is not a cheque transaction");
+		}
+
+		if (txn.getTxnStatus() != Transaction.TxnStatusEnum.PROCESSING) {
+			throw new CustomException("INVALID_TRANSACTION_STATUS", "Cheque transaction must be in PROCESSING state");
+		}
+
+		if (Transaction.TxnStatusEnum.SUCCESS.equals(request.getAction())) {
+			txn.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
+			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+			paymentsService.registerPayment(
+					TransactionRequest.builder().transaction(txn).requestInfo(request.getRequestInfo()).build());
+
+			updateChequeTransactionStatus(txn, request.getRequestInfo());
+
+			return "Cheque payment for Bill ID " + request.getBillId()
+					+ " has been successfully verified and payment processing has been completed.";
+
+		} else if (Transaction.TxnStatusEnum.FAILURE.equals(request.getAction())) {
+
+			txn.setTxnStatus(Transaction.TxnStatusEnum.FAILURE);
+			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+
+			updateChequeTransactionStatus(txn, request.getRequestInfo());
+
+			return "Cheque payment for Bill ID " + request.getBillId() + " has been rejected and marked as failed.";
+		}
+
+		return "Invalid action for cheque payment for Bill ID " + request.getBillId();
+	}
+	
+	private void updateChequeTransactionStatus(Transaction txn, RequestInfo requestInfo) {
+		producer.push(appProperties.getUpdateTxnTopic(), new org.egov.pg.models.TransactionRequest(requestInfo, txn));
+	}
 
 }
