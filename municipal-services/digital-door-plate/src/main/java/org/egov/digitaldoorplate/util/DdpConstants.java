@@ -45,6 +45,10 @@ public class DdpConstants {
 
 	public static final String COLLECTOR_ASSIGNMENT_STATUS_UNASSIGNED = "UNASSIGNED";
 
+	public static final String USER_TYPE_EMPLOYEE = "EMPLOYEE";
+
+	public static final String USER_ROLE_GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR";
+
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
 
