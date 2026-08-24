@@ -10,9 +10,9 @@ import org.springframework.util.CollectionUtils;
 public class ContractorWardMappingQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_contractor_ward_mapping "
-			+ "(uuid, tenant_id, contractor_uuid, ulb, ward_number, is_active, "
+			+ "(uuid, tenant_id, contractor_uuid, contractor_user_uuid, ulb, ward_number, is_active, "
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_contractor_ward_mapping WHERE 1=1 ";
 

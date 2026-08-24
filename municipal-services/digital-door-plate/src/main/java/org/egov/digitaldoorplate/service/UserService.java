@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.digitaldoorplate.model.Contractor;
 import org.egov.digitaldoorplate.model.GarbageCollector;
 import org.egov.digitaldoorplate.model.GarbageSupervisor;
 import org.egov.digitaldoorplate.model.contract.CreateUserRequest;
@@ -132,6 +133,48 @@ public class UserService {
 			throw new CustomException("USER_CREATE_FAILED",
 					"Failed to create egov-user account for garbage supervisor, mobileNumber: "
 							+ supervisor.getMobileNumber());
+		}
+
+		return response.getUser().get(0);
+	}
+
+	/**
+	 * Returns the contractor's existing egov-user account for their contact
+	 * person's mobile number/tenant, or creates a new EMPLOYEE user with the
+	 * CONTRACTOR role if none exists yet. The login identity is the individual
+	 * named in {@code contractorDetails} (the organisation's contact person),
+	 * not the organisation itself.
+	 */
+	public User createOrGetContractorUser(RequestInfo requestInfo, Contractor contractor) {
+
+		String mobileNumber = contractor.getContractorDetails().getContactNumber();
+
+		User existingUser = findExistingUser(requestInfo, mobileNumber, contractor.getTenantId());
+		if (existingUser != null) {
+			return existingUser;
+		}
+
+		User newUser = User.builder()
+				.name(contractor.getContractorDetails().getName())
+				.userName(mobileNumber)
+				.mobileNumber(mobileNumber)
+				.emailId(contractor.getContractorDetails().getEmail())
+				.gender(contractor.getGender())
+				.tenantId(contractor.getTenantId())
+				.type(DdpConstants.USER_TYPE_EMPLOYEE)
+				.active(true)
+				.roles(Collections.singletonList(Role.builder()
+						.code(DdpConstants.USER_ROLE_CONTRACTOR)
+						.name("Contractor")
+						.build()))
+				.build();
+
+		UserDetailResponse response = createUser(requestInfo, newUser);
+
+		if (ObjectUtils.isEmpty(response) || CollectionUtils.isEmpty(response.getUser())
+				|| ObjectUtils.isEmpty(response.getUser().get(0).getUuid())) {
+			throw new CustomException("USER_CREATE_FAILED",
+					"Failed to create egov-user account for contractor, mobileNumber: " + mobileNumber);
 		}
 
 		return response.getUser().get(0);

@@ -22,6 +22,7 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 				.uuid(rs.getString("uuid"))
 				.tenantId(rs.getString("tenant_id"))
 				.type(rs.getString("type"))
+				.contractorCode(rs.getString("contractor_code"))
 				.organisationName(rs.getString("organisation_name"))
 				.organisationContact(rs.getString("organisation_contact"))
 				.ulb(rs.getString("ulb"))

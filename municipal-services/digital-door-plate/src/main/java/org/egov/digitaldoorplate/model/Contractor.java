@@ -19,6 +19,8 @@ public class Contractor {
 
 	private String type;
 
+	private String contractorCode;
+
 	private String organisationName;
 
 	private String organisationContact;
@@ -40,6 +42,13 @@ public class Contractor {
 	private ContractorDetails contractorDetails;
 
 	private Object additionalDetails;
+
+	/**
+	 * Populated by {@code ContractorService.create()} once the egov-user login
+	 * has been created for the contractor's contact person. Not persisted on
+	 * this entity; carried on each ward mapping instead.
+	 */
+	private String contractorUserUuid;
 
 	private String status;
 

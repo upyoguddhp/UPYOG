@@ -10,17 +10,50 @@ import org.springframework.util.CollectionUtils;
 public class ContractorQueryBuilder {
 
 	public static final String CREATE_QUERY = "INSERT INTO eg_ddp_contractor "
-			+ "(uuid, tenant_id, type, organisation_name, organisation_contact, ulb, "
+			+ "(uuid, tenant_id, type, contractor_code, organisation_name, organisation_contact, ulb, "
 			+ "organisation_address, organisation_pincode, gender, start_date, end_date, "
 			+ "contractor_name, contractor_father_name, contractor_contact_number, contractor_email, "
 			+ "contractor_address, contractor_pincode, contractor_dob, additional_details, status, is_active, "
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_contractor WHERE 1=1 ";
 
+	private static final String COUNT_QUERY = "SELECT "
+			+ "COUNT(*) AS total_vendors, "
+			+ "COUNT(*) FILTER (WHERE is_active = true) AS active_vendors, "
+			+ "COUNT(*) FILTER (WHERE is_active = false OR is_active IS NULL) AS inactive_vendors, "
+			+ "COUNT(*) FILTER (WHERE UPPER(type) = 'CONTRACTOR') AS contractors, "
+			+ "COUNT(*) FILTER (WHERE UPPER(type) IN ('NGO', 'AGENCY')) AS agencies, "
+			+ "COUNT(*) FILTER (WHERE type IS NULL OR UPPER(type) NOT IN ('CONTRACTOR', 'NGO', 'AGENCY')) AS other_vendors "
+			+ "FROM eg_ddp_contractor WHERE 1=1 ";
+
 	public String getSearchQuery(SearchCriteriaContractor criteria, List<Object> preparedStatementValues) {
 		StringBuilder query = new StringBuilder(SEARCH_QUERY);
+		appendFilters(query, criteria, preparedStatementValues);
+
+		query.append(" ORDER BY createddate DESC");
+
+		if (null != criteria.getLimit()) {
+			query.append(" LIMIT ?");
+			preparedStatementValues.add(criteria.getLimit());
+		}
+		if (null != criteria.getOffset()) {
+			query.append(" OFFSET ?");
+			preparedStatementValues.add(criteria.getOffset());
+		}
+
+		return query.toString();
+	}
+
+	public String getCountQuery(SearchCriteriaContractor criteria, List<Object> preparedStatementValues) {
+		StringBuilder query = new StringBuilder(COUNT_QUERY);
+		appendFilters(query, criteria, preparedStatementValues);
+		return query.toString();
+	}
+
+	private void appendFilters(StringBuilder query, SearchCriteriaContractor criteria,
+			List<Object> preparedStatementValues) {
 
 		if (!CollectionUtils.isEmpty(criteria.getUuid())) {
 			query.append(" AND uuid IN (").append(getPlaceholders(criteria.getUuid().size())).append(")");
@@ -42,27 +75,23 @@ public class ContractorQueryBuilder {
 			query.append(" AND ulb = ?");
 			preparedStatementValues.add(criteria.getUlb());
 		}
+		if (null != criteria.getOrganisationName()) {
+			query.append(" AND organisation_name ILIKE ?");
+			preparedStatementValues.add("%" + criteria.getOrganisationName() + "%");
+		}
 		if (null != criteria.getOrganisationContact()) {
 			query.append(" AND organisation_contact = ?");
 			preparedStatementValues.add(criteria.getOrganisationContact());
+		}
+		if (null != criteria.getMobileNumber()) {
+			query.append(" AND (organisation_contact = ? OR contractor_contact_number = ?)");
+			preparedStatementValues.add(criteria.getMobileNumber());
+			preparedStatementValues.add(criteria.getMobileNumber());
 		}
 		if (null != criteria.getIsActive()) {
 			query.append(" AND is_active = ?");
 			preparedStatementValues.add(criteria.getIsActive());
 		}
-
-		query.append(" ORDER BY createddate DESC");
-
-		if (null != criteria.getLimit()) {
-			query.append(" LIMIT ?");
-			preparedStatementValues.add(criteria.getLimit());
-		}
-		if (null != criteria.getOffset()) {
-			query.append(" OFFSET ?");
-			preparedStatementValues.add(criteria.getOffset());
-		}
-
-		return query.toString();
 	}
 
 	private String getPlaceholders(int count) {

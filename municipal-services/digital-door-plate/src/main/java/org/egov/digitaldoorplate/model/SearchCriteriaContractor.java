@@ -19,6 +19,10 @@ public class SearchCriteriaContractor {
 
 	private List<String> type;
 
+	private String organisationName;
+
+	private String mobileNumber;
+
 	private String ulb;
 
 	private String organisationContact;

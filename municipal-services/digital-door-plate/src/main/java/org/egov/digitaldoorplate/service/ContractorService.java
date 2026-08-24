@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.digitaldoorplate.model.Contractor;
+import org.egov.digitaldoorplate.model.ContractorCounts;
 import org.egov.digitaldoorplate.model.ContractorRequest;
 import org.egov.digitaldoorplate.model.ContractorResponse;
 import org.egov.digitaldoorplate.model.ContractorWardMapping;
 import org.egov.digitaldoorplate.model.SearchCriteriaContractor;
 import org.egov.digitaldoorplate.model.SearchCriteriaContractorRequest;
+import org.egov.digitaldoorplate.model.contract.User;
 import org.egov.digitaldoorplate.repository.ContractorRepository;
 import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
@@ -34,6 +36,9 @@ public class ContractorService {
 	private ContractorWardMappingService contractorWardMappingService;
 
 	@Autowired
+	private UserService userService;
+
+	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
 	/**
@@ -51,7 +56,8 @@ public class ContractorService {
 		}
 
 		Long now = System.currentTimeMillis();
-		String userUuid = contractorRequest.getRequestInfo().getUserInfo().getUuid();
+		RequestInfo requestInfo = contractorRequest.getRequestInfo();
+		String userUuid = requestInfo.getUserInfo().getUuid();
 
 		List<Contractor> result = contractorRequest.getContractors().stream().map(contractor -> {
 			validateContractor(contractor);
@@ -68,10 +74,14 @@ public class ContractorService {
 
 			contractorRepository.create(contractor);
 
+			User contractorUser = userService.createOrGetContractorUser(requestInfo, contractor);
+			contractor.setContractorUserUuid(contractorUser.getUuid());
+
 			contractor.getWard().forEach(wardNumber -> contractorWardMappingService.createOrGetMapping(
 					ContractorWardMapping.builder()
 							.tenantId(contractor.getTenantId())
 							.contractorUuid(contractor.getUuid())
+							.contractorUserUuid(contractorUser.getUuid())
 							.ulb(contractor.getUlb())
 							.wardNumber(wardNumber)
 							.build(), userUuid));
@@ -93,11 +103,13 @@ public class ContractorService {
 		}
 
 		List<Contractor> contractors = contractorRepository.search(criteria);
+		ContractorCounts counts = contractorRepository.getCounts(criteria);
 
 		return ContractorResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(),
 						true))
-				.contractors(contractors).build();
+				.contractors(contractors)
+				.counts(counts).build();
 	}
 
 	private void validateContractor(Contractor contractor) {

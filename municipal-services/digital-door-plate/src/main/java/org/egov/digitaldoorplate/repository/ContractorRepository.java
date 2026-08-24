@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.digitaldoorplate.model.Contractor;
+import org.egov.digitaldoorplate.model.ContractorCounts;
 import org.egov.digitaldoorplate.model.SearchCriteriaContractor;
 import org.egov.digitaldoorplate.repository.builder.ContractorQueryBuilder;
 import org.egov.digitaldoorplate.repository.rowmapper.ContractorRowMapper;
@@ -32,6 +33,7 @@ public class ContractorRepository {
 				contractor.getUuid(),
 				contractor.getTenantId(),
 				contractor.getType(),
+				contractor.getContractorCode(),
 				contractor.getOrganisationName(),
 				contractor.getOrganisationContact(),
 				contractor.getUlb(),
@@ -60,5 +62,19 @@ public class ContractorRepository {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
 		return jdbcTemplate.query(query, preparedStatementValues.toArray(), rowMapper);
+	}
+
+	public ContractorCounts getCounts(SearchCriteriaContractor criteria) {
+		List<Object> preparedStatementValues = new ArrayList<>();
+		String query = queryBuilder.getCountQuery(criteria, preparedStatementValues);
+		return jdbcTemplate.queryForObject(query, preparedStatementValues.toArray(),
+				(rs, rowNum) -> ContractorCounts.builder()
+						.totalVendors(rs.getLong("total_vendors"))
+						.activeVendors(rs.getLong("active_vendors"))
+						.inactiveVendors(rs.getLong("inactive_vendors"))
+						.contractors(rs.getLong("contractors"))
+						.agencies(rs.getLong("agencies"))
+						.otherVendors(rs.getLong("other_vendors"))
+						.build());
 	}
 }

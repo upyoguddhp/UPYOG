@@ -23,4 +23,6 @@ public class ContractorResponse {
 	private ResponseInfo responseInfo;
 
 	private List<Contractor> contractors;
+
+	private ContractorCounts counts;
 }
