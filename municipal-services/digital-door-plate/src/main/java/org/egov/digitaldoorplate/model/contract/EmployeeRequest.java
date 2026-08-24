@@ -1,5 +1,7 @@
 package org.egov.digitaldoorplate.model.contract;
 
+import java.util.List;
+
 import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,13 +13,13 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Data
-@NoArgsConstructor
 @Builder
-public class CreateUserRequest {
+@NoArgsConstructor
+public class EmployeeRequest {
 
-	@JsonProperty("requestInfo")
+	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo;
 
-	@JsonProperty("user")
-	private User user;
+	@JsonProperty("Employees")
+	private List<Employee> employees;
 }

@@ -46,6 +46,13 @@ public class GarbageCollector {
 	private Integer noOfHouseAlloted;
 
 	/**
+	 * Optional date of birth, used only to satisfy egov-hrms's mandatory
+	 * user.dob when creating the collector's login. Not persisted on this
+	 * entity; falls back to a placeholder if omitted.
+	 */
+	private Long dob;
+
+	/**
 	 * Populated by {@code GarbageCollectorService.create()} once the egov-user
 	 * login and the mapping row have been created.
 	 */
