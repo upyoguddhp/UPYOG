@@ -47,7 +47,7 @@ public class DdpConstants {
 
 	public static final String USER_TYPE_EMPLOYEE = "EMPLOYEE";
 
-	public static final String USER_ROLE_GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR";
+	public static final String USER_ROLE_GARBAGE_COLLECTOR = "DDP_GRBG_COLLECTOR";
 
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
