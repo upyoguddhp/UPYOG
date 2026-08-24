@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.digitaldoorplate.model.GarbageCollector;
+import org.egov.digitaldoorplate.model.GarbageSupervisor;
 import org.egov.digitaldoorplate.model.contract.CreateUserRequest;
 import org.egov.digitaldoorplate.model.contract.Role;
 import org.egov.digitaldoorplate.model.contract.User;
@@ -94,11 +95,54 @@ public class UserService {
 	}
 
 	private User findExistingUser(RequestInfo requestInfo, GarbageCollector collector) {
+		return findExistingUser(requestInfo, collector.getMobileNumber(), collector.getTenantId());
+	}
+
+	/**
+	 * Returns the supervisor's existing egov-user account for their mobile
+	 * number/tenant, or creates a new EMPLOYEE user with the
+	 * GARBAGE_SUPERVISOR role if none exists yet.
+	 */
+	public User createOrGetSupervisorUser(RequestInfo requestInfo, GarbageSupervisor supervisor) {
+
+		User existingUser = findExistingUser(requestInfo, supervisor.getMobileNumber(), supervisor.getTenantId());
+		if (existingUser != null) {
+			return existingUser;
+		}
+
+		User newUser = User.builder()
+				.name(supervisor.getSupervisorName())
+				.userName(supervisor.getMobileNumber())
+				.mobileNumber(supervisor.getMobileNumber())
+				.emailId(supervisor.getEmailId())
+				.gender(supervisor.getGender())
+				.tenantId(supervisor.getTenantId())
+				.type(DdpConstants.USER_TYPE_EMPLOYEE)
+				.active(true)
+				.roles(Collections.singletonList(Role.builder()
+						.code(DdpConstants.USER_ROLE_GARBAGE_SUPERVISOR)
+						.name("Garbage Supervisor")
+						.build()))
+				.build();
+
+		UserDetailResponse response = createUser(requestInfo, newUser);
+
+		if (ObjectUtils.isEmpty(response) || CollectionUtils.isEmpty(response.getUser())
+				|| ObjectUtils.isEmpty(response.getUser().get(0).getUuid())) {
+			throw new CustomException("USER_CREATE_FAILED",
+					"Failed to create egov-user account for garbage supervisor, mobileNumber: "
+							+ supervisor.getMobileNumber());
+		}
+
+		return response.getUser().get(0);
+	}
+
+	private User findExistingUser(RequestInfo requestInfo, String mobileNumber, String tenantId) {
 
 		UserSearchRequest searchRequest = UserSearchRequest.builder()
 				.requestInfo(requestInfo)
-				.mobileNumber(collector.getMobileNumber())
-				.tenantId(collector.getTenantId())
+				.mobileNumber(mobileNumber)
+				.tenantId(tenantId)
 				.userType(DdpConstants.USER_TYPE_EMPLOYEE)
 				.active(true)
 				.build();
