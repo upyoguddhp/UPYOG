@@ -49,9 +49,9 @@ public class DdpConstants {
 
 	public static final String USER_ROLE_GARBAGE_COLLECTOR = "DDP_GRBG_COLLECTOR";
 
-	public static final String USER_ROLE_GARBAGE_SUPERVISOR = "GARBAGE_SUPERVISOR";
+	public static final String USER_ROLE_GARBAGE_SUPERVISOR = "DDP_SUPERVISOR";
 
-	public static final String USER_ROLE_CONTRACTOR = "CONTRACTOR";
+	public static final String USER_ROLE_CONTRACTOR = "DDP_CONTRACTOR";
 
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
