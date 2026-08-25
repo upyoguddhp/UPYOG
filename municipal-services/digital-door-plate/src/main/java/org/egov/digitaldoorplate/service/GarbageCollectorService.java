@@ -1,5 +1,6 @@
 package org.egov.digitaldoorplate.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -75,17 +76,19 @@ public class GarbageCollectorService {
 			User collectorUser = userService.createOrGetCollectorUser(requestInfo, collector);
 			collector.setCollectorUserUuid(collectorUser.getUuid());
 
-			GarbageCollectorMapping mapping = garbageCollectorMappingService.create(GarbageCollectorMapping.builder()
-					.tenantId(collector.getTenantId())
-					.collectorUuid(collector.getUuid())
-					.contractorUuid(collector.getContractorUuid())
-					.supervisorId(collector.getSupervisorId())
-					.collectorUserUuid(collectorUser.getUuid())
-					.wardNumber(collector.getWardNumber())
-					.noOfHouseAlloted(collector.getNoOfHouseAlloted())
-					.build(), userUuid);
+			List<String> mappingUuids = collector.getWardNumber().stream()
+					.map(wardNumber -> garbageCollectorMappingService.create(GarbageCollectorMapping.builder()
+							.tenantId(collector.getTenantId())
+							.collectorUuid(collector.getUuid())
+							.contractorUuid(collector.getContractorUuid())
+							.supervisorId(collector.getSupervisorId())
+							.collectorUserUuid(collectorUser.getUuid())
+							.wardNumber(wardNumber)
+							.noOfHouseAlloted(collector.getNoOfHouseAlloted())
+							.build(), userUuid).getUuid())
+					.collect(Collectors.toList());
 
-			collector.setMappingUuid(mapping.getUuid());
+			collector.setMappingUuids(mappingUuids);
 
 			return collector;
 		}).collect(Collectors.toList());
@@ -93,6 +96,66 @@ public class GarbageCollectorService {
 		return GarbageCollectorResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.collectors(result).build();
+	}
+
+	/**
+	 * Updates a garbage collector's master record and replaces their
+	 * contractor/supervisor/ward mapping wholesale: every existing active
+	 * mapping is deactivated and a fresh mapping row is created per ward on the
+	 * updated payload, mirroring how {@link #create} maps each ward
+	 * individually.
+	 */
+	@Transactional
+	public GarbageCollectorResponse update(GarbageCollectorRequest request) {
+
+		validateUserInfo(request.getRequestInfo());
+		if (CollectionUtils.isEmpty(request.getCollectors())) {
+			throw new CustomException("INVALID_REQUEST", "Provide garbage collector details to update.");
+		}
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		String userUuid = requestInfo.getUserInfo().getUuid();
+		Long now = System.currentTimeMillis();
+
+		List<GarbageCollector> result = request.getCollectors().stream().map(collector -> {
+
+			if (StringUtils.isEmpty(collector.getUuid())) {
+				throw new CustomException("INVALID_REQUEST", "Uuid is mandatory to update collector details.");
+			}
+			validateCollector(collector);
+
+			GarbageCollector existing = getExistingCollector(collector.getUuid(), collector.getTenantId());
+			collector.setCreatedBy(existing.getCreatedBy());
+			collector.setCreatedDate(existing.getCreatedDate());
+			collector.setLastModifiedBy(userUuid);
+			collector.setLastModifiedDate(now);
+			if (null == collector.getIsActive()) {
+				collector.setIsActive(existing.getIsActive());
+			}
+
+			garbageCollectorRepository.update(collector);
+
+			List<GarbageCollectorMapping> mappings = garbageCollectorMappingService.replaceMappings(collector,
+					userUuid);
+			collector.setCollectorUserUuid(mappings.get(0).getCollectorUserUuid());
+			collector.setMappingUuids(
+					mappings.stream().map(GarbageCollectorMapping::getUuid).collect(Collectors.toList()));
+
+			return collector;
+		}).collect(Collectors.toList());
+
+		return GarbageCollectorResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
+				.collectors(result).build();
+	}
+
+	private GarbageCollector getExistingCollector(String uuid, String tenantId) {
+		List<GarbageCollector> existing = garbageCollectorRepository.search(SearchCriteriaGarbageCollector.builder()
+				.uuid(Collections.singletonList(uuid)).tenantId(tenantId).build());
+		if (CollectionUtils.isEmpty(existing)) {
+			throw new CustomException("COLLECTOR_NOT_FOUND", "No garbage collector found for uuid: " + uuid);
+		}
+		return existing.get(0);
 	}
 
 	public GarbageCollectorResponse search(SearchCriteriaGarbageCollectorRequest searchRequest) {
@@ -126,8 +189,8 @@ public class GarbageCollectorService {
 		if (StringUtils.isEmpty(collector.getContractorUuid())) {
 			throw new CustomException("INVALID_REQUEST", "ContractorUuid is mandatory to map the collector.");
 		}
-		if (StringUtils.isEmpty(collector.getWardNumber())) {
-			throw new CustomException("INVALID_REQUEST", "WardNumber is mandatory to map the collector.");
+		if (CollectionUtils.isEmpty(collector.getWardNumber())) {
+			throw new CustomException("INVALID_REQUEST", "At least one ward is mandatory to map the collector.");
 		}
 	}
 

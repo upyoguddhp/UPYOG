@@ -58,6 +58,34 @@ public class ContractorRepository {
 				contractor.getLastModifiedDate());
 	}
 
+	public void update(Contractor contractor) {
+		jdbcTemplate.update(ContractorQueryBuilder.UPDATE_QUERY,
+				contractor.getType(),
+				contractor.getContractorCode(),
+				contractor.getOrganisationName(),
+				contractor.getOrganisationContact(),
+				contractor.getUlb(),
+				contractor.getOrganisationAddress(),
+				contractor.getOrganisationPincode(),
+				contractor.getGender(),
+				contractor.getStartDate(),
+				contractor.getEndDate(),
+				contractor.getContractorDetails().getName(),
+				contractor.getContractorDetails().getFatherName(),
+				contractor.getContractorDetails().getContactNumber(),
+				contractor.getContractorDetails().getEmail(),
+				contractor.getContractorDetails().getAddress(),
+				contractor.getContractorDetails().getPincode(),
+				contractor.getContractorDetails().getDob(),
+				jsonbUtil.toPGobject(contractor.getAdditionalDetails()),
+				contractor.getStatus(),
+				contractor.getIsActive(),
+				contractor.getLastModifiedBy(),
+				contractor.getLastModifiedDate(),
+				contractor.getUuid(),
+				contractor.getTenantId());
+	}
+
 	public List<Contractor> search(SearchCriteriaContractor criteria) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);

@@ -2,6 +2,7 @@ package org.egov.digitaldoorplate.repository.rowmapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.egov.digitaldoorplate.model.GarbageCollector;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,11 +29,20 @@ public class GarbageCollectorRowMapper implements RowMapper<GarbageCollector> {
 				.createdDate(getLong(rs, "createddate"))
 				.lastModifiedBy(rs.getString("lastmodifiedby"))
 				.lastModifiedDate(getLong(rs, "lastmodifieddate"))
+				.wardNumber(Arrays.asList((String[]) rs.getArray("ward_number").getArray()))
+				.contractorUuid(rs.getString("contractor_uuid"))
+				.supervisorId(rs.getString("supervisor_id"))
+				.noOfHouseAlloted(getInteger(rs, "no_of_house_alloted"))
 				.build();
 	}
 
 	private Long getLong(ResultSet rs, String columnName) throws SQLException {
 		long value = rs.getLong(columnName);
+		return rs.wasNull() ? null : value;
+	}
+
+	private Integer getInteger(ResultSet rs, String columnName) throws SQLException {
+		int value = rs.getInt(columnName);
 		return rs.wasNull() ? null : value;
 	}
 }

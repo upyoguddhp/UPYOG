@@ -43,4 +43,8 @@ public class GarbageSupervisorMappingRepository {
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
 		return jdbcTemplate.query(query, preparedStatementValues.toArray(), rowMapper);
 	}
+
+	public void deactivateAll(String supervisorUuid, String userUuid, Long now) {
+		jdbcTemplate.update(GarbageSupervisorMappingQueryBuilder.DEACTIVATE_ALL_QUERY, userUuid, now, supervisorUuid);
+	}
 }

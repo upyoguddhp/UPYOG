@@ -45,4 +45,8 @@ public class GarbageCollectorMappingRepository {
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
 		return jdbcTemplate.query(query, preparedStatementValues.toArray(), rowMapper);
 	}
+
+	public void deactivateAll(String collectorUuid, String userUuid, Long now) {
+		jdbcTemplate.update(GarbageCollectorMappingQueryBuilder.DEACTIVATE_ALL_QUERY, userUuid, now, collectorUuid);
+	}
 }

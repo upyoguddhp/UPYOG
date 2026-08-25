@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.digitaldoorplate.model.Contractor;
 import org.egov.digitaldoorplate.model.ContractorWardMapping;
 import org.egov.digitaldoorplate.model.ContractorWardMappingRequest;
 import org.egov.digitaldoorplate.model.ContractorWardMappingResponse;
@@ -99,6 +100,40 @@ public class ContractorWardMappingService {
 
 		contractorWardMappingRepository.create(mapping);
 		return mapping;
+	}
+
+	/**
+	 * Replaces a contractor's ward mapping wholesale: deactivates every
+	 * existing active mapping row, then creates a fresh one per ward on the
+	 * updated payload. Used by {@code ContractorService.update()} so a changed
+	 * ulb on update is always reflected, rather than silently reusing a stale
+	 * mapping row for an unchanged ward.
+	 */
+	@Transactional
+	public List<ContractorWardMapping> replaceMappings(Contractor contractor, String userUuid) {
+
+		List<ContractorWardMapping> existingMappings = contractorWardMappingRepository
+				.search(SearchCriteriaContractorWardMapping.builder()
+						.contractorUuid(Collections.singletonList(contractor.getUuid()))
+						.tenantId(contractor.getTenantId()).isActive(Boolean.TRUE).build());
+		if (CollectionUtils.isEmpty(existingMappings)) {
+			throw new CustomException("MAPPING_NOT_FOUND",
+					"No active ward mapping found for contractorUuid: " + contractor.getUuid());
+		}
+		String contractorUserUuid = existingMappings.get(0).getContractorUserUuid();
+		Long now = System.currentTimeMillis();
+
+		contractorWardMappingRepository.deactivateAll(contractor.getUuid(), userUuid, now);
+
+		return contractor.getWard().stream()
+				.map(wardNumber -> createOrGetMapping(ContractorWardMapping.builder()
+						.tenantId(contractor.getTenantId())
+						.contractorUuid(contractor.getUuid())
+						.contractorUserUuid(contractorUserUuid)
+						.ulb(contractor.getUlb())
+						.wardNumber(wardNumber)
+						.build(), userUuid))
+				.collect(Collectors.toList());
 	}
 
 	public ContractorWardMappingResponse search(SearchCriteriaContractorWardMappingRequest searchRequest) {

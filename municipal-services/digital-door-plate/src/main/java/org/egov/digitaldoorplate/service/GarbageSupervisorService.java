@@ -1,5 +1,6 @@
 package org.egov.digitaldoorplate.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -75,16 +76,17 @@ public class GarbageSupervisorService {
 			User supervisorUser = userService.createOrGetSupervisorUser(requestInfo, supervisor);
 			supervisor.setSupervisorUserUuid(supervisorUser.getUuid());
 
-			GarbageSupervisorMapping mapping = garbageSupervisorMappingService.create(GarbageSupervisorMapping
-					.builder()
-					.tenantId(supervisor.getTenantId())
-					.supervisorUuid(supervisor.getUuid())
-					.contractorUuid(supervisor.getContractorUuid())
-					.supervisorUserUuid(supervisorUser.getUuid())
-					.wardNumber(supervisor.getWardNumber())
-					.build(), userUuid);
+			List<String> mappingUuids = supervisor.getWardNumber().stream()
+					.map(wardNumber -> garbageSupervisorMappingService.create(GarbageSupervisorMapping.builder()
+							.tenantId(supervisor.getTenantId())
+							.supervisorUuid(supervisor.getUuid())
+							.contractorUuid(supervisor.getContractorUuid())
+							.supervisorUserUuid(supervisorUser.getUuid())
+							.wardNumber(wardNumber)
+							.build(), userUuid).getUuid())
+					.collect(Collectors.toList());
 
-			supervisor.setMappingUuid(mapping.getUuid());
+			supervisor.setMappingUuids(mappingUuids);
 
 			return supervisor;
 		}).collect(Collectors.toList());
@@ -92,6 +94,65 @@ public class GarbageSupervisorService {
 		return GarbageSupervisorResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.supervisors(result).build();
+	}
+
+	/**
+	 * Updates a garbage supervisor's master record and replaces their
+	 * contractor/ward mapping wholesale: every existing active mapping is
+	 * deactivated and a fresh mapping row is created per ward on the updated
+	 * payload, mirroring how {@link #create} maps each ward individually.
+	 */
+	@Transactional
+	public GarbageSupervisorResponse update(GarbageSupervisorRequest request) {
+
+		validateUserInfo(request.getRequestInfo());
+		if (CollectionUtils.isEmpty(request.getSupervisors())) {
+			throw new CustomException("INVALID_REQUEST", "Provide garbage supervisor details to update.");
+		}
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		String userUuid = requestInfo.getUserInfo().getUuid();
+		Long now = System.currentTimeMillis();
+
+		List<GarbageSupervisor> result = request.getSupervisors().stream().map(supervisor -> {
+
+			if (StringUtils.isEmpty(supervisor.getUuid())) {
+				throw new CustomException("INVALID_REQUEST", "Uuid is mandatory to update supervisor details.");
+			}
+			validateSupervisor(supervisor);
+
+			GarbageSupervisor existing = getExistingSupervisor(supervisor.getUuid(), supervisor.getTenantId());
+			supervisor.setCreatedBy(existing.getCreatedBy());
+			supervisor.setCreatedDate(existing.getCreatedDate());
+			supervisor.setLastModifiedBy(userUuid);
+			supervisor.setLastModifiedDate(now);
+			if (null == supervisor.getIsActive()) {
+				supervisor.setIsActive(existing.getIsActive());
+			}
+
+			garbageSupervisorRepository.update(supervisor);
+
+			List<GarbageSupervisorMapping> mappings = garbageSupervisorMappingService.replaceMappings(supervisor,
+					userUuid);
+			supervisor.setSupervisorUserUuid(mappings.get(0).getSupervisorUserUuid());
+			supervisor.setMappingUuids(
+					mappings.stream().map(GarbageSupervisorMapping::getUuid).collect(Collectors.toList()));
+
+			return supervisor;
+		}).collect(Collectors.toList());
+
+		return GarbageSupervisorResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
+				.supervisors(result).build();
+	}
+
+	private GarbageSupervisor getExistingSupervisor(String uuid, String tenantId) {
+		List<GarbageSupervisor> existing = garbageSupervisorRepository.search(SearchCriteriaGarbageSupervisor
+				.builder().uuid(Collections.singletonList(uuid)).tenantId(tenantId).build());
+		if (CollectionUtils.isEmpty(existing)) {
+			throw new CustomException("SUPERVISOR_NOT_FOUND", "No garbage supervisor found for uuid: " + uuid);
+		}
+		return existing.get(0);
 	}
 
 	public GarbageSupervisorResponse search(SearchCriteriaGarbageSupervisorRequest searchRequest) {
@@ -123,8 +184,8 @@ public class GarbageSupervisorService {
 		if (StringUtils.isEmpty(supervisor.getUlb())) {
 			throw new CustomException("INVALID_REQUEST", "Ulb is mandatory in supervisor details.");
 		}
-		if (StringUtils.isEmpty(supervisor.getWardNumber())) {
-			throw new CustomException("INVALID_REQUEST", "WardNumber is mandatory to map the supervisor.");
+		if (CollectionUtils.isEmpty(supervisor.getWardNumber())) {
+			throw new CustomException("INVALID_REQUEST", "At least one ward is mandatory to map the supervisor.");
 		}
 	}
 

@@ -14,6 +14,10 @@ public class GarbageSupervisorMappingQueryBuilder {
 			+ "is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+	public static final String DEACTIVATE_ALL_QUERY = "UPDATE eg_ddp_garbage_supervisor_mapping "
+			+ "SET is_active = false, lastmodifiedby = ?, lastmodifieddate = ? "
+			+ "WHERE supervisor_uuid = ? AND is_active = true";
+
 	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_garbage_supervisor_mapping WHERE 1=1 ";
 
 	public String getSearchQuery(SearchCriteriaGarbageSupervisorMapping criteria,

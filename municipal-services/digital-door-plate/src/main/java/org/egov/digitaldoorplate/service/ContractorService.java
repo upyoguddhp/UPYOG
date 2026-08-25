@@ -1,5 +1,6 @@
 package org.egov.digitaldoorplate.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,6 +94,66 @@ public class ContractorService {
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(contractorRequest.getRequestInfo(), true))
 				.contractors(result).build();
+	}
+
+	/**
+	 * Updates a contractor's master record and replaces their ward mapping
+	 * wholesale: every existing active mapping is deactivated and a fresh
+	 * mapping row is created per ward on the updated payload, mirroring how
+	 * {@link #create} maps each ward individually.
+	 */
+	@Transactional
+	public ContractorResponse update(ContractorRequest contractorRequest) {
+
+		validateUserInfo(contractorRequest.getRequestInfo());
+		if (CollectionUtils.isEmpty(contractorRequest.getContractors())) {
+			throw new CustomException("INVALID_REQUEST", "Provide contractor/NGO details to update.");
+		}
+
+		Long now = System.currentTimeMillis();
+		RequestInfo requestInfo = contractorRequest.getRequestInfo();
+		String userUuid = requestInfo.getUserInfo().getUuid();
+
+		List<Contractor> result = contractorRequest.getContractors().stream().map(contractor -> {
+
+			if (StringUtils.isEmpty(contractor.getUuid())) {
+				throw new CustomException("INVALID_REQUEST", "Uuid is mandatory to update contractor details.");
+			}
+			validateContractor(contractor);
+
+			Contractor existing = getExistingContractor(contractor.getUuid(), contractor.getTenantId());
+			contractor.setStatus(existing.getStatus());
+			contractor.setCreatedBy(existing.getCreatedBy());
+			contractor.setCreatedDate(existing.getCreatedDate());
+			contractor.setLastModifiedBy(userUuid);
+			contractor.setLastModifiedDate(now);
+			if (null == contractor.getIsActive()) {
+				contractor.setIsActive(existing.getIsActive());
+			}
+
+			contractorRepository.update(contractor);
+
+			List<ContractorWardMapping> mappings = contractorWardMappingService.replaceMappings(contractor,
+					userUuid);
+			contractor.setContractorUserUuid(mappings.get(0).getContractorUserUuid());
+
+			return contractor;
+		}).collect(Collectors.toList());
+
+		return ContractorResponse.builder()
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(contractorRequest.getRequestInfo(), true))
+				.contractors(result).build();
+	}
+
+	private Contractor getExistingContractor(String uuid, String tenantId) {
+		List<Contractor> existing = contractorRepository
+				.search(SearchCriteriaContractor.builder().uuid(Collections.singletonList(uuid)).tenantId(tenantId)
+						.build());
+		if (CollectionUtils.isEmpty(existing)) {
+			throw new CustomException("CONTRACTOR_NOT_FOUND", "No contractor found for uuid: " + uuid);
+		}
+		return existing.get(0);
 	}
 
 	public ContractorResponse search(SearchCriteriaContractorRequest searchRequest) {

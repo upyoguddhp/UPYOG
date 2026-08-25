@@ -42,6 +42,23 @@ public class GarbageCollectorRepository {
 				collector.getLastModifiedDate());
 	}
 
+	public void update(GarbageCollector collector) {
+		jdbcTemplate.update(GarbageCollectorQueryBuilder.UPDATE_QUERY,
+				collector.getCollectorName(),
+				collector.getCollectorCode(),
+				collector.getMobileNumber(),
+				collector.getEmailId(),
+				collector.getGender(),
+				collector.getJoiningDate(),
+				collector.getAddress(),
+				collector.getUlb(),
+				collector.getIsActive(),
+				collector.getLastModifiedBy(),
+				collector.getLastModifiedDate(),
+				collector.getUuid(),
+				collector.getTenantId());
+	}
+
 	public List<GarbageCollector> search(SearchCriteriaGarbageCollector criteria) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);

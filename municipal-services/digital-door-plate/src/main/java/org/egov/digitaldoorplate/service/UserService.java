@@ -83,8 +83,7 @@ public class UserService {
 		return createEmployeeUser(requestInfo, collector.getCollectorName(), collector.getMobileNumber(),
 				collector.getEmailId(), collector.getGender(), collector.getDob(), collector.getTenantId(),
 				collector.getJoiningDate(), DdpConstants.USER_ROLE_GARBAGE_COLLECTOR, "Garbage Collector",
-				buildWardAdditionalDetail(collector.getTenantId(),
-						Collections.singletonList(collector.getWardNumber())));
+				buildWardAdditionalDetail(collector.getTenantId(), collector.getWardNumber()));
 	}
 
 	/**
@@ -102,8 +101,7 @@ public class UserService {
 		return createEmployeeUser(requestInfo, supervisor.getSupervisorName(), supervisor.getMobileNumber(),
 				supervisor.getEmailId(), supervisor.getGender(), supervisor.getDob(), supervisor.getTenantId(),
 				supervisor.getJoiningDate(), DdpConstants.USER_ROLE_GARBAGE_SUPERVISOR, "Garbage Supervisor",
-				buildWardAdditionalDetail(supervisor.getTenantId(),
-						Collections.singletonList(supervisor.getWardNumber())));
+				buildWardAdditionalDetail(supervisor.getTenantId(), supervisor.getWardNumber()));
 	}
 
 	/**

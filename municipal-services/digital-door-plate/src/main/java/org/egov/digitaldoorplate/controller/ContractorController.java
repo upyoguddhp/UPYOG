@@ -26,6 +26,11 @@ public class ContractorController {
 		return ResponseEntity.ok(contractorService.create(contractorRequest));
 	}
 
+	@PostMapping("/_update")
+	public ResponseEntity<ContractorResponse> update(@RequestBody ContractorRequest contractorRequest) {
+		return ResponseEntity.ok(contractorService.update(contractorRequest));
+	}
+
 	@PostMapping("/_search")
 	public ResponseEntity<ContractorResponse> search(
 			@RequestBody SearchCriteriaContractorRequest searchCriteriaContractorRequest) {

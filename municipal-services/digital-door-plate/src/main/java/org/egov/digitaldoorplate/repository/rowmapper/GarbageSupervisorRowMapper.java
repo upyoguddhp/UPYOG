@@ -29,7 +29,8 @@ public class GarbageSupervisorRowMapper implements RowMapper<GarbageSupervisor> 
 				.createdDate(getLong(rs, "createddate"))
 				.lastModifiedBy(rs.getString("lastmodifiedby"))
 				.lastModifiedDate(getLong(rs, "lastmodifieddate"))
-				.wardNumber(rs.getString("ward_number"))
+				.wardNumber(Arrays.asList((String[]) rs.getArray("ward_number").getArray()))
+				.contractorUuid(rs.getString("contractor_uuid"))
 				.build();
 	}
 

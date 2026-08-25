@@ -14,9 +14,16 @@ public class GarbageSupervisorQueryBuilder {
 			+ "joining_date, address, ulb, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String SEARCH_QUERY = "SELECT s.*, " + "(SELECT sm.ward_number "
+	public static final String UPDATE_QUERY = "UPDATE eg_ddp_garbage_supervisor SET "
+			+ "supervisor_name = ?, supervisor_code = ?, mobile_number = ?, email_id = ?, gender = ?, "
+			+ "joining_date = ?, address = ?, ulb = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
+			+ "WHERE uuid = ? AND tenant_id = ?";
+
+	private static final String SEARCH_QUERY = "SELECT s.*, " + "ARRAY(" + "    SELECT DISTINCT sm.ward_number "
+			+ "    FROM eg_ddp_garbage_supervisor_mapping sm " + "    WHERE sm.supervisor_uuid = s.uuid "
+			+ "    AND sm.is_active = true" + ") AS ward_number, " + "(SELECT sm.contractor_uuid "
 			+ " FROM eg_ddp_garbage_supervisor_mapping sm " + " WHERE sm.supervisor_uuid = s.uuid "
-			+ " AND sm.is_active = true " + " LIMIT 1) AS ward_number " + "FROM eg_ddp_garbage_supervisor s "
+			+ " AND sm.is_active = true " + " LIMIT 1) AS contractor_uuid " + "FROM eg_ddp_garbage_supervisor s "
 			+ "WHERE 1=1 ";
 	
 	public String getSearchQuery(SearchCriteriaGarbageSupervisor criteria, List<Object> preparedStatementValues) {

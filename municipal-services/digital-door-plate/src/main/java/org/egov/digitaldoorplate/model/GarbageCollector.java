@@ -1,5 +1,7 @@
 package org.egov.digitaldoorplate.model;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +43,7 @@ public class GarbageCollector {
 
 	private String supervisorId;
 
-	private String wardNumber;
+	private List<String> wardNumber;
 
 	private Integer noOfHouseAlloted;
 
@@ -54,11 +56,11 @@ public class GarbageCollector {
 
 	/**
 	 * Populated by {@code GarbageCollectorService.create()} once the egov-user
-	 * login and the mapping row have been created.
+	 * login and the mapping row(s) have been created.
 	 */
 	private String collectorUserUuid;
 
-	private String mappingUuid;
+	private List<String> mappingUuids;
 
 	private String createdBy;
 

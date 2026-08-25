@@ -14,7 +14,21 @@ public class GarbageCollectorQueryBuilder {
 			+ "joining_date, address, ulb, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_garbage_collector WHERE 1=1 ";
+	public static final String UPDATE_QUERY = "UPDATE eg_ddp_garbage_collector SET "
+			+ "collector_name = ?, collector_code = ?, mobile_number = ?, email_id = ?, gender = ?, "
+			+ "joining_date = ?, address = ?, ulb = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
+			+ "WHERE uuid = ? AND tenant_id = ?";
+
+	private static final String SEARCH_QUERY = "SELECT c.*, " + "ARRAY(" + "    SELECT DISTINCT cm.ward_number "
+			+ "    FROM eg_ddp_garbage_collector_mapping cm " + "    WHERE cm.collector_uuid = c.uuid "
+			+ "    AND cm.is_active = true" + ") AS ward_number, " + "(SELECT cm.contractor_uuid "
+			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
+			+ " AND cm.is_active = true " + " LIMIT 1) AS contractor_uuid, " + "(SELECT cm.supervisor_id "
+			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
+			+ " AND cm.is_active = true " + " LIMIT 1) AS supervisor_id, " + "(SELECT cm.no_of_house_alloted "
+			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
+			+ " AND cm.is_active = true " + " LIMIT 1) AS no_of_house_alloted " + "FROM eg_ddp_garbage_collector c "
+			+ "WHERE 1=1 ";
 
 	public String getSearchQuery(SearchCriteriaGarbageCollector criteria, List<Object> preparedStatementValues) {
 		StringBuilder query = new StringBuilder(SEARCH_QUERY);

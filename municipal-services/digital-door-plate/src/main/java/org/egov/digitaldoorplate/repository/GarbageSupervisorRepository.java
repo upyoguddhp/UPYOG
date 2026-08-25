@@ -42,6 +42,23 @@ public class GarbageSupervisorRepository {
 				supervisor.getLastModifiedDate());
 	}
 
+	public void update(GarbageSupervisor supervisor) {
+		jdbcTemplate.update(GarbageSupervisorQueryBuilder.UPDATE_QUERY,
+				supervisor.getSupervisorName(),
+				supervisor.getSupervisorCode(),
+				supervisor.getMobileNumber(),
+				supervisor.getEmailId(),
+				supervisor.getGender(),
+				supervisor.getJoiningDate(),
+				supervisor.getAddress(),
+				supervisor.getUlb(),
+				supervisor.getIsActive(),
+				supervisor.getLastModifiedBy(),
+				supervisor.getLastModifiedDate(),
+				supervisor.getUuid(),
+				supervisor.getTenantId());
+	}
+
 	public List<GarbageSupervisor> search(SearchCriteriaGarbageSupervisor criteria) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);

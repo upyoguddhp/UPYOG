@@ -27,6 +27,12 @@ public class GarbageSupervisorController {
 		return ResponseEntity.ok(garbageSupervisorService.create(garbageSupervisorRequest));
 	}
 
+	@PostMapping("/_update")
+	public ResponseEntity<GarbageSupervisorResponse> update(
+			@RequestBody GarbageSupervisorRequest garbageSupervisorRequest) {
+		return ResponseEntity.ok(garbageSupervisorService.update(garbageSupervisorRequest));
+	}
+
 	@PostMapping("/_search")
 	public ResponseEntity<GarbageSupervisorResponse> search(
 			@RequestBody SearchCriteriaGarbageSupervisorRequest searchCriteriaGarbageSupervisorRequest) {

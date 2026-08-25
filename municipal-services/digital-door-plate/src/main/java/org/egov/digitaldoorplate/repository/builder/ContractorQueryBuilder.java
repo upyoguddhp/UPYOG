@@ -17,6 +17,14 @@ public class ContractorQueryBuilder {
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+	public static final String UPDATE_QUERY = "UPDATE eg_ddp_contractor SET "
+			+ "type = ?, contractor_code = ?, organisation_name = ?, organisation_contact = ?, ulb = ?, "
+			+ "organisation_address = ?, organisation_pincode = ?, gender = ?, start_date = ?, end_date = ?, "
+			+ "contractor_name = ?, contractor_father_name = ?, contractor_contact_number = ?, contractor_email = ?, "
+			+ "contractor_address = ?, contractor_pincode = ?, contractor_dob = ?, additional_details = ?, "
+			+ "status = ?, is_active = ?, lastmodifiedby = ?, lastmodifieddate = ? "
+			+ "WHERE uuid = ? AND tenant_id = ?";
+
 	private static final String SEARCH_QUERY = "SELECT c.*, " + "ARRAY(" + "    SELECT DISTINCT wm.ward_number "
 			+ "    FROM eg_ddp_contractor_ward_mapping wm " + "    WHERE wm.contractor_uuid = c.uuid "
 			+ "    AND wm.is_active = true" + ") AS ward " + "FROM eg_ddp_contractor c " + "WHERE 1=1 ";

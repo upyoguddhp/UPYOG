@@ -43,4 +43,8 @@ public class ContractorWardMappingRepository {
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
 		return jdbcTemplate.query(query, preparedStatementValues.toArray(), rowMapper);
 	}
+
+	public void deactivateAll(String contractorUuid, String userUuid, Long now) {
+		jdbcTemplate.update(ContractorWardMappingQueryBuilder.DEACTIVATE_ALL_QUERY, userUuid, now, contractorUuid);
+	}
 }
