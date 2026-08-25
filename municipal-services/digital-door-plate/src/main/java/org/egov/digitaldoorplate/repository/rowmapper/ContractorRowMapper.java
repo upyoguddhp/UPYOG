@@ -2,6 +2,7 @@ package org.egov.digitaldoorplate.repository.rowmapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.egov.digitaldoorplate.model.Contractor;
 import org.egov.digitaldoorplate.model.ContractorDetails;
@@ -47,6 +48,7 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 				.createdDate(getLong(rs, "createddate"))
 				.lastModifiedBy(rs.getString("lastmodifiedby"))
 				.lastModifiedDate(getLong(rs, "lastmodifieddate"))
+				.ward(Arrays.asList((String[]) rs.getArray("ward").getArray()))
 				.build();
 	}
 

@@ -34,4 +34,6 @@ public class SearchCriteriaContractor {
 	private Integer limit;
 
 	private Integer offset;
+	
+	private List<String> ward;
 }

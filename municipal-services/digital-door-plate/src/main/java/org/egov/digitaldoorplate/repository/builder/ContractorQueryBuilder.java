@@ -17,7 +17,9 @@ public class ContractorQueryBuilder {
 			+ "createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_contractor WHERE 1=1 ";
+	private static final String SEARCH_QUERY = "SELECT c.*, " + "ARRAY(" + "    SELECT DISTINCT wm.ward_number "
+			+ "    FROM eg_ddp_contractor_ward_mapping wm " + "    WHERE wm.contractor_uuid = c.uuid "
+			+ "    AND wm.is_active = true" + ") AS ward " + "FROM eg_ddp_contractor c " + "WHERE 1=1 ";
 
 	private static final String COUNT_QUERY = "SELECT "
 			+ "COUNT(*) AS total_vendors, "
@@ -26,7 +28,7 @@ public class ContractorQueryBuilder {
 			+ "COUNT(*) FILTER (WHERE UPPER(type) = 'CONTRACTOR') AS contractors, "
 			+ "COUNT(*) FILTER (WHERE UPPER(type) IN ('NGO', 'AGENCY')) AS agencies, "
 			+ "COUNT(*) FILTER (WHERE type IS NULL OR UPPER(type) NOT IN ('CONTRACTOR', 'NGO', 'AGENCY')) AS other_vendors "
-			+ "FROM eg_ddp_contractor WHERE 1=1 ";
+			+ "FROM eg_ddp_contractor c WHERE 1=1 ";
 
 	public String getSearchQuery(SearchCriteriaContractor criteria, List<Object> preparedStatementValues) {
 		StringBuilder query = new StringBuilder(SEARCH_QUERY);
@@ -91,6 +93,12 @@ public class ContractorQueryBuilder {
 		if (null != criteria.getIsActive()) {
 			query.append(" AND is_active = ?");
 			preparedStatementValues.add(criteria.getIsActive());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getWard())) {
+			query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_contractor_ward_mapping wm ")
+					.append("WHERE wm.contractor_uuid = c.uuid ").append("AND wm.is_active = true ")
+					.append("AND wm.ward_number IN (").append(getPlaceholders(criteria.getWard().size())).append("))");
+			preparedStatementValues.addAll(criteria.getWard());
 		}
 	}
 
