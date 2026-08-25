@@ -14,8 +14,11 @@ public class GarbageSupervisorQueryBuilder {
 			+ "joining_date, address, ulb, is_active, createdby, createddate, lastmodifiedby, lastmodifieddate) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String SEARCH_QUERY = "SELECT * FROM eg_ddp_garbage_supervisor WHERE 1=1 ";
-
+	private static final String SEARCH_QUERY = "SELECT s.*, " + "(SELECT sm.ward_number "
+			+ " FROM eg_ddp_garbage_supervisor_mapping sm " + " WHERE sm.supervisor_uuid = s.uuid "
+			+ " AND sm.is_active = true " + " LIMIT 1) AS ward_number " + "FROM eg_ddp_garbage_supervisor s "
+			+ "WHERE 1=1 ";
+	
 	public String getSearchQuery(SearchCriteriaGarbageSupervisor criteria, List<Object> preparedStatementValues) {
 		StringBuilder query = new StringBuilder(SEARCH_QUERY);
 
@@ -44,6 +47,15 @@ public class GarbageSupervisorQueryBuilder {
 		if (null != criteria.getIsActive()) {
 			query.append(" AND is_active = ?");
 			preparedStatementValues.add(criteria.getIsActive());
+		}
+		
+		if (!CollectionUtils.isEmpty(criteria.getWardNumber())) {
+			query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_garbage_supervisor_mapping sm ")
+					.append("WHERE sm.supervisor_uuid = s.uuid ").append("AND sm.is_active = true ")
+					.append("AND sm.ward_number IN (").append(getPlaceholders(criteria.getWardNumber().size()))
+					.append("))");
+
+			preparedStatementValues.addAll(criteria.getWardNumber());
 		}
 
 		query.append(" ORDER BY createddate DESC");

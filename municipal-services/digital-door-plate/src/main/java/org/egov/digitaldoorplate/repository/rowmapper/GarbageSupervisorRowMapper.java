@@ -2,6 +2,7 @@ package org.egov.digitaldoorplate.repository.rowmapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.egov.digitaldoorplate.model.GarbageSupervisor;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,6 +29,7 @@ public class GarbageSupervisorRowMapper implements RowMapper<GarbageSupervisor> 
 				.createdDate(getLong(rs, "createddate"))
 				.lastModifiedBy(rs.getString("lastmodifiedby"))
 				.lastModifiedDate(getLong(rs, "lastmodifieddate"))
+				.wardNumber(rs.getString("ward_number"))
 				.build();
 	}
 

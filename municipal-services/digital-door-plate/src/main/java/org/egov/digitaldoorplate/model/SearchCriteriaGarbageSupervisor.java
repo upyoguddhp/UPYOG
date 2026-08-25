@@ -28,4 +28,6 @@ public class SearchCriteriaGarbageSupervisor {
 	private Integer limit;
 
 	private Integer offset;
+	
+	private List<String> wardNumber;
 }
