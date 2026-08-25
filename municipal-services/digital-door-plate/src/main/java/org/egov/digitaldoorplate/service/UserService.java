@@ -152,6 +152,7 @@ public class UserService {
 				.type(DdpConstants.USER_TYPE_EMPLOYEE)
 				.tenantId(stateTenantId)
 				.dob(null == dob ? DdpConstants.DEFAULT_DOB : dob)
+				.password(DdpConstants.DEFAULT_EMPLOYEE_PASSWORD)
 				.roles(Arrays.asList(
 						Role.builder().code(DdpConstants.USER_ROLE_EMPLOYEE).name("Employee")
 								.tenantId(stateTenantId).build(),
@@ -293,7 +294,7 @@ public class UserService {
 			userMap.put("pwdExpiryDate", toEpochMillis((String) userMap.get("pwdExpiryDate"), dateTimeFormat));
 		}
 		if (userMap.get("dob") != null) {
-			userMap.put("dob", toEpochMillis((String) userMap.get("dob"), "dd/MM/yyyy"));
+			userMap.put("dob", toEpochMillis(String.valueOf(userMap.get("dob")), "dd/MM/yyyy"));
 		}
 	}
 
