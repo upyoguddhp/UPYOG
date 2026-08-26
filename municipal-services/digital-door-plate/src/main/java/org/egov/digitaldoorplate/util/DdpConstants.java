@@ -57,7 +57,7 @@ public class DdpConstants {
 
 	public static final String EMPLOYEE_TYPE_PERMANENT = "PERMANENT";
 	
-	public static final String DEFAULT_EMPLOYEE_PASSWORD = "CitySeva@Emp26";
+	public static final String DEFAULT_EMPLOYEE_PASSWORD = "CitySeva@0225";
 
 	/**
 	 * Placeholder department/designation until real HRMS master codes exist for
