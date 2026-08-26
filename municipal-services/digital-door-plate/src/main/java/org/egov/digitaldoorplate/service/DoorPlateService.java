@@ -227,7 +227,7 @@ public class DoorPlateService {
 		DoorPlateQrSnapshot dbSnapshot = DoorPlateQrSnapshot.builder()
 				.ownerName(account.getName())
 				.mobileNo(account.getMobileNumber())
-				.propertyId(account.getPropertyId())
+				.propertyId(account.getSystemPropertyId())
 				.id(account.getUuid())
 				.ulbName(null == address ? null : address.getUlbName())
 				.ward(null == address ? null : address.getWardName())
