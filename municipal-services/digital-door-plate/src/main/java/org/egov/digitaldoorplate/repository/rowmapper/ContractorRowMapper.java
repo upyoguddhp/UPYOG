@@ -48,6 +48,7 @@ public class ContractorRowMapper implements RowMapper<Contractor> {
 				.createdDate(getLong(rs, "createddate"))
 				.lastModifiedBy(rs.getString("lastmodifiedby"))
 				.lastModifiedDate(getLong(rs, "lastmodifieddate"))
+				.contractorUserUuid(rs.getString("contractor_user_uuid"))
 				.ward(Arrays.asList((String[]) rs.getArray("ward").getArray()))
 				.build();
 	}
