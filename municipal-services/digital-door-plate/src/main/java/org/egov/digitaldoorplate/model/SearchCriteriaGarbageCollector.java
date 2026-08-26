@@ -25,6 +25,8 @@ public class SearchCriteriaGarbageCollector {
 
 	private Boolean isActive;
 
+	private String supervisorId;
+
 	private Integer limit;
 
 	private Integer offset;

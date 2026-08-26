@@ -59,6 +59,12 @@ public class GarbageCollectorQueryBuilder {
 			query.append(" AND is_active = ?");
 			preparedStatementValues.add(criteria.getIsActive());
 		}
+		if (null != criteria.getSupervisorId()) {
+			query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_garbage_collector_mapping cm ")
+					.append("WHERE cm.collector_uuid = c.uuid ").append("AND cm.is_active = true ")
+					.append("AND cm.supervisor_id = ?)");
+			preparedStatementValues.add(criteria.getSupervisorId());
+		}
 
 		query.append(" ORDER BY createddate DESC");
 
