@@ -23,7 +23,9 @@ public class GarbageSupervisorQueryBuilder {
 			+ "    FROM eg_ddp_garbage_supervisor_mapping sm " + "    WHERE sm.supervisor_uuid = s.uuid "
 			+ "    AND sm.is_active = true" + ") AS ward_number, " + "(SELECT sm.contractor_uuid "
 			+ " FROM eg_ddp_garbage_supervisor_mapping sm " + " WHERE sm.supervisor_uuid = s.uuid "
-			+ " AND sm.is_active = true " + " LIMIT 1) AS contractor_uuid " + "FROM eg_ddp_garbage_supervisor s "
+			+ " AND sm.is_active = true " + " LIMIT 1) AS contractor_uuid, " + "(SELECT sm.supervisor_user_uuid "
+			+ " FROM eg_ddp_garbage_supervisor_mapping sm " + " WHERE sm.supervisor_uuid = s.uuid "
+			+ " AND sm.is_active = true " + " LIMIT 1) AS supervisor_user_uuid " + "FROM eg_ddp_garbage_supervisor s "
 			+ "WHERE 1=1 ";
 	
 	public String getSearchQuery(SearchCriteriaGarbageSupervisor criteria, List<Object> preparedStatementValues) {
