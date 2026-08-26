@@ -1,6 +1,8 @@
 package org.egov.digitaldoorplate.controller;
 
 import org.egov.digitaldoorplate.model.DoorPlateActionRequest;
+import org.egov.digitaldoorplate.model.DoorPlateQrVerifyRequest;
+import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
 import org.egov.digitaldoorplate.model.DoorPlateRequest;
 import org.egov.digitaldoorplate.model.DoorPlateResponse;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlateRequest;
@@ -41,5 +43,16 @@ public class DoorPlateController {
 	public ResponseEntity<DoorPlateResponse> search(
 			@RequestBody SearchCriteriaDoorPlateRequest searchCriteriaDoorPlateRequest) {
 		return ResponseEntity.ok(doorPlateService.search(searchCriteriaDoorPlateRequest));
+	}
+
+	/**
+	 * Verifies the owner/property snapshot scanned from a printed door plate's
+	 * QR code against the current live record, to check whether the record was
+	 * updated in the system after the QR code was generated.
+	 */
+	@PostMapping("/_verifyQr")
+	public ResponseEntity<DoorPlateQrVerifyResponse> verifyQr(
+			@RequestBody DoorPlateQrVerifyRequest doorPlateQrVerifyRequest) {
+		return ResponseEntity.ok(doorPlateService.verifyQrData(doorPlateQrVerifyRequest));
 	}
 }

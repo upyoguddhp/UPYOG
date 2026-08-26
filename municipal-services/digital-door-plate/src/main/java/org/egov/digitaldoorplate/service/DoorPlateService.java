@@ -1,16 +1,24 @@
 package org.egov.digitaldoorplate.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.digitaldoorplate.model.DoorPlate;
 import org.egov.digitaldoorplate.model.DoorPlateActionRequest;
+import org.egov.digitaldoorplate.model.DoorPlateQrSnapshot;
+import org.egov.digitaldoorplate.model.DoorPlateQrVerifyRequest;
+import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
 import org.egov.digitaldoorplate.model.DoorPlateRequest;
 import org.egov.digitaldoorplate.model.DoorPlateResponse;
 import org.egov.digitaldoorplate.model.QrCodeData;
+import org.egov.digitaldoorplate.model.RemoteGarbageAccount;
+import org.egov.digitaldoorplate.model.RemoteGrbgAddress;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlate;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlateRequest;
 import org.egov.digitaldoorplate.repository.DoorPlateRepository;
@@ -21,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +44,12 @@ public class DoorPlateService {
 
 	@Autowired
 	private QrCodeService qrCodeService;
+
+	@Autowired
+	private GarbageAccountService garbageAccountService;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
@@ -162,6 +179,106 @@ public class DoorPlateService {
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(actionRequest.getRequestInfo(), true))
 				.doorPlates(Collections.singletonList(doorPlate)).build();
+	}
+
+	/**
+	 * Compares the owner/property snapshot embedded in a scanned door plate QR
+	 * code (captured at print time) against the current live record in
+	 * garbage-service, to detect whether the record has since been updated in
+	 * the system.
+	 */
+	@SuppressWarnings("unchecked")
+	public DoorPlateQrVerifyResponse verifyQrData(DoorPlateQrVerifyRequest request) {
+
+		validateUserInfo(request.getRequestInfo());
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to verify the QR data.");
+		}
+		if (StringUtils.isEmpty(request.getData())) {
+			throw new CustomException("INVALID_REQUEST", "Provide the scanned QR data to verify.");
+		}
+
+		DoorPlateQrSnapshot qrSnapshot;
+		try {
+			qrSnapshot = objectMapper.readValue(request.getData(), DoorPlateQrSnapshot.class);
+		} catch (Exception e) {
+			throw new CustomException("INVALID_QR", "Scanned QR data is not in the expected format.");
+		}
+		if (StringUtils.isEmpty(qrSnapshot.getId())) {
+			throw new CustomException("INVALID_QR", "Scanned QR data does not contain the garbage account id.");
+		}
+
+		Map<String, Object> garbageSearchResponse = garbageAccountService.searchGarbageAccountByUuid(
+				request.getRequestInfo(), request.getTenantId(), qrSnapshot.getId());
+
+		Object rawGarbageAccounts = garbageSearchResponse.get("garbageAccounts");
+		if (null == rawGarbageAccounts
+				|| (rawGarbageAccounts instanceof List && ((List<?>) rawGarbageAccounts).isEmpty())) {
+			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
+					"No active garbage account found for id: " + qrSnapshot.getId());
+		}
+		List<RemoteGarbageAccount> remoteGarbageAccounts = objectMapper.convertValue(rawGarbageAccounts,
+				new TypeReference<List<RemoteGarbageAccount>>() {
+				});
+		RemoteGarbageAccount account = remoteGarbageAccounts.get(0);
+		RemoteGrbgAddress address = CollectionUtils.isEmpty(account.getAddresses()) ? null
+				: account.getAddresses().get(0);
+
+		DoorPlateQrSnapshot dbSnapshot = DoorPlateQrSnapshot.builder()
+				.ownerName(account.getName())
+				.mobileNo(account.getMobileNumber())
+				.propertyId(account.getPropertyId())
+				.id(account.getUuid())
+				.ulbName(null == address ? null : address.getUlbName())
+				.ward(null == address ? null : address.getWardName())
+				.address(toPropertyAddress(address))
+				.build();
+
+		List<String> mismatchedFields = findMismatchedFields(qrSnapshot, dbSnapshot);
+
+		return DoorPlateQrVerifyResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.dataInQr(qrSnapshot)
+				.dataInDatabase(dbSnapshot)
+				.isMatching(mismatchedFields.isEmpty())
+				.mismatchedFields(mismatchedFields)
+				.build();
+	}
+
+	private List<String> findMismatchedFields(DoorPlateQrSnapshot qrSnapshot, DoorPlateQrSnapshot dbSnapshot) {
+		List<String> mismatched = new ArrayList<>();
+		if (!fieldsEqual(qrSnapshot.getOwnerName(), dbSnapshot.getOwnerName())) {
+			mismatched.add("OwnerName");
+		}
+		if (!fieldsEqual(qrSnapshot.getMobileNo(), dbSnapshot.getMobileNo())) {
+			mismatched.add("MobileNo");
+		}
+		if (!fieldsEqual(qrSnapshot.getPropertyId(), dbSnapshot.getPropertyId())) {
+			mismatched.add("PropertyID");
+		}
+		if (!fieldsEqual(qrSnapshot.getUlbName(), dbSnapshot.getUlbName())) {
+			mismatched.add("ulbName");
+		}
+		if (!fieldsEqual(qrSnapshot.getWard(), dbSnapshot.getWard())) {
+			mismatched.add("Ward");
+		}
+		if (!fieldsEqual(qrSnapshot.getAddress(), dbSnapshot.getAddress())) {
+			mismatched.add("Address");
+		}
+		return mismatched;
+	}
+
+	private boolean fieldsEqual(String a, String b) {
+		return StringUtils.isEmpty(a) ? StringUtils.isEmpty(b) : a.trim().equalsIgnoreCase(null == b ? "" : b.trim());
+	}
+
+	private String toPropertyAddress(RemoteGrbgAddress address) {
+		if (null == address) {
+			return null;
+		}
+		return Stream.of(address.getAddress1(), address.getAddress2(), address.getCity())
+				.filter(StringUtils::isNotEmpty)
+				.collect(Collectors.joining(", "));
 	}
 
 	public DoorPlateResponse search(SearchCriteriaDoorPlateRequest searchRequest) {
