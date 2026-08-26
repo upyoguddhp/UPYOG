@@ -27,7 +27,10 @@ public class ContractorQueryBuilder {
 
 	private static final String SEARCH_QUERY = "SELECT c.*, " + "ARRAY(" + "    SELECT DISTINCT wm.ward_number "
 			+ "    FROM eg_ddp_contractor_ward_mapping wm " + "    WHERE wm.contractor_uuid = c.uuid "
-			+ "    AND wm.is_active = true" + ") AS ward " + "FROM eg_ddp_contractor c " + "WHERE 1=1 ";
+			+ "    AND wm.is_active = true" + ") AS ward, " + "( " + "    SELECT wm.contractor_user_uuid "
+			+ "    FROM eg_ddp_contractor_ward_mapping wm " + "    WHERE wm.contractor_uuid = c.uuid "
+			+ "    AND wm.is_active = true " + "    AND wm.contractor_user_uuid IS NOT NULL " + "    LIMIT 1 "
+			+ ") AS contractor_user_uuid " + "FROM eg_ddp_contractor c " + "WHERE 1=1 ";
 
 	private static final String COUNT_QUERY = "SELECT "
 			+ "COUNT(*) AS total_vendors, "
