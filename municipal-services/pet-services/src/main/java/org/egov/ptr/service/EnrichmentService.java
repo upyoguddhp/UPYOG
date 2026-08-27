@@ -50,7 +50,7 @@ public class EnrichmentService {
 				config.getPetIdGenFormat(), petRegistrationRequest.getPetRegistrationApplications().size());
 		Integer index = 0;
 		for (PetRegistrationApplication application : petRegistrationRequest.getPetRegistrationApplications()) {
-			application.setBusinessService(PET_BUSINESS_SERVICE);
+			application.setBusinessService(application.getBusinessService());
 
 			AuditDetails auditDetails = AuditDetails.builder()
 					.createdBy(petRegistrationRequest.getRequestInfo().getUserInfo().getUuid())

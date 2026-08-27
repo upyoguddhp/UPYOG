@@ -61,7 +61,7 @@ public class WorkflowService {
 			processInstance.setAction(workflow.getAction());
 			processInstance.setModuleName(PTRConstants.BUSINESS_SERVICE);
 			processInstance.setTenantId(application.getTenantId());
-			processInstance.setBusinessService(PTRConstants.WORKFLOW_BUSINESS_SERVICE);
+			processInstance.setBusinessService(application.getBusinessService());
 			processInstance.setDocuments(workflow.getDocuments());
 			processInstance.setComment(workflow.getComments());
 
