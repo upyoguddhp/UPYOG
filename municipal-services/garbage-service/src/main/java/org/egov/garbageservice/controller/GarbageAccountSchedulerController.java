@@ -1,6 +1,8 @@
 package org.egov.garbageservice.controller;
 
 import org.egov.garbageservice.model.GenerateBillRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingResponse;
 import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.service.GarbageAccountSchedulerService;
@@ -70,6 +72,18 @@ public class GarbageAccountSchedulerController {
 	@PostMapping("/extract-tracker")
 	public ResponseEntity<?> getTrackerByBillId(@RequestBody BillIdRequest request) {
 	    return ResponseEntity.ok(service.getTrackerByBillId(request));
+	}
+
+	/**
+	 * Fetches every ULB/ward enabled for door plate printing from the
+	 * ULBS.DdpPrinting MDMS master and, for each, marks all ddpVerified
+	 * garbage accounts in that ULB/ward as ready for printing (batch-wise per
+	 * ULB/ward).
+	 */
+	@PostMapping("/ddp/mark-ready-for-printing")
+	public ResponseEntity<MarkReadyForPrintingResponse> markReadyForPrinting(
+			@RequestBody MarkReadyForPrintingRequest markReadyForPrintingRequest) {
+		return ResponseEntity.ok(service.markReadyForPrinting(markReadyForPrintingRequest));
 	}
 
 }

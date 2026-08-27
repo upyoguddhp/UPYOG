@@ -157,6 +157,10 @@ public class GarbageAccountRepository {
 	private static final String UPDATE_DDP_DETAILS_BY_ID = "UPDATE eg_grbg_account "
 			+ "SET ddp_print_verified = :ddpPrintVerified, " + "    ddp_modified_date = :ddpModifiedDate "
 			+ "WHERE id = :id";
+
+	private static final String UPDATE_READY_FOR_PRINTING = "UPDATE eg_grbg_account "
+			+ "SET is_ready_for_printing = true, last_modified_by = ?, last_modified_date = ? "
+			+ "WHERE id IN (%s)";
     
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
@@ -786,7 +790,36 @@ public class GarbageAccountRepository {
 		accountInputs.put("id", garbageAccount.getId());
 		accountInputs.put("ddpPrintVerified", garbageAccount.getDdpPrintVerified());
 		accountInputs.put("ddpModifiedDate", garbageAccount.getDdpModifiedDate());
-		
+
 		namedParameterJdbcTemplate.update(UPDATE_DDP_DETAILS_BY_ID, accountInputs);
+	}
+
+	/**
+	 * Bulk-marks the given account ids as ready for printing. Called by the
+	 * DDP printing scheduler in id batches (see
+	 * {@code GarbageAccountSchedulerService.markReadyForPrinting}) so a single
+	 * ULB/ward's matching accounts don't require one UPDATE per row.
+	 */
+	public int markReadyForPrinting(List<Long> ids, String userUuid, Long lastModifiedDate) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return 0;
+		}
+
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < ids.size(); i++) {
+			if (i > 0) {
+				placeholders.append(",");
+			}
+			placeholders.append("?");
+		}
+
+		String query = String.format(UPDATE_READY_FOR_PRINTING, placeholders);
+
+		List<Object> params = new ArrayList<>();
+		params.add(userUuid);
+		params.add(lastModifiedDate);
+		params.addAll(ids);
+
+		return jdbcTemplate.update(query, params.toArray());
 	}
 }

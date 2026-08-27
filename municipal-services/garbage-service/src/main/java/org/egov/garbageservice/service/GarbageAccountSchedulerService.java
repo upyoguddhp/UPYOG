@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.contract.bill.BillResponse;
 import org.egov.garbageservice.contract.bill.Demand;
 import org.egov.garbageservice.contract.bill.GenerateBillCriteria;
+import org.egov.garbageservice.model.DdpPrintingUlbWard;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.GenerateBillRequest;
@@ -33,12 +34,16 @@ import org.egov.garbageservice.model.GrbgBillTracker;
 import org.egov.garbageservice.model.GrbgBillTrackerRequest;
 import org.egov.garbageservice.model.GrbgBillTrackerResponse;
 import org.egov.garbageservice.model.GrbgBillTrackerSearchCriteria;
+import org.egov.garbageservice.model.MarkReadyForPrintingRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingResponse;
+import org.egov.garbageservice.model.UlbWardPrintingResult;
 import org.egov.garbageservice.producer.GarbageProducer;
 import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
 import org.egov.garbageservice.model.UserSearchRequest;
 import org.egov.garbageservice.model.contract.OwnerInfo;
+import org.egov.garbageservice.repository.GarbageAccountRepository;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.garbageservice.contract.bill.BillSearchCriteria;
@@ -46,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.garbageservice.util.ResponseInfoFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.mdms.model.MdmsResponse;
@@ -110,7 +116,13 @@ public class GarbageAccountSchedulerService {
 	
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
-	
+
+	@Autowired
+	private GarbageAccountRepository garbageAccountRepository;
+
+	@Autowired
+	private ResponseInfoFactory responseInfoFactory;
+
 	@Value("${garbage.rebate.grace.days:15}")
 	private Integer rebateGraceDays;
 	
@@ -1054,6 +1066,92 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
 		}
 		return trackers.get(0);
+	}
+
+	/**
+	 * For every ULB/ward enabled for door plate printing (per the
+	 * ULBS.DdpPrinting MDMS master), finds ddpVerified, approved, active
+	 * garbage accounts in that ULB/ward and marks them ready for printing, in
+	 * id batches per ULB/ward so a single UPDATE doesn't have to cover every
+	 * matching row across the whole tenant at once.
+	 */
+	public MarkReadyForPrintingResponse markReadyForPrinting(MarkReadyForPrintingRequest request) {
+
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST",
+					"TenantId is mandatory to mark accounts ready for printing.");
+		}
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		String userUuid = null != requestInfo && null != requestInfo.getUserInfo()
+				? requestInfo.getUserInfo().getUuid()
+				: "system";
+		int batchSize = null != request.getBatchSize() && request.getBatchSize() > 0 ? request.getBatchSize() : 500;
+		Long now = System.currentTimeMillis();
+
+		List<DdpPrintingUlbWard> ulbWards = mdmsService.fetchDdpPrintingUlbWards(requestInfo, request.getTenantId());
+
+		List<UlbWardPrintingResult> results = new ArrayList<>();
+		int totalMarked = 0;
+
+		for (DdpPrintingUlbWard ulbWard : ulbWards) {
+
+			List<GarbageAccount> accounts = searchDdpVerifiedAccounts(requestInfo, request.getTenantId(), ulbWard);
+
+			List<Long> idsToMark = accounts.stream()
+					.filter(account -> !Boolean.TRUE.equals(account.getIsReadyForPrinting()))
+					.map(GarbageAccount::getId).filter(Objects::nonNull).collect(Collectors.toList());
+
+			int marked = 0;
+			for (int i = 0; i < idsToMark.size(); i += batchSize) {
+				List<Long> batch = idsToMark.subList(i, Math.min(i + batchSize, idsToMark.size()));
+				marked += garbageAccountRepository.markReadyForPrinting(batch, userUuid, now);
+			}
+
+			totalMarked += marked;
+			results.add(UlbWardPrintingResult.builder().ulbName(ulbWard.getUlbName())
+					.wardName(ulbWard.getWardName()).accountsMarkedReady(marked).build());
+
+			log.info("[DdpPrinting] ulb={}, ward={}, ddpVerifiedAccountsFound={}, markedReady={}",
+					ulbWard.getUlbName(), ulbWard.getWardName(), accounts.size(), marked);
+		}
+
+		return MarkReadyForPrintingResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
+				.totalUlbWardsProcessed(ulbWards.size()).totalAccountsMarkedReady(totalMarked).results(results)
+				.build();
+	}
+
+	/**
+	 * Searches ddpVerified, approved, active accounts for one ULB/ward,
+	 * following the same tenantId="{tenantId}.{ulbName}" + wardNames search
+	 * convention used by {@link #getGarbageAccounts}, with an in-memory
+	 * ulb/ward re-check on the address since wardNames alone can't
+	 * disambiguate identically-named wards across different ULBs.
+	 */
+	private List<GarbageAccount> searchDdpVerifiedAccounts(RequestInfo requestInfo, String tenantId,
+			DdpPrintingUlbWard ulbWard) {
+
+		SearchCriteriaGarbageAccountRequest searchRequest = SearchCriteriaGarbageAccountRequest.builder()
+				.requestInfo(requestInfo)
+				.searchCriteriaGarbageAccount(SearchCriteriaGarbageAccount.builder()
+						.tenantId(tenantId + "." + ulbWard.getUlbName())
+						.wardNames(Collections.singletonList(ulbWard.getWardName())).isDdpVerified(true)
+						.status(Collections.singletonList("APPROVED")).isActiveAccount(true).isActiveSubAccount(true)
+						.build())
+				.isSchedulerCall(true).build();
+
+		GarbageAccountResponse response = garbageAccountService.searchGarbageAccounts(searchRequest, false);
+
+		if (null == response || CollectionUtils.isEmpty(response.getGarbageAccounts())) {
+			return Collections.emptyList();
+		}
+
+		return response.getGarbageAccounts().stream()
+				.filter(account -> !CollectionUtils.isEmpty(account.getAddresses())
+						&& ulbWard.getUlbName().equals(account.getAddresses().get(0).getUlbName())
+						&& ulbWard.getWardName().equals(account.getAddresses().get(0).getWardName()))
+				.collect(Collectors.toList());
 	}
 
 }
