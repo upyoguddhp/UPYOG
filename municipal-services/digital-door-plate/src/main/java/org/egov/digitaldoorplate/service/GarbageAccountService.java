@@ -54,4 +54,41 @@ public class GarbageAccountService {
 
 		return (Map<String, Object>) response.get();
 	}
+
+	/**
+	 * Partially updates the DDP workflow fields (vendor print verification,
+	 * ULB verification, or installation + lat/long) on the garbage account
+	 * identified by {@code garbageAccountUuid}, via garbage-service's
+	 * {@code /garbage-accounts/_updateDdpWorkflow}. Fields left null are not
+	 * sent as "clear this column" but simply omitted from the update (see
+	 * garbage-service's COALESCE-based partial update), so each role-specific
+	 * caller only needs to pass the field(s) it owns.
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> updateDdpWorkflowFields(RequestInfo requestInfo, String tenantId,
+			String garbageAccountUuid, String vendorPrintVerified, Boolean ulbVerified, Boolean installationDone,
+			String ddpLatitude, String ddpLongitude) {
+
+		StringBuilder uri = new StringBuilder(ddpConfig.getGarbageServiceHostUrl())
+				.append(ddpConfig.getGarbageAccountUpdateDdpWorkflowEndpoint());
+
+		Map<String, Object> request = new HashMap<>();
+		request.put("RequestInfo", requestInfo);
+		request.put("tenantId", tenantId);
+		request.put("uuid", garbageAccountUuid);
+		request.put("vendorPrintVerified", vendorPrintVerified);
+		request.put("ulbVerified", ulbVerified);
+		request.put("installationDone", installationDone);
+		request.put("ddpLatitude", ddpLatitude);
+		request.put("ddpLongitude", ddpLongitude);
+
+		Optional<Object> response = serviceRequestRepository.fetchResult(uri, request);
+
+		if (!response.isPresent()) {
+			throw new CustomException("GARBAGE_UPDATE_FAILED",
+					"No response received from garbage-service while updating DDP workflow fields.");
+		}
+
+		return (Map<String, Object>) response.get();
+	}
 }

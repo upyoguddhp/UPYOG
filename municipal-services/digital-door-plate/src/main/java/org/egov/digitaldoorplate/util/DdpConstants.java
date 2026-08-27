@@ -85,4 +85,11 @@ public class DdpConstants {
 
 	@Value("${egov.garbage.account.search.endpoint}")
 	private String garbageAccountSearchEndpoint;
+
+	@Value("${egov.garbage.account.update.ddp.workflow.endpoint}")
+	private String garbageAccountUpdateDdpWorkflowEndpoint;
+
+	public static final String VENDOR_PRINT_VERIFIED_STATUS_VERIFIED = "VERIFIED";
+
+	public static final String VENDOR_PRINT_VERIFIED_STATUS_REJECTED = "REJECTED";
 }

@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.digitaldoorplate.model.DoorPlate;
 import org.egov.digitaldoorplate.model.DoorPlateActionRequest;
+import org.egov.digitaldoorplate.model.DoorPlateDdpWorkflowRequest;
+import org.egov.digitaldoorplate.model.DoorPlateDdpWorkflowResponse;
 import org.egov.digitaldoorplate.model.DoorPlateQrSnapshot;
 import org.egov.digitaldoorplate.model.DoorPlateQrVerifyRequest;
 import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
@@ -242,6 +244,56 @@ public class DoorPlateService {
 				.dataInDatabase(dbSnapshot)
 				.isMatching(mismatchedFields.isEmpty())
 				.mismatchedFields(mismatchedFields)
+				.build();
+	}
+
+	/**
+	 * Single entry point for every DDP workflow role update on the garbage
+	 * account identified by {@code garbageAccountUuid} (the "id" resolved
+	 * from {@code /_verifyQr}): vendor print verification, ULB verification,
+	 * or installation + lat/long. Each caller only sets the field(s) relevant
+	 * to its own role; the rest are left null and left untouched by
+	 * garbage-service's COALESCE-based partial update.
+	 */
+	public DoorPlateDdpWorkflowResponse updateDdpWorkflow(DoorPlateDdpWorkflowRequest request) {
+
+		validateUserInfo(request.getRequestInfo());
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory.");
+		}
+		if (StringUtils.isEmpty(request.getGarbageAccountUuid())) {
+			throw new CustomException("INVALID_REQUEST", "GarbageAccountUuid is mandatory.");
+		}
+		if (StringUtils.isEmpty(request.getVendorPrintVerified()) && null == request.getUlbVerified()
+				&& null == request.getInstallationDone()) {
+			throw new CustomException("INVALID_REQUEST",
+					"Provide at least one of vendorPrintVerified, ulbVerified or installationDone to update.");
+		}
+		if (StringUtils.isNotEmpty(request.getVendorPrintVerified())
+				&& !(DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_VERIFIED
+						.equalsIgnoreCase(request.getVendorPrintVerified())
+						|| DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_REJECTED
+								.equalsIgnoreCase(request.getVendorPrintVerified()))) {
+			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
+		}
+		if (null != request.getInstallationDone()
+				&& (StringUtils.isEmpty(request.getDdpLatitude()) || StringUtils.isEmpty(request.getDdpLongitude()))) {
+			throw new CustomException("INVALID_REQUEST",
+					"ddpLatitude and ddpLongitude are mandatory to record installation.");
+		}
+
+		garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
+				request.getGarbageAccountUuid(), request.getVendorPrintVerified(), request.getUlbVerified(),
+				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude());
+
+		return DoorPlateDdpWorkflowResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.garbageAccountUuid(request.getGarbageAccountUuid())
+				.vendorPrintVerified(request.getVendorPrintVerified())
+				.ulbVerified(request.getUlbVerified())
+				.installationDone(request.getInstallationDone())
+				.ddpLatitude(request.getDdpLatitude())
+				.ddpLongitude(request.getDdpLongitude())
 				.build();
 	}
 

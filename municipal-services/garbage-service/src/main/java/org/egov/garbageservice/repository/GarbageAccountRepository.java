@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
 import org.egov.garbageservice.model.ApplicationBillDTO;
@@ -161,7 +162,16 @@ public class GarbageAccountRepository {
 	private static final String UPDATE_READY_FOR_PRINTING = "UPDATE eg_grbg_account "
 			+ "SET is_ready_for_printing = true, last_modified_by = ?, last_modified_date = ? "
 			+ "WHERE id IN (%s)";
-    
+
+	private static final String UPDATE_DDP_WORKFLOW_BY_UUID = "UPDATE eg_grbg_account SET "
+			+ "vendor_print_verified = COALESCE(:vendorPrintVerified, vendor_print_verified), "
+			+ "ulb_verified = COALESCE(:ulbVerified, ulb_verified), "
+			+ "installation_done = COALESCE(:installationDone, installation_done), "
+			+ "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
+			+ "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
+			+ "last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate "
+			+ "WHERE uuid = :uuid AND tenant_id = :tenantId";
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
 
@@ -821,5 +831,30 @@ public class GarbageAccountRepository {
 		params.addAll(ids);
 
 		return jdbcTemplate.update(query, params.toArray());
+	}
+
+	/**
+	 * Partially updates the DDP workflow columns (vendor print verification,
+	 * ULB verification, installation + lat/long) for one account, identified
+	 * by uuid. Any field left null on the request keeps its existing column
+	 * value (see the COALESCE in {@link #UPDATE_DDP_WORKFLOW_BY_UUID}), so each
+	 * role-specific caller only needs to send the field(s) it owns.
+	 *
+	 * @return the number of rows updated (0 if no account matched the
+	 *         uuid/tenantId).
+	 */
+	public int updateDdpWorkflowFields(DdpWorkflowUpdateRequest request, String userUuid, Long now) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", request.getUuid());
+		params.put("tenantId", request.getTenantId());
+		params.put("vendorPrintVerified", request.getVendorPrintVerified());
+		params.put("ulbVerified", request.getUlbVerified());
+		params.put("installationDone", request.getInstallationDone());
+		params.put("ddpLatitude", request.getDdpLatitude());
+		params.put("ddpLongitude", request.getDdpLongitude());
+		params.put("lastModifiedBy", userUuid);
+		params.put("lastModifiedDate", now);
+
+		return namedParameterJdbcTemplate.update(UPDATE_DDP_WORKFLOW_BY_UUID, params);
 	}
 }

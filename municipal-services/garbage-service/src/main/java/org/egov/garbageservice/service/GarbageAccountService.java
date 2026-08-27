@@ -49,6 +49,8 @@ import org.egov.garbageservice.contract.workflow.ProcessInstanceResponse;
 import org.egov.garbageservice.contract.workflow.State;
 import org.egov.garbageservice.contract.workflow.WorkflowService;
 import org.egov.garbageservice.model.AuditDetails;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
+import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
 import org.egov.garbageservice.model.GarbageAccountActionResponse;
@@ -2917,4 +2919,49 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			}
 			return validGarbageIds;
 		}
+
+	/**
+	 * Partially updates the DDP (door plate) workflow fields on one account
+	 * (vendor print verification, ULB verification, installation + lat/long),
+	 * identified by uuid. Called from digital-door-plate's role-specific
+	 * verify/install endpoints; each caller only sets the field(s) relevant to
+	 * its own role, leaving the others null so they're left untouched.
+	 */
+	public DdpWorkflowUpdateResponse updateDdpWorkflowFields(DdpWorkflowUpdateRequest request) {
+
+		if (null == request.getRequestInfo() || null == request.getRequestInfo().getUserInfo()
+				|| StringUtils.isEmpty(request.getRequestInfo().getUserInfo().getUuid())) {
+			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
+		}
+		if (StringUtils.isEmpty(request.getUuid())) {
+			throw new CustomException("INVALID_REQUEST", "Uuid is mandatory to update DDP workflow details.");
+		}
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to update DDP workflow details.");
+		}
+		if (null != request.getVendorPrintVerified()
+				&& !("VERIFIED".equalsIgnoreCase(request.getVendorPrintVerified())
+						|| "REJECTED".equalsIgnoreCase(request.getVendorPrintVerified()))) {
+			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
+		}
+
+		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
+		Long now = System.currentTimeMillis();
+
+		int updatedRows = garbageAccountRepository.updateDdpWorkflowFields(request, userUuid, now);
+		if (updatedRows == 0) {
+			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
+					"No garbage account found for uuid: " + request.getUuid());
+		}
+
+		return DdpWorkflowUpdateResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.uuid(request.getUuid())
+				.vendorPrintVerified(request.getVendorPrintVerified())
+				.ulbVerified(request.getUlbVerified())
+				.installationDone(request.getInstallationDone())
+				.ddpLatitude(request.getDdpLatitude())
+				.ddpLongitude(request.getDdpLongitude())
+				.build();
+	}
 }

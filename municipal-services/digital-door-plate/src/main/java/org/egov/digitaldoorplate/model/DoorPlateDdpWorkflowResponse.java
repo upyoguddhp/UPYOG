@@ -1,0 +1,34 @@
+package org.egov.digitaldoorplate.model;
+
+import org.egov.common.contract.response.ResponseInfo;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@Data
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DoorPlateDdpWorkflowResponse {
+
+	@JsonProperty("ResponseInfo")
+	private ResponseInfo responseInfo;
+
+	private String garbageAccountUuid;
+
+	private String vendorPrintVerified;
+
+	private Boolean ulbVerified;
+
+	private Boolean installationDone;
+
+	private String ddpLatitude;
+
+	private String ddpLongitude;
+}

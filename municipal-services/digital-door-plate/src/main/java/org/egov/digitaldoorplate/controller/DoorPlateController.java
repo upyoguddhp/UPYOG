@@ -1,6 +1,8 @@
 package org.egov.digitaldoorplate.controller;
 
 import org.egov.digitaldoorplate.model.DoorPlateActionRequest;
+import org.egov.digitaldoorplate.model.DoorPlateDdpWorkflowRequest;
+import org.egov.digitaldoorplate.model.DoorPlateDdpWorkflowResponse;
 import org.egov.digitaldoorplate.model.DoorPlateQrVerifyRequest;
 import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
 import org.egov.digitaldoorplate.model.DoorPlateRequest;
@@ -54,5 +56,18 @@ public class DoorPlateController {
 	public ResponseEntity<DoorPlateQrVerifyResponse> verifyQr(
 			@RequestBody DoorPlateQrVerifyRequest doorPlateQrVerifyRequest) {
 		return ResponseEntity.ok(doorPlateService.verifyQrData(doorPlateQrVerifyRequest));
+	}
+
+	/**
+	 * Single endpoint for every DDP workflow role update on the garbage
+	 * account uuid resolved from {@code /_verifyQr}: vendor print
+	 * verification, ULB verification, or installation + lat/long. Each caller
+	 * (vendor/ULB official/installer) only sets the field(s) relevant to its
+	 * own role.
+	 */
+	@PostMapping("/_updateDdpWorkflow")
+	public ResponseEntity<DoorPlateDdpWorkflowResponse> updateDdpWorkflow(
+			@RequestBody DoorPlateDdpWorkflowRequest doorPlateDdpWorkflowRequest) {
+		return ResponseEntity.ok(doorPlateService.updateDdpWorkflow(doorPlateDdpWorkflowRequest));
 	}
 }
