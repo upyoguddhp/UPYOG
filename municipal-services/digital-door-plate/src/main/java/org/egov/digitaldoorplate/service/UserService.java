@@ -153,8 +153,8 @@ public class UserService {
 				.password(DdpConstants.DEFAULT_EMPLOYEE_PASSWORD)
 				.roles(Arrays.asList(
 						Role.builder().code(DdpConstants.USER_ROLE_EMPLOYEE).name("Employee")
-								.tenantId(stateTenantId).build(),
-						Role.builder().code(roleCode).name(roleName).tenantId(stateTenantId).build()))
+								.tenantId(ulbTenantId).build(),
+						Role.builder().code(roleCode).name(roleName).tenantId(ulbTenantId).build()))
 				.build();
 
 		Assignment assignment = Assignment.builder()

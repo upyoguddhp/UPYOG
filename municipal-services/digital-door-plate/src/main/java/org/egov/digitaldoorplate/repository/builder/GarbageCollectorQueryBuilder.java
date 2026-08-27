@@ -1,6 +1,7 @@
 package org.egov.digitaldoorplate.repository.builder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollector;
 import org.springframework.stereotype.Component;
@@ -59,12 +60,21 @@ public class GarbageCollectorQueryBuilder {
 			query.append(" AND is_active = ?");
 			preparedStatementValues.add(criteria.getIsActive());
 		}
-		if (null != criteria.getSupervisorId()) {
-			query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_garbage_collector_mapping cm ")
-					.append("WHERE cm.collector_uuid = c.uuid ").append("AND cm.is_active = true ")
-					.append("AND cm.supervisor_id = ?)");
-			preparedStatementValues.add(criteria.getSupervisorId());
-		}
+			if (null != criteria.getSupervisorId()) {
+				query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_garbage_collector_mapping cm ")
+						.append("WHERE cm.collector_uuid = c.uuid ").append("AND cm.is_active = true ")
+						.append("AND cm.supervisor_id = ?)");
+				preparedStatementValues.add(criteria.getSupervisorId());
+			}
+			if (null != criteria.getWardNumber() && !criteria.getWardNumber().isEmpty()) {
+				query.append(" AND EXISTS (").append("SELECT 1 ").append("FROM eg_ddp_garbage_collector_mapping cm ")
+						.append("WHERE cm.collector_uuid = c.uuid ").append("AND cm.is_active = true ")
+						.append("AND cm.ward_number IN (");
+				query.append(criteria.getWardNumber().stream().map(ward -> "?").collect(Collectors.joining(", ")));
+				query.append("))");
+
+				preparedStatementValues.addAll(criteria.getWardNumber());
+			}
 
 		query.append(" ORDER BY createddate DESC");
 

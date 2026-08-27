@@ -30,4 +30,6 @@ public class SearchCriteriaGarbageCollector {
 	private Integer limit;
 
 	private Integer offset;
+	
+	private List<String> wardNumber;
 }
