@@ -2994,6 +2994,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		}
 
 		searchRequest.getSearchCriteriaGarbageAccount().setIsReadyForPrinting(Boolean.TRUE);
+		String tenantId = searchRequest.getSearchCriteriaGarbageAccount().getTenantId();
 
 		GarbageAccountResponse garbageAccountResponse = searchGarbageAccounts(searchRequest, false);
 
@@ -3001,12 +3002,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				|| CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts()) ? Collections.emptyList()
 						: garbageAccountResponse.getGarbageAccounts();
 
+		List<String> systemPropertyIds = garbageAccounts.stream().map(GarbageAccount::getSystemPropertyId)
+				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
 		Map<String, PtProperty> propertyBySystemPropertyId = fetchPropertiesBySystemPropertyId(
-				searchRequest.getRequestInfo(), searchRequest.getSearchCriteriaGarbageAccount().getTenantId(),
-				garbageAccounts);
+				searchRequest.getRequestInfo(), tenantId, systemPropertyIds);
+		Map<String, String> ownerMobileBySystemPropertyId = fetchOwnerMobileNumbers(tenantId, systemPropertyIds);
 
 		List<DdpPrintingRecord> records = garbageAccounts.stream()
-				.map(account -> toDdpPrintingRecord(account, propertyBySystemPropertyId)).collect(Collectors.toList());
+				.map(account -> toDdpPrintingRecord(account, propertyBySystemPropertyId, ownerMobileBySystemPropertyId))
+				.collect(Collectors.toList());
 
 		return DdpPrintingSearchResponse.builder()
 				.responseInfo(
@@ -3018,17 +3023,12 @@ public GarbageAccountActionResponse openSearchPayPreview(
 	 * Batch-fetches property-services Property records for every distinct
 	 * systemPropertyId present on the given garbage accounts (50 per call,
 	 * matching property-services' own search convention), keyed by propertyId
-	 * for O(1) lookup while building the DDP printing records.
+	 * for O(1) lookup while building the DDP printing records. Used for
+	 * OwnerName and Address only; MobileNo is fetched separately (see
+	 * {@link #fetchOwnerMobileNumbers}).
 	 */
 	private Map<String, PtProperty> fetchPropertiesBySystemPropertyId(RequestInfo requestInfo, String tenantId,
-			List<GarbageAccount> garbageAccounts) {
-
-		if (CollectionUtils.isEmpty(garbageAccounts)) {
-			return Collections.emptyMap();
-		}
-
-		List<String> systemPropertyIds = garbageAccounts.stream().map(GarbageAccount::getSystemPropertyId)
-				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+			List<String> systemPropertyIds) {
 
 		if (CollectionUtils.isEmpty(systemPropertyIds)) {
 			return Collections.emptyMap();
@@ -3065,19 +3065,30 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		return propertyMap;
 	}
 
-	private DdpPrintingRecord toDdpPrintingRecord(GarbageAccount account,
-			Map<String, PtProperty> propertyBySystemPropertyId) {
+	/**
+	 * Batch-fetches the raw eg_pt_owner.mobile_number for every distinct
+	 * systemPropertyId, straight from the DB (see
+	 * {@code GarbageAccountRepository.getOwnerMobileNumbersBySystemPropertyIds}
+	 * for why this doesn't go through property-services' own API), keyed by
+	 * propertyId.
+	 */
+	private Map<String, String> fetchOwnerMobileNumbers(String tenantId, List<String> systemPropertyIds) {
+		return garbageAccountRepository.getOwnerMobileNumbersBySystemPropertyIds(systemPropertyIds, tenantId);
+	}
 
-		PtProperty property = StringUtils.isEmpty(account.getSystemPropertyId()) ? null
-				: propertyBySystemPropertyId.get(account.getSystemPropertyId());
+	private DdpPrintingRecord toDdpPrintingRecord(GarbageAccount account,
+			Map<String, PtProperty> propertyBySystemPropertyId, Map<String, String> ownerMobileBySystemPropertyId) {
+
+		String systemPropertyId = account.getSystemPropertyId();
+		PtProperty property = StringUtils.isEmpty(systemPropertyId) ? null
+				: propertyBySystemPropertyId.get(systemPropertyId);
 
 		GrbgAddress accountAddress = CollectionUtils.isEmpty(account.getAddresses()) ? null
 				: account.getAddresses().get(0);
 
 		String ownerName = null;
-		String mobileNo = null;
 		String address = null;
-		String propertyId = account.getSystemPropertyId();
+		String propertyId = systemPropertyId;
 
 		if (null != property) {
 			if (StringUtils.isNotEmpty(property.getPropertyId())) {
@@ -3087,9 +3098,11 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			PtOwnerInfo owner = findPrimaryOwner(property.getOwners());
 			if (null != owner) {
 				ownerName = owner.getPropertyOwnerName();
-				mobileNo = owner.getMobileNumber();
 			}
 		}
+
+		String mobileNo = StringUtils.isEmpty(systemPropertyId) ? null
+				: ownerMobileBySystemPropertyId.get(systemPropertyId);
 
 		return DdpPrintingRecord.builder().ownerName(ownerName).mobileNo(mobileNo).propertyId(propertyId)
 				.id(account.getUuid()).ulbName(null == accountAddress ? null : accountAddress.getUlbName())
@@ -3104,23 +3117,17 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.orElse(owners.get(0));
 	}
 
+	/**
+	 * Reads the display address from eg_pt_address's additionalDetails ->
+	 * propertyAddress key (populated by property-services itself, e.g. during
+	 * excel migration - see ExcelUtils.enrichAddress), rather than
+	 * reconstructing one from doorNo/street/city.
+	 */
 	private String toPropertyAddress(PtAddress address) {
-		if (null == address) {
+		if (null == address || null == address.getAdditionalDetails()) {
 			return null;
 		}
-		List<String> parts = new ArrayList<>();
-		if (StringUtils.isNotEmpty(address.getDoorNo())) {
-			parts.add(address.getDoorNo());
-		}
-		if (StringUtils.isNotEmpty(address.getBuildingName())) {
-			parts.add(address.getBuildingName());
-		}
-		if (StringUtils.isNotEmpty(address.getStreet())) {
-			parts.add(address.getStreet());
-		}
-		if (StringUtils.isNotEmpty(address.getCity())) {
-			parts.add(address.getCity());
-		}
-		return String.join(", ", parts);
+		JsonNode propertyAddress = address.getAdditionalDetails().path("propertyAddress");
+		return propertyAddress.isMissingNode() || propertyAddress.isNull() ? null : propertyAddress.asText();
 	}
 }

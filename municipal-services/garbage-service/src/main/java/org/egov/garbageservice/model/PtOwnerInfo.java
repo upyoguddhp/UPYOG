@@ -27,9 +27,12 @@ public class PtOwnerInfo {
 	private String propertyOwnerName;
 
 	/**
-	 * eg_pt_owner.mobile_number.
+	 * Deliberately not read from here: property-services' /property/_search
+	 * overwrites owners[].mobileNumber with egov-user's stored number during
+	 * enrichment, and its search query doesn't even select
+	 * eg_pt_owner.mobile_number. MobileNo for the DDP printing search is
+	 * fetched separately, straight from that column (see
+	 * {@code GarbageAccountRepository.getOwnerMobileNumbersBySystemPropertyIds}).
 	 */
-	private String mobileNumber;
-
 	private Boolean isPrimaryOwner;
 }
