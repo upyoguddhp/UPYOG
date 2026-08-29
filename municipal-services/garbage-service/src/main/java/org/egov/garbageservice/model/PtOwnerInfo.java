@@ -19,8 +19,16 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PtOwnerInfo {
 
-	private String name;
+	/**
+	 * The owner's display name is stored under eg_pt_owner's
+	 * propertyOwnerName column (not the generic "name" inherited from User),
+	 * so that's the field the DDP printing search reads for OwnerName.
+	 */
+	private String propertyOwnerName;
 
+	/**
+	 * eg_pt_owner.mobile_number.
+	 */
 	private String mobileNumber;
 
 	private Boolean isPrimaryOwner;

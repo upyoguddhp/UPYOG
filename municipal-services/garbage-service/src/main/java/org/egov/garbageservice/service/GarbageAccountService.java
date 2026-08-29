@@ -3086,7 +3086,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			address = toPropertyAddress(property.getAddress());
 			PtOwnerInfo owner = findPrimaryOwner(property.getOwners());
 			if (null != owner) {
-				ownerName = owner.getName();
+				ownerName = owner.getPropertyOwnerName();
 				mobileNo = owner.getMobileNumber();
 			}
 		}
