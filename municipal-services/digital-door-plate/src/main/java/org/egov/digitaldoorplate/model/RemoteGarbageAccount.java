@@ -36,6 +36,10 @@ public class RemoteGarbageAccount {
 	private String grbgApplicationNumber;
 	
 	private String systemPropertyId;
+	
+	private Double ddpLatitude;
+	
+	private Double ddpLongitude;
 
 	private List<RemoteGrbgAddress> addresses;
 
