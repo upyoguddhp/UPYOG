@@ -3004,10 +3004,14 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		List<String> systemPropertyIds = garbageAccounts.stream().map(GarbageAccount::getSystemPropertyId)
 				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+		
+		log.info("****** systemPropertyIds *****: {}", systemPropertyIds);
 
 		Map<String, PtProperty> propertyBySystemPropertyId = fetchPropertiesBySystemPropertyId(
 				searchRequest.getRequestInfo(), tenantId, systemPropertyIds);
 		Map<String, String> ownerMobileBySystemPropertyId = fetchOwnerMobileNumbers(tenantId, systemPropertyIds);
+		
+		log.info("****** propertyBySystemPropertyId *****: {}", propertyBySystemPropertyId);
 
 		List<DdpPrintingRecord> records = garbageAccounts.stream()
 				.map(account -> toDdpPrintingRecord(account, propertyBySystemPropertyId, ownerMobileBySystemPropertyId))
