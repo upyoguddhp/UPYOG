@@ -272,11 +272,11 @@
                            <td><span th:text="${billNo}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Bill Date</th>
+                           <th>Bill Generated Date</th>
                            <td><span th:text="${date}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Bill Due Date</th>
+                           <th>Payment Due Date</th>
                            <td><span th:text="${billDueDate}">NA</span></td>
                         </tr>
 						<tr>
@@ -297,7 +297,7 @@
 						     <td><span th:text="${totalAmount}">NA</span></td>
 						</tr>
                         <tr>
-                           <th>Amount Due (INR)</th>
+                           <th>Amount Payable (INR)</th>
                            <td><span class="highlight"><span th:text="${amountDue}"> NA </span></span></td>
                         </tr>
 						<tr>
@@ -403,26 +403,32 @@
             <img class="qr-code" th:src="${qrCodeText}" src="/qr.png" alt="QR Code" />
             </div> -->
          <div class="footer">
-			<ul class="">
-            <li class="highlight">
-               <strong>
-               The generated bill will be expired after 
-               <span th:text="${billDueDate}"> NA </span>.
-               </strong>
-            </li>
-			</ul>
             <ul class="footer-list">
                <li>
                   Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
                   regarding the regularization or ownership of the property.
                </li>
                <li class="bold-dark-text">
-                 Bill generation and data accuracy are the responsibility of the concerned ULB. For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> ULB office.
+                 Bill generation and data accuracy are the responsibility of the concerned ULB.
                </li>
-               <li>
-                  This receipt has been generated electronically and does not require a physical signature. | Generated on 
-                  <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
-               </li>
+			   <li class="bold-dark-text">
+			     For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> office.
+			   </li>
+			   <li class="bold-dark-text">
+			      The existing bill will expire once a new bill is generated.
+			   </li>
+			   <li>
+				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+				<ul>
+				        <li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
+				        <li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>
+				        <li>The applicable penalty/interest may be calculated on a <strong>monthly basis</strong>, as per the applicable rules.</li>
+				</ul>
+			   </li>
+			   <li>
+			    This receipt has been generated electronically and does not require a physical signature. | Generated on 
+			    <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
+			   </li>
             </ul>
          </div>
       </div>
