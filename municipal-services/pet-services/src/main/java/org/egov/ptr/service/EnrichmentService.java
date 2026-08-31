@@ -164,8 +164,8 @@ public class EnrichmentService {
 
 
 	public void enrichPetApplicationUponUpdate(PetRegistrationRequest petRegistrationRequest, PetRegistrationApplication existingApplication) {
-		petRegistrationRequest.getPetRegistrationApplications().get(0).setBusinessService(PET_BUSINESS_SERVICE);
-		existingApplication.setBusinessService(PET_BUSINESS_SERVICE);
+		petRegistrationRequest.getPetRegistrationApplications().get(0).setBusinessService(petRegistrationRequest.getPetRegistrationApplications().get(0).getBusinessService());
+		existingApplication.setBusinessService(petRegistrationRequest.getPetRegistrationApplications().get(0).getBusinessService());
 		
 		existingApplication.setWorkflow(petRegistrationRequest.getPetRegistrationApplications().get(0).getWorkflow());
 		existingApplication.setIsOnlyWorkflowCall(petRegistrationRequest.getPetRegistrationApplications().get(0).getIsOnlyWorkflowCall());
