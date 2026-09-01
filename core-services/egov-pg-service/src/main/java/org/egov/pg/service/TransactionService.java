@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pg.config.AppProperties;
+import org.egov.pg.models.BankAccount;
+import org.egov.pg.models.BankAccountResponse;
+import org.egov.pg.models.BankAccountSearchCriteria;
 import org.egov.pg.models.Bill;
 import org.egov.pg.models.BillDetail;
 import org.egov.pg.models.CollectionPayment;
@@ -55,6 +58,9 @@ public class TransactionService {
 	private AppProperties appProperties;
 	private TransactionRepository transactionRepository;
 	private PaymentsService paymentsService;
+	
+	@Autowired
+	private BankAccountService bankAccountService;
 
 	@Autowired
 	TransactionService(TransactionValidator validator, GatewayService gatewayService, Producer producer,
@@ -97,6 +103,17 @@ public class TransactionService {
 			transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 			paymentsService.registerPayment(transactionRequest);
 		} else {
+			Set<String> tenantIds = Collections.singleton(transaction.getTenantId());;
+			BankAccountResponse bankAccountResponse = null;
+			BankAccountSearchCriteria bankAccountSearchCriteria = BankAccountSearchCriteria.builder()
+					.requestInfo(requestInfo).tenantIds(tenantIds).active(true).build();
+	
+			// fetch all bank account
+			bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
+			 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
+			        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
+			        transaction.setPayTo(bankAccount.getPayTo());
+			    }
 			URI uri = gatewayService.initiateTxn(transaction);
 			transaction.setRedirectUrl(uri.toString());
 

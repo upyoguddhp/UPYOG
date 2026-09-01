@@ -22,5 +22,8 @@ public class CalculateTaxResponse {
 
 	@JsonProperty("taxCalculatorTrackers")
 	private List<PtTaxCalculatorTracker> taxCalculatorTrackers;
+	
+	@JsonProperty("message")
+	private String message;
 
 }

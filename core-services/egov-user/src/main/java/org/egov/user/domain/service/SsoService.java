@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.egov.user.domain.service.utils.Constants;
@@ -115,6 +116,16 @@ public class SsoService {
 //			User user = User.builder().username("hemantkumar0753").tenantId("hp").password(constants.CITIZEN_PASSWORD).build();
 //			do login;
 			Object loginResponse = userService.getLoginAccess(userModels.get(0), userModels.get(0).getPassword());
+			
+			if (loginResponse instanceof Map) {
+				Map<String, Object> responseMap = (Map<String, Object>) loginResponse;
+
+				Object userRequestObj = responseMap.get("UserRequest");
+				if (userRequestObj instanceof Map) {
+					Map<String, Object> userRequest = (Map<String, Object>) userRequestObj;
+					userRequest.put("isDataProtectionAccepted", userModels.get(0).getIsdataprotectionaccepted());
+				}
+			}
 
 //			send login response;
 			response = new ResponseEntity<Object>(loginResponse, HttpStatus.OK);

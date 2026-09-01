@@ -98,6 +98,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.egov.garbageservice.contract.bill.DemandDetail;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.egov.garbageservice.model.DdpVerificationCount;
+import java.time.temporal.ChronoUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -654,9 +657,13 @@ public class GarbageAccountService {
 	}
 
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
+		
+		Boolean isDdpUpdateCall = updateGarbageRequest.getGarbageAccounts().get(0).getIsDdpUpdateCall();
 
-		// remove child garbage account if not in request
-		removeChildGarbageAccount(updateGarbageRequest);
+		// remove child garbage account if not in request and if not a Ddp Update Call
+		if (!isDdpUpdateCall) {
+			removeChildGarbageAccount(updateGarbageRequest);
+		}
 
 		// create child garbage account if new in request
 		createChildGarbageAccount(updateGarbageRequest);
@@ -675,6 +682,14 @@ public class GarbageAccountService {
 					Collectors.toMap(a -> a.getValue().getGrbgApplication().getApplicationNo(), b -> b.getValue()));
 		} catch (Exception e) {
 			throw new CustomException("FAILED_SEARCH_GARBAGE_ACCOUNTS", "Search Garbage account details failed.");
+		}
+		
+		if (Boolean.TRUE.equals(isDdpUpdateCall)) {
+		    Set<Long> validGarbageIds = validateDdpUpdateWindow(existingGarbageIdAccountsMap);
+		    updateGarbageRequest.getGarbageAccounts().removeIf(account -> !validGarbageIds.contains(account.getGarbageId()));
+		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
+		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
+		    }
 		}
 
 		// load garbage account from backend if workflow = true
@@ -1305,6 +1320,12 @@ public class GarbageAccountService {
 				if (child.getAdditionalDetail() == null) {
 	                child.setAdditionalDetail(newGarbageAccount.getAdditionalDetail());
 	            }
+				if (child.getIsDdpVerified() == null) {
+					child.setIsDdpVerified(newGarbageAccount.getIsDdpVerified());
+				}
+				if (StringUtils.isBlank(child.getSystemPropertyId())) {
+					child.setSystemPropertyId(newGarbageAccount.getSystemPropertyId());
+				}
 				garbageAccountRepository.update(child);
 				// update application
 				grbgApplicationRepository.update(child.getGrbgApplication());
@@ -1375,6 +1396,10 @@ public class GarbageAccountService {
 		// update garbage account
 		garbageAccountRepository.update(newGarbageAccount);
 
+		if (Boolean.TRUE.equals(newGarbageAccount.getIsDdpUpdateCall())) {
+			garbageAccountRepository.updateDdpDetails(newGarbageAccount);
+		}
+
 	}
 
 	private Map<Long, GarbageAccount> searchGarbageAccountMap(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
@@ -1432,6 +1457,11 @@ public class GarbageAccountService {
 			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex) {
 
 		searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setUserType(searchCriteriaGarbageAccountRequest.getRequestInfo().getUserInfo().getType());
+		
+		if (searchCriteriaGarbageAccountRequest.getIsDdpVerified() != null) {
+			searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setIsDdpVerified(searchCriteriaGarbageAccountRequest.getIsDdpVerified());
+		}
+		
 		// validate search criteria
 		validateAndEnrichSearchGarbageAccount(searchCriteriaGarbageAccountRequest);
 
@@ -1503,7 +1533,7 @@ public class GarbageAccountService {
 			grbgAccs = garbageAccountRepository.searchGarbageAccount(
 					searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount(), garbageCriteriaMap);
 
-		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs);
+		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest);
 
 		if (CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			garbageAccountResponse.setResponseInfo(responseInfoFactory
@@ -1535,11 +1565,22 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 
 
-	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs) {
+	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
 				.build();
 
+		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
+		Integer totalApprovedAccounts = garbageAccountRepository.getTotalApprovedActiveAccounts(
+				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
+		
+		garbageAccountResponse.setTotalDdpVerified(ddpCount.getTotalDdpVerified());
+		garbageAccountResponse.setRemainingForDdpVerification(ddpCount.getRemainingForDdpVerification());
+		garbageAccountResponse.setTotalApprovedOwnerAccounts(ddpCount.getTotalApprovedOwnerAccounts());
+		garbageAccountResponse.setTotalApprovedAccounts(totalApprovedAccounts);
+		
 		processResponse(garbageAccountResponse);
 
 		return garbageAccountResponse;
@@ -2502,6 +2543,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 	public Map<String, Object> generateArrear(GenrateArrearRequest genrateArrearRequest) {
 		String message = null;
+		boolean isSuccess = true;
 		List<String> ListOfConsumerCode = new ArrayList<>();
 		ListOfConsumerCode.add(genrateArrearRequest.getDemands().get(0).getConsumerCode());
 		List<String> setOfStatuses = new ArrayList<>();
@@ -2518,10 +2560,15 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
+			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 
-				validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount);
+				if (validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount)) {
+					log.warn("Skipping arrear generation for application {} due to overlapping bill period",
+							garbageAccount.getGrbgApplicationNumber());
+					return;
+				};
 				
 				Map<String, Object> additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
 
@@ -2575,22 +2622,29 @@ public GarbageAccountActionResponse openSearchPayPreview(
 							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
 					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
+					arrearGenerated.set(true);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
 							"Bill not generated due to no Demand found for the given consumerCode");				}
 			});
-			message = "Arear Generated Successfully";
+			if (arrearGenerated.get()) {
+			    message = "Arrear Generated Successfully";
+			} else {
+			    message = "No arrear generated. Bill already exists for overlapping period.";
+			    isSuccess = false;
+			}
 		} else {
 			message = "Invalid Garbage Details";
+			isSuccess = false;
 		}
-		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), isSuccess);
 		Map<String, Object> response = new HashMap<>();
 		response.put("ResponseInfo", resInfo);
 		response.put("message", message);
 		return response;
 	}
 	
-	private void validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
+	private boolean validateBillPeriodOverlap(Demand arrearDemand, RequestInfo requestInfo,
 			GarbageAccount garbageAccount) {
 
 		BillSearchCriteria billSearchRequest = BillSearchCriteria.builder()
@@ -2602,7 +2656,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		BillResponse billResponse = billService.searchBill(billSearchRequest, requestInfo);
 
 		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return;
+			return false;
 		}
 
 		for (Bill bill : billResponse.getBill()) {
@@ -2625,12 +2679,11 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 				if (isOverlapping(arrearDemand.getTaxPeriodFrom(), arrearDemand.getTaxPeriodTo(), existingFrom,
 						existingTo)) {
-
-					throw new CustomException("ARREAR_PERIOD_OVERLAP",
-							"Arrear period overlaps with existing bill period");
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 	
 	private boolean isOverlapping(Long newFrom, Long newTo, Long existingFrom, Long existingTo) {
@@ -2845,5 +2898,23 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    );
 		
 		    garbageBillTrackerRepository.updatePenalty(tracker);
+		}
+		
+		private Set<Long> validateDdpUpdateWindow(Map<Long, GarbageAccount> existingGarbageAccountsMap) {
+
+			Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+			Set<Long> validGarbageIds = new HashSet<>();
+
+			for (GarbageAccount garbageAccount : existingGarbageAccountsMap.values()) {
+				Long ddpModifiedDate = garbageAccount.getDdpModifiedDate();
+				if (ddpModifiedDate == null || ddpModifiedDate <= 0) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+					continue;
+				}
+				if (!Instant.ofEpochMilli(ddpModifiedDate).isBefore(sevenDaysAgo)) {
+					validGarbageIds.add(garbageAccount.getGarbageId());
+				}
+			}
+			return validGarbageIds;
 		}
 }
