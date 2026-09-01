@@ -352,8 +352,14 @@ public class PropertySchedulerService {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
 				
-				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
-						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+										|| "PLOT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
 				
 				// Net rateable value after rebate
 				if (isShimlaPlotOfLand) {
@@ -378,8 +384,8 @@ public class PropertySchedulerService {
 				}
 
 
-BigDecimal rateUpto100 = BigDecimal.ZERO;
-BigDecimal rateAbove100 = BigDecimal.ZERO;
+				BigDecimal rateUpto100 = BigDecimal.ZERO;
+				BigDecimal rateAbove100 = BigDecimal.ZERO;
 				
 				// Find property tax rate
 				for (JsonNode propertyTaxRate : propertyTaxRates) {
@@ -895,8 +901,14 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
 				
-				boolean isShimlaPlotOfLand = ulbName.equalsIgnoreCase("Shimla")
-						&& "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText());
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
 
 				// Net rateable value after rebate
 				if (isShimlaPlotOfLand) {
@@ -1127,7 +1139,13 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 	private boolean hasPreviousUnpaidBill(RequestInfo requestInfo, String propertyId) {
 
 		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
-				.propertyIds(Collections.singleton(propertyId)).build();
+				.propertyIds(Collections.singleton(propertyId))
+				.billStatus(new HashSet<>(Arrays.asList(
+					    BillStatus.ACTIVE,
+					    BillStatus.PARTIALLY_PAID,
+					    BillStatus.EXPIRED
+					)))
+				.build();
 		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
 		if (CollectionUtils.isEmpty(trackers)) {
 			return false;

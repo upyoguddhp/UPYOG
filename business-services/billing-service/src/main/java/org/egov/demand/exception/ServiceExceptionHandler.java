@@ -1,12 +1,12 @@
-package org.egov.garbageservice.exception;
+package org.egov.demand.exception;
 
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_GENERATE_ID;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_HTTP_CLIENT;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_INPUT_VALIDATION;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_NOT_FOUND;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_ROWMAPPER;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_TECHNICAL;
-import static org.egov.garbageservice.exception.ErrorConstants.ERR_TECHNICAL_MSG;
+import static org.egov.demand.exception.ErrorConstants.ERR_GENERATE_ID;
+import static org.egov.demand.exception.ErrorConstants.ERR_HTTP_CLIENT;
+import static org.egov.demand.exception.ErrorConstants.ERR_INPUT_VALIDATION;
+import static org.egov.demand.exception.ErrorConstants.ERR_NOT_FOUND;
+import static org.egov.demand.exception.ErrorConstants.ERR_ROWMAPPER;
+import static org.egov.demand.exception.ErrorConstants.ERR_TECHNICAL;
+import static org.egov.demand.exception.ErrorConstants.ERR_TECHNICAL_MSG;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,10 +32,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 @ControllerAdvice
-public class GarbageServiceExceptionHandler extends ResponseEntityExceptionHandler {
+public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(GarbageServiceException.class)
-	public ResponseEntity<Object> handleUserServiceException(GarbageServiceException ex) {
+	@ExceptionHandler(ServiceException.class)
+	public ResponseEntity<Object> handleUserServiceException(ServiceException ex) {
 
 		ex.printStackTrace();
 		HttpStatus httpStatus;

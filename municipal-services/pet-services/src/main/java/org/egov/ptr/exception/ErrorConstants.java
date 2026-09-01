@@ -1,4 +1,4 @@
-package org.egov.garbageservice.exception;
+package org.egov.ptr.exception;
 
 import org.springframework.stereotype.Component;
 
