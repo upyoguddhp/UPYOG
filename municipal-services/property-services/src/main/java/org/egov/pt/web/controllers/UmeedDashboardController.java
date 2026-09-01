@@ -1,7 +1,10 @@
 package org.egov.pt.web.controllers;
 
 import org.egov.pt.service.UmeedDashboardService;
+
 import org.egov.pt.models.RequestInfoWrapper;
+import org.egov.pt.models.UmeedDashboardResponse;
+import org.egov.pt.models.data.DataItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,18 +13,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@RequestMapping("/data-dashboard")   
+@RequestMapping("/data-dashboard")
 public class UmeedDashboardController {
 
-    @Autowired
-    private UmeedDashboardService umeedDashboardService;
+	@Autowired
+	private UmeedDashboardService umeedDashboardService;
 
-    @PostMapping("/data-metrics")
-    public ResponseEntity<?> prepareDataMetrics(
-            @RequestBody RequestInfoWrapper requestInfoWrapper) {
+	@PostMapping("/data-metrics")
+	public ResponseEntity<?> prepareDataMetrics(@RequestBody RequestInfoWrapper requestInfoWrapper) {
 
-        return ResponseEntity.ok(
-                umeedDashboardService.prepareDataMetrics(null)
-        );
-    }
+		UmeedDashboardResponse dataResponse = umeedDashboardService.prepareDataMetrics(requestInfoWrapper);
+		return ResponseEntity.ok(dataResponse);
+
+	}
 }

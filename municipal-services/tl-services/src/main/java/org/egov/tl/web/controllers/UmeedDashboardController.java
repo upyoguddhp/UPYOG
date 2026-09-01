@@ -27,5 +27,4 @@ public class UmeedDashboardController {
 
 		return ResponseEntity.ok(dataResponse);
 	}
-
 }

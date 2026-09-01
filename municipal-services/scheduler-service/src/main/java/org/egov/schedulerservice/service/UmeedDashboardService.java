@@ -93,32 +93,33 @@ public class UmeedDashboardService {
 			log.info("Request Payload {}", umeedDashboardRequest);
 			// Step 3: call umeed dashboard api to push data
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
-			log.info("Response Paylaod {}" ,ingestResponse);
-			
-			//Object umeedDashboardLog = ummedDashboardLoggerService;
-			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo, ingestResponse,umeedDashboardRequest,SchedulerConstants.PGR_SERVICE);
+			log.info("Response Paylaod {}", ingestResponse);
 
-			 
+			// Object umeedDashboardLog = ummedDashboardLoggerService;
+
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo, ingestResponse,
+					umeedDashboardRequest, SchedulerConstants.PGR_SERVICE);
+
 		} else {
-			ingestResponse = "No Data from PGR Service";	
+			ingestResponse = "No Data from PGR Service";
 		}
 		
 		return ingestResponse;
 	}
-	//Property
+	
+	//-----------------Property
 	public Object pushUmeedDashboardMetricsForProperty(RequestInfo requestInfo) {
 
 		String ingestResponse = "";
 
-		// Step 1: Build request info for Umeed Dashboard
+		// Step 1: Build request info for Umeed Dashboard	
 		RequestInfo umeedDashboardRequestInfo = buildRequestInfo();
 
-		
+		// Step 2: Fetch  dashboard metrics
 		Object umeedDashboardDataMatrics = propertyService.getUmeedDashbaordDataMatrics(requestInfo);
 
 		if (null != umeedDashboardDataMatrics
-				) {
+				&& null != objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")) {
 			UmeedDashboardRequest umeedDashboardRequest = UmeedDashboardRequest.builder()
 					.requestInfo(umeedDashboardRequestInfo)
 					.data(objectMapper.valueToTree(umeedDashboardDataMatrics).get("Data")).build();
@@ -126,19 +127,20 @@ public class UmeedDashboardService {
 			log.info("Request Payload {}", umeedDashboardRequest);
 			// Step 3: call umeed dashboard api to push data
 			ingestResponse = umeedDashboardClientService.sendMetrics(umeedDashboardRequest);
-			log.info("Response Paylaod {}" ,ingestResponse);
-			
-			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo,ingestResponse , umeedDashboardRequest,SchedulerConstants.PROPERTY_SERVICE);
+			log.info("Response Paylaod {}", ingestResponse);
 
-			 
+			// Object umeedDashboardLog = ummedDashboardLoggerService;
+
+			Object umeedDashboardLog = ummedDashboardLoggerService.saveUmeedDashbaordLog(requestInfo, ingestResponse,
+					umeedDashboardRequest, SchedulerConstants.PROPERTY_SERVICE);
+
 		} else {
 			ingestResponse = "No Data from Property Service";
 		}
-
 		
 		return ingestResponse;
 	}
-	
+
 	private RequestInfo buildRequestInfo() {
 		RequestInfo requestInfo = RequestInfo.builder().build();
 
@@ -161,7 +163,7 @@ public class UmeedDashboardService {
 
 					User user = objectMapper.treeToValue(jsonNode.get("UserRequest"), User.class);
 
-					user.setTenantId("pg");
+					//user.setTenantId("pg");
 
 					requestInfo.setUserInfo(user);
 
@@ -170,7 +172,6 @@ public class UmeedDashboardService {
 				}
 			}
 		}
-		return requestInfo;	
+		return requestInfo;
 	}
-
 }

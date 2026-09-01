@@ -51,7 +51,7 @@ public class PropertyConfiguration {
     
     @Value("${persister.save.property.topic}")
     private String savePropertyTopic;
-    
+     
     @Value("${persister.save.billfailure.topic}")
     private String saveBillFailureTopic;
     

@@ -117,27 +117,27 @@ public class PropertyService {
 		}
 	}
 
-	//getUmeedDashbaordDataMatrics
+	//UmeedDashbaordPropertyDataMatrics
 	
-	public String getUmeedDashbaordDataMatrics(RequestInfo requestInfo) {
+	public Object getUmeedDashbaordDataMatrics(RequestInfo requestInfo) {
 
 		try {
 			StringBuilder url = new StringBuilder(applicationConfig.getPropertyServiceHostUrl());
 			url.append(applicationConfig.getPropertyServiceEndpoint());
 
-			// Make the POST request
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
-					String.class);
+			ResponseEntity<Object> responseEntity = restTemplate.postForEntity(url.toString(), requestInfoWrapper,
+					Object.class);
+
 			return responseEntity.getBody();
+
 		} catch (Exception e) {
 			log.error("Error occured while getting umeed dashbaord data matrics.", e);
 			throw new SchedulerServiceException(ErrorConstants.ERR_PROPERTY_SERVICE_ERROR,
 					"Error occured while getting umeed dashbaord data matrics. Message: " + e.getMessage());
 		}
 	}
-	
 
 	
 

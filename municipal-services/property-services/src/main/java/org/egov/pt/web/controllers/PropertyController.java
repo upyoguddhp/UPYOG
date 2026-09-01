@@ -85,6 +85,9 @@ public class PropertyController {
 
 	@Autowired
 	PropertyEncryptionService propertyEncryptionService;
+	
+//	@Autowired
+//	private UsageCategoryUpdateService usageCategoryUpdateService;
 
 	@PostMapping("/_create")
 	public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
@@ -103,12 +106,12 @@ public class PropertyController {
 							if (!properties.isEmpty())
 								throw new CustomException(null,
 										"Document numbers added in Owner Information is already present in the system.");
-
 						}
 				}
 			}
 		}
-		Property property = propertyService.createProperty(propertyRequest);
+
+		Property property = propertyService.createProperty(propertyRequest);		
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
 				true);
 		PropertyResponse response = PropertyResponse.builder().properties(Arrays.asList(property)).responseInfo(resInfo)

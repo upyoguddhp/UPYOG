@@ -210,17 +210,29 @@ public class PropertyQueryBuilder {
 			+ "  'ULBS.BuildingUse', " + "  'ULBS.OverAllRebate', " + "  'ULBS.PenaltyRate', "
 			+ "  'ULBS.EarlyPaymentRebate', " + "  'PropertyTaxRate.PropertyTaxRate' " + ") ";
 
-	// --------------------------	
-	private static final String UNIQUE_WARDS_SEARCH_QUERY = "SELECT DISTINCT "
-			+ "(additionaldetails::jsonb)->>'wardNumber' AS ward, " + "(additionaldetails::jsonb)->>'ulbName' AS ulb, "
-			+ "district AS region " + "FROM eg_pt_address " + "WHERE TO_TIMESTAMP(createdtime / 1000)::date = "
-			+ "TO_DATE(?, 'DD-MM-YYYY')";
+	// --------------------------PTMetric Data Query 	
+	private static final String UNIQUE_WARDS_SEARCH_QUERY = "SELECT DISTINCT ward, ulb, region FROM ( "
+			+ "SELECT addr.additionaldetails->>'wardNumber' AS ward, "
+			+ "addr.additionaldetails->>'ulbName' AS ulb, addr.district AS region "
+			+ "FROM eg_pt_property p JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE p.createdtime BETWEEN ? AND ? " 
+			+ "UNION "
+			+ "SELECT addr.additionaldetails->>'wardNumber' AS ward, "
+			+ "addr.additionaldetails->>'ulbName' AS ulb, addr.district AS region "
+			+ "FROM eg_pg_transactions t JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.txn_status = 'SUCCESS' "
+			+ "AND t.product_info = 'PROPERTY' AND t.created_time BETWEEN ? AND ? ) "
+			+ "wards WHERE ward IS NOT NULL ORDER BY ward";
 
-	public String getUniqueWardsSearchQuery(String stringDate, List<Object> preparedStmtList) {
-		StringBuilder builder = new StringBuilder(UNIQUE_WARDS_SEARCH_QUERY);
-		preparedStmtList.add(stringDate);
+	public String getUniqueWardsSearchQuery(long startEpoch, long endEpoch, List<Object> preparedStmtList) {
 
-		return builder.toString();
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+
+		return UNIQUE_WARDS_SEARCH_QUERY;
 	}
 	
 	public String getDataMetricsSearchQuery(long startEpoch, long endEpoch, String wardName, int slaDays,
@@ -229,15 +241,20 @@ public class PropertyQueryBuilder {
 		StringBuilder query = new StringBuilder();
 
 		query.append("SELECT ")
-
-				.append("COUNT(CASE WHEN p.createdtime BETWEEN ? AND ? THEN 1 END) AS todaysTotalApplications, ");
+		
+		.append("COUNT(CASE WHEN p.status IN ('APPROVED','INITIATED','PENDINGFORAPPROVAL','PENDINGFORVERIFICATION','PENDINGFORMODIFICATION','REJECTED') ")
+		.append("AND p.createdtime BETWEEN ? AND ? THEN 1 END) AS assessedProperties, ");
+		preparedStmtList.add(startEpoch);//AssessedProperties
+		preparedStmtList.add(endEpoch);
+		
+		query.append("COUNT(CASE WHEN p.createdtime BETWEEN ? AND ? THEN 1 END) AS todaysTotalApplications, ");
 		preparedStmtList.add(startEpoch);// Total applications
 		preparedStmtList.add(endEpoch);
 
-		query.append("COUNT(CASE WHEN p.status IN ('APPROVED','REJECTED') ")
-				.append("AND p.lastmodifiedtime BETWEEN ? AND ? THEN 1 END) AS todaysClosedApplications, ");
-		preparedStmtList.add(startEpoch);// Closed applications
-		preparedStmtList.add(endEpoch);
+//		query.append("COUNT(CASE WHEN p.status IN ('APPROVED','REJECTED') ")
+//				.append("AND p.lastmodifiedtime BETWEEN ? AND ? THEN 1 END) AS todaysClosedApplications, ");
+//		preparedStmtList.add(startEpoch);// Closed applications
+//		preparedStmtList.add(endEpoch);
 
 		query.append("COUNT(CASE WHEN p.status = 'APPROVED' ")
 				.append("AND p.lastmodifiedtime BETWEEN ? AND ? THEN 1 END) AS todaysApprovedApplications, ");
@@ -256,15 +273,12 @@ public class PropertyQueryBuilder {
 				.append("THEN 1 END) AS pendingApplicationsBeyondTimeline, ");
 		preparedStmtList.add(slaDays);// Pending beyond SLA
 
-
-		
-		query.append("COALESCE(AVG(CASE WHEN p.status = 'APPROVED' ")
-	     .append("AND p.lastmodifiedtime BETWEEN ? AND ? ")
-	     .append("THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END), 0) ")
-	     .append("AS avgDaysForApplicationApproval, ");
+		query.append("COALESCE(AVG(CASE WHEN p.status = 'APPROVED' ").append("AND p.lastmodifiedtime BETWEEN ? AND ? ")
+				.append("THEN ((p.lastmodifiedtime - p.createdtime) / 86400000.0) END), 0) ")
+				.append("AS avgDaysForApplicationApproval, ");
 		preparedStmtList.add(startEpoch);// Avg days
 		preparedStmtList.add(endEpoch);
-		
+
 		query.append("? AS stipulatedDays, ");
 		preparedStmtList.add(slaDays);// Stipulated days
 
@@ -278,15 +292,17 @@ public class PropertyQueryBuilder {
 				.append("LEFT JOIN egbs_bill_v1 b ON b.consumercode = p.propertyid ");
 
 		query.append("WHERE addr.additionaldetails->>'wardNumber' = ? ");
-		preparedStmtList.add(wardName);
+		preparedStmtList.add(wardName);//ward 
 
 		return query.toString();
 	}
 
-	private static final String TODAYS_MOVED_APPLICATION_QUERY = "SELECT p.status AS status, COUNT(*) AS value "
-			+ "FROM eg_pt_property p " + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-			+ "WHERE p.lastmodifiedtime BETWEEN ? AND ? " + "AND addr.additionaldetails->>'wardNumber' = ? "
-			+ "GROUP BY p.status " + "ORDER BY p.status";
+	private static final String TODAYS_MOVED_APPLICATION_QUERY = "SELECT p.status AS status, "
+			+ "COUNT(*) AS value FROM eg_pt_property p "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE p.lastmodifiedtime BETWEEN ? AND ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? "
+			+ "GROUP BY p.status ORDER BY p.status";
 
 	public String getTodaysMovedApplicationQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -298,17 +314,15 @@ public class PropertyQueryBuilder {
 		return TODAYS_MOVED_APPLICATION_QUERY;
 	}
 
-	private static final String PROPERTIES_REGISTERED_FY_QUERY =
-
-			"SELECT " + "CASE " + "WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(p.createdtime/1000)) >= 4 " + "THEN CONCAT( "
-					+ "EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)), '-', "
-					+ "RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) + 1)::text, 2)) " + "ELSE CONCAT( "
-					+ "EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) - 1, '-', "
-					+ "RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2)) " + "END AS FYear, "
-					+ "COUNT(*) AS value " + "FROM eg_pt_property p "
-					+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE addr.additionaldetails->>'wardNumber' = ? " + "AND p.createdtime BETWEEN ? AND ? "
-					+ "GROUP BY 1 " + "ORDER BY 1";
+	private static final String PROPERTIES_REGISTERED_FY_QUERY = "SELECT "
+			+ "CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(p.createdtime/1000)) >= 4 THEN CONCAT( "
+			+ "EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)), '-', "
+			+ "RIGHT((EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) + 1)::text, 2)) ELSE CONCAT( "
+			+ "EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000)) - 1, '-', "
+			+ "RIGHT(EXTRACT(YEAR FROM TO_TIMESTAMP(p.createdtime/1000))::text, 2)) END AS FYear, "
+			+ "COUNT(*) AS value FROM eg_pt_property p JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE addr.additionaldetails->>'wardNumber' = ? AND p.createdtime BETWEEN ? AND ? "
+			+ "GROUP BY 1 ORDER BY 1";
 
 	public String getPropertiesRegisteredFYQuery(long startEpoch, long endEpoch,String wardName, List<Object> preparedStmtList) {
 		
@@ -319,41 +333,16 @@ public class PropertyQueryBuilder {
 		return PROPERTIES_REGISTERED_FY_QUERY;
 	}
 	
-
-	private static final String TRANSACTION_WARDS_QUERY =
-		    "SELECT DISTINCT " +
-		    "addr.additionaldetails->>'wardNumber' AS ward, " +
-		    "addr.additionaldetails->>'ulbName' AS ulb, " +
-		    "addr.district AS region " +
-		    "FROM eg_pg_transactions t " +
-		    "JOIN eg_pt_property p ON p.propertyid = t.consumer_code " +
-		    "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-		    "WHERE t.txn_status = 'SUCCESS' " +
-		    "AND t.created_time BETWEEN ? AND ?";
-	
-	public String getTransactionWardsQuery(long startEpoch, long endEpoch, List<Object> preparedStmtList) {
-
-	    preparedStmtList.add(startEpoch);
-	    preparedStmtList.add(endEpoch);
-
-	    return TRANSACTION_WARDS_QUERY;
-	}
-
-	private static final String ASSESSED_PROPERTIES_QUERY = "SELECT p.usagecategory AS name, COUNT(*) AS value "
-			+ "FROM eg_pt_property p JOIN eg_pt_address addr ON addr.propertyid = p.id "
-			+ "WHERE p.status = 'APPROVED' AND addr.additionaldetails->>'wardNumber' = ? "
-			+ "AND p.createdtime BETWEEN ? AND ? GROUP BY p.usagecategory";
-
-//	private static final String ASSESSED_PROPERTIES_QUERY =
-//	        "SELECT u.usagecategoryv2 AS name, COUNT(*) AS value "
-//	      + "FROM eg_pt_property p "
-//	      + "JOIN eg_pt_unit u ON u.propertyid = p.id "
-//	      + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-//	      + "WHERE p.status = 'APPROVED' "
-//	      + "AND addr.additionaldetails->>'wardNumber' = ? "
-//	      + "AND p.createdtime BETWEEN ? AND ? "
-//	      + "GROUP BY u.usagecategoryv2 "
-//	      + "ORDER BY u.usagecategoryv2";
+	private static final String ASSESSED_PROPERTIES_QUERY = "WITH filtered_properties AS (SELECT p.id "
+			+ "    FROM eg_pt_property p JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "    WHERE p.status IN ('APPROVED','INITIATED','PENDINGFORAPPROVAL', 'PENDINGFORVERIFICATION','PENDINGFORMODIFICATION','REJECTED') "
+			+ "      AND addr.additionaldetails->>'wardNumber' = ? AND p.createdtime BETWEEN ? AND ? ),"
+			+ "    property_usage AS (SELECT fp.id, CASE "
+			+ "               WHEN COUNT(DISTINCT u.usagecategory) > 1 THEN 'Mixed Use' "
+			+ "               ELSE MIN(u.usagecategory)  END AS usagecategory "
+			+ "    FROM filtered_properties fp JOIN eg_pt_unit u ON u.propertyid = fp.id "
+			+ "    GROUP BY fp.id ) SELECT usagecategory AS name, COUNT(*) AS value "
+			+ "  FROM property_usage GROUP BY usagecategory ORDER BY usagecategory";
 	
 	public String getAssessedPropertiesQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -364,193 +353,170 @@ public class PropertyQueryBuilder {
 
 		return ASSESSED_PROPERTIES_QUERY;
 	}
-  //it old query  
-//	private static final String TRANSACTION_QUERY = "SELECT p.usagecategoryv2 AS name, COUNT(t.txn_id) AS value "
-//			+ "FROM eg_pg_transactions t " + "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
-//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.txn_status = 'SUCCESS' "
-//			+ "AND t.created_time BETWEEN ? AND ? AND addr.additionaldetails->>'wardNumber' = ? "
-//			+ "GROUP BY p.usagecategoryv2 ORDER BY p.usagecategoryv2";
-//
-//	public String getTransactionsQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
-//
-//		preparedStmtList.add(startEpoch);
-//		preparedStmtList.add(endEpoch);
-//		preparedStmtList.add(wardName);
-//
-//		return TRANSACTION_QUERY;
-//	} 
-	
-//	public String getTransactionsQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
-//
-//		preparedStmtList.add(startEpoch);
-//		preparedStmtList.add(endEpoch);
-//		preparedStmtList.add(wardName);
-//
-//		return TRANSACTION_USAGE_CATEGORY_QUERY;
-//	}
-	
-	//Transaction query end here
-//	private static final String TRANSACTION_QUERY =
-//	        "SELECT u.usagecategoryv2 AS name,"
-//	        + " COUNT(t.txn_id) AS value " +
-//	        "FROM eg_pg_transactions t " +
-//	        "JOIN eg_pt_property p ON p.propertyid = t.consumer_code " +
-//	        "JOIN eg_pt_unit u ON u.propertyid = p.id " +  
-//	        "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-//	        "WHERE t.txn_status = 'SUCCESS' " +
-//	        "AND t.created_time BETWEEN ? AND ? " +
-//	        "AND addr.additionaldetails->>'wardNumber' = ? " +
-//	        "GROUP BY u.usagecategoryv2 " +               
-//	        "ORDER BY u.usagecategoryv2";
-//
-//	private static final String TODAY_COLLECTION_QUERY = "SELECT p.usagecategory AS name, "
-//			+ "SUM(t.txn_amount) AS totalAmount " + "FROM eg_pg_transactions t "
-//			+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
-//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id " + "WHERE t.txn_status = 'SUCCESS' "
-//			+ "AND t.created_time BETWEEN ? AND ? " + "AND addr.additionaldetails->>'wardNumber' = ? "
-//			+ "GROUP BY p.usagecategory " + "ORDER BY p.usagecategory;";
-
-	//comment 
-//	private static final String TODAY_COLLECTION_QUERY =
-//	        "SELECT u.usagecategoryv2 AS name, " +
-//	        "SUM(t.txn_amount) AS totalAmount " +
-//	        "FROM eg_pg_transactions t " +
-//	        "JOIN eg_pt_property p ON p.propertyid = t.consumer_code " +
-//	        "JOIN eg_pt_unit u ON u.propertyid = p.id " +
-//	        "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-//	        "WHERE t.txn_status = 'SUCCESS' " +
-//	        "AND t.created_time BETWEEN ? AND ? " +
-//	        "AND addr.additionaldetails->>'wardNumber' = ? " +
-//	        "GROUP BY u.usagecategoryv2 " +
-//	        "ORDER BY u.usagecategoryv2;";
-	
-////new combine query transactiion and today collection query 
-//	private static final String TRANSACTION_AND_COLLECTION_QUERY = "WITH txn_data AS ( " + "SELECT DISTINCT "
-//			+ "t.txn_id, " + "t.txn_amount, " + "u.usagecategoryv2 " + "FROM eg_pg_transactions t "
-//			+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code " + "JOIN eg_pt_unit u ON u.propertyid = p.id "
-//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id " + "WHERE t.txn_status = 'SUCCESS' "
-//			+ "AND t.created_time BETWEEN ? AND ? " + "AND addr.additionaldetails->>'wardNumber' = ? " + ") "
-//			+ "SELECT " + "usagecategoryv2 AS name, " 
-//			+ "COUNT(txn_id) AS transactionCount, "
-//			+ "SUM(txn_amount) AS totalAmount " + "FROM txn_data " + "GROUP BY usagecategoryv2 "
-//			+ "ORDER BY usagecategoryv2";
-	
-	private static final String TRANSACTION_AND_COLLECTION_PAYMENT_QUERY ="WITH txn_data AS ( " + "SELECT DISTINCT " 
-					+ "t.txn_id, " + "t.txn_amount, " + "u.usagecategoryv2, "
-					+ "CASE " + "    WHEN t.gateway IN ('RAZORPAY', 'PAYTMPOS') THEN 'Digital' "
-					+ "    ELSE 'Non Digital' " + "END AS paymentMode " + "FROM eg_pg_transactions t "
-					+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
-					+ "JOIN eg_pt_unit u ON u.propertyid = p.id " + "JOIN eg_pt_address addr ON addr.propertyid = p.id "
-					+ "WHERE t.txn_status = 'SUCCESS' " + "AND t.product_info = 'PROPERTY' "
-					+ "AND t.created_time BETWEEN ? AND ? " + "AND addr.additionaldetails->>'wardNumber' = ? " + ") "
-
-					+ "SELECT " + "usagecategoryv2 AS name, " + "paymentMode, " + "COUNT(txn_id) AS transactionCount, "
-					+ "SUM(txn_amount) AS totalAmount " + "FROM txn_data " + "GROUP BY usagecategoryv2, paymentMode "
-					+ "ORDER BY usagecategoryv2, paymentMode";
+	 
+	private static final String TRANSACTION_COUNT_BY_USAGE_CATEGORY_QUERY = "WITH txn_properties AS ( "
+			+ " SELECT DISTINCT p.id  FROM eg_pg_transactions t "
+			+ " JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
+			+ " JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.txn_status = 'SUCCESS' "
+			+ "   AND t.product_info = 'PROPERTY' AND t.created_time BETWEEN ? AND ? "
+			+ "   AND addr.additionaldetails->>'wardNumber' = ?), property_usage AS ( "
+			+ " SELECT u.propertyid, CASE "
+			+ "   WHEN COUNT(DISTINCT u.usagecategory) > 1 THEN 'Mixed Use' "
+			+ "   ELSE MAX(u.usagecategory) END AS usagecategory FROM eg_pt_unit u "
+			+ " JOIN txn_properties tp ON tp.id = u.propertyid "
+			+ "    GROUP BY u.propertyid ) "
+			+ " SELECT pu.usagecategory AS name, "
+			+ "    COUNT(*) AS transactionCount FROM eg_pg_transactions t "
+			+ " JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
+			+ " JOIN property_usage pu ON pu.propertyid = p.id "
+			+ " JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ " WHERE t.txn_status = 'SUCCESS' AND t.product_info = 'PROPERTY' "
+			+ "    AND t.created_time BETWEEN ? AND ? AND addr.additionaldetails->>'wardNumber' = ? "
+			+ " GROUP BY pu.usagecategory ORDER BY pu.usagecategory";
 	
 	public String getTransactionAndCollectionAndPaymentQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+		
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+		
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+		return TRANSACTION_COUNT_BY_USAGE_CATEGORY_QUERY;
+	}
+
+	private static final String TODAY_COLLECTION_QUERY = "WITH filtered_txn AS (SELECT DISTINCT t.txn_id, "
+			+ "t.txn_amount, p.id AS property_id FROM eg_pg_transactions t "
+			+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id "
+			+ "WHERE t.txn_status = 'SUCCESS' AND t.product_info = 'PROPERTY' "
+			+ "AND t.created_time BETWEEN ? AND ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? ) "
+			+ "SELECT COALESCE(pu.usagecategory, 'Others') AS name, SUM(ft.txn_amount) AS totalAmount "
+			+ "FROM filtered_txn ft LEFT JOIN ( SELECT propertyid, CASE "
+			+ "WHEN COUNT(DISTINCT usagecategory) > 1 THEN 'Mixed Use' ELSE MIN(usagecategory) "
+			+ "END AS usagecategory FROM eg_pt_unit WHERE propertyid IN (SELECT property_id "
+			+ "FROM filtered_txn) GROUP BY propertyid) pu ON pu.propertyid = ft.property_id "
+			+ "GROUP BY pu.usagecategory ORDER BY pu.usagecategory";
+
+	public String getTodayCollectionQuery(long startEpoch, long endEpoch, String wardName,
+			List<Object> preparedStmtList) {
+
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		preparedStmtList.add(wardName);
+
+		return TODAY_COLLECTION_QUERY;
+	}
+	
+	private static final String PAYMENT_CHANNEL_TYPE_QUERY = "SELECT CASE "
+			+ "WHEN t.gateway IN ('RAZORPAY', 'PAYTMPOS') THEN 'Digital' ELSE 'Non Digital' END AS paymentMode, "
+			+ "SUM(t.txn_amount) AS totalAmount FROM eg_pg_transactions t "
+			+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
+			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.txn_status = 'SUCCESS' "
+			+ "AND t.product_info = 'PROPERTY' AND t.created_time BETWEEN ? AND ? "
+			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY paymentMode ORDER BY paymentMode";
+	
+	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
 		preparedStmtList.add(startEpoch);
 		preparedStmtList.add(endEpoch);
 		preparedStmtList.add(wardName);
-		return TRANSACTION_AND_COLLECTION_PAYMENT_QUERY;
+
+		return PAYMENT_CHANNEL_TYPE_QUERY;
 	}
 	
-//---end 	
-	
-	
-	
-//	public String getTodayCollectionQuery(long startEpoch, long endEpoch, String wardName,
-//			List<Object> preparedStmtList) {
-//
-//		preparedStmtList.add(startEpoch);
-//		preparedStmtList.add(endEpoch);
-//		preparedStmtList.add(wardName);
-//
-//		return TODAY_COLLECTION_QUERY;
-//	}
-//	private static final String PAYMENT_CHANNEL_TYPE_QUERY = "SELECT CASE "
-//			+ "WHEN t.gateway IN ('RAZORPAY', 'PAYTMPOS') THEN 'Digital' " + "ELSE 'Non Digital' END AS paymentMode, "
-//			+ "SUM(t.txn_amount) AS totalAmount " + "FROM eg_pg_transactions t "
-//			+ "JOIN eg_pt_property p ON p.propertyid = t.consumer_code "
-//	        + "JOIN eg_pt_unit u ON u.propertyid = p.id "
-//			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id " + "WHERE t.txn_status = 'SUCCESS' "
-//			+ "AND t.product_info = 'PROPERTY' " + "AND t.created_time BETWEEN ? AND ? "
-//			+ "AND addr.additionaldetails->>'wardNumber' = ? " + "GROUP BY CASE "
-//			+ "WHEN t.gateway IN ('RAZORPAY', 'PAYTMPOS') THEN 'Digital' " + "ELSE 'Non Digital' END "
-//			+ "ORDER BY paymentMode;";
-//
-//	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
-//			List<Object> preparedStmtList) {
-//
-//		preparedStmtList.add(startEpoch);
-//		preparedStmtList.add(endEpoch);
-//		preparedStmtList.add(wardName);
-//
-//		return PAYMENT_CHANNEL_TYPE_QUERY;
-//	}
-
-//	private static final String PROPERTY_TAX_QUERY = "SELECT p.usagecategory AS name, SUM(t.propertytax) AS value "
+//	private static final String TAX_METRICS_QUERY = "WITH filtered_tax AS (SELECT t.propertytax, "
+//			+ "t.penaltyamount, t.rebateamount, t.additionaldetails, p.id AS property_id "
 //			+ "FROM eg_pt_tax_calculator_tracker t JOIN eg_pt_property p ON p.propertyid = t.propertyid "
 //			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE t.createdtime >= ? "
-//			+ "AND t.createdtime < ? AND addr.additionaldetails->>'wardNumber' = ? GROUP BY p.usagecategory "
-//			+ "ORDER BY p.usagecategory";
+//			+ "AND t.createdtime < ? AND addr.additionaldetails->>'wardNumber' = ? )   "
+//			+ "SELECT COALESCE(pu.usagecategory, 'Others') AS usageCategory, "
+//			+ "  SUM(COALESCE(ft.propertytax,0)) AS propertyTax, "
+//			+ "  SUM(COALESCE((ft.additionaldetails->>'cessAmount')::numeric,0)) AS cess, "
+//			+ "  SUM(COALESCE(ft.penaltyamount,0)) AS penalty, "
+//			+ "  SUM(COALESCE((ft.additionaldetails->>'interestAmount')::numeric,0)) AS interest, "
+//			+ "  SUM(COALESCE(ft.rebateamount,0)) AS rebate FROM filtered_tax ft LEFT JOIN ( SELECT "
+//			+ "propertyid, CASE WHEN COUNT(DISTINCT usagecategory) > 1 THEN 'Mixed Use' "
+//			+ "ELSE MIN(usagecategory) END AS usagecategory FROM eg_pt_unit WHERE propertyid IN ( "
+//			+ "SELECT DISTINCT property_id FROM filtered_tax ) GROUP BY propertyid ) pu "
+//			+ "ON pu.propertyid = ft.property_id GROUP BY pu.usagecategory ORDER BY pu.usagecategory";
 	
-	private static final String PROPERTY_TAX_QUERY =
-	        "SELECT u.usagecategoryv2 AS name, SUM(t.propertytax) AS value " +
-	        "FROM eg_pt_tax_calculator_tracker t " +
-	        "JOIN eg_pt_property p ON p.propertyid = t.propertyid " +
-	        "JOIN eg_pt_unit u ON u.propertyid = p.id " +
-	        "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-	        "WHERE t.createdtime >= ? " +
-	        "AND t.createdtime < ? " +
-	        "AND addr.additionaldetails->>'wardNumber' = ? " +
-	        "GROUP BY u.usagecategoryv2 " +
-	        "ORDER BY u.usagecategoryv2";
-
-	public String getPropertyTaxQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
-
-		preparedStmtList.add(startEpoch);
-		preparedStmtList.add(endEpoch);
-		preparedStmtList.add(wardName);
-
-		return PROPERTY_TAX_QUERY;
-	}
 
 	private static final String TAX_METRICS_QUERY =
-	        "SELECT u.usagecategoryv2 AS name, " +
-	        "SUM(COALESCE(t.propertytax,0)) AS propertyTax, " +
-	        "SUM(COALESCE((t.additionaldetails->>'cessAmount')::numeric,0)) AS cess, " +
-	        "SUM(COALESCE(t.penaltyamount,0)) AS penalty, " +
-	        "SUM(COALESCE((t.additionaldetails->>'interestAmount')::numeric,0)) AS interest, " +
-	        "SUM(COALESCE(t.rebateamount,0)) AS rebate " +
-	        "FROM eg_pt_tax_calculator_tracker t " +
-	        "JOIN eg_pt_property p ON p.propertyid = t.propertyid " +
-	        "JOIN eg_pt_unit u ON u.propertyid = p.id " +
-	        "JOIN eg_pt_address addr ON addr.propertyid = p.id " +
-	        "WHERE t.createdtime >= ? " +
-	        "AND t.createdtime < ? " +
-	        "AND addr.additionaldetails->>'wardNumber' = ? " +
-	        "GROUP BY u.usagecategoryv2 " +
-	        "ORDER BY u.usagecategoryv2";
-
+	        "WITH filtered_tax AS ( "
+	      + "    SELECT "
+	      + "        t.propertytax, "
+	      + "        t.penaltyamount, "
+	      + "        t.rebateamount, "
+	      + "        t.additionaldetails, "
+	      + "        p.id AS property_id "
+	      + "    FROM eg_pt_tax_calculator_tracker t "
+	      + "    JOIN eg_pt_property p "
+	      + "        ON p.propertyid = t.propertyid "
+	      + "    JOIN eg_pt_address addr "
+	      + "        ON addr.propertyid = p.id "
+	      + "    WHERE t.createdtime >= ? "
+	      + "      AND t.createdtime < ? "
+	      + "      AND addr.additionaldetails->>'wardNumber' = ? "
+	      + "      AND ( "
+	      + "            EXISTS ( "
+	      + "                SELECT 1 "
+	      + "                FROM eg_pg_transactions pt "
+	      + "                WHERE pt.bill_id = t.bill_id "
+	      + "                  AND pt.txn_status = 'SUCCESS' "
+	      + "                  AND pt.created_time >= ? "
+	      + "                  AND pt.created_time < ? "
+	      + "            ) "
+	      + "            OR EXISTS ( "
+	      + "                SELECT 1 "
+	      + "                FROM eg_pg_transactions_details td "
+	      + "                WHERE td.bill_id = t.bill_id "
+	      + "                  AND td.created_time >= ? "
+	      + "                  AND td.created_time < ? "
+	      + "            ) "
+	      + "      ) "
+	      + ") "
+	      + "SELECT "
+	      + "    COALESCE(pu.usagecategory, 'Others') AS usageCategory, "
+	      + "    SUM(COALESCE(ft.propertytax,0)) AS propertyTax, "
+	      + "    SUM(COALESCE((ft.additionaldetails->>'cessAmount')::numeric,0)) AS cess, "
+	      + "    SUM(COALESCE(ft.penaltyamount,0)) AS penalty, "
+	      + "    SUM(COALESCE((ft.additionaldetails->>'interestAmount')::numeric,0)) AS interest, "
+	      + "    SUM(COALESCE(ft.rebateamount,0)) AS rebate "
+	      + "FROM filtered_tax ft "
+	      + "LEFT JOIN ( "
+	      + "    SELECT "
+	      + "        propertyid, "
+	      + "        CASE "
+	      + "            WHEN COUNT(DISTINCT usagecategory) > 1 THEN 'Mixed Use' "
+	      + "            ELSE MIN(usagecategory) "
+	      + "        END AS usagecategory "
+	      + "    FROM eg_pt_unit "
+	      + "    WHERE propertyid IN (SELECT DISTINCT property_id FROM filtered_tax) "
+	      + "    GROUP BY propertyid "
+	      + ") pu "
+	      + "ON pu.propertyid = ft.property_id "
+	      + "GROUP BY pu.usagecategory "
+	      + "ORDER BY pu.usagecategory";
 	public String getTaxMetricsQuery(long startEpoch, long endEpoch, String wardName, List<Object> preparedStmtList) {
 
 		preparedStmtList.add(startEpoch);
 		preparedStmtList.add(endEpoch);
 		preparedStmtList.add(wardName);
+		
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
+		
+		preparedStmtList.add(startEpoch);
+		preparedStmtList.add(endEpoch);
 
 		return TAX_METRICS_QUERY;
 	}
-
-	private static final String PAYMENT_CHANNEL_TYPE_QUERY = "SELECT pay.paymentmode AS name, "
-			+ "SUM(pay.totalamountpaid) AS value FROM egcl_payment pay "
-			+ "JOIN egcl_bill b ON b.id = (pay.additionaldetails->'taxAndPayments'->0->>'billId') "
-			+ "JOIN eg_pt_property p ON p.propertyid = b.consumercode "
-			+ "JOIN eg_pt_address addr ON addr.propertyid = p.id WHERE pay.paymentstatus = 'DEPOSITED' "
-			+ "AND pay.createdtime >= ? AND pay.createdtime < ? "
-			+ "AND addr.additionaldetails->>'wardNumber' = ? GROUP BY pay.paymentmode " + "ORDER BY pay.paymentmode";
 	
+	//---------------------PTMetric Data Query end 
 	private static final String PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY =
 	        "UPDATE eg_pt_tax_calculator_tracker eptct";
 	
@@ -560,17 +526,6 @@ public class PropertyQueryBuilder {
             "lastmodifiedtime = ? " +
             "WHERE propertyid = ? " +
             "AND bill_status = 'ACTIVE'";
-
-	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
-			List<Object> preparedStmtList) {
-
-		preparedStmtList.add(startEpoch);
-		preparedStmtList.add(endEpoch);
-		preparedStmtList.add(wardName);
-
-		return PAYMENT_CHANNEL_TYPE_QUERY;
-	}
-
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
 		if (criteria.getIsSchedulerCall()) {
