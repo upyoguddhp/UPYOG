@@ -285,6 +285,14 @@
                   <div class="card-box">
                      <h3>Bill Details</h3>
                      <table class="card-table">
+						<tr>
+						   <th>Bill Generated Date</th>
+						   <td><span th:text="${billGeneratedDate}">NA</span></td>
+						</tr>
+						<tr>
+						   <th>Payment Due Date</th>
+						   <td><span th:text="${paymentDueDate}">NA</span></td>
+						</tr>
                         <tr>
                            <th>Property Tax</th>
                            <td><span th:text="${propertyTax}">NA</span></td>
@@ -310,7 +318,7 @@
                            <td><span th:text="${totalTax}">NA</span></td>
                         </tr>
 						<tr>
-						    <th>Amount Due</th>
+						    <th>Amount Payable</th>
 						    <td class="highlight"><span th:text="${amountDue}">NA</span></td>
 						</tr>
                         <tr>
@@ -320,10 +328,6 @@
                         <tr>
                            <th>Payment Status</th>
                            <td><span th:text="${paymentStatus}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Bill Generated Date</th>
-                           <td><span th:text="${billGeneratedDate}">NA</span></td>
                         </tr>
                         <tr>
                            <th>Payment Date</th>
@@ -430,20 +434,26 @@
             </table>
          </div>
          <div class="footer">
-            <ul class="">
-               <li class="highlight">
-                  <strong>
-                  The generated bill will be expired after 
-                  <span th:text="${billDueDate}"> NA </span>.
-                  </strong>
-               </li>
-			   </ul>
 			   <ul class="footer-list">
                <li>Property Tax payment does not legalize unauthorized properties.</li>
                <li>Merely paying and processing a Property Tax does not confer any right or imply any statement 
                   regarding the regularization or ownership of the property.
                </li>
-			   <li class="bold-dark-text">Bill generation and data accuracy are the responsibility of the concerned ULB. For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> ULB office.
+			   <li class="bold-dark-text">Bill generation and data accuracy are the responsibility of the concerned ULB.
+			   </li>
+			   <li class="bold-dark-text">
+				For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> office.
+			   </li>
+			   <li class="bold-dark-text">
+			   	The existing bill will expire once a new bill is generated.
+			   </li>
+			   <li>
+			   	<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+			   	<ul>
+			   		<li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
+			   		<li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>
+			   		<li>The applicable penalty/interest may be calculated on a <strong>monthly basis</strong>, as per the applicable rules.</li>
+			   	</ul>
 			   </li>
 			   <li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
 				<span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"
