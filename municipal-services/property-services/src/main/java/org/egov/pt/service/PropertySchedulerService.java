@@ -515,6 +515,11 @@ public class PropertySchedulerService {
 
 				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
 				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				
+				if ("Dalhousie".equalsIgnoreCase(ulbName) && finalPropertyTax.compareTo(BigDecimal.valueOf(1200)) < 0) {
+					finalPropertyTax = BigDecimal.valueOf(1200);
+				}
+				
 				propertyTaxWithoutRebate = finalPropertyTax;
 
 				// early payment rebate
@@ -1098,6 +1103,11 @@ public class PropertySchedulerService {
 
 				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
 				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				
+				if ("Dalhousie".equalsIgnoreCase(ulbName) && finalPropertyTax.compareTo(BigDecimal.valueOf(1200)) < 0) {
+					finalPropertyTax = BigDecimal.valueOf(1200);
+				}
+				
 				propertyTaxWithoutRebate = finalPropertyTax;
 
 				// early payment rebate
