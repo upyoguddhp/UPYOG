@@ -191,7 +191,13 @@
 						"value": {
 						"path": "$.billDueDate"
 						}
-				}
+					},
+					{
+						"variable": "paymentDueDate",
+						"value": {
+						"path": "$.paymentDueDate"
+						}
+					}
 				]
 			}
 		]
