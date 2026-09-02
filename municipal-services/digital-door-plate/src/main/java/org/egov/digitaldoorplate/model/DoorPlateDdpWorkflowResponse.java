@@ -31,4 +31,8 @@ public class DoorPlateDdpWorkflowResponse {
 	private String ddpLatitude;
 
 	private String ddpLongitude;
+
+	private Boolean ddpPrintingDone;
+
+	private Boolean ddpDispatched;
 }

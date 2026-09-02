@@ -250,10 +250,11 @@ public class DoorPlateService {
 	/**
 	 * Single entry point for every DDP workflow role update on the garbage
 	 * account identified by {@code garbageAccountUuid} (the "id" resolved
-	 * from {@code /_verifyQr}): vendor print verification, ULB verification,
-	 * or installation + lat/long. Each caller only sets the field(s) relevant
-	 * to its own role; the rest are left null and left untouched by
-	 * garbage-service's COALESCE-based partial update.
+	 * from {@code /_verifyQr}): vendor print verification, vendor
+	 * printing-done, vendor dispatched, ULB verification, or installation +
+	 * lat/long. Each caller only sets the field(s) relevant to its own role;
+	 * the rest are left null and left untouched by garbage-service's
+	 * COALESCE-based partial update.
 	 */
 	public DoorPlateDdpWorkflowResponse updateDdpWorkflow(DoorPlateDdpWorkflowRequest request) {
 
@@ -265,9 +266,11 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_REQUEST", "GarbageAccountUuid is mandatory.");
 		}
 		if (StringUtils.isEmpty(request.getVendorPrintVerified()) && null == request.getUlbVerified()
-				&& null == request.getInstallationDone()) {
+				&& null == request.getInstallationDone() && null == request.getDdpPrintingDone()
+				&& null == request.getDdpDispatched()) {
 			throw new CustomException("INVALID_REQUEST",
-					"Provide at least one of vendorPrintVerified, ulbVerified or installationDone to update.");
+					"Provide at least one of vendorPrintVerified, ulbVerified, installationDone, "
+							+ "ddpPrintingDone or ddpDispatched to update.");
 		}
 		if (StringUtils.isNotEmpty(request.getVendorPrintVerified())
 				&& !(DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_VERIFIED
@@ -284,7 +287,8 @@ public class DoorPlateService {
 
 		garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
 				request.getGarbageAccountUuid(), request.getVendorPrintVerified(), request.getUlbVerified(),
-				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude());
+				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
+				request.getDdpPrintingDone(), request.getDdpDispatched());
 
 		return DoorPlateDdpWorkflowResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
@@ -294,6 +298,8 @@ public class DoorPlateService {
 				.installationDone(request.getInstallationDone())
 				.ddpLatitude(request.getDdpLatitude())
 				.ddpLongitude(request.getDdpLongitude())
+				.ddpPrintingDone(request.getDdpPrintingDone())
+				.ddpDispatched(request.getDdpDispatched())
 				.build();
 	}
 

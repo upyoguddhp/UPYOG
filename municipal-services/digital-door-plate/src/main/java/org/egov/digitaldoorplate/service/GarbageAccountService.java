@@ -57,8 +57,9 @@ public class GarbageAccountService {
 
 	/**
 	 * Partially updates the DDP workflow fields (vendor print verification,
-	 * ULB verification, or installation + lat/long) on the garbage account
-	 * identified by {@code garbageAccountUuid}, via garbage-service's
+	 * vendor printing-done, vendor dispatched, ULB verification, or
+	 * installation + lat/long) on the garbage account identified by
+	 * {@code garbageAccountUuid}, via garbage-service's
 	 * {@code /garbage-accounts/_updateDdpWorkflow}. Fields left null are not
 	 * sent as "clear this column" but simply omitted from the update (see
 	 * garbage-service's COALESCE-based partial update), so each role-specific
@@ -67,7 +68,7 @@ public class GarbageAccountService {
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> updateDdpWorkflowFields(RequestInfo requestInfo, String tenantId,
 			String garbageAccountUuid, String vendorPrintVerified, Boolean ulbVerified, Boolean installationDone,
-			String ddpLatitude, String ddpLongitude) {
+			String ddpLatitude, String ddpLongitude, Boolean ddpPrintingDone, Boolean ddpDispatched) {
 
 		StringBuilder uri = new StringBuilder(ddpConfig.getGarbageServiceHostUrl())
 				.append(ddpConfig.getGarbageAccountUpdateDdpWorkflowEndpoint());
@@ -81,6 +82,8 @@ public class GarbageAccountService {
 		request.put("installationDone", installationDone);
 		request.put("ddpLatitude", ddpLatitude);
 		request.put("ddpLongitude", ddpLongitude);
+		request.put("ddpPrintingDone", ddpPrintingDone);
+		request.put("ddpDispatched", ddpDispatched);
 
 		Optional<Object> response = serviceRequestRepository.fetchResult(uri, request);
 

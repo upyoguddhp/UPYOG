@@ -2932,10 +2932,11 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 	/**
 	 * Partially updates the DDP (door plate) workflow fields on one account
-	 * (vendor print verification, ULB verification, installation + lat/long),
-	 * identified by uuid. Called from digital-door-plate's role-specific
-	 * verify/install endpoints; each caller only sets the field(s) relevant to
-	 * its own role, leaving the others null so they're left untouched.
+	 * (vendor print verification, ULB verification, installation + lat/long,
+	 * vendor printing-done, vendor dispatched), identified by uuid. Called
+	 * from digital-door-plate's single DDP workflow endpoint; each caller
+	 * only sets the field(s) relevant to its own role, leaving the others
+	 * null so they're left untouched.
 	 */
 	public DdpWorkflowUpdateResponse updateDdpWorkflowFields(DdpWorkflowUpdateRequest request) {
 
@@ -2972,6 +2973,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.installationDone(request.getInstallationDone())
 				.ddpLatitude(request.getDdpLatitude())
 				.ddpLongitude(request.getDdpLongitude())
+				.ddpPrintingDone(request.getDdpPrintingDone())
+				.ddpDispatched(request.getDdpDispatched())
 				.build();
 	}
 

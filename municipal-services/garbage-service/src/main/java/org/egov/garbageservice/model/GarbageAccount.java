@@ -60,6 +60,17 @@ public class GarbageAccount {
 
 	private String ddpLongitude;
 
+	/**
+	 * Set by the printing vendor once the physical plate has been printed.
+	 */
+	private Boolean ddpPrintingDone;
+
+	/**
+	 * Set by the printing vendor once the printed plate has been dispatched
+	 * to the ULB/installer.
+	 */
+	private Boolean ddpDispatched;
+
 	private String type;
 
 	private String name;

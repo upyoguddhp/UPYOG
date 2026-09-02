@@ -67,6 +67,8 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                         .installationDone((Boolean) rs.getObject("installation_done"))
                         .ddpLatitude(rs.getString("ddp_latitude"))
                         .ddpLongitude(rs.getString("ddp_longitude"))
+                        .ddpPrintingDone((Boolean) rs.getObject("ddp_printing_done"))
+                        .ddpDispatched((Boolean) rs.getObject("ddp_dispatched"))
                         .type(rs.getString("type"))
                         .name(rs.getString("name"))
                         .mobileNumber(rs.getString("mobile_number"))

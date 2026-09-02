@@ -10,10 +10,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Shared request shape for the three role-specific DDP workflow endpoints on
- * {@code DoorPlateController} (vendor print verification, ULB verification,
- * installation); each endpoint only reads the field(s) relevant to its own
- * role and forwards them to garbage-service's eg_grbg_account record
+ * Request shape for {@code DoorPlateController._updateDdpWorkflow}, the
+ * single endpoint covering every DDP workflow role update (vendor print
+ * verification, vendor printing-done, vendor dispatched, ULB verification,
+ * installation); each caller only sets the field(s) relevant to its own
+ * role, and they're forwarded to garbage-service's eg_grbg_account record
  * identified by {@link #garbageAccountUuid} (the "id" scanned from the door
  * plate QR / returned by {@code /door-plate/_verifyQr}).
  */
@@ -42,12 +43,21 @@ public class DoorPlateDdpWorkflowRequest {
 	private Boolean ulbVerified;
 
 	/**
-	 * Used only by {@code /door-plate/_installationDone}, along with
-	 * {@link #ddpLatitude}/{@link #ddpLongitude}.
+	 * Along with {@link #ddpLatitude}/{@link #ddpLongitude}.
 	 */
 	private Boolean installationDone;
 
 	private String ddpLatitude;
 
 	private String ddpLongitude;
+
+	/**
+	 * Vendor step: physical plate has been printed.
+	 */
+	private Boolean ddpPrintingDone;
+
+	/**
+	 * Vendor step: printed plate has been dispatched to the ULB/installer.
+	 */
+	private Boolean ddpDispatched;
 }

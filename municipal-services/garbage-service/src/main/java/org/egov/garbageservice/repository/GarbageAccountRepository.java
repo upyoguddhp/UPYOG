@@ -182,6 +182,8 @@ public class GarbageAccountRepository {
 			+ "installation_done = COALESCE(:installationDone, installation_done), "
 			+ "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
 			+ "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
+			+ "ddp_printing_done = COALESCE(:ddpPrintingDone, ddp_printing_done), "
+			+ "ddp_dispatched = COALESCE(:ddpDispatched, ddp_dispatched), "
 			+ "last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate "
 			+ "WHERE uuid = :uuid AND tenant_id = :tenantId";
 
@@ -871,6 +873,8 @@ public class GarbageAccountRepository {
 		params.put("installationDone", request.getInstallationDone());
 		params.put("ddpLatitude", request.getDdpLatitude());
 		params.put("ddpLongitude", request.getDdpLongitude());
+		params.put("ddpPrintingDone", request.getDdpPrintingDone());
+		params.put("ddpDispatched", request.getDdpDispatched());
 		params.put("lastModifiedBy", userUuid);
 		params.put("lastModifiedDate", now);
 
