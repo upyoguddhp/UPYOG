@@ -33,6 +33,7 @@ public class GarbageCollectorRowMapper implements RowMapper<GarbageCollector> {
 				.contractorUuid(rs.getString("contractor_uuid"))
 				.supervisorId(rs.getString("supervisor_id"))
 				.noOfHouseAlloted(getInteger(rs, "no_of_house_alloted"))
+				.collectorUserUuid(rs.getString("collector_user_uuid"))
 				.build();
 	}
 

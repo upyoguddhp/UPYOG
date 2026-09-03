@@ -58,6 +58,18 @@ public class GarbageSupervisor {
 
 	private List<String> mappingUuids;
 
+	/**
+	 * Populated only on search (not persisted): sum of today's collectedToday
+	 * across every collector mapped under this supervisor (supervisorId).
+	 */
+	private Integer collectedToday;
+
+	/**
+	 * Populated only on search (not persisted): sum of noOfHouseAlloted
+	 * across every collector mapped under this supervisor (supervisorId).
+	 */
+	private Integer totalHouseAllocated;
+
 	private String createdBy;
 
 	private Long createdDate;

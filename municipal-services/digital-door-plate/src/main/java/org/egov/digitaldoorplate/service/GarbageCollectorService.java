@@ -1,20 +1,27 @@
 package org.egov.digitaldoorplate.service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.digitaldoorplate.model.GarbageCollection;
 import org.egov.digitaldoorplate.model.GarbageCollector;
 import org.egov.digitaldoorplate.model.GarbageCollectorMapping;
 import org.egov.digitaldoorplate.model.GarbageCollectorRequest;
 import org.egov.digitaldoorplate.model.GarbageCollectorResponse;
+import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollector;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollectorRequest;
 import org.egov.digitaldoorplate.model.contract.User;
+import org.egov.digitaldoorplate.repository.GarbageCollectionRepository;
 import org.egov.digitaldoorplate.repository.GarbageCollectorRepository;
+import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +40,9 @@ public class GarbageCollectorService {
 
 	@Autowired
 	private GarbageCollectorMappingService garbageCollectorMappingService;
+
+	@Autowired
+	private GarbageCollectionRepository garbageCollectionRepository;
 
 	@Autowired
 	private UserService userService;
@@ -166,11 +176,48 @@ public class GarbageCollectorService {
 		}
 
 		List<GarbageCollector> collectors = garbageCollectorRepository.search(criteria);
+		enrichCollectedToday(collectors);
 
 		return GarbageCollectorResponse.builder()
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(), true))
 				.collectors(collectors).build();
+	}
+
+	/**
+	 * Populates collectedToday on each collector: the count of active,
+	 * completed garbage collections logged today under that collector's own
+	 * egov-user login (collectorUserUuid, i.e. GarbageCollection.staffUuid).
+	 */
+	private void enrichCollectedToday(List<GarbageCollector> collectors) {
+
+		if (CollectionUtils.isEmpty(collectors)) {
+			return;
+		}
+
+		List<String> staffUuids = collectors.stream().map(GarbageCollector::getCollectorUserUuid)
+				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+		if (CollectionUtils.isEmpty(staffUuids)) {
+			collectors.forEach(collector -> collector.setCollectedToday(0));
+			return;
+		}
+
+		List<GarbageCollection> todaysCollections = garbageCollectionRepository
+				.search(SearchCriteriaGarbageCollection.builder().staffUuid(staffUuids).fromDate(getStartOfDay())
+						.isCollected(Boolean.TRUE).isActive(Boolean.TRUE).build());
+
+		Map<String, Long> countByStaffUuid = todaysCollections.stream()
+				.collect(Collectors.groupingBy(GarbageCollection::getStaffUuid, Collectors.counting()));
+
+		collectors.forEach(collector -> collector.setCollectedToday(
+				StringUtils.isEmpty(collector.getCollectorUserUuid()) ? 0
+						: countByStaffUuid.getOrDefault(collector.getCollectorUserUuid(), 0L).intValue()));
+	}
+
+	private Long getStartOfDay() {
+		ZoneId zone = ZoneId.of(DdpConstants.TIMEZONE);
+		return ZonedDateTime.now(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli();
 	}
 
 	private void validateCollector(GarbageCollector collector) {

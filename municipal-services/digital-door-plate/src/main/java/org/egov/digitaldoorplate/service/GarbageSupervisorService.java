@@ -1,5 +1,7 @@
 package org.egov.digitaldoorplate.service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -7,14 +9,20 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.digitaldoorplate.model.GarbageCollector;
 import org.egov.digitaldoorplate.model.GarbageSupervisor;
 import org.egov.digitaldoorplate.model.GarbageSupervisorMapping;
 import org.egov.digitaldoorplate.model.GarbageSupervisorRequest;
 import org.egov.digitaldoorplate.model.GarbageSupervisorResponse;
+import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
+import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollector;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageSupervisor;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageSupervisorRequest;
 import org.egov.digitaldoorplate.model.contract.User;
+import org.egov.digitaldoorplate.repository.GarbageCollectionRepository;
+import org.egov.digitaldoorplate.repository.GarbageCollectorRepository;
 import org.egov.digitaldoorplate.repository.GarbageSupervisorRepository;
+import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +41,12 @@ public class GarbageSupervisorService {
 
 	@Autowired
 	private GarbageSupervisorMappingService garbageSupervisorMappingService;
+
+	@Autowired
+	private GarbageCollectorRepository garbageCollectorRepository;
+
+	@Autowired
+	private GarbageCollectionRepository garbageCollectionRepository;
 
 	@Autowired
 	private UserService userService;
@@ -163,11 +177,53 @@ public class GarbageSupervisorService {
 		}
 
 		List<GarbageSupervisor> supervisors = garbageSupervisorRepository.search(criteria);
+		enrichCollectionStats(supervisors);
 
 		return GarbageSupervisorResponse.builder()
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(), true))
 				.supervisors(supervisors).build();
+	}
+
+	/**
+	 * For each supervisor, aggregates collectedToday (sum of today's
+	 * collections logged by every collector mapped under that supervisor)
+	 * and totalHouseAllocated (sum of noOfHouseAlloted across those same
+	 * collectors).
+	 */
+	private void enrichCollectionStats(List<GarbageSupervisor> supervisors) {
+
+		if (CollectionUtils.isEmpty(supervisors)) {
+			return;
+		}
+
+		supervisors.forEach(supervisor -> {
+
+			List<GarbageCollector> collectorsUnderSupervisor = garbageCollectorRepository
+					.search(SearchCriteriaGarbageCollector.builder().tenantId(supervisor.getTenantId())
+							.supervisorId(supervisor.getUuid()).isActive(Boolean.TRUE).build());
+
+			int totalHouseAllocated = collectorsUnderSupervisor.stream()
+					.mapToInt(collector -> null == collector.getNoOfHouseAlloted() ? 0
+							: collector.getNoOfHouseAlloted())
+					.sum();
+
+			List<String> staffUuids = collectorsUnderSupervisor.stream().map(GarbageCollector::getCollectorUserUuid)
+					.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+			int collectedToday = CollectionUtils.isEmpty(staffUuids) ? 0
+					: garbageCollectionRepository.search(SearchCriteriaGarbageCollection.builder()
+							.staffUuid(staffUuids).fromDate(getStartOfDay()).isCollected(Boolean.TRUE)
+							.isActive(Boolean.TRUE).build()).size();
+
+			supervisor.setTotalHouseAllocated(totalHouseAllocated);
+			supervisor.setCollectedToday(collectedToday);
+		});
+	}
+
+	private Long getStartOfDay() {
+		ZoneId zone = ZoneId.of(DdpConstants.TIMEZONE);
+		return ZonedDateTime.now(zone).toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli();
 	}
 
 	private void validateSupervisor(GarbageSupervisor supervisor) {

@@ -28,7 +28,9 @@ public class GarbageCollectorQueryBuilder {
 			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
 			+ " AND cm.is_active = true " + " LIMIT 1) AS supervisor_id, " + "(SELECT cm.no_of_house_alloted "
 			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
-			+ " AND cm.is_active = true " + " LIMIT 1) AS no_of_house_alloted " + "FROM eg_ddp_garbage_collector c "
+			+ " AND cm.is_active = true " + " LIMIT 1) AS no_of_house_alloted, " + "(SELECT cm.collector_user_uuid "
+			+ " FROM eg_ddp_garbage_collector_mapping cm " + " WHERE cm.collector_uuid = c.uuid "
+			+ " AND cm.is_active = true " + " LIMIT 1) AS collector_user_uuid " + "FROM eg_ddp_garbage_collector c "
 			+ "WHERE 1=1 ";
 
 	public String getSearchQuery(SearchCriteriaGarbageCollector criteria, List<Object> preparedStatementValues) {

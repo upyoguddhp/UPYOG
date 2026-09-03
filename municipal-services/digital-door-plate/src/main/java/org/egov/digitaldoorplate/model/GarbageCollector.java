@@ -62,6 +62,13 @@ public class GarbageCollector {
 
 	private List<String> mappingUuids;
 
+	/**
+	 * Populated only on search (not persisted): count of active, completed
+	 * garbage collections logged today under this collector's own egov-user
+	 * login (collectorUserUuid).
+	 */
+	private Integer collectedToday;
+
 	private String createdBy;
 
 	private Long createdDate;
