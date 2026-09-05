@@ -325,6 +325,8 @@ public class PDFRequestGenerator {
 		ptbr.put("paymentStatus", paymentStatus);
 		ptbr.put("billGeneratedDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
 				.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		ptbr.put("paymentDueDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
+				.toLocalDateTime().plusDays(30).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		ptbr.put("paymentDate", paymentDate);
 		ptbr.put("advancePaid", advancePaid.toString());
 

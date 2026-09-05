@@ -195,6 +195,7 @@ public class UserRepository {
             updateuserInputs.put("AccountLockedDate", user.getAccountLockedDate());
 
         updateuserInputs.put("Active", user.getActive());
+        updateuserInputs.put("IsDataProtectionAccepted", user.getIsdataprotectionaccepted());
         updateuserInputs.put("AltContactNumber", user.getAltContactNumber());
 
         List<Enum> bloodGroupEnumValues = Arrays.asList(BloodGroup.values());
