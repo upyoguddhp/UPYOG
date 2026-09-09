@@ -36,8 +36,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Slf4j
 public class IdGenerationService {
 
-	private static final String STATE_LEVEL_TENANT_ID = "hp";
-	
     @Autowired
     DataSource dataSource;
 
@@ -52,6 +50,12 @@ public class IdGenerationService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    // HP-specific: id_generator sequences are shared at the state level rather than
+    // per-ULB, so every request's tenantId is forced to this value regardless of what
+    // the caller passed - see generateIdResponse().
+    @Value("${state.level.tenant.id}")
+    private String stateLevelTenantId;
 
     // by default 'idformat' will be taken from MDMS. Change value of 'ismdms.on' to 'false'
     // in application.properties to get data from DB instead.
@@ -80,11 +84,9 @@ public class IdGenerationService {
         RequestInfo requestInfo = idGenerationRequest.getRequestInfo();
         List<IdRequest> idRequests = idGenerationRequest.getIdRequests();
         List<IdResponse> idResponses = new LinkedList<>();
-        
-        idRequests.stream().forEach(idRequest -> {
-			idRequest.setTenantId(STATE_LEVEL_TENANT_ID);
-		});
-        
+
+        idRequests.forEach(idRequest -> idRequest.setTenantId(stateLevelTenantId));
+
         IdGenerationResponse idGenerationResponse = new IdGenerationResponse();
 
         for (IdRequest idRequest : idRequests) {
