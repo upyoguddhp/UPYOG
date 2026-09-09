@@ -154,6 +154,15 @@ public class VoucherServiceImpl implements VoucherService {
 		voucherRequest.setVouchers(vouchers);
 		voucherRequest.setRequestInfo(requestInfo);
 		voucherRequest.setTenantId(tenantId);
+		
+		try {
+			LOGGER.info("VOUCHER REQUEST JSON = {}",
+					mapper.writerWithDefaultPrettyPrinter().writeValueAsString(voucherRequest));
+		} catch (Exception e) {
+			LOGGER.error("Unable to serialize voucher request", e);
+		}
+		
+		
 		return mapper.convertValue(serviceRequestRepository.fetchResult(voucher_create_url, voucherRequest, tenantId), VoucherResponse.class);
 	}
 

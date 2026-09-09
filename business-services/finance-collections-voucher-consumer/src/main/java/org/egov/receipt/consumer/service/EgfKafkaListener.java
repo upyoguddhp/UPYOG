@@ -189,10 +189,10 @@ public class EgfKafkaListener {
 						Bill bill = recpt.getBill().get(0);
 						VoucherResponse voucherByServiceAndRefDoc = voucherService.getVoucherByServiceAndRefDoc(recRequestTemp.getRequestInfo(), recpt.getTenantId(), null, recpt.getPaymentId());
 						if (voucherService.isVoucherCreationEnabled(recpt, recRequestTemp.getRequestInfo(), finSerMdms)) {
-							if(!voucherByServiceAndRefDoc.getVouchers().isEmpty() && !voucherByServiceAndRefDoc.getVouchers().get(0).getStatus().getCode().equals("4")){
-	        					voucherNumber = voucherByServiceAndRefDoc.getVouchers().get(0).getVoucherNumber();
-	        					throw new VoucherCustomException(ProcessStatus.NA, String.format("Already voucher exists (%1$s) for service %2$s with reference number: %3$s.", voucherNumber, bill.getBusinessService(), recpt.getPaymentId()));
-	        				}
+//							if(!voucherByServiceAndRefDoc.getVouchers().isEmpty() && !voucherByServiceAndRefDoc.getVouchers().get(0).getStatus().getCode().equals("4")){
+//	        					voucherNumber = voucherByServiceAndRefDoc.getVouchers().get(0).getVoucherNumber();
+//	        					throw new VoucherCustomException(ProcessStatus.NA, String.format("Already voucher exists (%1$s) for service %2$s with reference number: %3$s.", voucherNumber, bill.getBusinessService(), recpt.getPaymentId()));
+//	        				}
 	        				VoucherResponse createReceiptVoucher = voucherService.createReceiptVoucher(recRequestTemp, finSerMdms, COLLECTION_VERSION);
 	        				if(voucherResponse == null){
 	        					voucherResponse = createReceiptVoucher;
