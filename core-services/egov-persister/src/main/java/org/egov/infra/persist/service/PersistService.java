@@ -32,9 +32,6 @@ public class PersistService {
 
 	@Transactional
 	public void persist(String topic, String json) {
-		
-		log.info("Persisting topic: {}, raw JSON: {}:::::::::::::", topic, json);
-
 
 		Map<String, List<Mapping>> map = topicMap.getTopicMap();
 
@@ -51,15 +48,12 @@ public class PersistService {
 				persistRepository.persist(query, jsonMaps, document, basePath);
 
 			}
-			log.info("{} applicable mappings found for topic {}: {}", applicableMappings.size(), topic, applicableMappings);
 
 		}
 	}
 
 	@Transactional
 	public void persist(String topic, List<String> jsons) {
-		
-		
 
 		Map<String, List<Mapping>> map = topicMap.getTopicMap();
 		Map<Object, List<Mapping>> applicableMappings = new LinkedHashMap<>();
@@ -73,7 +67,6 @@ public class PersistService {
 			for (Mapping mapping : mappings) {
 				List<QueryMap> queryMaps = mapping.getQueryMaps();
 				for (QueryMap queryMap : queryMaps) {
-					
 					String query = queryMap.getQuery();
 					List<JsonMap> jsonMaps = queryMap.getJsonMaps();
 					String basePath = queryMap.getBasePath();
@@ -99,7 +92,6 @@ public class PersistService {
 			if(semVer.satisfies(map.getVersion()))
 				filteredMaps.add(map);
 		}
-		
 
 		return filteredMaps;
 	}
