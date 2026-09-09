@@ -59,6 +59,8 @@ public class HRMSConstants {
 
 	public static final String INTERNALMICROSERVICEUSER_TYPE = "SYSTEM";
 
+	// HP-specific: workflow transitions for the Trade License "NewTL" business
+	// service directly update eg_tl_tradelicense - see WorkflowService.
 	public static final String TRADELICENCE_WORKFLOW_BUSINESS_SERVICE_NEWTL = "NewTL";
 
 	public static final String TRADELICENCE_WORKFLOW_MODULE_NAME = "TL";
@@ -70,5 +72,5 @@ public class HRMSConstants {
 	public static final String TRADELICENCE_NEWTL_APPLICATION_STATUS_VERIFIED = "VERIFIED";
 
 	public static final String TRADELICENCE_NEWTL_APPLICATION_STATUS_APPROVED = "APPROVED";
-	
+
 }

@@ -36,7 +36,7 @@ serviceMaps:
       - jsonPath: $.Employees.*.auditDetails.lastModifiedBy
 
       - jsonPath: $.Employees.*.auditDetails.lastModifiedDate
-      
+
       - jsonPath: $.Employees.*.additionalDetail
         type: JSON
         dbType: JSONB
@@ -49,9 +49,7 @@ serviceMaps:
       jsonMaps:
 
 
-#      - jsonPath: $.Employees[*][?({id} in @.assignments[*].id)].tenantId
-
-      - jsonPath: $.Employees.*.assignments.*.tenantid
+      - jsonPath: $.Employees[*][?({id} in @.assignments[*].id)].tenantId
 
       - jsonPath: $.Employees.*.assignments.*.id
 
@@ -282,7 +280,7 @@ serviceMaps:
       - jsonPath: $.Employees.*.auditDetails.lastModifiedBy
 
       - jsonPath: $.Employees.*.auditDetails.lastModifiedDate
-      
+
       - jsonPath: $.Employees.*.additionalDetail
         type: JSON
         dbType: JSONB
