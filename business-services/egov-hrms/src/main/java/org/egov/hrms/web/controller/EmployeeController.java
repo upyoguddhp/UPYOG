@@ -40,11 +40,7 @@
 
 package org.egov.hrms.web.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.Valid;
-
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.hrms.service.EmployeeService;
 import org.egov.hrms.service.WorkflowService;
@@ -57,15 +53,12 @@ import org.egov.hrms.web.validator.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -77,9 +70,11 @@ public class EmployeeController {
 	
 	@Autowired
 	private EmployeeValidator validator;
-	
+
+	// HP-specific: workflow transitions (e.g. Trade License NewTL verify/approve) -
+	// see WorkflowService.
 	@Autowired
-	private WorkflowService workflowService; 
+	private WorkflowService workflowService;
 
 
 	/**
@@ -128,6 +123,7 @@ public class EmployeeController {
 	@ResponseBody
 	public ResponseEntity<?> search(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper, @ModelAttribute @Valid EmployeeSearchCriteria criteria) {
 		validator.validateSearchRequest(requestInfoWrapper.getRequestInfo(), criteria);
+		log.info(criteria.toString());
 		EmployeeResponse employeeResponse = employeeService.search(criteria, requestInfoWrapper.getRequestInfo());
 		return new ResponseEntity<>(employeeResponse,HttpStatus.OK);
 	}
@@ -141,12 +137,11 @@ public class EmployeeController {
 		response = employeeService.getEmployeeCountResponse(requestInfo,tenantId);
 		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/workflow/_transition")
 	private ResponseEntity<?> workflowTransition(@RequestBody ProcessInstanceRequest processInstanceRequest) {
 		Object object = workflowService.workflowTransition(processInstanceRequest);
 		return new ResponseEntity<>(object,HttpStatus.OK);
 	}
-
 
 }
