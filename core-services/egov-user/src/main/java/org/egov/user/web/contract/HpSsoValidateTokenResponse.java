@@ -37,5 +37,5 @@ public class HpSsoValidateTokenResponse {
 	@JsonProperty("UsersArray")
     private List<Object> usersArray; // Type should be specified more precisely if possible
 
-    
+
 }

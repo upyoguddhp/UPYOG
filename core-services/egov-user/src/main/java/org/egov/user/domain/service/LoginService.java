@@ -20,11 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.internal.http2.ErrorCode;
 
 @Service
 @Slf4j
@@ -39,30 +37,6 @@ public class LoginService {
 	@Autowired
 	private UserService userService;
 
-//	public Object enterpriseUserLogin(String username, String tenantId, String otp, String password) {
-//		String emailId = StringUtils.EMPTY;
-//		String mobileNumber = StringUtils.EMPTY;
-//
-//		// Determining the username from Email or Phone Number
-//		if (EmailValidator.getInstance().isValid(username)) {
-//			emailId = username;
-//			UserSearchCriteria searchCriteria = UserSearchCriteria.builder().emailId(emailId).tenantId(tenantId)
-//					.build();
-//			List<User> users = userService.searchUsers(searchCriteria, true, null);
-//			if (CollectionUtils.isNotEmpty(users)) {
-//				mobileNumber = users.get(0).getMobileNumber();
-//			}
-//		} else if (StringUtils.isNumeric(username)) {
-//			mobileNumber = username;
-//		}
-//
-//		if (StringUtils.isEmpty(mobileNumber)) {
-//			throw new UserServiceException(ErrorCode.ERR_UNAUTHORIZE_LOGIN);
-//		}
-//
-//		return authenticateUser(mobileNumber, password, tenantId, UserType.ENTERPRISE.name());
-//	}
-
 	public Object employeeUserLogin(LoginRequest loginRequest) {
 		String password = loginRequest.getPassword();
 		String emailId = StringUtils.EMPTY;
@@ -72,17 +46,17 @@ public class LoginService {
 		UserType userType = UserType.fromValue(loginRequest.getUserType());
 		String tenantId = loginRequest.getTenantId();
 		List<User> users = null;
-		
+
 		Boolean skipTenantCheck = loginRequest.getSkipTenantCheck();
 
 		// Determining the username from Email or Phone Number
-		
+
 		if (EmailValidator.getInstance().isValid(usernameValue)) {
 			emailId = usernameValue;
 			UserSearchCriteria searchCriteria = UserSearchCriteria.builder().emailId(emailId).tenantId(tenantId).type(userType)
 					.skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
-			if (CollectionUtils.isNotEmpty(users)) {
+			if (users != null && !users.isEmpty()) {
 				finalUsername = users.get(0).getUsername();
 			}
 		} else if (usernameValue.matches(UserServiceConstants.PATTERN_MOBILE)) {
@@ -90,14 +64,14 @@ public class LoginService {
 			UserSearchCriteria searchCriteria = UserSearchCriteria.builder().mobileNumber(mobileNumber).type(userType)
 					.tenantId(tenantId).skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
-			if (CollectionUtils.isNotEmpty(users)) {
+			if (users != null && !users.isEmpty()) {
 				finalUsername = users.get(0).getUsername();
 			}
 		} else {
 			UserSearchCriteria searchCriteria = UserSearchCriteria.builder().userName(usernameValue).tenantId(tenantId).type(userType)
 					.skipTenantCheck(skipTenantCheck).build();
 			users = userService.searchUsers(searchCriteria, true, null);
-			if (CollectionUtils.isNotEmpty(users)) {
+			if (users != null && !users.isEmpty()) {
 				finalUsername = users.get(0).getUsername();
 			} else {
 				throw new RuntimeException("Unauthorized login.");
@@ -131,7 +105,7 @@ public class LoginService {
 			map.add("scope", "read");
 			map.add("tenantId", tenantId);
 			map.add("userType", userType);
-			if (skipTenantCheck) {
+			if (Boolean.TRUE.equals(skipTenantCheck)) {
 				map.add("skipTenantCheck", "TRUE");
 			}
 
