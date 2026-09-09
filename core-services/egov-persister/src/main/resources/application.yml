@@ -8,7 +8,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO eg_user(title, salutation, dob, locale, username, password, pwdexpirydate, mobilenumber, altcontactnumber, emailid, createddate, lastmodifieddate, createdby, lastmodifiedby, active, name, gender, pan, aadhaarnumber, type, version, guardian, guardianrelation, signature, accountlocked, bloodgroup, photo, identificationmark, tenantid, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: Users.*
+      basePath: $.Users.*
       jsonMaps:
        - jsonPath: $.Users.*.salutation #title
          type: STRING
@@ -105,7 +105,7 @@ serviceMaps:
          type: LONG
     
     - query: INSERT INTO eg_user_address(id, version, createddate, lastmodifieddate, createdby, lastmodifiedby, type, address, city, pincode, userid, tenantid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: Users.*.userDetails.addresses.*
+      basePath: $.Users.*.userDetails.addresses.*
       jsonMaps:
        - jsonPath: $.Users.*.userDetails.addresses.*.id
          type: STRING
@@ -150,7 +150,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egov_citizen_service_req(id, tenantid, userid, servicecode, consumercode, email, mobilenumber, assignedto, createddate, lastmodifiedddate, createdby, lastmodifiedby, jsonvalue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.serviceReq
+      basePath: $.serviceReq
       jsonMaps:
        - jsonPath: $.serviceReq.serviceRequestId
          type: STRING
@@ -200,7 +200,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: UPDATE egov_citizen_service_req SET  userid=?, servicecode=?, consumercode=?, email=?, mobilenumber=?, assignedto=?,  lastmodifiedddate=?, lastmodifiedby=?, jsonvalue=? WHERE id=? and tenantid=?;
-      rootObject: $.serviceReq
+      basePath: $.serviceReq
       jsonMaps:
        
        - jsonPath: $.RequestInfo.userInfo.id
@@ -244,7 +244,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egmr_marriage_regn(id, regnunitid,marriagedate, venue, street, placeofmarriage,locality,   city, marriagephoto, bridegroomid, brideid, priestname,priestreligion, priestaddress, priestaadhaar, priestmobileno, priestemail, serialno, volumeno, applicationnumber, regnnumber, regndate, status, source, stateid, isactive, tenantid, feeid, demandid, approvaldepartment, approvaldesignation, approvalassignee, approvalaction, approvalstatus, approvalcomments, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.MarriageRegn
+      basePath: $.MarriageRegn
       jsonMaps:
        - jsonPath: $.MarriageRegn.id 
          type: STRING
@@ -364,7 +364,7 @@ serviceMaps:
          dbType: LONG
          
     - query: INSERT INTO egmr_marriageregn_witness(id, applicationnumber, tenantid, witnessno, name, relation, relatedto, dob, address, relationshipwithapplicants, occupation, aadhaar, mobileno, email) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?);
-      rootObject: $.MarriageRegn.witnesses.*
+      basePath: $.MarriageRegn.witnesses.*
       jsonMaps:
        - jsonPath: $.MarriageRegn.witnesses.*.id
          type: LONG
@@ -409,7 +409,7 @@ serviceMaps:
          type: STRING
          
     - query: INSERT INTO egmr_marrying_person(id, name, parentname, street, locality, city, dob, status, aadhaar, mobileno, email, religion, religionpractice, education, occupation, handicapped, residenceaddress, photo, nationality, tenantid, officeaddress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.MarriageRegn.bridegroom
+      basePath: $.MarriageRegn.bridegroom
       jsonMaps:
        - jsonPath: $.MarriageRegn.bridegroom.id
          type: LONG
@@ -475,7 +475,7 @@ serviceMaps:
          type: STRING
 
     - query: INSERT INTO egmr_marrying_person(id, name, parentname, street, locality, city, dob, status, aadhaar, mobileno, email, religion, religionpractice, education, occupation, handicapped, residenceaddress, photo, nationality, tenantid, officeaddress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.MarriageRegn.bride
+      basePath: $.MarriageRegn.bride
       jsonMaps:
        - jsonPath: $.MarriageRegn.bride.id
          type: LONG
@@ -547,7 +547,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: UPDATE egmr_marriage_regn SET  regnunitid=?, marriagedate=?, venue=?, street=?, placeofmarriage=?, locality=?, city=?, marriagephoto=?, bridegroomid=?, brideid=?, priestname=?, priestreligion=?, priestaddress=?, priestaadhaar=?, priestmobileno=?, priestemail=?, serialno=?, volumeno=?, regnnumber=?, regndate=?, status=?, source=?, stateid=?, isactive=?, feeid=?, demandid=?, approvaldepartment=?, approvaldesignation=?, approvalassignee=?, approvalaction=?, approvalstatus=?, approvalcomments=?, lastmodifiedby=?, lastmodifiedtime=? WHERE tenantid=? AND applicationnumber=? ;
-      rootObject: $.MarriageRegn
+      basePath: $.MarriageRegn
       jsonMaps:
 
        - jsonPath: $.MarriageRegn.regnUnit.id
@@ -660,7 +660,7 @@ serviceMaps:
          type: STRING
 
     - query: UPDATE egmr_marriageregn_witness SET id=?, witnessno=?, name=?, relation=?, relatedto=?, address=?, relationshipwithapplicants=?, occupation=?, aadhaar=?, mobileno=?, email=?, dob=? WHERE tenantid=? AND applicationnumber=?;
-      rootObject: $.MarriageRegn.witnesses.*
+      basePath: $.MarriageRegn.witnesses.*
       jsonMaps:
        - jsonPath: $.MarriageRegn.witnesses.*.id
          type: LONG
@@ -705,7 +705,7 @@ serviceMaps:
          type: STRING
          
     - query: UPDATE egmr_marrying_person  SET name=?, parentname=?, street=?, locality=?, city=?, dob=?, status=?, aadhaar=?, mobileno=?, email=?, religion=?, religionpractice=?, education=?, occupation=?, handicapped=?, residenceaddress=?, photo=?, nationality=?, officeaddress=? WHERE id=? AND tenantid=? ;
-      rootObject: $.MarriageRegn.bridegroom
+      basePath: $.MarriageRegn.bridegroom
       jsonMaps:
 
        - jsonPath: $.MarriageRegn.bridegroom.name
@@ -772,7 +772,7 @@ serviceMaps:
          type: STRING
 
     - query: UPDATE egmr_marrying_person  SET name=?, parentname=?, street=?, locality=?, city=?, dob=?, status=?, aadhaar=?, mobileno=?, email=?, religion=?, religionpractice=?, education=?, occupation=?, handicapped=?, residenceaddress=?, photo=?, nationality=?, officeaddress=? WHERE id=? AND tenantid=? ;
-      rootObject: $.MarriageRegn.bride
+      basePath: $.MarriageRegn.bride
       jsonMaps:
 
        - jsonPath: $.MarriageRegn.bride.name
@@ -845,7 +845,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egmr_registration_unit(id, name, isactive, tenantid, locality, zone, revenueward, block, street, electionward, doorno, pincode, ismainregistrationunit, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.regnUnit
+      basePath: $.regnUnit
       jsonMaps:
 
        - jsonPath: $.regnUnit.id
@@ -908,7 +908,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_registration_unit SET  name=?, isactive=?, locality=?, zone=?, revenueward=?, block=?, street=?, electionward=?, doorno=?, pincode=?, ismainregistrationunit=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=? AND tenantid=?;
-      rootObject: $.regnUnit
+      basePath: $.regnUnit
       jsonMaps:
 
        - jsonPath: $.regnUnit.name
@@ -964,7 +964,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_marriage_document_type(id,name,code,isactive,isindividual,isrequired,proof,appltype,tenantid,createdby,lastmodifiedby,createdtime,lastmodifiedtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.MarriageDocumentType.*
+      basePath: $.MarriageDocumentType.*
       jsonMaps:
 
        - jsonPath: $.MarriageDocumentType.*.id
@@ -1015,7 +1015,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_marriage_document_type SET name=?, isactive=?, isindividual=?, isrequired=?, proof=?, appltype=? ,lastmodifiedby=?, lastmodifiedtime=? WHERE id=? AND code=? AND tenantid=?;
-      rootObject: $.MarriageDocumentType.*
+      basePath: $.MarriageDocumentType.*
       jsonMaps:
        - jsonPath: $.MarriageDocumentType.*.name
          type: STRING
@@ -1058,7 +1058,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_fee(createddate,tenantid, feecriteria, fee, fromdate, todate, lastmodifieddate, createdby, lastmodifiedby, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.Fee.*
+      basePath: $.Fee.*
       jsonMaps:
       
        - type: CURRENTDATE
@@ -1098,7 +1098,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: UPDATE egmr_fee SET  feecriteria=?, fee=?, fromdate=?, todate=?, lastmodifieddate=?, lastmodifiedby=? WHERE id=? AND tenantid=? ;
-      rootObject: $.Fee.*
+      basePath: $.Fee.*
       jsonMaps:
        - jsonPath: $.Fee.*.feeCriteria
          type: BOOLEAN
@@ -1132,7 +1132,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:         
     - query: INSERT INTO egmr_reissuecertificate(id, regnno, applicantname, applicantaddress, applicantmobileno,applicantfee, applicantaadhaar, applicationnumber, reissueapplstatus, stateid, approvaldepartment, approvaldesignation, approvalassignee, approvalaction, approvalstatus, approvalcomments, demands,rejectionreason, remarks, isactive, createdby, createdtime, lastmodifiedby, lastmodifiedtime, tenantid, applsubmisiondate, regnunit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      rootObject: $.ReissueApplication
+      basePath: $.ReissueApplication
       jsonMaps:
 
        - jsonPath: $.ReissueApplication.id
@@ -1225,7 +1225,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egbs_demand (id,consumerCode,consumerType,businessService,owner,taxPeriodFrom,taxPeriodTo,minimumAmountPayable,createdby,lastModifiedby,createdtime,lastModifiedtime,tenantid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.Demands.*
+      basePath: $.Demands.*
       jsonMaps:
        
        - jsonPath: $.Demands.*.id
@@ -1268,7 +1268,7 @@ serviceMaps:
          type: STRING                
 
     - query: INSERT INTO egbs_demanddetail (id,demandid,taxHeadCode,taxamount,collectionamount,createdby,lastModifiedby,createdtime,lastModifiedtime,tenantid) VALUES (?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.Demands.*.demandDetails.*
+      basePath: $.Demands.*.demandDetails.*
       jsonMaps:
        - jsonPath: $.Demands.*.demandDetails.*.id
          type: STRING
@@ -1307,7 +1307,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT into egbs_bill (id, tenantid, payeename, payeeaddress, payeeemail, isactive, iscancelled, createdby, createddate, lastmodifiedby, lastmodifieddate) values(?,?,?,?,?,?,?,?,?,?,?)
-      rootObject: $.Bills.*
+      basePath: $.Bills.*
       jsonMaps:
        
        - jsonPath: $.Bills.*.id
@@ -1344,7 +1344,7 @@ serviceMaps:
          dbType: LONG
          
     - query: INSERT into egbs_billdetail (id, tenantid, billid, businessservice, billno, billdate, consumercode, consumertype, billdescription, displaymessage, minimumamount, totalamount, callbackforapportioning, partpaymentallowed, collectionmodesnotallowed, createdby, createddate, lastmodifiedby, lastmodifieddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.Bills.*.billDetails.*
+      basePath: $.Bills.*.billDetails.*
       jsonMaps:
        - jsonPath: $.Bills.*.billDetails.*.id
          type: STRING
@@ -1405,7 +1405,7 @@ serviceMaps:
          dbType: LONG 
          
     - query: INSERT into egbs_billaccountdetail(id, tenantid, billdetail, glcode, orderno, accountdescription, cramounttobepaid, creditamount, debitamount, isactualdemand, purpose, createdby, createddate, lastmodifiedby, lastmodifieddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.Bills.*.billDetails.*.billAccountDetails.*
+      basePath: $.Bills.*.billDetails.*.billAccountDetails.*
       jsonMaps:
        - jsonPath: $.Bills.*.billDetails.*.billAccountDetails.*.id
          type: STRING
@@ -1460,7 +1460,7 @@ serviceMaps:
    isTransaction: true
    queryMaps: 
     - query: INSERT INTO egpt_property (id,tenantId, upicNumber, oldUpicNumber, vltUpicNumber,creationReason, assessmentDate,occupancyDate, gisRefNo,isAuthorised, isUnderWorkflow, channel, createdBy,lastModifiedBy, createdTime,lastModifiedTime,sequenceNo)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*
+      basePath: $.properties.*
       jsonMaps:
        
        - jsonPath: $.properties.*.id
@@ -1519,7 +1519,7 @@ serviceMaps:
          type: INT    
 
     - query: INSERT INTO egpt_propertydetails (source, regdDocNo, regdDocDate,reason, status, isVerified,verificationDate, isExempted, exemptionReason, propertyType, category, usage,department, apartment, siteLength, siteBreadth, sitalArea,totalBuiltupArea, undividedShare, noOfFloors, isSuperStructure, landOwner, floorType,woodType, roofType, wallType, stateId, applicationNo, createdBy, lastModifiedBy,createdTime, lastModifiedTime, property, taxCalculations,factors,assessmentDates,builderDetails,bpaNo,bpaDate,subUsage)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*.propertyDetail
+      basePath: $.properties.*.propertyDetail
       jsonMaps:
        
        - jsonPath: $.properties.*.propertyDetail.source
@@ -1648,7 +1648,7 @@ serviceMaps:
          type: STRING  
 
     - query: INSERT INTO egpt_floors (floorNo,createdBy, lastModifiedBy, createdTime, lastModifiedTime, propertydetails)VALUES(?,?,?,?,?,?);
-      rootObject: $.properties.*.propertyDetail.floors.*
+      basePath: $.properties.*.propertyDetail.floors.*
       jsonMaps:
        
        - jsonPath: $.properties.*.propertyDetail.floors.*.floorNo
@@ -1670,7 +1670,7 @@ serviceMaps:
          type: LONG
          
     - query: INSERT INTO egpt_unit (unitNo, unitType, length,width,builtupArea,assessableArea,bpaBuiltupArea,bpaNo,bpaDate,usage,occupancytype,occupierName,firmName,rentCollected, structure, age,exemptionReason, isStructured, occupancyDate, constCompletionDate, manualArv, arv,electricMeterNo, waterMeterNo, createdBy, lastModifiedBy, createdTime, lastModifiedTime,floor,isAuthorised,constructionStartDate,landCost,buildingCost,subusage,carpetArea,exemptionArea,rv) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*.propertyDetail.floors.*.units.*
+      basePath: $.properties.*.propertyDetail.floors.*.units.*
       jsonMaps:
        
        - jsonPath: $.properties.*.propertyDetail.floors.*.units.*.unitNo
@@ -1788,7 +1788,7 @@ serviceMaps:
          type: DOUBLE     
          
     - query: INSERT INTO egpt_document (fileStore, createdBy, lastModifiedBy, createdTime, lastModifiedTime,propertydetails,documenttype) VALUES(?,?,?,?,?,?,?);
-      rootObject: $.properties.*.propertyDetail.documents.*
+      basePath: $.properties.*.propertyDetail.documents.*
       jsonMaps:
        
        - jsonPath: $.properties.*.propertyDetail.documents.*.fileStore
@@ -1814,7 +1814,7 @@ serviceMaps:
          
 
     - query: INSERT INTO egpt_propertylocation (revenueBoundary, locationBoundary, adminBoundary, northBoundedBy,eastBoundedBy, westBoundedBy, southBoundedBy,createdBy, lastModifiedBy, createdTime,lastModifiedTime,property,guidanceValueBoundary) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*.boundary
+      basePath: $.properties.*.boundary
       jsonMaps:
        
        - jsonPath: $.properties.*.revenueBoundary.id
@@ -1857,7 +1857,7 @@ serviceMaps:
          type: LONG      
          
     - query: INSERT INTO egpt_property_owner (owner,property,isPrimaryOwner, isSecondaryOwner,ownerShipPercentage, ownerType,createdBy, lastModifiedBy, createdTime, lastModifiedTime ) VALUES(?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*.owners.*
+      basePath: $.properties.*.owners.*
       jsonMaps:
        
        - jsonPath: $.properties.*.owners.*.owner
@@ -1891,7 +1891,7 @@ serviceMaps:
          type: LONG   
          
     - query: INSERT INTO egpt_Address (tenantId, latitude, longitude, addressNumber, addressLine1, addressLine2, landmark, city, pincode, detail,createdBy, lastModifiedBy, createdTime, lastModifiedTime, property, surveyNo, plotNo )VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-      rootObject: $.properties.*.address
+      basePath: $.properties.*.address
       jsonMaps:
       
        - jsonPath: $.properties.*.address.tenantId
