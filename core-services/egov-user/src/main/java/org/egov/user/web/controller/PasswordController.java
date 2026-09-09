@@ -1,7 +1,5 @@
 package org.egov.user.web.controller;
 
-import javax.validation.Valid;
-
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.user.domain.service.UserService;
 import org.egov.user.web.contract.LoggedInUserUpdatePasswordRequest;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -37,13 +36,6 @@ public class PasswordController {
         userService.updatePasswordForLoggedInUser(request.toDomain());
         return new UpdatePasswordResponse(ResponseInfo.builder().status(String.valueOf(HttpStatus.OK.value())).build());
     }
-    
-    @PostMapping("/nologin/_update/checkToken")
-    public UpdatePasswordResponse updatePasswordForNonLoggedInUserCheckToken(@RequestBody @Valid NonLoggedInUserUpdatePasswordRequest request) {
-        userService.updatePasswordForNonLoggedInUser(request.toDomain(), request.getRequestInfo(),true);
-
-        return new UpdatePasswordResponse(ResponseInfo.builder().status(String.valueOf(HttpStatus.OK.value())).build());
-    }
 
     /**
      * end-point to update the password for non logged in user
@@ -53,7 +45,7 @@ public class PasswordController {
      */
     @PostMapping("/nologin/_update")
     public UpdatePasswordResponse updatePasswordForNonLoggedInUser(@RequestBody @Valid NonLoggedInUserUpdatePasswordRequest request) {
-        userService.updatePasswordForNonLoggedInUser(request.toDomain(), request.getRequestInfo(),false);
+        userService.updatePasswordForNonLoggedInUser(request.toDomain(), request.getRequestInfo());
 
         return new UpdatePasswordResponse(ResponseInfo.builder().status(String.valueOf(HttpStatus.OK.value())).build());
     }

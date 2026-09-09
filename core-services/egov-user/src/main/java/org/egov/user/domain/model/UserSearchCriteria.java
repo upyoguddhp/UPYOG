@@ -10,11 +10,11 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Builder
 @ToString
-@NoArgsConstructor
 public class UserSearchCriteria {
 
     private List<Long> id;
@@ -30,14 +30,18 @@ public class UserSearchCriteria {
     private List<String> sort;
     private UserType type;
     private String tenantId;
-    private String ulbName;
     private List<String> roleCodes;
     private String alternatemobilenumber;
+    //private boolean digilockersearch;
+
+    private Boolean excludeAddressDetails = false; // This fields is added to exclude address details from user search response V2
+    // HP addition: lets a caller (LoginService, SsoService) search/authenticate a user
+    // without forcing the state-level tenant, e.g. looking up an SSO-created citizen
+    // by email/mobile before their tenant is known.
     @Builder.Default
     private Boolean skipTenantCheck = false;
-    
-    @Builder.Default
-    private Boolean skipValidate = false;
+    private String addressId; // This field is added to search user with particular address using addressId
+    private String addressStatus; // This field is used to search address with particular status
 
     public void validate(boolean isInterServiceCall) {
         if (validateIfEmptySearch(isInterServiceCall) || validateIfTenantIdExists(isInterServiceCall)) {
