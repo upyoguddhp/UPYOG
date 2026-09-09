@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
  * embedded in the door plate's QR code: OwnerName/MobileNo/PropertyID/Address
  * come from property-services (looked up by the garbage account's
  * systemPropertyId), id is the garbage account uuid, ulbName/Ward come from
- * the garbage account's own address.
+ * the garbage account's own address, and Category comes from the account's
+ * (first/primary) garbage collection unit.
  */
 @AllArgsConstructor
 @Data
@@ -40,4 +41,7 @@ public class DdpPrintingRecord {
 
 	@JsonProperty("Address")
 	private String address;
+
+	@JsonProperty("Category")
+	private String category;
 }

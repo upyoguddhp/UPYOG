@@ -3111,9 +3111,13 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		String mobileNo = StringUtils.isEmpty(systemPropertyId) ? null
 				: ownerMobileBySystemPropertyId.get(systemPropertyId);
 
+		String category = CollectionUtils.isEmpty(account.getGrbgCollectionUnits()) ? null
+				: account.getGrbgCollectionUnits().get(0).getCategory();
+
 		return DdpPrintingRecord.builder().ownerName(ownerName).mobileNo(mobileNo).propertyId(propertyId)
 				.id(account.getUuid()).ulbName(null == accountAddress ? null : accountAddress.getUlbName())
-				.ward(null == accountAddress ? null : accountAddress.getWardName()).address(address).build();
+				.ward(null == accountAddress ? null : accountAddress.getWardName()).address(address)
+				.category(category).build();
 	}
 
 	private PtOwnerInfo findPrimaryOwner(List<PtOwnerInfo> owners) {
