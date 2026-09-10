@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,7 +20,6 @@ import static org.egov.wf.util.WorkflowConstants.*;
 
 
 @Component
-@Slf4j
 public class WorkflowValidator {
 
 
@@ -48,7 +45,6 @@ public class WorkflowValidator {
         String tenantId = processStateAndActions.get(0).getProcessInstanceFromRequest().getTenantId();
         String businessServiceCode = processStateAndActions.get(0).getProcessInstanceFromRequest().getBusinessService();
         BusinessService businessService = businessUtil.getBusinessService(tenantId,businessServiceCode);
-        log.info("####### value businessService : "+businessService.getBusinessService()+" ## tenant: "+businessService.getTenantId());
         validateAction(requestInfo,processStateAndActions,businessService);
         validateDocuments(processStateAndActions);
         validateAssignes(requestInfo, processStateAndActions);
@@ -145,11 +141,13 @@ public class WorkflowValidator {
                 throw new CustomException("INVALID ROLE","User is not authorized to perform action");
             if(action!=null && !isStateChanging && !util.isRoleAvailable(roles,util.rolesAllowedInService(businessService)))
                 throw new CustomException("INVALID ROLE","User is not authorized to perform action");
+            // HP-specific: record which role the user acted under - see ProcessInstance.role.
             if(isRoleAvailable) {
-            	processStateAndAction.getProcessInstanceFromRequest().setRole(roles.stream()
+                processStateAndAction.getProcessInstanceFromRequest().setRole(roles.stream()
                         .filter(action.getRoles()::contains)
                         .findFirst().get());
             }
+
 
 
 
