@@ -33,6 +33,10 @@ public class EscalationQueryBuilder {
         builder.append(" AND wf.status = ? ");
         preparedStmtList.add(criteria.getStatus());
 
+        // Subtract the SLA duration so "exceeded by" measures time past the deadline,
+        // not just record age - upstream simplified this to a bare age check, which
+        // would misfire (escalating everything older than the threshold regardless of
+        // its actual SLA). Restoring the original DIGIT 2.5-era formula.
         if(criteria.getStateSlaExceededBy() != null){
             builder.append(" AND (select extract(epoch from current_timestamp)) * 1000 - wf.createdtime - wf.statesla > ? ");
             preparedStmtList.add(criteria.getStateSlaExceededBy());

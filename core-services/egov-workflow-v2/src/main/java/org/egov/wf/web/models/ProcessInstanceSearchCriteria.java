@@ -1,95 +1,109 @@
 package org.egov.wf.web.models;
 
+
 import java.util.List;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//import javax.validation.constraints.NotNull;
+//import javax.validation.constraints.Size;
+import java.util.List;
+
+// HP-specific: @Builder/@AllArgsConstructor/@NoArgsConstructor added for
+// WorkflowInboxService's .builder()...build() usage.
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProcessInstanceSearchCriteria {
-	
-	@JsonProperty("RequestInfo")
+
+    // HP-specific: used by the unauthenticated /process/_search-pgr endpoint, which
+    // takes the whole request body as this criteria object (no RequestInfoWrapper).
+    @JsonProperty("RequestInfo")
     private RequestInfo requestInfo;
 
-	@JsonProperty("tenantId")
-	private String tenantId;
+    @JsonProperty("tenantId")
+    private String tenantId;
 
-	@JsonProperty("status")
-	private List<String> status;
+    @JsonProperty("status")
+    private List<String> status;
 
-	@JsonProperty("businessIds")
-	private List<@Size(min = 4) String> businessIds;
+    @JsonProperty("businessIds")
+    private List<@Size(min=4) String> businessIds;
 
-	@JsonProperty("assignee")
-	private String assignee;
+    @JsonProperty("assignee")
+    private String  assignee;
 
-	@JsonProperty("ids")
-	private List<String> ids;
+    @JsonProperty("ids")
+    private List<String> ids;
 
-	@JsonProperty("history")
-	@Builder.Default
-	private Boolean history = false;
+    @JsonProperty("history")
+    @Builder.Default
+    private Boolean history = false;
 
-	@JsonProperty("fromDate")
-	private Long fromDate = null;
+    @JsonProperty("fromDate")
+    private Long fromDate = null;
 
-	@JsonProperty("toDate")
-	private Long toDate = null;
+    @JsonProperty("toDate")
+    private Long toDate = null;
 
-	@JsonProperty("offset")
-	private Integer offset;
 
-	@JsonProperty("limit")
-	private Integer limit;
+    @JsonProperty("offset")
+    private Integer offset;
 
-	@JsonProperty("businessService")
-	private String businessService;
+    @JsonProperty("limit")
+    private Integer limit;
 
-	@JsonProperty("moduleName")
-	private String moduleName;
+    @JsonProperty("businessService")
+    private String businessService;
 
-	@JsonIgnore
-	private Boolean isNearingSlaCount;
+    @JsonProperty("moduleName")
+    private String moduleName;
+    
+    @JsonIgnore
+    private Boolean isNearingSlaCount;
 
-	@JsonIgnore
-	private List<String> tenantSpecifiStatus;
+    @JsonIgnore
+    private List<String> tenantSpecifiStatus;
 
-	@JsonIgnore
-	private List<String> multipleAssignees;
+    @JsonIgnore
+    private List<String> multipleAssignees;
 
-	@JsonIgnore
-	private List<String> statesToIgnore;
+    @JsonIgnore
+    private List<String> statesToIgnore;
 
-	@JsonIgnore
-	private Boolean isEscalatedCount;
+    @JsonIgnore
+    private Boolean isEscalatedCount;
 
-	@JsonIgnore
-	private Boolean isAssignedToMeCount;
+    @JsonIgnore
+    private Boolean isAssignedToMeCount;
 
-	@JsonIgnore
-	private List<String> statusesIrrespectiveOfTenant;
+    @JsonIgnore
+    private List<String> statusesIrrespectiveOfTenant;
+    
+    @JsonIgnore
+    private Long slotPercentageSlaLimit;
 
-	@JsonIgnore
-	private Long slotPercentageSlaLimit;
 
-	public Boolean isNull() {
-		if (this.getBusinessIds() == null && this.getIds() == null && this.getAssignee() == null
-				&& this.getStatus() == null)
-			return true;
-		else
-			return false;
-	}
+
+
+    public Boolean isNull(){
+        if(this.getBusinessIds()==null && this.getIds()==null && this.getAssignee()==null &&
+                this.getStatus()==null)
+            return true;
+        else return false;
+    }
+
+
 
 }

@@ -26,7 +26,7 @@ import lombok.ToString;
  */
 @ApiModel(description = "A Object holds the basic data for a Trade License")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
+//@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
 
 @Getter
 @Setter
@@ -109,6 +109,8 @@ public class ProcessInstance   {
         @JsonProperty("escalated")
         private Boolean escalated = false;
 
+        // HP-specific: records which role the acting user held when performing the
+        // transition that produced this ProcessInstance - see WorkflowValidator.
         @JsonProperty("role")
         private String role = null;
 
