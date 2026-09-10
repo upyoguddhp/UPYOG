@@ -229,6 +229,12 @@ public class PropertySchedulerService {
 			BigDecimal propertyTaxWithoutRebate = BigDecimal.ZERO;
 			String ulbName = property.getTenantId().split("\\.")[1];
 			JsonNode addressAdditionalDetails = objectMapper.valueToTree(property.getAddress().getAdditionalDetails());
+			
+			boolean previousBillUnpaid = false;
+
+			if ("Shimla".equalsIgnoreCase(ulbName)) {
+				previousBillUnpaid = hasPreviousUnpaidBill(calculateTaxRequest.getRequestInfo(),property.getPropertyId());
+			}
 
 			for (Unit unit : property.getUnits()) {
 				BigDecimal totalRateableValue = BigDecimal.ZERO;
@@ -345,11 +351,21 @@ public class PropertySchedulerService {
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
-
+				
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+										|| "PLOT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
+				
 				// Net rateable value after rebate
-if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
-					
-					
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
 					if (isShimlaAreaAbove100) {
 
 						oAndMRebateUpto100Amount = upto100RateableValue
@@ -368,8 +384,8 @@ if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null
 				}
 
 
-BigDecimal rateUpto100 = BigDecimal.ZERO;
-BigDecimal rateAbove100 = BigDecimal.ZERO;
+				BigDecimal rateUpto100 = BigDecimal.ZERO;
+				BigDecimal rateAbove100 = BigDecimal.ZERO;
 				
 				// Find property tax rate
 				for (JsonNode propertyTaxRate : propertyTaxRates) {
@@ -499,6 +515,11 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
 				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				
+				if ("Dalhousie".equalsIgnoreCase(ulbName) && finalPropertyTax.compareTo(BigDecimal.valueOf(1200)) < 0) {
+					finalPropertyTax = BigDecimal.valueOf(1200);
+				}
+				
 				propertyTaxWithoutRebate = finalPropertyTax;
 
 				// early payment rebate
@@ -508,7 +529,7 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
 					}
 				}
-				if (epRebatePercentage != null) {
+				if (epRebatePercentage != null && !previousBillUnpaid) {
 					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
@@ -884,11 +905,21 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 				} else {
 					errorSet.add("PropertyType issue factor value is missing in mdms");
 				}
+				
+				boolean isShimlaPlotOfLand = "Shimla".equalsIgnoreCase(ulbName) && (("PLOT OF LAND"
+						.equalsIgnoreCase(unitAdditionalDetails.get("propType").asText())
+						|| "RCC FRAME STRUCTURE".equalsIgnoreCase(unitAdditionalDetails.get("propType").asText()))
+						&& ("VACANT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT OF LAND".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "RCC FRAME STRUCTURE AND LANTER"
+										.equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())
+								|| "PLOT".equalsIgnoreCase(unitAdditionalDetails.get("useOfBuilding").asText())));
 
 				// Net rateable value after rebate
-				if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
-					
-					
+				if (isShimlaPlotOfLand) {
+				    netRateableValue = totalRateableValue;
+				    oAndMRebatePercentage = BigDecimal.ZERO;
+				}else if (!BigDecimal.ZERO.equals(totalRateableValue) && oAndMRebatePercentage != null || ((oAndMRebateUpto100Amount !=null && netUpto100RateableValue !=null) && (oAndMRebateAbove100Amount !=null && netAbove100RateableValue !=null))) {
 					if (isShimlaAreaAbove100) {
 
 						oAndMRebateUpto100Amount = upto100RateableValue
@@ -1072,6 +1103,11 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 				oneDayPropertyTax = totalPropertyTax.divide(BigDecimal.valueOf(365), 6, RoundingMode.HALF_UP);
 				finalPropertyTax = oneDayPropertyTax.multiply(days);
+				
+				if ("Dalhousie".equalsIgnoreCase(ulbName) && finalPropertyTax.compareTo(BigDecimal.valueOf(1200)) < 0) {
+					finalPropertyTax = BigDecimal.valueOf(1200);
+				}
+				
 				propertyTaxWithoutRebate = finalPropertyTax;
 
 				// early payment rebate
@@ -1081,7 +1117,14 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 						epRebatePercentage = new BigDecimal(earlyPaymentRebatePercentage.get("rate").asText());
 					}
 				}
-				if (epRebatePercentage != null) {
+				
+				boolean previousBillUnpaid = false;
+
+				if ("Shimla".equalsIgnoreCase(ulbName)) {
+					previousBillUnpaid = hasPreviousUnpaidBill(calculateTaxRequest.getRequestInfo(),property.getPropertyId());
+				}
+
+				if (epRebatePercentage != null  && !previousBillUnpaid) {
 					rebateAmount = finalPropertyTax.multiply(epRebatePercentage.divide(BigDecimal.valueOf(100)));
 					finalPropertyTax = finalPropertyTax.subtract(rebateAmount);
 				}
@@ -1102,6 +1145,34 @@ BigDecimal rateAbove100 = BigDecimal.ZERO;
 
 		return previewResponses;
 	}
+	
+	private boolean hasPreviousUnpaidBill(RequestInfo requestInfo, String propertyId) {
+
+		PtTaxCalculatorTrackerSearchCriteria criteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.propertyIds(Collections.singleton(propertyId))
+				.billStatus(new HashSet<>(Arrays.asList(
+					    BillStatus.ACTIVE,
+					    BillStatus.PARTIALLY_PAID,
+					    BillStatus.EXPIRED
+					)))
+				.build();
+		List<PtTaxCalculatorTracker> trackers = propertyService.getTaxCalculatedProperties(criteria);
+		if (CollectionUtils.isEmpty(trackers)) {
+			return false;
+		}
+
+		for (PtTaxCalculatorTracker tracker : trackers) {
+			if (StringUtils.isBlank(tracker.getDemandId())) {
+				continue;
+			}
+			List<Demand> demand = demandService.searchDemand(tracker.getTenantId(),
+					Collections.singleton(tracker.getDemandId()), null, requestInfo, "PROPERTY");
+			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIspaymentcompleted())) {
+				return true;
+			}
+		}
+		return false;
+		}
 
 	private void createFailureLog(Property property, CalculateTaxRequest generateBillRequest, BillResponse billResponse,
 			Set<String> errorMap) {
