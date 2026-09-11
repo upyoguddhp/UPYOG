@@ -4,25 +4,26 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.egov.common.utils.MultiStateInstanceUtil;
 import org.egov.tracer.model.CustomException;
 import org.egov.url.shortening.model.ShortenRequest;
 import org.egov.url.shortening.service.URLConverterService;
 import org.egov.url.shortening.validator.URLValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -51,7 +52,9 @@ public class ShortenController {
         redirectView.setUrl(redirectUrlString);
         return redirectView;
     }
-    
+
+    // HP-specific: query-param variant used by the garbage service, which
+    // couldn't shape its URL to use the path-variable form above.
     @RequestMapping(method=RequestMethod.GET)
     public RedirectView redirectUrlWithParam(@RequestParam("id") String id, HttpServletRequest request) throws IOException, URISyntaxException, Exception {
         String redirectUrlString = urlConverterService.getLongURLFromID(id);

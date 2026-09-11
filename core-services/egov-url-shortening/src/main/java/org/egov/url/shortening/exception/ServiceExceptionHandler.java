@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -71,7 +71,7 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
+			HttpHeaders headers, org.springframework.http.HttpStatusCode status, WebRequest request) {
 		ex.printStackTrace();
 		String errorMessage = "Http message not readable exception occured.";
 		JsonMappingException jsonMappingException = (JsonMappingException) ex.getCause();
@@ -87,7 +87,7 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
+			HttpHeaders headers, org.springframework.http.HttpStatusCode status, WebRequest request) {
 		ex.printStackTrace();
 		String errorMessage = "Method argument not valid exception occured.";
 		List<String> errors = ex.getBindingResult().getFieldErrors().stream()
