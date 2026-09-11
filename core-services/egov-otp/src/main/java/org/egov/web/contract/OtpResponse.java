@@ -8,6 +8,7 @@ import org.egov.domain.model.Token;
 public class OtpResponse {
     private ResponseInfo responseInfo;
     private Otp otp;
+    // HP-specific: populated when the validate request asks for returnToken.
     private String accessToken;
 
     public OtpResponse(Token token) {
