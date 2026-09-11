@@ -66,7 +66,9 @@ public class EmailProperties {
     @Value("${mail.sender.password}")
     @Getter
     private String mailSenderPassword;
-    
+
+    // HP-specific: Solan ULB sends email from its own separate account rather
+    // than the default sender - see ExternalEmailService.getMailSender().
     @Value("${mail.sender.solan.username}")
     @Getter
     public String solanUsername;

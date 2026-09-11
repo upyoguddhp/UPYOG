@@ -2,7 +2,6 @@ package org.egov.web.notification.mail.consumer;
 
 import java.util.HashMap;
 
-import org.egov.web.notification.mail.consumer.contract.Email;
 import org.egov.web.notification.mail.consumer.contract.EmailRequest;
 import org.egov.web.notification.mail.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EmailNotificationListener {
 
@@ -27,16 +29,15 @@ public class EmailNotificationListener {
 
     @KafkaListener(topics = "${kafka.topics.notification.mail.name}")
     public void listen(final HashMap<String, Object> record) {
-    	//EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
-        //emailService.sendEmail(emailRequest.getEmail());
-    	try {
-			EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
-			emailService.sendEmail(emailRequest.getEmail());
-		} catch (IllegalArgumentException ex) {
-			Email emailRequest = objectMapper.convertValue(record, Email.class);
-	        emailService.sendEmail(emailRequest);
-		}catch (Exception e) {
-			e.printStackTrace();
-		}  
+       // log.info("Entering mail topic");
+    	EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
+        emailService.sendEmail(emailRequest.getEmail());
+       //log.info("Printing Records");
+       //log.info("Recors is ================================"+record);
+
+        
     }
+    
+    
+
 }
