@@ -2,7 +2,7 @@ package org.egov.pdf.model;
 
 import java.util.Map;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 import org.egov.pdf.request.RequestInfo;
 
