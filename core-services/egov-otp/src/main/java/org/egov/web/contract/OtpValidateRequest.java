@@ -2,12 +2,12 @@ package org.egov.web.contract;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.domain.model.ValidateRequest;
 
-import javax.validation.Valid;
 
 @Getter
 @AllArgsConstructor
@@ -19,6 +19,9 @@ public class OtpValidateRequest {
     @JsonProperty("otp")
     @Valid
     private Otp otp;
+
+    // HP-specific: when true, also fetch and return a user access token
+    // alongside a successful validation - see OtpController/TokenService.
     private Boolean returnToken;
 
     public ValidateRequest toDomainValidateRequest() {
