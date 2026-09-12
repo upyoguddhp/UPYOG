@@ -37,6 +37,10 @@ public class PostEventLogFilter implements GlobalFilter , Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
+        if (!eventLogEnabled) {
+            return chain.filter(exchange);
+        }
+
         String requestURL = exchange.getRequest().getURI().toString();
         Boolean toLog = urlsWhiteList.stream().anyMatch(url -> requestURL.startsWith(url)) || urlsWhiteList.isEmpty();
 
