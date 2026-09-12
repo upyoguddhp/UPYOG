@@ -30,6 +30,8 @@ public class SmsTrackerRepository {
 
    public void insert(SmsTracker tracker) {
 
+    tracker.setUuid(UUID.randomUUID().toString());
+
     PGobject additionalDetailJson = null;
     PGobject smsRequestJson = null;
     PGobject smsResponseJson = null;
