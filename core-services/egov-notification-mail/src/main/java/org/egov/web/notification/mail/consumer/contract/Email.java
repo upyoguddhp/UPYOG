@@ -24,6 +24,8 @@ public class Email {
 	private String body;
 	@JsonProperty("isHTML")
 	private boolean isHTML;
-	private String ulbName;
+    private Attachments attachments;
+    // HP-specific: selects a per-ULB sender account - see ExternalEmailService.
+    private String ulbName;
 
 }
