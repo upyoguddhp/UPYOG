@@ -1,6 +1,6 @@
 package org.egov.pdf.request;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
