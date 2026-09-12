@@ -2,8 +2,8 @@ package org.egov.web.notification.sms.models;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import org.egov.common.contract.request.RequestInfo;
 
