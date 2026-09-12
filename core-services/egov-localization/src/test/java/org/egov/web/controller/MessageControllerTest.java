@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.egov.TestConfiguration;
 import org.egov.domain.model.*;
 import org.egov.domain.service.MessageService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -110,11 +108,10 @@ public class MessageControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(content().json(getFileContents("messagesResponse.json")));
 
-        verify(messageService).create(eq(defaultTenant), anyListOf(Message.class), eq(new AuthenticatedUser(1L)));
+        verify(messageService).create(eq(defaultTenant), anyList(), eq(new AuthenticatedUser(1L)));
     }
 
     @Test
-    @Ignore
     public void test_should_return_bad_request_when_mandatory_fields_are_not_present_when_creating_messages()
         throws Exception {
         mockMvc.perform(post("/messages/v1/_create").content(getFileContents
@@ -138,12 +135,11 @@ public class MessageControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(content().json(getFileContents("createNewMessageResponse.json")));
         verify(messageService)
-            .updateMessagesForModule(eq(new Tenant("default")), anyListOf(Message.class),
+            .updateMessagesForModule(eq(new Tenant("default")), anyList(),
                 eq(new AuthenticatedUser(1L)));
     }
 
     @Test
-    @Ignore
     public void test_should_give_bad_request_message_when_mandatory_fields_not_available_update_messages()
         throws Exception {
         mockMvc.perform(post("/messages/v1/_update")
