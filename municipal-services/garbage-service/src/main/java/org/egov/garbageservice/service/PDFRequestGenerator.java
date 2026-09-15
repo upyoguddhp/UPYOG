@@ -326,8 +326,13 @@ public class PDFRequestGenerator {
 		grbg.put("qrCodeText", uri);
 		dataObject.put("grbg", grbg);
 
-		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgBillReceipt")
-				.tenantId("hp").data(dataObject).build();
+		if ("ARREAR".equals(grbgBillTracker.get(0).getType())) {
+			return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgArrearBillReceipt")
+					.tenantId("hp").data(dataObject).build();
+		} else {
+			return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgBillReceipt")
+					.tenantId("hp").data(dataObject).build();
+		}
 	}
 	
 	private String escapeHtml(String input) {
