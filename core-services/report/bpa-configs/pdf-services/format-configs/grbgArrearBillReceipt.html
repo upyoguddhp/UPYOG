@@ -245,21 +245,30 @@
             </table>
          </div>
          <!-- Invoice Header -->
-         <div class="invoice-header">
-            <table>
-               <tr>
-                  <td><strong>Bill No:</strong><span th:text="${billNo}">NA</span></td>
-                  <td align="center">
-					<h1 th:text="${amountPaid > 0} 
-					    ? 'Garbage Collection Bill Receipt' 
-					    : 'Garbage Collection Bill'">
-					   Garbage Collection Bill
-					</h1>
-                  </td>
-                  <td align="right"><strong>Financial Year:</strong> <br /><span th:text="${finYear}">NA</span></td>
-               </tr>
-            </table>
-         </div>
+		 <div class="invoice-header">
+		    <table>
+		       <tr>
+		          <td colspan="2">
+		             <h1 th:text="${amountPaid > 0} 
+		                   ? 'Garbage Collection Arrear Bill Receipt' 
+		                   : 'Garbage Collection Arrear Bill'">
+		                Garbage Collection Arrear Bill
+		             </h1>
+		          </td>
+		       </tr>
+			   <br></br>
+		       <tr>
+		          <td>
+		             <strong>Bill No:</strong>
+		             <span th:text="${billNo}">NA</span>
+		          </td>
+				  <td align="right">
+				     <strong>Financial Year:</strong>
+				     <span th:text="${finYear}">NA</span>
+				  </td>
+		       </tr>
+		    </table>
+		 </div>
          <!-- Bill Details / Customer Details -->
          <table width="100%" style="margin-bottom:20px;">
             <tr>
@@ -361,7 +370,7 @@
                   <th>Owner/Tenant Name</th>
                   <th>Property Type</th>
                   <th>Unit</th>
-                  <th>Value</th>
+                  <th>Arrear / Value</th>
                   <th>Arrear</th>
                   <th>Interest</th>
                   <th>Status</th>
