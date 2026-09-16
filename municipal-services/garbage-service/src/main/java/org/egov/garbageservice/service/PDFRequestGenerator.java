@@ -126,7 +126,20 @@ public class PDFRequestGenerator {
 			        : "";
 
 			grbgObj.get("paymentDates").add(paymentDate);
-			grbgObj.get("paymentStatuses").add(billObj.getStatus().toString());
+			String paymentStatus;
+
+			GrbgBillTracker tracker = grbgBillTracker.stream()
+			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()))
+			        .findFirst()
+			        .orElse(null);
+
+			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+			    paymentStatus = "PROCESSING";
+			} else {
+			    paymentStatus = billObj.getStatus().toString();
+			}
+
+			grbgObj.get("paymentStatuses").add(paymentStatus);
 			grbgObj.get("grbgTaxPlusArrear").add(grbgTaxPlusArrear.toString());
 		}
 
