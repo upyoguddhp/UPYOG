@@ -52,7 +52,10 @@ public class GarbageBillTrackerRepository {
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
 		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
-
+	
+	private static final String UPDATE_BILL_TRACKER_PAYMENT_STATUS = "UPDATE eg_grbg_bill_tracker "
+			+ "SET is_payment_processing = :status " + "WHERE bill_id = :billId";
+	
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
 //			+ "(:id, :consumer_code,:module_name, :tenant_id, failure_reason,:month, :year, :from_date, :to_date, :request_payload, :response_payload, :status_code)";
@@ -234,6 +237,14 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
+	}
+	
+	public void updatePaymentProcessing(String billId, boolean isPaymentProcessing) {
+		String query = UPDATE_BILL_TRACKER_PAYMENT_STATUS;
+		Map<String, Object> params = new HashMap<>();
+		params.put("billId", billId);
+		params.put("status", isPaymentProcessing);
+		namedParameterJdbcTemplate.update(query, params);
 	}
 	
 	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {

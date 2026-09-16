@@ -53,7 +53,6 @@ import org.egov.pg.service.gateways.razorpay.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.pg.web.models.ChequeTransactionRequest;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.egov.pg.models.DemandResponse;
 import org.egov.pg.models.DemandDetail;
@@ -142,6 +141,7 @@ public class TransactionServiceV2 {
 			if ("CHEQUE".equalsIgnoreCase(transaction.getGatewayPaymentMode())) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.PROCESSING);
 				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+				updatePaymentProcessing(transaction, true);
 			}
 			else if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
@@ -474,6 +474,7 @@ public class TransactionServiceV2 {
 					TransactionRequest.builder().transaction(txn).requestInfo(request.getRequestInfo()).build());
 
 			updateChequeTransactionStatus(txn, request.getRequestInfo());
+			updatePaymentProcessing(txn, false);
 
 			return "Cheque payment for Bill ID " + request.getBillId()
 					+ " has been successfully verified and payment processing has been completed.";
@@ -484,6 +485,7 @@ public class TransactionServiceV2 {
 			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
 
 			updateChequeTransactionStatus(txn, request.getRequestInfo());
+			updatePaymentProcessing(txn, false);
 
 			return "Cheque payment for Bill ID " + request.getBillId() + " has been rejected and marked as failed.";
 		}
@@ -493,6 +495,19 @@ public class TransactionServiceV2 {
 	
 	private void updateChequeTransactionStatus(Transaction txn, RequestInfo requestInfo) {
 		producer.push(appProperties.getUpdateTxnTopic(), new org.egov.pg.models.TransactionRequest(requestInfo, txn));
+	}
+	
+	private void updatePaymentProcessing(Transaction transaction, boolean isPaymentProcessing) {
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("billId", transaction.getBillId());
+		payload.put("txnId", transaction.getTxnId());
+		payload.put("isPaymentProcessing", isPaymentProcessing);
+
+		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getGrbgPaymentProcessingTopic(), payload);
+		} else if ("PROPERTY".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getPropertyPaymentProcessingTopic(), payload);
+		}
 	}
 
 }

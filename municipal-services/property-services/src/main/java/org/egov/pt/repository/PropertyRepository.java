@@ -794,4 +794,10 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			String query = queryBuilder.getUpdateStatusQuery(tracker, preparedStmtList);
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
+		
+		public int updatePaymentProcessing(String billId, boolean isPaymentProcessing) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getUpdateIsProcessingPaymentQuery(preparedStmtList, billId,isPaymentProcessing);
+			return jdbcTemplate.update(query, preparedStmtList.toArray());
+		}
 	}
