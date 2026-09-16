@@ -1518,7 +1518,9 @@ public class PropertySchedulerService {
 
 		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-		return trackers.stream().filter(tracker -> {
+		return trackers.stream()
+			.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing()))
+			.filter(tracker -> {
 			long createdTime = tracker.getAuditDetails().getCreatedTime();
 			long diffDays = ChronoUnit.DAYS.between(
 					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),
