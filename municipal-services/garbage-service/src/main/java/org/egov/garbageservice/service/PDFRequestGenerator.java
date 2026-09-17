@@ -193,7 +193,7 @@ public class PDFRequestGenerator {
 		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
 		        totalPaid = totalPaid.add(amount);
 		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
 		        totalDue = totalDue.add(amount);
 		        totalAmount = amount;
 		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
@@ -201,6 +201,7 @@ public class PDFRequestGenerator {
 		        for (BillDetail billDetail : billObj.getBillDetails()) {
 		            if (billDetail.getBillAccountDetails() != null) {
 		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+		                	
 		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
 		                            ? accDetail.getAdjustedAmount()
 		                            : BigDecimal.ZERO;
@@ -208,6 +209,11 @@ public class PDFRequestGenerator {
 		                }
 		            }
 		        }
+		        
+				if (totalArrear.compareTo(BigDecimal.ZERO) < 0) {
+					billPaid = billPaid.add(totalArrear);
+				}
+		        
 		        totalPaid = totalPaid.add(billPaid);
 		        totalDue = totalDue.add(amount.subtract(billPaid));
 		        totalAmount = amount;
@@ -216,6 +222,8 @@ public class PDFRequestGenerator {
 
 		BigDecimal totalRebate = BigDecimal.ZERO;
 		BigDecimal totalWithoutRebate = BigDecimal.ZERO;
+		BigDecimal advancePaid = BigDecimal.ZERO;
+
 
 		for (GrbgBillTracker tracker : grbgBillTracker) {
 			if (tracker.getRebateAmount() != null) {
@@ -225,6 +233,10 @@ public class PDFRequestGenerator {
 			if (tracker.getGarbageBillWithoutRebate() != null) {
 				totalWithoutRebate = totalWithoutRebate.add(tracker.getGarbageBillWithoutRebate());
 			}
+			
+			if (tracker.getAdvancePaid() != null) {
+				advancePaid = advancePaid.add(tracker.getAdvancePaid());
+		    }
 		}
 		
 		grbg.put("amountPaid", totalPaid);
@@ -232,6 +244,7 @@ public class PDFRequestGenerator {
 		grbg.put("totalAmount", totalAmount);
 		grbg.put("rebateAmount", totalRebate);
 		grbg.put("amountWithoutRebate", totalWithoutRebate);
+		grbg.put("advancePaid", advancePaid);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");

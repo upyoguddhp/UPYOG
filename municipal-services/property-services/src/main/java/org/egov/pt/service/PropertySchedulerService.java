@@ -79,6 +79,7 @@ import org.egov.pt.web.contracts.alfresco.DmsResponse;
 import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.bill.DemandDetail;
 import org.egov.pt.models.BillIdRequest;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -579,7 +580,8 @@ public class PropertySchedulerService {
 									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
 									.billStatus(new HashSet<>(Arrays.asList(
 										    BillStatus.ACTIVE, 
-										    BillStatus.PARTIALLY_PAID
+										    BillStatus.PARTIALLY_PAID,
+										    BillStatus.ADVANCE_ADJUSTED
 										)))
 									.build();
 
@@ -666,6 +668,7 @@ public class PropertySchedulerService {
 						} catch (Exception e) {
 							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
 						}
+						syncTrackerWithBillStatus(tracker, calculateTaxRequest);
 					}
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
@@ -681,6 +684,7 @@ public class PropertySchedulerService {
 		int skipped = skippedCount.get();
 
 		String message = null;
+		
 
 		if (generatedCount > 0 && skipped > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Property Id(s). Failed for " + skipped
@@ -2026,7 +2030,41 @@ public class PropertySchedulerService {
 
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
+	
+	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, CalculateTaxRequest calculateTaxRequest) {
+		
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+		
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+                .tenantId(tracker.getTenantId())
+                .consumerCode(Collections.singleton(tracker.getPropertyId()))
+                .service("PROPERTY")
+                .billId(Collections.singleton(tracker.getBillId()))
+                .build();
+		
+		List<Bill> bill = billService
+							.searchBill(billSearchCriteria, calculateTaxRequest.getRequestInfo())
+							.getBill();
+		
+		Bill currentBill = bill.get(0);
+		
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+			JsonNode additionalDetails = tracker.getAdditionalDetails();
 
+			if (additionalDetails != null && additionalDetails.isArray() && additionalDetails.size() > 0) {
 
+				ObjectNode firstObject = (ObjectNode) additionalDetails.get(0);
+				firstObject.put("advanceAdjusted", true);
+
+				tracker.setAdditionalDetails(additionalDetails);
+				repository.updateTrackerAdditionalDetails(tracker);
+			}
+		}
+		
+		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
+     	propertyService.UpdatePtTrackerStatus(tracker);
+	}
 
 }

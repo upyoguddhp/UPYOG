@@ -51,7 +51,11 @@ public class GarbageBillTrackerRepository {
 			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:demandId,:type,:additionaldetail::JSONB)";
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
-		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
+		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime, advance_paid = :advancePaid ";
+	
+	private static final String UPDATE_TRACKER_ADDITIONAL_DETAIL = "UPDATE eg_grbg_bill_tracker "
+			+ "SET additionaldetail = CAST(:additionalDetail AS jsonb), " + "last_modified_by = :lastModifiedBy, "
+			+ "last_modified_time = :lastModifiedTime " + "WHERE bill_id = :billId";
 	
 	private static final String UPDATE_BILL_TRACKER_PAYMENT_STATUS = "UPDATE eg_grbg_bill_tracker "
 			+ "SET is_payment_processing = :status " + "WHERE bill_id = :billId";
@@ -111,7 +115,7 @@ public class GarbageBillTrackerRepository {
             "last_modified_by = :lastModifiedBy, " +
             "last_modified_time = :lastModifiedTime " +
             "WHERE grbg_application_id = :grbgApplicationId " +
-            "AND status = 'ACTIVE'";
+            "AND status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
 	
 	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
@@ -213,7 +217,7 @@ public class GarbageBillTrackerRepository {
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
 		StringBuilder builder = new StringBuilder(UPDATE_BILL_TRACKER_STATUS);
-		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID') ");
+		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID' OR status = 'ADVANCE_ADJUSTED') ");
 
         Map<String, Object> updateTrackerStatus = new HashMap<>();
 
@@ -235,6 +239,7 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
         updateTrackerStatus.put("lastModifiedTime", grbgBillTracker.getAuditDetails().getLastModifiedDate());
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
+        updateTrackerStatus.put("advancePaid", grbgBillTracker.getAdvancePaid());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
 	}
@@ -247,12 +252,24 @@ public class GarbageBillTrackerRepository {
 		namedParameterJdbcTemplate.update(query, params);
 	}
 	
-	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {
+	public int updateTrackerAdditionalDetails(GrbgBillTracker tracker) {
+
+	    Map<String, Object> params = new HashMap<>();
+
+	    params.put("billId", tracker.getBillId());
+	    params.put("additionalDetail", tracker.getAdditionaldetail().toString());
+	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
+	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(UPDATE_TRACKER_ADDITIONAL_DETAIL,params);
+	}
+	
+	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails, String status) {
 
 		String query = ACTIVATE_PREVIOUS_TRACKER;
 
 		Map<String, Object> params = new HashMap<>();
-		params.put("status", "ACTIVE");
+		params.put("status", status);
 		params.put("billId", billId);
 		params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
 		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());

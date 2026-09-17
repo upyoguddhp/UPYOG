@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 
 /**
  * A Object which holds the basic info about the revenue assessment for which
@@ -68,6 +69,10 @@ public class Demand {
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
+	
+	@Default
+	@JsonProperty("isPaymentCompleted")
+    private Boolean isPaymentCompleted = false;
 
 	@Builder.Default
 	@JsonProperty("minimumAmountPayable")

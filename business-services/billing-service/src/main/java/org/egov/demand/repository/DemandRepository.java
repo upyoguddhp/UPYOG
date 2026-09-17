@@ -198,7 +198,8 @@ public class DemandRepository {
 				ps.setString(14, status);
 				ps.setObject(15, util.getPGObject(demand.getAdditionalDetails()));
 				ps.setObject(16, demand.getBillExpiryTime());
-				ps.setObject(17, demand.getFixedBillExpiryDate());
+				ps.setBoolean(17, Boolean.TRUE.equals(demand.getIsPaymentCompleted()));
+				ps.setObject(18, demand.getFixedBillExpiryDate());
 			}
 
 			@Override
@@ -430,5 +431,16 @@ public class DemandRepository {
 		}
 
 		return paymentId;
+	}
+	
+	public void updateAdvanceCollectionAmount(DemandDetail advanceDetail) {
+
+	    String query = DemandQueryBuilder.DEMAND_DETAIL_COLLECTION_AMOUNT_UPDATE;
+
+	    jdbcTemplate.update(query,
+	            advanceDetail.getCollectionAmount(),
+	            advanceDetail.getAuditDetails().getLastModifiedBy(),
+	            advanceDetail.getAuditDetails().getLastModifiedTime(),
+	            advanceDetail.getId());
 	}
 }

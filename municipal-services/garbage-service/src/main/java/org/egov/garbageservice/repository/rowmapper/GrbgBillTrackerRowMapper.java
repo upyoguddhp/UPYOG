@@ -45,7 +45,9 @@ public class GrbgBillTrackerRowMapper implements RowMapper<GrbgBillTracker> {
 				.rebateAmount(rs.getBigDecimal("rebate_amount"))
 				.garbageBillWithoutRebate(rs.getBigDecimal("garbage_bill_without_rebate"))
 				.isPaymentProcessing(rs.getBoolean("is_payment_processing"))
-				.additionaldetail(additionalDetail).build();
+				.additionaldetail(additionalDetail)
+				.advancePaid(rs.getBigDecimal("advance_paid"))
+				.build();
 	}
 
 	private Date purseToDate(String dateString) {
