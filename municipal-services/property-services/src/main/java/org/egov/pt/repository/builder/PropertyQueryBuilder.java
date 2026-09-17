@@ -559,7 +559,7 @@ public class PropertyQueryBuilder {
             "lastmodifiedby = ?, " +
             "lastmodifiedtime = ? " +
             "WHERE propertyid = ? " +
-            "AND bill_status = 'ACTIVE'";
+            "AND bill_status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1323,13 +1323,14 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
 	
-		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ?, advance_paid = ? ");
 		builder.append(" WHERE 1 = 1 ");
-		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID' OR eptct.bill_status = 'ADVANCE_ADJUSTED') ");
 	
 		preparedStmtList.add(tracker.getBillStatus().name());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+		preparedStmtList.add(tracker.getAdvancePaid());
 	
 		if (tracker.getDemandId() != null) {
 			builder.append(" AND eptct.demand_id = ? ");
@@ -1341,6 +1342,27 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 		    preparedStmtList.add(tracker.getPropertyId());
 		}
 	
+		return builder.toString();
+	}
+	
+	public String getUpdateAdditionalDetailsQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+
+		builder.append(" SET additionaldetails = CAST(? AS jsonb), ");
+		builder.append(" lastmodifiedby = ?, ");
+		builder.append(" lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+
+		preparedStmtList.add(tracker.getAdditionalDetails().toString());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+
+		if (tracker.getBillId() != null) {
+			builder.append(" AND eptct.bill_id = ? ");
+			preparedStmtList.add(tracker.getBillId());
+		}
+
 		return builder.toString();
 	}
 	

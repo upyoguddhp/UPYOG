@@ -240,11 +240,12 @@ public class GarbageAccountSchedulerService {
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
+							syncTrackerWithBillStatus(grbgBillTracker, generateBillRequest);
 
 							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
-									.grbgApplicationIds(Collections
-											.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
-									.status(Collections.singleton("ACTIVE")).tenantId(garbageAccount.getTenantId())
+									.grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
+									.status(new HashSet<>(Arrays.asList("ACTIVE", "ADVANCE_ADJUSTED")))
+									.tenantId(garbageAccount.getTenantId())
 									.build();
 
 							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository
@@ -1054,6 +1055,41 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
 		}
 		return trackers.get(0);
+	}
+	
+	private void syncTrackerWithBillStatus(GrbgBillTracker tracker, GenerateBillRequest generateBillRequest) {
+
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.tenantId(tracker.getTenantId())
+				.consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+				.billId(Collections.singleton(tracker.getBillId()))
+				.build();
+
+		List<Bill> bill = billService.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo()).getBill();
+
+		Bill currentBill = bill.get(0);
+
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+
+			ObjectNode additionalDetails;
+
+			if (tracker.getAdditionaldetail() != null && !tracker.getAdditionaldetail().isNull()) {
+				additionalDetails = (ObjectNode) tracker.getAdditionaldetail().deepCopy();
+			} else {
+				additionalDetails = objectMapper.createObjectNode();
+			}
+
+			additionalDetails.put("advanceAdjusted", true);
+			tracker.setAdditionaldetail(additionalDetails);
+			garbageBillTrackerRepository.updateTrackerAdditionalDetails(tracker);
+		}
+
+		tracker.setStatus(currentBill.getStatus().name());
+		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
 	}
 
 }

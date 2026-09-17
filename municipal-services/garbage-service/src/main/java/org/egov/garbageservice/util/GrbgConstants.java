@@ -145,6 +145,9 @@ public class GrbgConstants {
 
 	@Value("${egov.demand.search.endpoint}")
 	public String demandSearchEndpoint;
+	
+	@Value("${egov.demand.search.by.criteria.endpoint}")
+	public String demandSearchByCriteriaEndpoint;
 
 	@Value("${egov.demand.update.endpoint}")
 	public String demandUpdateEndpoint;

@@ -11,6 +11,7 @@ import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -113,6 +114,43 @@ public class DemandRepository {
             throw new CustomException("PARSING ERROR","Failed to parse response from Demand Search");
         }
         
+		return response;
+	}
+	
+	public DemandResponse searchByDemandID(String tenantId, Set<String> demandIds, Set<String> consumerCodes,
+			RequestInfoWrapper requestInfoWrapper, String businessService) {
+
+		StringBuilder uriBuilder = new StringBuilder(config.getBillHost()).append(config.getDemandSearchByCriteriaEndpoint());
+
+		if (!StringUtils.isEmpty(tenantId)) {
+			uriBuilder.append("?tenantId=").append(tenantId);
+		}
+
+		boolean hasQueryParam = uriBuilder.toString().contains("?");
+
+		if (!StringUtils.isEmpty(businessService)) {
+			uriBuilder.append(hasQueryParam ? "&" : "?").append("businessService=").append(businessService);
+			hasQueryParam = true;
+		}
+
+		if (!CollectionUtils.isEmpty(consumerCodes)) {
+			uriBuilder.append(hasQueryParam ? "&" : "?").append("consumerCode=")
+					.append(String.join(",", consumerCodes));
+			hasQueryParam = true;
+		}
+		if (!CollectionUtils.isEmpty(demandIds)) {
+			uriBuilder.append(hasQueryParam ? "&" : "?").append("demandId=").append(String.join(",", demandIds));
+		}
+
+		Object result = restCallRepository.fetchResult(uriBuilder, requestInfoWrapper);
+		DemandResponse response = null;
+
+		try {
+			response = objectMapper.convertValue(result, DemandResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
+		}
+
 		return response;
 	}
 

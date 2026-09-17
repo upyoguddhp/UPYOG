@@ -262,20 +262,18 @@ public class Util {
 	 * if the call happens with payment false and the demand is already tallied even then the demands won't be set to paid-completely to allow zero payment
 	 */
 	public void updateDemandPaymentStatus(Demand demand, Boolean isUpdateFromPayment) {
-		BigDecimal totoalTax = demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		
-		BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		if(StringUtils.equalsIgnoreCase(demand.getBusinessService(), Constants.NEWTL_BUSINESS_SERVICE)) {
-			isUpdateFromPayment = true;
-		}
-		
-		if (totoalTax.compareTo(totalCollection) == 0 && isUpdateFromPayment)
-			demand.setIsPaymentCompleted(true);
-		else if (totoalTax.compareTo(totalCollection) != 0)
-			demand.setIsPaymentCompleted(false);
+	    if (StringUtils.equalsIgnoreCase(demand.getBusinessService(), Constants.NEWTL_BUSINESS_SERVICE)) {
+	        isUpdateFromPayment = true;
+	    }
+
+	    boolean paymentComplete = demand.getDemandDetails().stream()
+	            .filter(detail -> detail.getTaxAmount().compareTo(BigDecimal.ZERO) > 0)
+	            .allMatch(detail -> detail.getCollectionAmount().compareTo(detail.getTaxAmount()) >= 0);
+
+	    if (Boolean.TRUE.equals(isUpdateFromPayment)) {
+	        demand.setIsPaymentCompleted(paymentComplete);
+	    }
 	}
 	
 	/**
