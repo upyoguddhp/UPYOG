@@ -1502,7 +1502,8 @@ public class PropertySchedulerService {
 				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId).type("CYCLIC")
 				.rebateamount(BigDecimal.ZERO).billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+		return propertyService.getTaxCalculatedProperties(criteria).stream()
+				.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing())).collect(Collectors.toList());
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days, int penaltyCycleDays) {
