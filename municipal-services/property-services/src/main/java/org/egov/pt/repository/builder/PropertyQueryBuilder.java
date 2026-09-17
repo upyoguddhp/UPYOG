@@ -854,8 +854,13 @@ public class PropertyQueryBuilder {
 
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("owner.name = ?");
-			preparedStmtList.add(criteria.getName());
+			 if (Boolean.TRUE.equals(criteria.getIsFuzzyNameSearch())) {
+		        builder.append("owner.name LIKE ?");
+		        preparedStmtList.add("%" + criteria.getName() + "%");
+		    } else {
+		        builder.append("owner.name = ?");
+		        preparedStmtList.add(criteria.getName());
+		    }
 		}
 
 		if (null != criteria.getMobileNumber()) {
