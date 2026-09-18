@@ -1171,7 +1171,7 @@ public class PropertySchedulerService {
 			}
 			List<Demand> demand = demandService.searchDemand(tracker.getTenantId(),
 					Collections.singleton(tracker.getDemandId()), null, requestInfo, "PROPERTY");
-			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIspaymentcompleted())) {
+			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIsPaymentCompleted())) {
 				return true;
 			}
 		}
