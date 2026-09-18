@@ -247,6 +247,13 @@ public class GarbageBillService {
 			    .filter(t -> t.getDemandId().equals(demandId))
 			    .findFirst()
 			    .orElseThrow(() -> new CustomException("NO_TRACKER", "Tracker not found"));
+		
+		if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+		    throw new CustomException(
+		        "PAYMENT_PROCESSING",
+		        "Bill cannot be cancelled because its payment is processing"
+		    );
+		}
 
 		if (trackers.size() > 1) {
 			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
