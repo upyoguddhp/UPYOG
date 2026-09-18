@@ -307,13 +307,16 @@ public class PDFRequestGenerator {
 		    amountDue = totalAmount.subtract(amountPaid);
 		}
 
-		if (bill.getStatus().equals(StatusEnum.PAID)) {
+		if (Boolean.TRUE.equals(ptTaxCalculatorTracker.getIsPaymentProcessing())) {
+		    paymentStatus = "Processing";
+		} else if (bill.getStatus().equals(StatusEnum.PAID)) {
 		    paymentStatus = "Success";
 		} else if (bill.getStatus().equals(StatusEnum.PARTIALLY_PAID)) {
 		    paymentStatus = "Partially Paid";
 		} else {
 		    paymentStatus = "Pending";
 		}
+		
 		if (amountPaid.compareTo(BigDecimal.ZERO) > 0) {
 		    paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime())
 		            .atZone(ZoneId.systemDefault())

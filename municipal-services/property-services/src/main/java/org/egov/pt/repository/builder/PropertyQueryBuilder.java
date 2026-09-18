@@ -560,6 +560,9 @@ public class PropertyQueryBuilder {
             "lastmodifiedtime = ? " +
             "WHERE propertyid = ? " +
             "AND bill_status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
+	
+	private static final String PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY = "UPDATE eg_pt_tax_calculator_tracker "
+			+ "SET is_payment_processing = ? " + "WHERE bill_id = ? ";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1368,6 +1371,12 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 	public String getExpireActiveTrackersByPropertyIdQuery() {
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
+	}
+	
+	public String getUpdateIsProcessingPaymentQuery(List<Object> preparedStmtList, String billId, boolean isPaymentProcessing) {
+		preparedStmtList.add(isPaymentProcessing);
+		preparedStmtList.add(billId);
+		return PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY;
 	}
 
 }

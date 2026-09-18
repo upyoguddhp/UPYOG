@@ -1171,7 +1171,7 @@ public class PropertySchedulerService {
 			}
 			List<Demand> demand = demandService.searchDemand(tracker.getTenantId(),
 					Collections.singleton(tracker.getDemandId()), null, requestInfo, "PROPERTY");
-			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIspaymentcompleted())) {
+			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIsPaymentCompleted())) {
 				return true;
 			}
 		}
@@ -1506,7 +1506,8 @@ public class PropertySchedulerService {
 				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId).type("CYCLIC")
 				.rebateamount(BigDecimal.ZERO).billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+		return propertyService.getTaxCalculatedProperties(criteria).stream()
+				.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing())).collect(Collectors.toList());
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days, int penaltyCycleDays) {
@@ -1522,7 +1523,9 @@ public class PropertySchedulerService {
 
 		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-		return trackers.stream().filter(tracker -> {
+		return trackers.stream()
+			.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing()))
+			.filter(tracker -> {
 			long createdTime = tracker.getAuditDetails().getCreatedTime();
 			long diffDays = ChronoUnit.DAYS.between(
 					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),

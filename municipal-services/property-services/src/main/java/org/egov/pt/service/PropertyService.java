@@ -1094,6 +1094,13 @@ public class PropertyService {
 			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
 		}
 		
+		if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+		    throw new CustomException(
+		            "PAYMENT_PROCESSING",
+		            "Bill cannot be cancelled because payment processing is in progress"
+		    );
+		}
+		
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
 				.tenantId(cancelRequest.getTenantId())
 				.billId(Collections.singleton(cancelRequest.getBillId()))

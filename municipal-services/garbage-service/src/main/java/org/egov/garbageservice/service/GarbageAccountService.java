@@ -2735,10 +2735,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    List<GrbgBillTracker> expiredTrackers = new ArrayList<>();
 		
 		    for (GrbgBillTracker tracker : trackers) {
+		    	
+				if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+					continue;
+				}
+		    	 
 		        if (tracker.getPenaltyAmount() != null
 		                && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
 		            continue;
 		        }
+		        
 		        BillSearchCriteria billSearchCriteria =
 		            BillSearchCriteria.builder()
 		                .tenantId(tracker.getTenantId())

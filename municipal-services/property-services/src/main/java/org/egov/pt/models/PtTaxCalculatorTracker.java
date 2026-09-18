@@ -47,4 +47,5 @@ public class PtTaxCalculatorTracker {
 	private String demandId;
 	private String ward;
 	private BigDecimal advancePaid;
+	private Boolean isPaymentProcessing;
 }
