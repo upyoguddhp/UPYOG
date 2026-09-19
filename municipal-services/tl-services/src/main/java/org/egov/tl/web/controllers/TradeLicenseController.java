@@ -71,13 +71,43 @@ public class TradeLicenseController {
 		this.tlNotificationService = tlNotificationService;
 	}
 	@PostMapping({ "/{servicename}/_create", "/_create" })
-	public ResponseEntity<TradeLicenseResponse> create(@Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
-			@PathVariable(required = false) String servicename) {
-		List<TradeLicense> licenses = tradeLicenseService.create(tradeLicenseRequest, servicename);
-		TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
-				responseInfoFactory.createResponseInfoFromRequestInfo(tradeLicenseRequest.getRequestInfo(), true))
-				.build();
-		return new ResponseEntity<>(response, HttpStatus.OK);
+	public ResponseEntity<TradeLicenseResponse> create(
+	        @Valid @RequestBody TradeLicenseRequest tradeLicenseRequest,
+	        @PathVariable(required = false) String servicename) {
+
+	    String resolvedServiceName = servicename;
+
+	    if (tradeLicenseRequest != null
+	            && tradeLicenseRequest.getLicenses() != null
+	            && !tradeLicenseRequest.getLicenses().isEmpty()
+	            && !"NewTL".equals(tradeLicenseRequest.getLicenses().get(0).getBusinessService())) {
+
+	        String requestBusinessService =
+	                tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+
+	        if (StringUtils.isNotBlank(requestBusinessService)) {
+
+	            resolvedServiceName = requestBusinessService;
+
+	            for (TradeLicense license : tradeLicenseRequest.getLicenses()) {
+	                if (StringUtils.isBlank(license.getBusinessService())) {
+	                    license.setBusinessService(resolvedServiceName);
+	                }
+	            }
+	        }
+	    }
+
+	    List<TradeLicense> licenses =
+	            tradeLicenseService.create(tradeLicenseRequest, resolvedServiceName);
+
+	    TradeLicenseResponse response = TradeLicenseResponse.builder()
+	            .licenses(licenses)
+	            .responseInfo(
+	                    responseInfoFactory.createResponseInfoFromRequestInfo(
+	                            tradeLicenseRequest.getRequestInfo(), true))
+	            .build();
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@PostMapping({ "/{servicename}/_renewal", "/_renewal" })
