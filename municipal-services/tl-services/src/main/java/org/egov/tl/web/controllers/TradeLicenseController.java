@@ -76,7 +76,7 @@ public class TradeLicenseController {
 	        @PathVariable(required = false) String servicename) {
 
 	    String resolvedServiceName = servicename;
-
+  
 	    if (tradeLicenseRequest != null
 	            && tradeLicenseRequest.getLicenses() != null
 	            && !tradeLicenseRequest.getLicenses().isEmpty()
