@@ -43,6 +43,22 @@ public class GarbageAccountScanInfo {
 
 	private String propertyAddress;
 
+	/**
+	 * Collection unit category of the garbage application, e.g.
+	 * Residential/Commercial/Institutional.
+	 */
+	private String propertyType;
+
+	private String vendorPrintVerified;
+
+	private Boolean ulbVerified;
+
+	private Boolean installationDone;
+
+	private Boolean ddpPrintingDone;
+
+	private Boolean ddpDispatched;
+
 	private Boolean garbageCollected;
 
 	private Boolean residentAvailable;

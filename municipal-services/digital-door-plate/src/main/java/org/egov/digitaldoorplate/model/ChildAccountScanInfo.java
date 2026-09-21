@@ -28,6 +28,12 @@ public class ChildAccountScanInfo {
 
 	private String mobileNumber;
 
+	/**
+	 * Collection unit category of the garbage application, e.g.
+	 * Residential/Commercial/Institutional.
+	 */
+	private String propertyType;
+
 	private Boolean garbageCollected;
 
 	private Boolean residentAvailable;
