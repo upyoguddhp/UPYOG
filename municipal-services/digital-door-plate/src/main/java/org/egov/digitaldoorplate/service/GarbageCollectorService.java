@@ -5,20 +5,24 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.digitaldoorplate.model.Attendance;
 import org.egov.digitaldoorplate.model.GarbageCollection;
 import org.egov.digitaldoorplate.model.GarbageCollector;
 import org.egov.digitaldoorplate.model.GarbageCollectorMapping;
 import org.egov.digitaldoorplate.model.GarbageCollectorRequest;
 import org.egov.digitaldoorplate.model.GarbageCollectorResponse;
+import org.egov.digitaldoorplate.model.SearchCriteriaAttendance;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollection;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollector;
 import org.egov.digitaldoorplate.model.SearchCriteriaGarbageCollectorRequest;
 import org.egov.digitaldoorplate.model.contract.User;
+import org.egov.digitaldoorplate.repository.AttendanceRepository;
 import org.egov.digitaldoorplate.repository.GarbageCollectionRepository;
 import org.egov.digitaldoorplate.repository.GarbageCollectorRepository;
 import org.egov.digitaldoorplate.util.DdpConstants;
@@ -43,6 +47,9 @@ public class GarbageCollectorService {
 
 	@Autowired
 	private GarbageCollectionRepository garbageCollectionRepository;
+
+	@Autowired
+	private AttendanceRepository attendanceRepository;
 
 	@Autowired
 	private UserService userService;
@@ -177,6 +184,7 @@ public class GarbageCollectorService {
 
 		List<GarbageCollector> collectors = garbageCollectorRepository.search(criteria);
 		enrichCollectedToday(collectors);
+		enrichIsPresent(collectors);
 
 		return GarbageCollectorResponse.builder()
 				.responseInfo(
@@ -213,6 +221,36 @@ public class GarbageCollectorService {
 		collectors.forEach(collector -> collector.setCollectedToday(
 				StringUtils.isEmpty(collector.getCollectorUserUuid()) ? 0
 						: countByStaffUuid.getOrDefault(collector.getCollectorUserUuid(), 0L).intValue()));
+	}
+
+	/**
+	 * Populates isPresent on each collector: whether an active attendance
+	 * record with a start time today exists for that collector's own
+	 * egov-user login (collectorUserUuid, i.e. Attendance.staffUuid).
+	 */
+	private void enrichIsPresent(List<GarbageCollector> collectors) {
+
+		if (CollectionUtils.isEmpty(collectors)) {
+			return;
+		}
+
+		List<String> staffUuids = collectors.stream().map(GarbageCollector::getCollectorUserUuid)
+				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+		if (CollectionUtils.isEmpty(staffUuids)) {
+			collectors.forEach(collector -> collector.setIsPresent(Boolean.FALSE));
+			return;
+		}
+
+		List<Attendance> todaysAttendances = attendanceRepository.search(SearchCriteriaAttendance.builder()
+				.staffUuid(staffUuids).fromDate(getStartOfDay()).isActive(Boolean.TRUE).build());
+
+		Set<String> presentStaffUuids = todaysAttendances.stream().map(Attendance::getStaffUuid)
+				.collect(Collectors.toSet());
+
+		collectors.forEach(collector -> collector.setIsPresent(
+				StringUtils.isNotEmpty(collector.getCollectorUserUuid())
+						&& presentStaffUuids.contains(collector.getCollectorUserUuid())));
 	}
 
 	private Long getStartOfDay() {
