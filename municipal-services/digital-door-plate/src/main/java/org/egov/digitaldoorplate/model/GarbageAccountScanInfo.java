@@ -58,6 +58,8 @@ public class GarbageAccountScanInfo {
 	private Boolean ddpPrintingDone;
 
 	private Boolean ddpDispatched;
+	
+	private Boolean ddpPrintVerified;
 
 	private Boolean garbageCollected;
 

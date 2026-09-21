@@ -50,6 +50,8 @@ public class RemoteGarbageAccount {
 	private Boolean ddpPrintingDone;
 
 	private Boolean ddpDispatched;
+	
+	private Boolean ddpPrintVerified;
 
 	private List<RemoteGrbgCollectionUnit> grbgCollectionUnits;
 
