@@ -38,8 +38,20 @@ public class RemoteGarbageAccount {
 	private String systemPropertyId;
 	
 	private Double ddpLatitude;
-	
+
 	private Double ddpLongitude;
+
+	private String vendorPrintVerified;
+
+	private Boolean ulbVerified;
+
+	private Boolean installationDone;
+
+	private Boolean ddpPrintingDone;
+
+	private Boolean ddpDispatched;
+
+	private List<RemoteGrbgCollectionUnit> grbgCollectionUnits;
 
 	private List<RemoteGrbgAddress> addresses;
 

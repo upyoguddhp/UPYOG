@@ -166,6 +166,12 @@ public class GarbageCollectionService {
 				.mobileNumber(account.getMobileNumber())
 				.propertyId(account.getPropertyId())
 				.propertyAddress(toPropertyAddress(address))
+				.propertyType(toPropertyType(account))
+				.vendorPrintVerified(account.getVendorPrintVerified())
+				.ulbVerified(account.getUlbVerified())
+				.installationDone(account.getInstallationDone())
+				.ddpPrintingDone(account.getDdpPrintingDone())
+				.ddpDispatched(account.getDdpDispatched())
 				.garbageCollected(Boolean.TRUE.equals(null == parentCollection ? null : parentCollection.getIsCollected()))
 				.residentAvailable(null == parentCollection ? null : parentCollection.getIsResidentAvailable())
 				.isWasteKeptOutside(null == parentCollection ? null : parentCollection.getIsWasteKeptOutside())
@@ -184,6 +190,7 @@ public class GarbageCollectionService {
 				.garbageId(null == child.getGarbageId() ? null : String.valueOf(child.getGarbageId()))
 				.name(child.getName())
 				.mobileNumber(child.getMobileNumber())
+				.propertyType(toPropertyType(child))
 				.garbageCollected(Boolean.TRUE.equals(null == childCollection ? null : childCollection.getIsCollected()))
 				.residentAvailable(null == childCollection ? null : childCollection.getIsResidentAvailable())
 				.isWasteKeptOutside(null == childCollection ? null : childCollection.getIsWasteKeptOutside())
@@ -215,6 +222,15 @@ public class GarbageCollectionService {
 		return Stream.of(address.getAddress1(), address.getAddress2(), address.getCity())
 				.filter(StringUtils::isNotEmpty)
 				.collect(Collectors.joining(", "));
+	}
+
+	/**
+	 * Collection unit category (e.g. Residential/Commercial/Institutional) of
+	 * the garbage application, taken from its first collection unit.
+	 */
+	private String toPropertyType(RemoteGarbageAccount account) {
+		return CollectionUtils.isEmpty(account.getGrbgCollectionUnits()) ? null
+				: account.getGrbgCollectionUnits().get(0).getCategory();
 	}
 
 	/**
