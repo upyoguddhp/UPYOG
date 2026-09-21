@@ -154,7 +154,7 @@ public class UserService {
 
 	private boolean isValidPhoneNumber(String mobileNumber) {
 		
-		String regex = "^[6-9]\\d{9}$";
+		String regex = "^(0?[1-9][0-9]{1,4}[0-9]{6,8}|[0-9]{10}|[0-9]{7,8})$";
 		return mobileNumber != null && mobileNumber.matches(regex);
 
 	}
