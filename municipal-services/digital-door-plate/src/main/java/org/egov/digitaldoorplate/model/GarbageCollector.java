@@ -69,6 +69,13 @@ public class GarbageCollector {
 	 */
 	private Integer collectedToday;
 
+	/**
+	 * Populated only on search (not persisted): whether this collector has
+	 * marked attendance (an active attendance record with a start time today)
+	 * under their own egov-user login (collectorUserUuid).
+	 */
+	private Boolean isPresent;
+
 	private String createdBy;
 
 	private Long createdDate;
