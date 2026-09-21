@@ -2,7 +2,7 @@
 <html lang="en">
    <head>
       <meta charset="UTF-8" />
-      <title>Property Tax Bill</title>
+      <title>Garbage Arrear Collection Bill</title>
       <style>
          @page {
          size: A4;
@@ -188,19 +188,6 @@
          border-top: 1px solid #ccc;
          padding: 5px;
          }
-         .footer-list {
-         list-style: none;       /* removes bullets */
-         margin: 0;
-         text-align: left;       /* ensures left alignment */
-         line-height: 1.4;
-         list-style-type: decimal;
-         padding-left: 20px;
-         }
-         .footer-list .highlight {
-         color: red;
-         text-align: center;
-         font-weight: bold;
-         }
          .qr-code {
          width: 300px;
          min-height: 300px;
@@ -210,6 +197,21 @@
          margin-left: auto;
          margin-right: auto;
          /* Center the QR code */
+         }
+         .footer-list {
+         list-style: none;       /* removes bullets */
+         margin: 0;
+         text-align: left;       /* ensures left alignment */
+         line-height: 1.4;
+		 list-style-type: decimal;
+		 padding-left: 20px;
+         }
+      
+       
+         .footer-list .highlight {
+         color: red;
+         text-align: center;
+         font-weight: bold;
          }
 		 .bold-dark-text {
 		 font-weight: 700;
@@ -231,7 +233,8 @@
                   </td>
                   <td>
                      <div class="title">
-                        <span th:text="${ulbType}">NA</span>, <span th:text="${ulbName}">NA</span>
+                        <div><span th:text="${ulbType}">NA</span>, <span
+                           th:text="${ulbName}">NA</span></div>
                         <img th:src="${citiSevaImage}"
                            alt="Citizen Seva" height="30" />
                      </div>
@@ -242,39 +245,30 @@
             </table>
          </div>
          <!-- Invoice Header -->
-         <div class="invoice-header">
-            <table>
-               <tr>
-                  <td colspan="2">
-					<h1 th:text="${paymentStatus == 'Success' or paymentStatus == 'Partially Paid'} 
-										    ? 'Property Tax - Bill Receipt' 
-										    : 'Property Collection Bill'">
-										    Property Tax - Bill Receipt
-					</h1>
-                  </td>
-               </tr>
-               <tr>
-                  <td>
-                     <strong>Bill No:</strong>
-                     <span th:text="${billNo}">NA</span>
-                  </td>
-                  <td>
-                     <strong>Financial Year:</strong>
-                     <span th:text="${billPeriod}">NA</span>
-                  </td>
-               </tr>
-               <tr>
-                  <td>
-                     <strong>From:</strong>
-                     <span th:text="${from}">NA</span>
-                  </td>
-                  <td>
-                     <strong>To:</strong>
-                     <span th:text="${to}">NA</span>
-                  </td>
-               </tr>
-            </table>
-         </div>
+		 <div class="invoice-header">
+		    <table>
+		       <tr>
+		          <td colspan="2">
+		             <h1 th:text="${amountPaid > 0} 
+		                   ? 'Garbage Collection Arrear Bill Receipt' 
+		                   : 'Garbage Collection Arrear Bill'">
+		                Garbage Collection Arrear Bill
+		             </h1>
+		          </td>
+		       </tr>
+			   <br></br>
+		       <tr>
+		          <td>
+		             <strong>Bill No:</strong>
+		             <span th:text="${billNo}">NA</span>
+		          </td>
+				  <td align="right">
+				     <strong>Financial Year:</strong>
+				     <span th:text="${finYear}">NA</span>
+				  </td>
+		       </tr>
+		    </table>
+		 </div>
          <!-- Bill Details / Customer Details -->
          <table width="100%" style="margin-bottom:20px;">
             <tr>
@@ -282,53 +276,46 @@
                   <div class="card-box">
                      <h3>Bill Details</h3>
                      <table class="card-table">
-						<tr>
-						  <th>Bill Generated Date</th>
-						  <td><span th:text="${billGeneratedDate}">NA</span></td>
-						</tr>
                         <tr>
-                           <th>Property Tax</th>
-                           <td><span th:text="${propertyTax}">NA</span></td>
+                           <th>Bill No</th>
+                           <td><span th:text="${billNo}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Arrear</th>
-                           <td><span th:text="${arrear}">NA</span></td>
+                           <th>Bill Generated Date</th>
+                           <td><span th:text="${date}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Property Tax + Arrear</th>
-                           <td><span th:text="${propertyTaxPlusArrear}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Rebate (Within 15 Days)</th>
-                           <td><span th:text="${rebate}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Penalty</th>
-                           <td><span th:text="${penalty}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Total Tax</th>
-                           <td><span th:text="${totalTax}">NA</span></td>
+                           <th>Payment Due Date</th>
+                           <td><span th:text="${billDueDate}">NA</span></td>
                         </tr>
 						<tr>
-							<th>Amount Payable</th>
-							<td class="highlight"><span th:text="${amountDue}">NA</span></td>
+						  <th>Rebate Amount (INR)</th>
+						  <td><span th:text="${rebateAmount}"> NA</span></td>
+						</tr>
+
+						<tr>
+						  <th>Amount Without Rebate (INR)</th>
+						  <td><span th:text="${amountWithoutRebate}"> NA </span></td>
+						</tr>
+						<tr>
+						    <th>Arrear Amount (INR)</th>
+						    <td><span th:text="${arrearAmount}"> NA</span> </td>
+						</tr>
+						<tr>
+						     <th>Total Amount</th>
+						     <td><span th:text="${totalAmount}">NA</span></td>
 						</tr>
                         <tr>
-                           <th>Amount Paid</th>
-                           <td class="highlight"><span th:text="${amountPaid}">NA</span></td>
+                           <th>Amount Payable (INR)</th>
+                           <td><span class="highlight"><span th:text="${amountDue}"> NA </span></span></td>
                         </tr>
 						<tr>
-							<th>Advance Paid</th>
-							<td><span class="highlight"><span th:text="${advancePaid}"> NA </span></span></td>
+						   <th>Amount Paid (INR)</th>
+						   <td><span class="highlight"><span th:text="${amountPaid}"> NA </span></span></td>
 						</tr>
                         <tr>
-                           <th>Payment Status</th>
-                           <td><span th:text="${paymentStatus}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Payment Date</th>
-                           <td><span th:text="${paymentDate}">NA</span></td>
+                           <th>Period</th>
+                           <td><span th:text="${from}">NA</span> - <span th:text="${to}">NA</span></td>
                         </tr>
                      </table>
                   </div>
@@ -339,27 +326,31 @@
                      <h3>Customer Details</h3>
                      <table class="card-table">
                         <tr>
-                           <th>Owner/Occupier</th>
-                           <td><span th:text="${ownerOrOccupier}">NA</span></td>
+                           <th>Garbage ID</th>
+                           <td><span th:text="${grbgId}">NA</span></td>
                         </tr>
-                        <tr>
-                           <th>Owner’s Father/Husband Name</th>
-                           <td><span th:text="${fatherOrHusbandName}">NA</span></td>
-                        </tr>
-                        <tr>
-                           <th>Customer ID</th>
-                           <td><span th:text="${customerId}">NA</span></td>
-                        </tr>
+						<tr>
+							<th>Old Garbage ID</th>
+						     <td><span th:text="${oldGarbageId}">NA</span></td>
+						 </tr>
                         <tr>
                            <th>Property ID</th>
                            <td><span th:text="${propertyId}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Mobile Number</th>
-                           <td><span th:text="${mobileNumber}">NA</span></td>
+                           <th>Owner Name</th>
+                           <td><span th:text="${ownerOrOccupier}">NA</span></td>
                         </tr>
+						<tr>
+							<th>Father</th>
+							<td><span th:text="${fatherOrHusbandName}">NA</span></td>
+						</tr>
+						<tr>
+						    <th>Mobile No</th>
+						    <td><span th:text="${mobileNo}">NA</span></td>
+						</tr>
                         <tr>
-                           <th>Ward Number</th>
+                           <th>Ward </th>
                            <td><span th:text="${wardNumber}">NA</span></td>
                         </tr>
                         <tr>
@@ -371,32 +362,43 @@
                </td>
             </tr>
          </table>
-		 
-		 <table class="main">
-		    <thead>
-		       <tr>
-		          <th>#</th>
-		          <th>Financial Year</th>
-		          <th>Total Tax</th>
-		       </tr>
-		    </thead>
-			<tbody style="text-align: center;">
-			   <tr style="display:none">
-			      <td style="display:none"> ARREAR_BILL_TABLE_ROW_START </td>
-			   </tr>
-
-               <tr style="display:none">
-                  <td><span th:text="slNo">NA</span></td>
-                  <td><span th:text="financialYear">NA</span></td>
-                  <td><span th:text="totalTax">NA</span></td>
+         <!-- Main Table -->
+         <table class="main">
+            <thead>
+               <tr>
+                  <th>Sr. No</th>
+                  <th>Owner/Tenant Name</th>
+                  <th>Property Type</th>
+                  <th>Unit</th>
+                  <th>Arrear / Value</th>
+                  <th>Arrear</th>
+                  <th>Interest</th>
+                  <th>Status</th>
+                  <th>Payment Date</th>
+                  <th>Amount</th>
                </tr>
-
-			   <tr style="display:none">
-			      <td style="display:none"> ARREAR_BILL_TABLE_ROW_END </td>
-			   </tr>
-			</tbody> 
-		 </table>
-        
+            </thead>
+            <tbody style="text-align: center;">
+               <tr style="display:none">
+                  <td style="display:none"> GARBAGE_BILL_TABLE_ROW_START </td>
+               </tr>
+               <tr style="display:none">
+                  <td><span th:text="allSerialNo">NA</span></td>
+                  <td><span th:text="allOwnerNames">NA</span></td>
+                  <td><span th:text="allPropertyTypes">NA</span></td>
+                  <td><span th:text="allUnits">NA</span></td>
+                  <td><span th:text="allGrbgTaxs">NA</span></td>
+                  <td><span th:text="allArrears">NA</span></td>
+                  <td><span th:text="allInterest">NA</span></td>
+                  <td><span th:text="allPaymentStatuses">NA</span></td>
+                  <td><span th:text="allPaymentDates">NA</span></td>
+                  <td><span th:text="allGrbgTaxPlusArrear">NA</span></td>
+               </tr>
+               <tr style="display:none">
+                  <td style="display:none"> GARBAGE_BILL_TABLE_ROW_END </td>
+               </tr>
+            </tbody>
+         </table>
          <div class="totals">
             <table>
                <tr class="total-row">
@@ -405,30 +407,36 @@
                </tr>
             </table>
          </div>
+         <!-- <div class="terms">
+            <strong>Pay through QR Code:</strong><br />
+            <img class="qr-code" th:src="${qrCodeText}" src="/qr.png" alt="QR Code" />
+            </div> -->
          <div class="footer">
             <ul class="footer-list">
-               <li>Disclaimer: Property Tax payment does not legalize unauthorized properties.</li>
-               <li>	Merely paying and processing a Property Tax does not confer any right or imply any statement 
-			                     regarding the regularization or ownership of the property.
+               <li>
+                  Merely paying and processing a Garbage Collection does not confer any right or imply any statement 
+                  regarding the regularization or ownership of the property.
                </li>
-			   <li class="bold-dark-text">Bill generation and data accuracy are the responsibility of the concerned ULB.
-			   			   </li>
-			   			   <li class="bold-dark-text">
-			   				For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> office.
-			   			   </li>
+               <li class="bold-dark-text">
+                 Bill generation and data accuracy are the responsibility of the concerned ULB.
+               </li>
 			   <li class="bold-dark-text">
-			   			   	The existing bill will expire once a new bill is generated.
-			   			   </li>
-			   			   <li>
-			   			   	<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
-			   			   	<ul>
-			   			   		<li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
-			   			   		<li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>
-			   			   		<li>The applicable penalty/interest may be calculated on a <strong>monthly basis</strong>, as per the applicable rules.</li>
-			   			   	</ul>
-			   			   </li>
-			   <li>This receipt has been generated electronically and does not require a physical signature. | Generated on 
-			                     <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
+			     For any discrepancy, please contact the  <span th:text="${ulbType}"> NA </span>,<span th:text="${ulbName}"> NA </span> office.
+			   </li>
+			   <li class="bold-dark-text">
+			      The existing bill will expire once a new bill is generated.
+			   </li>
+			   <li>
+				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+				<ul>
+				        <li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
+				        <li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>
+				        <li>The applicable penalty/interest may be calculated on a <strong>monthly basis</strong>, as per the applicable rules.</li>
+				</ul>
+			   </li>
+			   <li>
+			    This receipt has been generated electronically and does not require a physical signature. | Generated on 
+			    <span th:text="${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></span>
 			   </li>
             </ul>
          </div>

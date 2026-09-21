@@ -2634,6 +2634,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 							.expireActiveTrackersByApplicationId(garbageAccount.getGrbgApplicationNumber(), audit);
 					
 					GrbgBillTracker grbgBillTracker = saveToGarbageBillTracker(grbgBillTrackerRequest);
+					syncArrearTrackerWithBillStatus(grbgBillTracker, genrateArrearRequest.getRequestInfo());
 					arrearGenerated.set(true);
 				}else {
 					throw new CustomException("INVALID_CONSUMERCODE",
@@ -2746,10 +2747,16 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    List<GrbgBillTracker> expiredTrackers = new ArrayList<>();
 		
 		    for (GrbgBillTracker tracker : trackers) {
+		    	
+				if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+					continue;
+				}
+		    	 
 		        if (tracker.getPenaltyAmount() != null
 		                && tracker.getPenaltyAmount().compareTo(BigDecimal.ZERO) > 0) {
 		            continue;
 		        }
+		        
 		        BillSearchCriteria billSearchCriteria =
 		            BillSearchCriteria.builder()
 		                .tenantId(tracker.getTenantId())
@@ -3141,4 +3148,40 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		JsonNode propertyAddress = address.getAdditionalDetails().path("propertyAddress");
 		return propertyAddress.isMissingNode() || propertyAddress.isNull() ? null : propertyAddress.asText();
 	}
+		
+		private void syncArrearTrackerWithBillStatus(GrbgBillTracker tracker, RequestInfo requestInfo) {
+
+			if (tracker == null || tracker.getBillId() == null) {
+				return;
+			}
+
+			BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(tracker.getTenantId())
+					.consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+					.billId(Collections.singleton(tracker.getBillId())).build();
+
+			List<Bill> bills = billService.searchBill(billSearchCriteria, requestInfo).getBill();
+
+			if (CollectionUtils.isEmpty(bills)) {
+				return;
+			}
+
+			Bill currentBill = bills.get(0);
+
+			if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+				ObjectNode additionalDetails;
+
+				if (tracker.getAdditionaldetail() != null && !tracker.getAdditionaldetail().isNull()) {
+					additionalDetails = (ObjectNode) tracker.getAdditionaldetail().deepCopy();
+				} else {
+					additionalDetails = objectMapper.createObjectNode();
+				}
+
+				additionalDetails.put("advanceAdjusted", true);
+				tracker.setAdditionaldetail(additionalDetails);
+				garbageBillTrackerRepository.updateTrackerAdditionalDetails(tracker);
+			}
+
+			tracker.setStatus(currentBill.getStatus().name());
+			garbageBillTrackerRepository.updateStatusBillTracker(tracker);
+		}
 }

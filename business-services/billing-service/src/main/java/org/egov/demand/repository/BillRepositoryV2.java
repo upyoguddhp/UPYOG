@@ -78,6 +78,7 @@ public class BillRepositoryV2 {
 						ps.setString(4, tenantId);
 						ps.setString(5, consumerCode);
 						ps.setString(6, BillStatus.ACTIVE.name());
+						ps.setString(7, BillStatus.ADVANCE_ADJUSTED.name());
 					}
 
 					@Override
@@ -251,7 +252,8 @@ public class BillRepositoryV2 {
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
+		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID)
+				|| status.equals(BillStatus.ADVANCE_ADJUSTED))) {
 			if (status.equals(BillStatus.PAID)) {
 				if ("ADVT".equalsIgnoreCase(updateBillCriteria.getBusinessService())
 						&& BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {

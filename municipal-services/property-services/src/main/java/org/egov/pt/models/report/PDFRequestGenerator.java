@@ -164,10 +164,6 @@ public class PDFRequestGenerator {
 		BigDecimal plinthAreaTotal = BigDecimal.ZERO;
 
 		JsonNode additionalDetailsNode = ptTaxCalculatorTracker.getAdditionalDetails(); // This is a JsonNode (array)
-
-		Set<String> trackerUnitIds = StreamSupport.stream(additionalDetailsNode.spliterator(), false)
-		    .map(jsonNode -> jsonNode.get("unitId").asText())
-		    .collect(Collectors.toSet());
 		
 		for (Unit unit : property.getUnits()) {
 			JsonNode matchedNode = StreamSupport.stream(additionalDetailsNode.spliterator(), false)
@@ -277,31 +273,50 @@ public class PDFRequestGenerator {
 
 		BigDecimal amountPaid = BigDecimal.ZERO;
 		BigDecimal amountDue = BigDecimal.ZERO;
+		BigDecimal advancePaid = ptTaxCalculatorTracker.getAdvancePaid() != null
+				? ptTaxCalculatorTracker.getAdvancePaid()
+				: BigDecimal.ZERO;
 		String paymentStatus = "";
 		String paymentDate = "";
-		if (bill.getBillDetails() != null) {
-			for (BillDetail billDetail : bill.getBillDetails()) {
-				if (billDetail.getBillAccountDetails() != null) {
-					for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
-						BigDecimal adjusted = accDetail.getAdjustedAmount() != null ? accDetail.getAdjustedAmount()
-								: BigDecimal.ZERO;
-						amountPaid = amountPaid.add(adjusted);
-					}
-				}
-			}
-		}
 		BigDecimal totalAmount = bill.getTotalAmount() != null
 		        ? bill.getTotalAmount()
 		        : BigDecimal.ZERO;
-		amountDue = totalAmount.subtract(amountPaid);
 
-		if (bill.getStatus().equals(StatusEnum.PAID)) {
+		if (bill.getStatus() == StatusEnum.PAID) {
+		    amountPaid = totalAmount;
+		} else if (bill.getStatus() == StatusEnum.ACTIVE
+		        || bill.getStatus() == StatusEnum.ADVANCE_ADJUSTED) {
+		    amountDue = totalAmount;
+		} else if (bill.getStatus() == StatusEnum.PARTIALLY_PAID) {
+
+		    for (BillDetail billDetail : bill.getBillDetails()) {
+		        if (billDetail.getBillAccountDetails() != null) {
+		            for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+		                BigDecimal adjusted = accDetail.getAdjustedAmount() != null
+		                        ? accDetail.getAdjustedAmount()
+		                        : BigDecimal.ZERO;
+		                amountPaid = amountPaid.add(adjusted);
+		            }
+		        }
+		    }
+		    
+		    if (arrear.compareTo(BigDecimal.ZERO) < 0) {
+		        amountPaid = amountPaid.add(arrear);
+		    }
+
+		    amountDue = totalAmount.subtract(amountPaid);
+		}
+
+		if (Boolean.TRUE.equals(ptTaxCalculatorTracker.getIsPaymentProcessing())) {
+		    paymentStatus = "Processing";
+		} else if (bill.getStatus().equals(StatusEnum.PAID)) {
 		    paymentStatus = "Success";
 		} else if (bill.getStatus().equals(StatusEnum.PARTIALLY_PAID)) {
 		    paymentStatus = "Partially Paid";
 		} else {
 		    paymentStatus = "Pending";
 		}
+		
 		if (amountPaid.compareTo(BigDecimal.ZERO) > 0) {
 		    paymentDate = Instant.ofEpochMilli(bill.getAuditDetails().getLastModifiedTime())
 		            .atZone(ZoneId.systemDefault())
@@ -316,6 +331,7 @@ public class PDFRequestGenerator {
 		ptbr.put("paymentDueDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
 				.toLocalDateTime().plusDays(30).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		ptbr.put("paymentDate", paymentDate);
+		ptbr.put("advancePaid", advancePaid.toString());
 
 		dataObject.putAll(tableRowMap);
 		dataObject.put("ptbr", ptbr);

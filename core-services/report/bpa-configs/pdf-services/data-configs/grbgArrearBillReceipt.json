@@ -1,5 +1,5 @@
 {
-	"key": "grbgBillReceipt",
+	"key": "grbgArrearBillReceipt",
 	"DataConfigs": {
 		"version": "1.0.0",
 		"baseKeyPath": "$.grbg",
@@ -170,10 +170,6 @@
 						"value": {
 								"path": "$.fatherOrHusbandName"
 						}
-					},
-					{
-						"variable": "advancePaid",
-						"value": { "path": "$.advancePaid" }
 					}
 				]
 			}

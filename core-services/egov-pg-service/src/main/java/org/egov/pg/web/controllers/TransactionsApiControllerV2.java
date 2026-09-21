@@ -1,5 +1,6 @@
 package org.egov.pg.web.controllers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.egov.pg.service.GatewayService;
 import org.egov.pg.service.OpenTransactionService;
 import org.egov.pg.service.TransactionServiceV2;
 import org.egov.pg.utils.ResponseInfoFactory;
+import org.egov.pg.web.models.ChequeTransactionRequest;
 import org.egov.pg.web.models.OpenTransactionRequest;
 import org.egov.pg.web.models.RequestInfoWrapper;
 import org.egov.pg.web.models.ResponseInfo;
@@ -129,5 +131,17 @@ public class TransactionsApiControllerV2 {
 		List<Transaction> transactions = openTransactionService.initiateOpenTransaction(openTransactionRequest);
 		TransactionResponseV2 response = openTransactionService.prepareResponse(transactions);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/transaction/v2/_updateChequeTransaction")
+	public ResponseEntity<Map<String, Object>> updateChequeTransaction(
+			@Valid @RequestBody ChequeTransactionRequest request) {
+		String message = transactionServiceV2.updateChequeTransaction(request);
+		ResponseInfo responseInfo = ResponseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(),
+				true);
+		Map<String, Object> response = new HashMap<>();
+		response.put("ResponseInfo", responseInfo);
+		response.put("message", message);
+		return ResponseEntity.ok(response);
 	}
 }

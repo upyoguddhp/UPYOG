@@ -126,7 +126,20 @@ public class PDFRequestGenerator {
 			        : "";
 
 			grbgObj.get("paymentDates").add(paymentDate);
-			grbgObj.get("paymentStatuses").add(billObj.getStatus().toString());
+			String paymentStatus;
+
+			GrbgBillTracker tracker = grbgBillTracker.stream()
+			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()))
+			        .findFirst()
+			        .orElse(null);
+
+			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+			    paymentStatus = "PROCESSING";
+			} else {
+			    paymentStatus = billObj.getStatus().toString();
+			}
+
+			grbgObj.get("paymentStatuses").add(paymentStatus);
 			grbgObj.get("grbgTaxPlusArrear").add(grbgTaxPlusArrear.toString());
 		}
 
@@ -180,7 +193,7 @@ public class PDFRequestGenerator {
 		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
 		        totalPaid = totalPaid.add(amount);
 		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE) {
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
 		        totalDue = totalDue.add(amount);
 		        totalAmount = amount;
 		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
@@ -188,6 +201,7 @@ public class PDFRequestGenerator {
 		        for (BillDetail billDetail : billObj.getBillDetails()) {
 		            if (billDetail.getBillAccountDetails() != null) {
 		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+		                	
 		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
 		                            ? accDetail.getAdjustedAmount()
 		                            : BigDecimal.ZERO;
@@ -195,6 +209,11 @@ public class PDFRequestGenerator {
 		                }
 		            }
 		        }
+		        
+				if (totalArrear.compareTo(BigDecimal.ZERO) < 0) {
+					billPaid = billPaid.add(totalArrear);
+				}
+		        
 		        totalPaid = totalPaid.add(billPaid);
 		        totalDue = totalDue.add(amount.subtract(billPaid));
 		        totalAmount = amount;
@@ -203,6 +222,8 @@ public class PDFRequestGenerator {
 
 		BigDecimal totalRebate = BigDecimal.ZERO;
 		BigDecimal totalWithoutRebate = BigDecimal.ZERO;
+		BigDecimal advancePaid = BigDecimal.ZERO;
+
 
 		for (GrbgBillTracker tracker : grbgBillTracker) {
 			if (tracker.getRebateAmount() != null) {
@@ -212,6 +233,10 @@ public class PDFRequestGenerator {
 			if (tracker.getGarbageBillWithoutRebate() != null) {
 				totalWithoutRebate = totalWithoutRebate.add(tracker.getGarbageBillWithoutRebate());
 			}
+			
+			if (tracker.getAdvancePaid() != null) {
+				advancePaid = advancePaid.add(tracker.getAdvancePaid());
+		    }
 		}
 		
 		grbg.put("amountPaid", totalPaid);
@@ -219,6 +244,7 @@ public class PDFRequestGenerator {
 		grbg.put("totalAmount", totalAmount);
 		grbg.put("rebateAmount", totalRebate);
 		grbg.put("amountWithoutRebate", totalWithoutRebate);
+		grbg.put("advancePaid", advancePaid);
 
 		Map<String, Object> tableRow = new HashMap<>();
 		tableRow.put("tag", "GARBAGE_BILL_TABLE_ROW");
@@ -326,8 +352,13 @@ public class PDFRequestGenerator {
 		grbg.put("qrCodeText", uri);
 		dataObject.put("grbg", grbg);
 
-		return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgBillReceipt")
-				.tenantId("hp").data(dataObject).build();
+		if ("ARREAR".equals(grbgBillTracker.get(0).getType())) {
+			return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgArrearBillReceipt")
+					.tenantId("hp").data(dataObject).build();
+		} else {
+			return PDFRequest.builder().RequestInfo(requestInfoWrapper.getRequestInfo()).key("grbgBillReceipt")
+					.tenantId("hp").data(dataObject).build();
+		}
 	}
 	
 	private String escapeHtml(String input) {
