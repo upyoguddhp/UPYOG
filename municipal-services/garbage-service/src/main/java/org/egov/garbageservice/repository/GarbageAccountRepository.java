@@ -2,6 +2,7 @@ package org.egov.garbageservice.repository;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
 import org.egov.garbageservice.model.ApplicationBillDTO;
@@ -153,11 +155,40 @@ public class GarbageAccountRepository {
 	
 	public static final String GET_APPROVER_FOR_TENANT = "select code from eg_hrms_employee ehe "
 			+ "join eg_userrole_v1 eur on eur.user_id = ehe.id WHERE role_tenantid = ? AND role_code = 'GB_APPROVER'";
-	
+
+	/**
+	 * property-services' own /property/_search overwrites owners[].mobileNumber
+	 * with egov-user's stored number during enrichment (its search query
+	 * doesn't even select eg_pt_owner.mobile_number), so the DDP printing
+	 * search reads the column straight from eg_pt_owner instead, joined via
+	 * eg_pt_property (both services share the same physical database).
+	 */
+	private static final String SELECT_PT_OWNER_MOBILE_NUMBERS = "SELECT p.propertyid AS property_id, "
+			+ "o.mobile_number AS mobile_number, o.isprimaryowner AS isprimaryowner "
+			+ "FROM eg_pt_property p JOIN eg_pt_owner o ON o.propertyid = p.id "
+			+ "WHERE p.propertyid IN (%s) AND p.tenantid = ? AND o.status = 'ACTIVE'";
+
 	private static final String UPDATE_DDP_DETAILS_BY_ID = "UPDATE eg_grbg_account "
 			+ "SET ddp_print_verified = :ddpPrintVerified, " + "    ddp_modified_date = :ddpModifiedDate "
 			+ "WHERE id = :id";
-    
+
+	private static final String UPDATE_READY_FOR_PRINTING = "UPDATE eg_grbg_account "
+			+ "SET is_ready_for_printing = true, last_modified_by = ?, last_modified_date = ? "
+			+ "WHERE id IN (%s)";
+
+	private static final String UPDATE_DDP_WORKFLOW_BY_UUID = "UPDATE eg_grbg_account SET "
+	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, vendor_print_verified), "
+	        + "ddp_print_verified = COALESCE(:ddpPrintVerified, ddp_print_verified), "
+	        + "ulb_verified = COALESCE(:ulbVerified, ulb_verified), "
+	        + "installation_done = COALESCE(:installationDone, installation_done), "
+	        + "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
+	        + "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
+	        + "ddp_printing_done = COALESCE(:ddpPrintingDone, ddp_printing_done), "
+	        + "ddp_dispatched = COALESCE(:ddpDispatched, ddp_dispatched), "
+	        + "last_modified_by = :lastModifiedBy, "
+	        + "last_modified_date = :lastModifiedDate "
+	        + "WHERE uuid = :uuid AND tenant_id = :tenantId";
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
 
@@ -709,7 +740,13 @@ public class GarbageAccountRepository {
 			whereClause.append(" acc.ddp_print_verified = ? ");
 			preparedStatementValues.add(searchCriteriaGarbageAccount.getDdpPrintVerified());
 		}
-		 
+
+		if (searchCriteriaGarbageAccount.getIsReadyForPrinting() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" acc.is_ready_for_printing = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getIsReadyForPrinting());
+		}
+
         return whereClause.toString();
 	}
 	
@@ -786,7 +823,115 @@ public class GarbageAccountRepository {
 		accountInputs.put("id", garbageAccount.getId());
 		accountInputs.put("ddpPrintVerified", garbageAccount.getDdpPrintVerified());
 		accountInputs.put("ddpModifiedDate", garbageAccount.getDdpModifiedDate());
-		
+
 		namedParameterJdbcTemplate.update(UPDATE_DDP_DETAILS_BY_ID, accountInputs);
+	}
+
+	/**
+	 * Bulk-marks the given account ids as ready for printing. Called by the
+	 * DDP printing scheduler in id batches (see
+	 * {@code GarbageAccountSchedulerService.markReadyForPrinting}) so a single
+	 * ULB/ward's matching accounts don't require one UPDATE per row.
+	 */
+	public int markReadyForPrinting(List<Long> ids, String userUuid, Long lastModifiedDate) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return 0;
+		}
+
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < ids.size(); i++) {
+			if (i > 0) {
+				placeholders.append(",");
+			}
+			placeholders.append("?");
+		}
+
+		String query = String.format(UPDATE_READY_FOR_PRINTING, placeholders);
+
+		List<Object> params = new ArrayList<>();
+		params.add(userUuid);
+		params.add(lastModifiedDate);
+		params.addAll(ids);
+
+		return jdbcTemplate.update(query, params.toArray());
+	}
+
+	/**
+	 * Partially updates the DDP workflow columns (vendor print verification,
+	 * ULB verification, installation + lat/long) for one account, identified
+	 * by uuid. Any field left null on the request keeps its existing column
+	 * value (see the COALESCE in {@link #UPDATE_DDP_WORKFLOW_BY_UUID}), so each
+	 * role-specific caller only needs to send the field(s) it owns.
+	 *
+	 * @return the number of rows updated (0 if no account matched the
+	 *         uuid/tenantId).
+	 */
+	public int updateDdpWorkflowFields(DdpWorkflowUpdateRequest request, String userUuid, Long now) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", request.getUuid());
+		params.put("tenantId", request.getTenantId());
+		params.put("vendorPrintVerified", request.getVendorPrintVerified());
+		params.put("ulbVerified", request.getUlbVerified());
+		params.put("installationDone", request.getInstallationDone());
+		params.put("ddpLatitude", request.getDdpLatitude());
+		params.put("ddpLongitude", request.getDdpLongitude());
+		params.put("ddpPrintingDone", request.getDdpPrintingDone());
+		params.put("ddpDispatched", request.getDdpDispatched());
+		params.put("lastModifiedBy", userUuid);
+		params.put("lastModifiedDate", now);
+		params.put("ddpPrintVerified", request.getDdpPrintVerified());
+
+		return namedParameterJdbcTemplate.update(UPDATE_DDP_WORKFLOW_BY_UUID, params);
+	}
+
+	/**
+	 * Looks up the raw eg_pt_owner.mobile_number for each of the given
+	 * property-services propertyIds (the garbage account's systemPropertyId),
+	 * preferring the primary owner's number and falling back to any other
+	 * active owner's if there's no primary. See {@link #SELECT_PT_OWNER_MOBILE_NUMBERS}
+	 * for why this reads the column directly rather than going through
+	 * property-services' /property/_search response.
+	 */
+	public Map<String, String> getOwnerMobileNumbersBySystemPropertyIds(List<String> systemPropertyIds,
+			String tenantId) {
+
+		if (CollectionUtils.isEmpty(systemPropertyIds)) {
+			return Collections.emptyMap();
+		}
+
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < systemPropertyIds.size(); i++) {
+			if (i > 0) {
+				placeholders.append(",");
+			}
+			placeholders.append("?");
+		}
+
+		String query = String.format(SELECT_PT_OWNER_MOBILE_NUMBERS, placeholders);
+		List<Object> params = new ArrayList<>(systemPropertyIds);
+		params.add(tenantId);
+
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, params.toArray());
+
+		Map<String, String> primaryMobileByPropertyId = new HashMap<>();
+		Map<String, String> fallbackMobileByPropertyId = new HashMap<>();
+
+		for (Map<String, Object> row : rows) {
+			String propertyId = (String) row.get("property_id");
+			String mobileNumber = (String) row.get("mobile_number");
+			Boolean isPrimary = (Boolean) row.get("isprimaryowner");
+
+			if (StringUtils.isEmpty(propertyId) || StringUtils.isEmpty(mobileNumber)) {
+				continue;
+			}
+			if (Boolean.TRUE.equals(isPrimary)) {
+				primaryMobileByPropertyId.putIfAbsent(propertyId, mobileNumber);
+			} else {
+				fallbackMobileByPropertyId.putIfAbsent(propertyId, mobileNumber);
+			}
+		}
+
+		fallbackMobileByPropertyId.forEach(primaryMobileByPropertyId::putIfAbsent);
+		return primaryMobileByPropertyId;
 	}
 }

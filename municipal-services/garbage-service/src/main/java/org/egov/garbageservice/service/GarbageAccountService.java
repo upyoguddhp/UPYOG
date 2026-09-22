@@ -49,6 +49,10 @@ import org.egov.garbageservice.contract.workflow.ProcessInstanceResponse;
 import org.egov.garbageservice.contract.workflow.State;
 import org.egov.garbageservice.contract.workflow.WorkflowService;
 import org.egov.garbageservice.model.AuditDetails;
+import org.egov.garbageservice.model.DdpPrintingRecord;
+import org.egov.garbageservice.model.DdpPrintingSearchResponse;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
+import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
 import org.egov.garbageservice.model.GarbageAccountActionResponse;
@@ -64,6 +68,10 @@ import org.egov.garbageservice.model.GrbgBillTrackerRequest;
 import org.egov.garbageservice.model.GrbgBillTrackerSearchCriteria;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
 import org.egov.garbageservice.model.PayNowRequest;
+import org.egov.garbageservice.model.PtOwnerInfo;
+import org.egov.garbageservice.model.PtAddress;
+import org.egov.garbageservice.model.PtProperty;
+import org.egov.garbageservice.model.PtPropertyResponse;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
 import org.egov.garbageservice.model.TotalCountRequest;
@@ -84,6 +92,7 @@ import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.GrbgUtils;
 import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.egov.garbageservice.util.ResponseInfoFactory;
+import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -140,6 +149,9 @@ public class GarbageAccountService {
 
 	@Autowired
 	private GrbgConstants applicationPropertiesAndConstant;
+
+	@Autowired
+	private RestCallRepository restCallRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -2924,6 +2936,218 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			}
 			return validGarbageIds;
 		}
+
+	/**
+	 * Partially updates the DDP (door plate) workflow fields on one account
+	 * (vendor print verification, ULB verification, installation + lat/long,
+	 * vendor printing-done, vendor dispatched), identified by uuid. Called
+	 * from digital-door-plate's single DDP workflow endpoint; each caller
+	 * only sets the field(s) relevant to its own role, leaving the others
+	 * null so they're left untouched.
+	 */
+	public DdpWorkflowUpdateResponse updateDdpWorkflowFields(DdpWorkflowUpdateRequest request) {
+
+		if (null == request.getRequestInfo() || null == request.getRequestInfo().getUserInfo()
+				|| StringUtils.isEmpty(request.getRequestInfo().getUserInfo().getUuid())) {
+			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
+		}
+		if (StringUtils.isEmpty(request.getUuid())) {
+			throw new CustomException("INVALID_REQUEST", "Uuid is mandatory to update DDP workflow details.");
+		}
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to update DDP workflow details.");
+		}
+		if (null != request.getVendorPrintVerified()
+				&& !("VERIFIED".equalsIgnoreCase(request.getVendorPrintVerified())
+						|| "REJECTED".equalsIgnoreCase(request.getVendorPrintVerified()))) {
+			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
+		}
+
+		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
+		Long now = System.currentTimeMillis();
+
+		int updatedRows = garbageAccountRepository.updateDdpWorkflowFields(request, userUuid, now);
+		if (updatedRows == 0) {
+			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
+					"No garbage account found for uuid: " + request.getUuid());
+		}
+
+		return DdpWorkflowUpdateResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.uuid(request.getUuid())
+				.vendorPrintVerified(request.getVendorPrintVerified())
+				.ulbVerified(request.getUlbVerified())
+				.installationDone(request.getInstallationDone())
+				.ddpLatitude(request.getDdpLatitude())
+				.ddpLongitude(request.getDdpLongitude())
+				.ddpPrintingDone(request.getDdpPrintingDone())
+				.ddpDispatched(request.getDdpDispatched())
+				.build();
+	}
+
+	/**
+	 * Searches garbage accounts ready for printing (isReadyForPrinting is
+	 * always forced true here, regardless of what the caller sends) for the
+	 * given ULB/wards (tenantId + wardNames on the criteria), and enriches
+	 * each with owner/property details from property-services (looked up by
+	 * systemPropertyId), in the same {OwnerName, MobileNo, PropertyID, id,
+	 * ulbName, Ward, Address} shape as the door plate QR payload.
+	 */
+	public DdpPrintingSearchResponse searchDdpPrintingData(SearchCriteriaGarbageAccountRequest searchRequest) {
+
+		if (null == searchRequest.getRequestInfo() || null == searchRequest.getRequestInfo().getUserInfo()) {
+			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
+		}
+		if (null == searchRequest.getSearchCriteriaGarbageAccount()
+				|| StringUtils.isEmpty(searchRequest.getSearchCriteriaGarbageAccount().getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to search DDP printing data.");
+		}
+
+		searchRequest.getSearchCriteriaGarbageAccount().setIsReadyForPrinting(Boolean.TRUE);
+		String tenantId = searchRequest.getSearchCriteriaGarbageAccount().getTenantId();
+
+		GarbageAccountResponse garbageAccountResponse = searchGarbageAccounts(searchRequest, false);
+
+		List<GarbageAccount> garbageAccounts = null == garbageAccountResponse
+				|| CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts()) ? Collections.emptyList()
+						: garbageAccountResponse.getGarbageAccounts();
+
+		List<String> systemPropertyIds = garbageAccounts.stream().map(GarbageAccount::getSystemPropertyId)
+				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+		
+		log.info("****** systemPropertyIds *****: {}", systemPropertyIds);
+
+		Map<String, PtProperty> propertyBySystemPropertyId = fetchPropertiesBySystemPropertyId(
+				searchRequest.getRequestInfo(), tenantId, systemPropertyIds);
+		Map<String, String> ownerMobileBySystemPropertyId = fetchOwnerMobileNumbers(tenantId, systemPropertyIds);
+		
+		log.info("****** propertyBySystemPropertyId *****: {}", propertyBySystemPropertyId);
+
+		List<DdpPrintingRecord> records = garbageAccounts.stream()
+				.map(account -> toDdpPrintingRecord(account, propertyBySystemPropertyId, ownerMobileBySystemPropertyId))
+				.collect(Collectors.toList());
+
+		return DdpPrintingSearchResponse.builder()
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(), true))
+				.ddpPrintingRecords(records).build();
+	}
+
+	/**
+	 * Batch-fetches property-services Property records for every distinct
+	 * systemPropertyId present on the given garbage accounts (50 per call,
+	 * matching property-services' own search convention), keyed by propertyId
+	 * for O(1) lookup while building the DDP printing records. Used for
+	 * OwnerName and Address only; MobileNo is fetched separately (see
+	 * {@link #fetchOwnerMobileNumbers}).
+	 */
+	private Map<String, PtProperty> fetchPropertiesBySystemPropertyId(RequestInfo requestInfo, String tenantId,
+			List<String> systemPropertyIds) {
+
+		if (CollectionUtils.isEmpty(systemPropertyIds)) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, PtProperty> propertyMap = new HashMap<>();
+		int batchSize = 50;
+
+		for (int i = 0; i < systemPropertyIds.size(); i += batchSize) {
+			List<String> batch = systemPropertyIds.subList(i, Math.min(i + batchSize, systemPropertyIds.size()));
+
+			StringBuilder uri = new StringBuilder(applicationPropertiesAndConstant.getPropertyServiceHostUrl())
+					.append(applicationPropertiesAndConstant.getPropertySearchEndpoint()).append("?tenantId=")
+					.append(tenantId).append("&propertyIds=").append(String.join(",", batch));
+
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("RequestInfo", requestInfo);
+
+			Object response = restCallRepository.fetchResult(uri, requestBody);
+			if (null == response) {
+				continue;
+			}
+
+			PtPropertyResponse propertyResponse = objectMapper.convertValue(response, PtPropertyResponse.class);
+			if (null != propertyResponse && !CollectionUtils.isEmpty(propertyResponse.getProperties())) {
+				propertyResponse.getProperties().forEach(property -> {
+					if (StringUtils.isNotEmpty(property.getPropertyId())) {
+						propertyMap.put(property.getPropertyId(), property);
+					}
+				});
+			}
+		}
+
+		return propertyMap;
+	}
+
+	/**
+	 * Batch-fetches the raw eg_pt_owner.mobile_number for every distinct
+	 * systemPropertyId, straight from the DB (see
+	 * {@code GarbageAccountRepository.getOwnerMobileNumbersBySystemPropertyIds}
+	 * for why this doesn't go through property-services' own API), keyed by
+	 * propertyId.
+	 */
+	private Map<String, String> fetchOwnerMobileNumbers(String tenantId, List<String> systemPropertyIds) {
+		return garbageAccountRepository.getOwnerMobileNumbersBySystemPropertyIds(systemPropertyIds, tenantId);
+	}
+
+	private DdpPrintingRecord toDdpPrintingRecord(GarbageAccount account,
+			Map<String, PtProperty> propertyBySystemPropertyId, Map<String, String> ownerMobileBySystemPropertyId) {
+
+		String systemPropertyId = account.getSystemPropertyId();
+		PtProperty property = StringUtils.isEmpty(systemPropertyId) ? null
+				: propertyBySystemPropertyId.get(systemPropertyId);
+
+		GrbgAddress accountAddress = CollectionUtils.isEmpty(account.getAddresses()) ? null
+				: account.getAddresses().get(0);
+
+		String ownerName = null;
+		String address = null;
+		String propertyId = systemPropertyId;
+
+		if (null != property) {
+			if (StringUtils.isNotEmpty(property.getPropertyId())) {
+				propertyId = property.getPropertyId();
+			}
+			address = toPropertyAddress(property.getAddress());
+			PtOwnerInfo owner = findPrimaryOwner(property.getOwners());
+			if (null != owner) {
+				ownerName = owner.getPropertyOwnerName();
+			}
+		}
+
+		String mobileNo = StringUtils.isEmpty(systemPropertyId) ? null
+				: ownerMobileBySystemPropertyId.get(systemPropertyId);
+
+		String category = CollectionUtils.isEmpty(account.getGrbgCollectionUnits()) ? null
+				: account.getGrbgCollectionUnits().get(0).getCategory();
+
+		return DdpPrintingRecord.builder().ownerName(ownerName).mobileNo(mobileNo).propertyId(propertyId)
+				.id(account.getUuid()).ulbName(null == accountAddress ? null : accountAddress.getUlbName())
+				.ward(null == accountAddress ? null : accountAddress.getWardName()).address(address)
+				.category(category).build();
+	}
+
+	private PtOwnerInfo findPrimaryOwner(List<PtOwnerInfo> owners) {
+		if (CollectionUtils.isEmpty(owners)) {
+			return null;
+		}
+		return owners.stream().filter(owner -> Boolean.TRUE.equals(owner.getIsPrimaryOwner())).findFirst()
+				.orElse(owners.get(0));
+	}
+
+	/**
+	 * Reads the display address from eg_pt_address's additionalDetails ->
+	 * propertyAddress key (populated by property-services itself, e.g. during
+	 * excel migration - see ExcelUtils.enrichAddress), rather than
+	 * reconstructing one from doorNo/street/city.
+	 */
+	private String toPropertyAddress(PtAddress address) {
+		if (null == address || null == address.getAdditionalDetails()) {
+			return null;
+		}
+		JsonNode propertyAddress = address.getAdditionalDetails().path("propertyAddress");
+		return propertyAddress.isMissingNode() || propertyAddress.isNull() ? null : propertyAddress.asText();
+	}
 		
 		private void syncArrearTrackerWithBillStatus(GrbgBillTracker tracker, RequestInfo requestInfo) {
 
