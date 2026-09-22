@@ -43,9 +43,16 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.egov.pg.models.DemandAmountInfo;
+import org.egov.pg.models.BankAccount;
+import org.egov.pg.models.BankAccountResponse;
+import org.egov.pg.models.BankAccountSearchCriteria;
 import org.egov.pg.models.Bill;
 import org.egov.pg.models.BillResponse;
-import org.egov.pg.models.Demand;
+import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
+import org.egov.pg.service.gateways.razorpay.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.pg.web.models.ChequeTransactionRequest;
+
 import lombok.extern.slf4j.Slf4j;
 import org.egov.pg.models.DemandResponse;
 import org.egov.pg.models.DemandDetail;
@@ -85,6 +92,15 @@ public class TransactionServiceV2 {
 	
 	@Autowired
 	private BillingService billingService;
+	
+	@Autowired
+	private RazorpayGateway RazorpayGateway;
+	
+	private ObjectMapper ObjectMapper;
+	
+	@Autowired
+	private BankAccountService bankAccountService;
+
 
 	/**
 	 * Initiates a transaction by generating a gateway redirect URI for the request
@@ -119,9 +135,17 @@ public class TransactionServiceV2 {
 
 			TransactionDump dump = TransactionDump.builder().txnId(transaction.getTxnId())
 					.auditDetails(transaction.getAuditDetails()).build();
+			
+			log.info("***PG SERVICE Request*** ==> Amount: {}, billId: {}",transaction.getTxnAmount(),transaction.getBillId());
 
-			if (validator.skipGateway(transaction)) {
+			if ("CHEQUE".equalsIgnoreCase(transaction.getGatewayPaymentMode())) {
+				transaction.setTxnStatus(Transaction.TxnStatusEnum.PROCESSING);
+				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+				updatePaymentProcessing(transaction, true);
+			}
+			else if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
+				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
 				paymentsService.registerPayment(
 						TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
 			}
@@ -145,6 +169,19 @@ public class TransactionServiceV2 {
 			    );
 			}
 			else {
+	
+				Set<String> tenantIds = Collections.singleton(transaction.getTenantId());;
+				BankAccountResponse bankAccountResponse = null;
+				BankAccountSearchCriteria bankAccountSearchCriteria = BankAccountSearchCriteria.builder()
+						.requestInfo(requestInfo).tenantIds(tenantIds).active(true).build();
+		
+				// fetch all bank account
+				bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
+				 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
+				        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
+				        transaction.setPayTo(bankAccount.getPayTo());
+				    }
+				transaction.setPayTo("");
 				URI uri = gatewayService.initiateTxn(transaction);
 				transaction.setRedirectUrl(uri.toString());
 
@@ -251,15 +288,26 @@ public class TransactionServiceV2 {
 				
 			} else {
 				newTxn = gatewayService.getLiveStatus(currentTxnStatus, requestParams);
+				Object razorpayRawResponse = newTxn.getResponseJson();
 
 				// Enrich the new transaction status before persisting
 				enrichmentService.enrichUpdateTransaction(new TransactionRequest(requestInfo, currentTxnStatus),
 						newTxn);
+
+				// Set payment response from gateway
+				if (razorpayRawResponse != null) {
+				    newTxn.setRazorpayResponse(razorpayRawResponse);
+				}
+
 			}
 			
 			String tenantId = currentTxnStatus.getTenantId();
 			String BillId = currentTxnStatus.getBillId();
-			DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo,tenantId, BillId);
+			try {
+				DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo, tenantId, BillId);
+			} catch (Exception e) {
+			    log.error("Unable to fetch demand amounts for bill {}", BillId, e);
+			}
 
 			// Check if transaction is successful, amount matches etc
 						if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
@@ -400,8 +448,67 @@ public class TransactionServiceV2 {
 	
 	    return new DemandAmountInfo(taxAmount, collectionAmount);
 	}
+	
+	public String updateChequeTransaction(ChequeTransactionRequest request) {
 
+		TransactionCriteriaV2 transactionSearchCriteria = TransactionCriteriaV2.builder()
+				.billIds(Collections.singleton(request.getBillId())).build();
 
+		List<Transaction> transactions = getTransactions(transactionSearchCriteria);
+		if (CollectionUtils.isEmpty(transactions)) {
+			throw new CustomException("TRANSACTION_NOT_FOUND", "Transaction not found");
+		}
+		Transaction txn = transactions.get(0);
 
+		if (!"CHEQUE".equalsIgnoreCase(txn.getGatewayPaymentMode())) {
+			throw new CustomException("INVALID_TRANSACTION", "Transaction is not a cheque transaction");
+		}
+
+		if (txn.getTxnStatus() != Transaction.TxnStatusEnum.PROCESSING) {
+			throw new CustomException("INVALID_TRANSACTION_STATUS", "Cheque transaction must be in PROCESSING state");
+		}
+
+		if (Transaction.TxnStatusEnum.SUCCESS.equals(request.getAction())) {
+			txn.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
+			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+			paymentsService.registerPayment(
+					TransactionRequest.builder().transaction(txn).requestInfo(request.getRequestInfo()).build());
+
+			updateChequeTransactionStatus(txn, request.getRequestInfo());
+			updatePaymentProcessing(txn, false);
+
+			return "Cheque payment for Bill ID " + request.getBillId()
+					+ " has been successfully verified and payment processing has been completed.";
+
+		} else if (Transaction.TxnStatusEnum.FAILURE.equals(request.getAction())) {
+
+			txn.setTxnStatus(Transaction.TxnStatusEnum.FAILURE);
+			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
+
+			updateChequeTransactionStatus(txn, request.getRequestInfo());
+			updatePaymentProcessing(txn, false);
+
+			return "Cheque payment for Bill ID " + request.getBillId() + " has been rejected and marked as failed.";
+		}
+
+		return "Invalid action for cheque payment for Bill ID " + request.getBillId();
+	}
+	
+	private void updateChequeTransactionStatus(Transaction txn, RequestInfo requestInfo) {
+		producer.push(appProperties.getUpdateTxnTopic(), new org.egov.pg.models.TransactionRequest(requestInfo, txn));
+	}
+	
+	private void updatePaymentProcessing(Transaction transaction, boolean isPaymentProcessing) {
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("billId", transaction.getBillId());
+		payload.put("txnId", transaction.getTxnId());
+		payload.put("isPaymentProcessing", isPaymentProcessing);
+
+		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getGrbgPaymentProcessingTopic(), payload);
+		} else if ("PROPERTY".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getPropertyPaymentProcessingTopic(), payload);
+		}
+	}
 
 }

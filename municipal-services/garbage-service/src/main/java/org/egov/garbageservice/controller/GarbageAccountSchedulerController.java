@@ -1,10 +1,13 @@
 package org.egov.garbageservice.controller;
 
 import org.egov.garbageservice.model.GenerateBillRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingResponse;
 import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.service.GarbageAccountSchedulerService;
 import org.egov.garbageservice.util.RequestInfoWrapper;
+import org.egov.garbageservice.model.GenerateBillPreviewResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,8 @@ import org.egov.garbageservice.model.BillIdRequest;
 import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.CustomAmountUpdateResponse;
@@ -35,8 +40,14 @@ public class GarbageAccountSchedulerController {
 //		return ResponseEntity.ok("Bill generated successfully!!!");
 		return ResponseEntity.ok(service.generateBill(generateBillRequest));
 	}
-
 	
+	@PostMapping("/bill-generator/preview")
+	public ResponseEntity<List<GenerateBillPreviewResponse>> taxCalculatorPreview(
+			@RequestBody GenerateBillRequest generateBillRequest) {
+
+		return ResponseEntity.ok(service.generateBillPreview(generateBillRequest));
+	}
+
 	@PostMapping("/on-demand-generation")
 	public ResponseEntity<?> demandGeneration(@RequestBody OnDemandBillRequest onDemandBillRequest) {
 		return ResponseEntity.ok(service.generateBillOnDemand(onDemandBillRequest));
@@ -70,6 +81,18 @@ public class GarbageAccountSchedulerController {
 
 	    CustomAmountUpdateResponse response = service.updateCustomAmount(request);
 	    return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * Fetches every ULB/ward enabled for door plate printing from the
+	 * ULBS.DdpPrinting MDMS master and, for each, marks all ddpVerified
+	 * garbage accounts in that ULB/ward as ready for printing (batch-wise per
+	 * ULB/ward).
+	 */
+	@PostMapping("/ddp/mark-ready-for-printing")
+	public ResponseEntity<MarkReadyForPrintingResponse> markReadyForPrinting(
+			@RequestBody MarkReadyForPrintingRequest markReadyForPrintingRequest) {
+		return ResponseEntity.ok(service.markReadyForPrinting(markReadyForPrintingRequest));
 	}
 
 }

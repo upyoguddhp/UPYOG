@@ -202,6 +202,16 @@ public class Transaction {
 	@JsonProperty("isMultiTransaction")
     @Builder.Default
 	private Boolean isMultiTransaction = false;
+	
+	@JsonProperty("razorpayResponse")
+	private Object razorpayResponse;
+	
+	@JsonProperty("payTo")
+	private String payTo=null;
+	
+	@JsonProperty("service")
+	@Size(min = 1, max = 512)
+	private String service;
 
 	/**
 	 * Current status of the transaction
@@ -213,7 +223,9 @@ public class Transaction {
 
 		PENDING("PENDING"),
 
-		CAPTURED("CAPTURED");
+		CAPTURED("CAPTURED"),
+		
+		PROCESSING("PROCESSING");
 
 		private String value;
 

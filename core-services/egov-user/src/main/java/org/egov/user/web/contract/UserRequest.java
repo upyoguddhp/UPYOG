@@ -98,7 +98,11 @@ public class UserRequest {
     private String locale;
 
     private UserType type;
+    
     private Boolean accountLocked;
+    
+    private Boolean isdataprotectionaccepted;
+    
     private Long accountLockedDate;
 
     @Pattern(regexp = UserServiceConstants.PATTERN_NAME)
@@ -168,6 +172,7 @@ public class UserRequest {
         this.locale = user.getLocale();
         this.type = user.getType();
         this.accountLocked = user.getAccountLocked();
+        this.isdataprotectionaccepted = user.getIsdataprotectionaccepted();
         this.accountLockedDate = user.getAccountLockedDate();
         this.signature = user.getSignature();
         this.bloodGroup = user.getBloodGroup() != null ? user.getBloodGroup().getValue() : null;
@@ -234,6 +239,7 @@ public class UserRequest {
                 .locale(this.locale)
                 .type(this.type)
                 .accountLocked(isAccountLocked(isCreate))
+                .isdataprotectionaccepted(this.isdataprotectionaccepted)
                 .accountLockedDate(this.accountLockedDate)
                 .signature(this.signature)
                 .photo(this.photo)

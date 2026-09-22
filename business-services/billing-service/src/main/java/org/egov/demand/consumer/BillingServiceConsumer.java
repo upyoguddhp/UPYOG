@@ -22,6 +22,7 @@ import org.egov.demand.repository.DemandRepository;
 import org.egov.demand.service.DemandService;
 import org.egov.demand.service.ReceiptService;
 import org.egov.demand.service.ReceiptServiceV2;
+import org.egov.demand.service.BillServicev2;
 import org.egov.demand.util.Constants;
 import org.egov.demand.util.Util;
 import org.egov.demand.web.contract.BillRequest;
@@ -29,6 +30,7 @@ import org.egov.demand.web.contract.BillRequestV2;
 import org.egov.demand.web.contract.DemandRequest;
 import org.egov.demand.web.contract.Receipt;
 import org.egov.demand.web.contract.ReceiptRequest;
+import org.egov.demand.model.BillCancelRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -61,6 +63,9 @@ public class BillingServiceConsumer {
 	private DemandService demandService;
 	
 	@Autowired
+	private BillServicev2 billServiceV2;
+	
+	@Autowired
 	private DemandRepository demandRepository;
 
 	@Autowired
@@ -85,7 +90,7 @@ public class BillingServiceConsumer {
 	@KafkaListener(topics = { "${kafka.topics.receipt.update.collecteReceipt}", "${kafka.topics.save.bill}",
 			"${kafka.topics.save.demand}", "${kafka.topics.update.demand}", "${kafka.topics.receipt.update.demand}",
 			"${kafka.topics.receipt.cancel.name}", "${kafka.topics.receipt.update.demand.v2}",
-			"${kafka.topics.receipt.cancel.name.v2}" })
+			"${kafka.topics.receipt.cancel.name.v2}","${kafka.topics.advt.bill.cancel}" })
 	public void processMessage(Map<String, Object> consumerRecord, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
 		log.debug("key:" + topic + ":" + "value:" + consumerRecord);
@@ -152,15 +157,21 @@ public class BillingServiceConsumer {
 			Boolean isReceiptCancellation = true;
 			updateDemandsFromPayment(consumerRecord, isReceiptCancellation);
 		}
+		/*
+		 * cancel bill from advertisement
+		 */
+		else if (applicationProperties.getAdvtBillCancelTopic().equals(topic)) {
+			BillCancelRequest cancelRequest = objectMapper.convertValue(consumerRecord, BillCancelRequest.class);
+			billServiceV2.cancelAdvtBill(cancelRequest);
+		}
 	}
 
 
 	private void updateDemandsFromPayment(Map<String, Object> consumerRecord, Boolean isReceiptCancellation) {
 		
 		BillRequestV2 billReq = BillRequestV2.builder().build();
-		
+		log.info("***BILLING SERVICE Request*** ==> consumerRecord: {}",consumerRecord);
 		try {
-
 			setBillRequestFromPayment(consumerRecord, billReq, isReceiptCancellation);
 			receiptServiceV2.updateDemandFromReceipt(billReq, isReceiptCancellation);
 			updateTrackerStatusAfterDemandUpdate(billReq, isReceiptCancellation);
@@ -224,11 +235,13 @@ public class BillingServiceConsumer {
 			criteria.setTenantId(bill.getTenantId());
 			criteria.setBusinessService(bill.getBusinessService());
 			criteria.setConsumerCode(Collections.singleton(bill.getConsumerCode()));
+			criteria.setDemandId(Collections.singleton(bill.getBillDetails().get(0).getDemandId()));
 
 			List<Demand> demands = demandService.getDemands(criteria, billReq.getRequestInfo());
 
 			BigDecimal totalDemand = BigDecimal.ZERO;
 			BigDecimal totalCollected = BigDecimal.ZERO;
+			BigDecimal advancePaid = BigDecimal.ZERO;
 
 			for (Demand demand : demands) {
 
@@ -246,6 +259,18 @@ public class BillingServiceConsumer {
 
 					if (dd.getCollectionAmount() != null)
 						totalCollected = totalCollected.add(dd.getCollectionAmount());
+					
+					if ("GB_ADVANCE_CARRYFORWARD".equals(dd.getTaxHeadMasterCode()) && dd.getTaxAmount() != null
+							&& dd.getTaxAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+						advancePaid = dd.getTaxAmount().abs();
+					}
+
+					if ("PT_ADVANCE_CARRYFORWARD".equals(dd.getTaxHeadMasterCode()) && dd.getTaxAmount() != null
+							&& dd.getTaxAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+						advancePaid = dd.getTaxAmount().abs();
+					}
 				}
 			}
 
@@ -270,11 +295,13 @@ public class BillingServiceConsumer {
 
 			if ("GB".equals(bill.getBusinessService())) {
 				log.info("payload in garbage consumer {}",payload);
+				payload.put("advancePaid", advancePaid);
 				producer.push("garbage-bill-tracker-status-update", payload);
 			}
 
 			if ("PROPERTY".equals(bill.getBusinessService())) {
 				log.info("payload in property consumer {}",payload);
+				payload.put("advancePaid", advancePaid);
 				producer.push("property-bill-tracker-status-update", payload);
 			}
 		}

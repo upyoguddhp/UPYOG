@@ -75,6 +75,7 @@ public class User {
     private String signature;
     private String photo;
     private Boolean accountLocked;
+    private Boolean isdataprotectionaccepted;
     private Long accountLockedDate;
     private Date lastModifiedDate;
     private Date createdDate;

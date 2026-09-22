@@ -2,11 +2,14 @@ package org.egov.pg.service.gateways.paytm;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Data // Lombok annotation to generate getters, setters, toString, equals, and hashCode
 public class PaymentStatusResponse {
     private Head head;
     private Body body;
+    
+    private JsonNode rawResponse;
 
     @Data
     public static class Head {

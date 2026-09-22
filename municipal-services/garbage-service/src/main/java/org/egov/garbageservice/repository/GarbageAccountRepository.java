@@ -2,6 +2,7 @@ package org.egov.garbageservice.repository;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
 import org.egov.garbageservice.model.ApplicationBillDTO;
@@ -33,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.egov.garbageservice.model.DdpVerificationCount;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +59,7 @@ public class GarbageAccountRepository {
 			+ ", old_dtl.uuid as old_dtl_uuid, old_dtl.garbage_id as old_dtl_garbage_id, old_dtl.old_garbage_id as old_dtl_old_garbage_id"
 			+ ", address.uuid as address_uuid, address.address_type as address_address_type, address.address1 as address_address1, address.address2 as address_address2, address.city as address_city, address.state as address_state, address.pincode as address_pincode, address.is_active as address_is_active, address.zone as address_zone, address.ulb_name as address_ulb_name, address.ulb_type as address_ulb_type, address.ward_name as address_ward_name, address.additional_detail as address_additional_detail, address.garbage_id as address_garbage_id"
 			+ ", unit.uuid as unit_uuid, unit.unit_name as unit_unit_name, unit.unit_ward as unit_unit_ward, unit.ulb_name as unit_ulb_name, unit.type_of_ulb as unit_type_of_ulb, unit.garbage_id as unit_garbage_id, unit.unit_type as unit_unit_type, unit.category as unit_category, unit.sub_category as unit_sub_category, unit.sub_category_type as unit_sub_category_type, unit.is_active as unit_is_active,unit.isbplunit as unit_isbplunit,unit.isbulkgeneration as unit_isbulkgeneration,unit.isvariablecalculation as unit_isvariablecalculation,unit.no_of_units as unit_no_of_units,unit.ismonthlybilling as unit_is_monthly_billing"
-			+ ", sub_acc.id as sub_acc_id, sub_acc.uuid as sub_acc_uuid, sub_acc.garbage_id as sub_acc_garbage_id, sub_acc.property_id as sub_acc_property_id, sub_acc.type as sub_acc_type "
+			+ ", sub_acc.id as sub_acc_id, sub_acc.uuid as sub_acc_uuid, sub_acc.garbage_id as sub_acc_garbage_id, sub_acc.system_property_id as sub_acc_system_property_id, sub_acc.him_parivar_id as sub_acc_him_parivar_id, sub_acc.ddp_verified as sub_acc_ddp_verified, sub_acc.ddp_modified_date as sub_acc_ddp_modified_date, sub_acc.ddp_print_verified as sub_acc_ddp_print_verified, sub_acc.property_id as sub_acc_property_id, sub_acc.type as sub_acc_type "
 			+ ", sub_acc.name as sub_acc_name, sub_acc.mobile_number as sub_acc_mobile_number, sub_acc.gender as sub_acc_gender, sub_acc.email_id as sub_acc_email_id, sub_acc.is_owner as sub_acc_is_owner"
 			+ ", sub_acc.user_uuid as sub_acc_user_uuid, sub_acc.declaration_uuid as sub_acc_declaration_uuid, sub_acc.status as sub_acc_status, sub_acc.business_service as sub_acc_business_service"
 			+ ", sub_acc.approval_date as sub_acc_approval_date, sub_acc.channel as sub_acc_channel"
@@ -100,7 +103,7 @@ public class GarbageAccountRepository {
     		+ ", property_id = :propertyId, type = :type, name = :name, mobile_number = :mobileNumber, is_owner = :isOwner"
     		+ ", user_uuid = :userUuid, declaration_uuid = :declarationUuid, status = :status"
     		+ ", gender = :gender, email_id = :emailId, additional_detail = :additionalDetail :: JSONB, last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate,"
-    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel WHERE id = :id";
+    		+ " tenant_id = :tenantId, business_service = :businessService, approval_date = :approvalDate , channel= :channel , system_property_id = :systemPropertyId , ddp_verified = :isDdpVerified , him_parivar_id = :himParivarId WHERE id = :id";
 
 	public static final String SELECT_NEXT_SEQUENCE = "select nextval('seq_id_hpudd_grbg_account')";
 	
@@ -122,6 +125,24 @@ public class GarbageAccountRepository {
 			+ ", grbg_account_details, auditcreatedtime) VALUES ((select nextval('seq_eg_grbg_account_audit')), :grbgApplicationNo, :status"
 			+ ", :type, :grbgAccountDetails, (SELECT extract(epoch from now())))";
 	
+	private static final String DDP_VERIFICATION_COUNT =
+	        "SELECT " +
+	        "COUNT(*) AS total_approved_accounts, " +
+	        "COUNT(CASE WHEN acc.ddp_verified = true THEN 1 END) AS total_ddp_verified, " +
+	        "COUNT(CASE WHEN acc.ddp_verified IS NULL OR acc.ddp_verified = false THEN 1 END) AS remaining_for_ddp_verification " +
+	        "FROM eg_grbg_account acc " +
+	        "WHERE acc.parent_account IS NULL " +
+	        "AND acc.tenant_id = ? " +
+	        "AND acc.is_active = true " +
+	        "AND acc.status = 'APPROVED'";
+	
+	private static final String TOTAL_APPROVED_ACTIVE_ACCOUNTS =
+	        "SELECT COUNT(*) " +
+	        "FROM eg_grbg_account " +
+	        "WHERE tenant_id = ? " +
+	        "AND is_active = true " +
+	        "AND status = 'APPROVED'";
+	
 	public static final String SELECT_NEXT_GARBAGE_ID = "select nextval('seq_eg_grbg_account_id')";
 	
 	public static final String WITH_SUB_QUERY = " WITH filtered_acc AS ({replace}) "
@@ -134,7 +155,40 @@ public class GarbageAccountRepository {
 	
 	public static final String GET_APPROVER_FOR_TENANT = "select code from eg_hrms_employee ehe "
 			+ "join eg_userrole_v1 eur on eur.user_id = ehe.id WHERE role_tenantid = ? AND role_code = 'GB_APPROVER'";
-    
+
+	/**
+	 * property-services' own /property/_search overwrites owners[].mobileNumber
+	 * with egov-user's stored number during enrichment (its search query
+	 * doesn't even select eg_pt_owner.mobile_number), so the DDP printing
+	 * search reads the column straight from eg_pt_owner instead, joined via
+	 * eg_pt_property (both services share the same physical database).
+	 */
+	private static final String SELECT_PT_OWNER_MOBILE_NUMBERS = "SELECT p.propertyid AS property_id, "
+			+ "o.mobile_number AS mobile_number, o.isprimaryowner AS isprimaryowner "
+			+ "FROM eg_pt_property p JOIN eg_pt_owner o ON o.propertyid = p.id "
+			+ "WHERE p.propertyid IN (%s) AND p.tenantid = ? AND o.status = 'ACTIVE'";
+
+	private static final String UPDATE_DDP_DETAILS_BY_ID = "UPDATE eg_grbg_account "
+			+ "SET ddp_print_verified = :ddpPrintVerified, " + "    ddp_modified_date = :ddpModifiedDate "
+			+ "WHERE id = :id";
+
+	private static final String UPDATE_READY_FOR_PRINTING = "UPDATE eg_grbg_account "
+			+ "SET is_ready_for_printing = true, last_modified_by = ?, last_modified_date = ? "
+			+ "WHERE id IN (%s)";
+
+	private static final String UPDATE_DDP_WORKFLOW_BY_UUID = "UPDATE eg_grbg_account SET "
+	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, vendor_print_verified), "
+	        + "ddp_print_verified = COALESCE(:ddpPrintVerified, ddp_print_verified), "
+	        + "ulb_verified = COALESCE(:ulbVerified, ulb_verified), "
+	        + "installation_done = COALESCE(:installationDone, installation_done), "
+	        + "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
+	        + "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
+	        + "ddp_printing_done = COALESCE(:ddpPrintingDone, ddp_printing_done), "
+	        + "ddp_dispatched = COALESCE(:ddpDispatched, ddp_dispatched), "
+	        + "last_modified_by = :lastModifiedBy, "
+	        + "last_modified_date = :lastModifiedDate "
+	        + "WHERE uuid = :uuid AND tenant_id = :tenantId";
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
 
@@ -204,6 +258,9 @@ public class GarbageAccountRepository {
         accountInputs.put("uuid", newGarbageAccount.getUuid());
         accountInputs.put("garbageId", newGarbageAccount.getGarbageId());
         accountInputs.put("propertyId", newGarbageAccount.getPropertyId());
+        accountInputs.put("isDdpVerified", newGarbageAccount.getIsDdpVerified());
+        accountInputs.put("systemPropertyId",newGarbageAccount.getSystemPropertyId());
+        accountInputs.put("himParivarId",newGarbageAccount.getHimParivarId());
         accountInputs.put("type", newGarbageAccount.getType());
         accountInputs.put("name", newGarbageAccount.getName());
         accountInputs.put("mobileNumber", newGarbageAccount.getMobileNumber());
@@ -287,6 +344,21 @@ public class GarbageAccountRepository {
         return garbageAccounts;
     }
 	
+	public DdpVerificationCount getDdpVerificationCount(String tenantId) {
+
+	    String query = DDP_VERIFICATION_COUNT;
+	    return jdbcTemplate.queryForObject(query, new Object[] { tenantId },
+	            (rs, rowNum) -> DdpVerificationCount.builder()
+	                    .totalApprovedOwnerAccounts(rs.getInt("total_approved_accounts"))
+	                    .totalDdpVerified(rs.getInt("total_ddp_verified"))
+	                    .remainingForDdpVerification(rs.getInt("remaining_for_ddp_verification"))
+	                    .build());
+	}
+	
+	public Integer getTotalApprovedActiveAccounts(String tenantId) {
+		return jdbcTemplate.queryForObject(TOTAL_APPROVED_ACTIVE_ACCOUNTS, new Object[] { tenantId }, Integer.class);
+	}
+	
 	public List<GarbageAccount> searchGarbageAccountIndex(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,
 			Map<Integer, SearchCriteriaGarbageAccount> garbageCriteriaMap) {
     	
@@ -295,8 +367,6 @@ public class GarbageAccountRepository {
 
 		//generate search query
     	searchQuery = getSearchQueryByCriteriaForIndex(searchQuery, searchCriteriaGarbageAccount, preparedStatementValues, garbageCriteriaMap);
-        
-        log.info("### search garbage account: "+searchQuery.toString() + " {}",preparedStatementValues);
 
         List<GarbageAccount> garbageAccounts = jdbcTemplate.query(searchQuery.toString(), preparedStatementValues.toArray(), garbageAccountRowMapper);
 
@@ -658,8 +728,25 @@ public class GarbageAccountRepository {
 		        whereClause.append(" acc.user_uuid IS NOT NULL ");
 		    }
 		}
+		
+		if (searchCriteriaGarbageAccount.getIsDdpVerified() != null) {
+		    isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+		    whereClause.append(" acc.ddp_verified = ? ");
+		    preparedStatementValues.add(searchCriteriaGarbageAccount.getIsDdpVerified());
+		}
+		
+		if (searchCriteriaGarbageAccount.getDdpPrintVerified() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" acc.ddp_print_verified = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getDdpPrintVerified());
+		}
 
-		 
+		if (searchCriteriaGarbageAccount.getIsReadyForPrinting() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" acc.is_ready_for_printing = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getIsReadyForPrinting());
+		}
+
         return whereClause.toString();
 	}
 	
@@ -730,4 +817,121 @@ public class GarbageAccountRepository {
             queryString.append(" OR ");
         return true;
     }
+	
+	public void updateDdpDetails(GarbageAccount garbageAccount) {
+		Map<String, Object> accountInputs = new HashMap<>();
+		accountInputs.put("id", garbageAccount.getId());
+		accountInputs.put("ddpPrintVerified", garbageAccount.getDdpPrintVerified());
+		accountInputs.put("ddpModifiedDate", garbageAccount.getDdpModifiedDate());
+
+		namedParameterJdbcTemplate.update(UPDATE_DDP_DETAILS_BY_ID, accountInputs);
+	}
+
+	/**
+	 * Bulk-marks the given account ids as ready for printing. Called by the
+	 * DDP printing scheduler in id batches (see
+	 * {@code GarbageAccountSchedulerService.markReadyForPrinting}) so a single
+	 * ULB/ward's matching accounts don't require one UPDATE per row.
+	 */
+	public int markReadyForPrinting(List<Long> ids, String userUuid, Long lastModifiedDate) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return 0;
+		}
+
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < ids.size(); i++) {
+			if (i > 0) {
+				placeholders.append(",");
+			}
+			placeholders.append("?");
+		}
+
+		String query = String.format(UPDATE_READY_FOR_PRINTING, placeholders);
+
+		List<Object> params = new ArrayList<>();
+		params.add(userUuid);
+		params.add(lastModifiedDate);
+		params.addAll(ids);
+
+		return jdbcTemplate.update(query, params.toArray());
+	}
+
+	/**
+	 * Partially updates the DDP workflow columns (vendor print verification,
+	 * ULB verification, installation + lat/long) for one account, identified
+	 * by uuid. Any field left null on the request keeps its existing column
+	 * value (see the COALESCE in {@link #UPDATE_DDP_WORKFLOW_BY_UUID}), so each
+	 * role-specific caller only needs to send the field(s) it owns.
+	 *
+	 * @return the number of rows updated (0 if no account matched the
+	 *         uuid/tenantId).
+	 */
+	public int updateDdpWorkflowFields(DdpWorkflowUpdateRequest request, String userUuid, Long now) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", request.getUuid());
+		params.put("tenantId", request.getTenantId());
+		params.put("vendorPrintVerified", request.getVendorPrintVerified());
+		params.put("ulbVerified", request.getUlbVerified());
+		params.put("installationDone", request.getInstallationDone());
+		params.put("ddpLatitude", request.getDdpLatitude());
+		params.put("ddpLongitude", request.getDdpLongitude());
+		params.put("ddpPrintingDone", request.getDdpPrintingDone());
+		params.put("ddpDispatched", request.getDdpDispatched());
+		params.put("lastModifiedBy", userUuid);
+		params.put("lastModifiedDate", now);
+		params.put("ddpPrintVerified", request.getDdpPrintVerified());
+
+		return namedParameterJdbcTemplate.update(UPDATE_DDP_WORKFLOW_BY_UUID, params);
+	}
+
+	/**
+	 * Looks up the raw eg_pt_owner.mobile_number for each of the given
+	 * property-services propertyIds (the garbage account's systemPropertyId),
+	 * preferring the primary owner's number and falling back to any other
+	 * active owner's if there's no primary. See {@link #SELECT_PT_OWNER_MOBILE_NUMBERS}
+	 * for why this reads the column directly rather than going through
+	 * property-services' /property/_search response.
+	 */
+	public Map<String, String> getOwnerMobileNumbersBySystemPropertyIds(List<String> systemPropertyIds,
+			String tenantId) {
+
+		if (CollectionUtils.isEmpty(systemPropertyIds)) {
+			return Collections.emptyMap();
+		}
+
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < systemPropertyIds.size(); i++) {
+			if (i > 0) {
+				placeholders.append(",");
+			}
+			placeholders.append("?");
+		}
+
+		String query = String.format(SELECT_PT_OWNER_MOBILE_NUMBERS, placeholders);
+		List<Object> params = new ArrayList<>(systemPropertyIds);
+		params.add(tenantId);
+
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, params.toArray());
+
+		Map<String, String> primaryMobileByPropertyId = new HashMap<>();
+		Map<String, String> fallbackMobileByPropertyId = new HashMap<>();
+
+		for (Map<String, Object> row : rows) {
+			String propertyId = (String) row.get("property_id");
+			String mobileNumber = (String) row.get("mobile_number");
+			Boolean isPrimary = (Boolean) row.get("isprimaryowner");
+
+			if (StringUtils.isEmpty(propertyId) || StringUtils.isEmpty(mobileNumber)) {
+				continue;
+			}
+			if (Boolean.TRUE.equals(isPrimary)) {
+				primaryMobileByPropertyId.putIfAbsent(propertyId, mobileNumber);
+			} else {
+				fallbackMobileByPropertyId.putIfAbsent(propertyId, mobileNumber);
+			}
+		}
+
+		fallbackMobileByPropertyId.forEach(primaryMobileByPropertyId::putIfAbsent);
+		return primaryMobileByPropertyId;
+	}
 }

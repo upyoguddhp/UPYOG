@@ -114,10 +114,48 @@ public class CommunityHallBookingController {
 		
 		bookingService.setRelatedAsset(applications, requestInfoWrapper);
 		
+		long approvedCount = applications.stream()
+		        .filter(app -> "APPROVED".equals(app.getApplicationStatus()))
+		        .count();
+
+		long pendingForPaymentCount = applications.stream()
+		        .filter(app -> "PENDINGFORPAYMENT".equals(app.getApplicationStatus()))
+		        .count();
+
+		long appliedCount = applications.stream()
+		        .filter(app -> "APPLIED".equals(app.getApplicationStatus()))
+		        .count();
+		long initialtedcount = applications.stream()
+		        .filter(app -> "INITIATED".equals(app.getApplicationStatus()))
+		        .count();
+		
+		long cancelCount = applications.stream()
+		        .filter(app -> "CANCELLED".equals(app.getApplicationStatus()))
+		        .count();
+		
+		long rejectedCount = applications.stream()
+		        .filter(app -> "REJECTED".equals(app.getApplicationStatus()))
+		        .count();
+
+		long pendingforModificationCount = applications.stream()
+		        .filter(app -> "PENDINGFORMODIFICATION".equals(app.getApplicationStatus()))
+		        .count();
+
+		
+		
 		ResponseInfo info = CommunityHallBookingUtil.createReponseInfo(requestInfoWrapper.getRequestInfo(), CommunityHallBookingConstants.COMMUNITY_HALL_BOOKING_LIST,
 				StatusEnum.SUCCESSFUL);
-		CommunityHallBookingResponse response = CommunityHallBookingResponse.builder().hallsBookingApplication(applications)
-				.responseInfo(info).build();
+		CommunityHallBookingResponse response = CommunityHallBookingResponse.builder()
+		        .hallsBookingApplication(applications)
+		        .responseInfo(info)
+		        .applicationApproved((int) approvedCount)
+		        .applicationPendingForPayment((int) pendingForPaymentCount)
+		        .applicationApplied((int) appliedCount)
+		        .applicationInitiated((int) initialtedcount)
+		        .applicationCancelled((int) cancelCount)
+		        .applicationRejected((int) rejectedCount)	
+		        .applicationPendingformodification((int) pendingforModificationCount)
+		        .build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	

@@ -488,6 +488,8 @@ public class PTConstants {
 	
 	public static final String MDMS_MODULE_ULBS = "ULBS";
 	public static final String MDMS_MODULE_PROPERTYTAXRATE = "PropertyTaxRate";
+	
+	public static final String MDMS_MODULE_PROPERTYTAXRATE_LAND = "PropertyTaxLandRate";
 
 	public static final String MDMS_MASTER_DETAILS_ZONES = "Zones";
 	public static final String MDMS_MASTER_DETAILS_BUILDINGSTRUCTURE = "BuildingStructure";
@@ -504,6 +506,9 @@ public class PTConstants {
 	public static final String MDMS_MASTER_DETAILS_PENALTYDAYS = "PropertyPenaltyDays";
 	
 	public static final String MDMS_MASTER_DETAILS_PROPERTYTAXRATE = "PropertyTaxRate";
+	
+	public static final String MDMS_MASTER_DETAILS_PROPERTYTAXRATE_LAND = "PropertyTaxLandRate";
+	
 
 	public static final String MDMS_MODULE_ACTIVE_FILTER = "[?(@.active == true)]";
 	

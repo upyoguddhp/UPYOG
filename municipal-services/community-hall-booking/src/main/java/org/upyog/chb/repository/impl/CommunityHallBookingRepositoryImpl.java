@@ -33,6 +33,7 @@ import org.upyog.chb.web.models.CommunityHallSlotAvailabilityDetail;
 import org.upyog.chb.web.models.CommunityHallSlotSearchCriteria;
 import org.upyog.chb.web.models.DocumentDetail;
 import org.upyog.chb.web.models.User;
+import org.upyog.chb.web.models.collection.Bill.StatusEnum;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -194,4 +195,22 @@ public class CommunityHallBookingRepositoryImpl implements CommunityHallBookingR
 //		User user = jdbcTemplate.query(query.toString(), paramsList.toArray(),userDetailRowMapper);
 //		return user;
 	}
+	
+	@Override
+	public void updateSlotStatusToAvailable(CommunityHallBookingRequest bookingRequest) {
+	    List<String> bookingIds = new ArrayList<>();
+	    bookingIds.add(bookingRequest.getHallsBookingApplication().getBookingId());
+	    List<BookingSlotDetail> slotDetails = jdbcTemplate.query(
+	            queryBuilder.getSlotDetailsQuery(bookingIds),
+	            bookingIds.toArray(),
+	            slotDetailRowmapper
+	    );
+	    slotDetails.forEach(slotDetail -> {
+	        slotDetail.setStatus("AVAILABLE");
+	     });
+	    bookingRequest.getHallsBookingApplication().setBookingSlotDetails(slotDetails);
+		//producer.push(bookingConfiguration.getCommunityHallBookingUpdateTopic(), bookingRequest);
+//return '';
+
+	  }
 }

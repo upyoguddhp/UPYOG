@@ -27,4 +27,5 @@ public interface CommunityHallBookingRepository {
 	List<CommunityHallSlotAvailabilityDetail> getBookingCodeSlots(String code);
 	
 	String getApproverName(String UlbName);
+	void updateSlotStatusToAvailable(CommunityHallBookingRequest communityHallsBookingRequest );
 }

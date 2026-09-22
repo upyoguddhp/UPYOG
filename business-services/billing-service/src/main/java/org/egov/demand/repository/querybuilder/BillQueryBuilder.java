@@ -21,7 +21,7 @@ public class BillQueryBuilder {
 	
 	public static final String REPLACE_STRING = "{replace}";
 	
-	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID') AND tenantId = ? ";
+	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID','ADVANCE_ADJUSTED') AND tenantId = ? ";
 	
 	public static final String BILL_CANCEL_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN('ACTIVE','EXPIRED') AND tenantId = ? ";
 
@@ -31,6 +31,9 @@ public class BillQueryBuilder {
 			+"(id, tenantid, payername, payeraddress, payeremail, isactive, iscancelled, createdby, createddate, lastmodifiedby, lastmodifieddate,"
 			+" mobilenumber, status, additionaldetails, payerid, consumercode)"
 			+"values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	
+	public static final String BILL_REFUND_UPDATE_QUERY_BASE =
+		    "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE tenantId = ?";
 	
 	public static final String INSERT_BILLDETAILS_QUERY = "INSERT into egbs_billdetail_v1 "
 			+"(id, tenantid, billid, demandid, fromperiod, toperiod, businessservice, billno, billdate, consumercode, consumertype, billdescription, displaymessage, "
@@ -105,7 +108,7 @@ public class BillQueryBuilder {
 	        "status = ?, lastmodifiedby = ?, lastmodifieddate = ? " +
 	        "WHERE tenantid = ? " +
 	        "AND consumercode = ? " +
-	        "AND status = ?";
+	        "AND status IN (?, ?)";
 	
 	public static final String BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY =
 		    "UPDATE egbs_billdetail_v1 " +
@@ -308,6 +311,31 @@ public class BillQueryBuilder {
 		return builder.toString();
 	}
 	
+	public String getRefundedBillUpdateQuery(UpdateBillCriteria criteria, List<Object> preparedStmtList) {
+
+		String additionalDetailsQuery = ", additionaldetails = ?";
+		StringBuilder builder = new StringBuilder();
+
+		preparedStmtList.add(System.currentTimeMillis());
+		preparedStmtList.add(criteria.getStatusToBeUpdated().toString());
+
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			if (criteria.getAdditionalDetails() != null) {
+				builder.append(BILL_REFUND_UPDATE_QUERY_BASE.replace("{replace}", additionalDetailsQuery));
+				preparedStmtList.add(util.getPGObject(criteria.getAdditionalDetails()));
+			} else {
+				builder.append(BILL_REFUND_UPDATE_QUERY_BASE.replace("{replace}", ""));
+			}
+			preparedStmtList.add(criteria.getTenantId());
+		}
+
+		if (!CollectionUtils.isEmpty(criteria.getBillIds())) {
+			builder.append(" AND id IN ( ");
+			appendListToQuery(criteria.getBillIds(), preparedStmtList, builder);
+		}
+		return builder.toString();
+	}
+
 	public String getBillCancelQuery(UpdateBillCriteria updateBillCriteria, List<Object> preparedStmtList) {
 		String additionalDetailsQuery = ", additionaldetails = ?";
 		StringBuilder builder = new StringBuilder();

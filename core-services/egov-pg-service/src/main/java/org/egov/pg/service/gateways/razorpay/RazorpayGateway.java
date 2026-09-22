@@ -45,6 +45,8 @@ public class RazorpayGateway implements Gateway {
 	private static final String PAYMENT_AUTO_CAPTURE = "1";
 
 	private static final String ORDER_ID = "ORDER_ID";
+	
+	private static final String ACCOUNT_ID = "ACCOUNT_ID";
 
 	private final RestTemplate restTemplate;
 
@@ -90,6 +92,7 @@ public class RazorpayGateway implements Gateway {
 
 		transaction.setOrderId(order.getOrderId());
 		additionalDetails.put(ORDER_ID, order.getOrderId());
+		additionalDetails.put(ACCOUNT_ID, transaction.getPayTo());
 		transaction.setAdditionalDetails(additionalDetails);
 
 		return URI.create(StringUtils.EMPTY); // Return an empty URI
@@ -183,6 +186,7 @@ public class RazorpayGateway implements Gateway {
 	private Transaction validateAndEnrichPaymentStatus(Transaction currentStatus, String transactionAmount,
 			String razorpayOrderId) {
 		PaymentResponse paymentResponse = fetchPaymentsByOrderId(razorpayOrderId);
+		
 
 		if (null != paymentResponse) {
 
@@ -210,7 +214,9 @@ public class RazorpayGateway implements Gateway {
 					.collect(Collectors.toList());
 
 			if (!CollectionUtils.isEmpty(failedPayments)) {
+				log.info("failedPayment logs alert:{}", failedPayments);
 				Payment failedPayment = failedPayments.get(0);
+				
 				return Transaction.builder().txnId(currentStatus.getTxnId()).txnAmount(currentStatus.getTxnAmount())
 						.txnStatus(Transaction.TxnStatusEnum.FAILURE).gatewayTxnId(failedPayment.getPaymentId())
 						.gatewayStatusCode(failedPayment.getErrorCode())
@@ -277,6 +283,7 @@ public class RazorpayGateway implements Gateway {
 					"Unable to transfer amount for the orderId: " + transfer.getNotes().getGatewayTxnId());
 		}
 	}
+
 
 	@Override
 	public Object getSettlementStatus(String gatewayTxnId) {

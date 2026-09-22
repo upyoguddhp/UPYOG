@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.contract.bill.BillResponse;
 import org.egov.garbageservice.contract.bill.Demand;
 import org.egov.garbageservice.contract.bill.GenerateBillCriteria;
+import org.egov.garbageservice.model.DdpPrintingUlbWard;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountResponse;
 import org.egov.garbageservice.model.GenerateBillRequest;
@@ -33,12 +34,16 @@ import org.egov.garbageservice.model.GrbgBillTracker;
 import org.egov.garbageservice.model.GrbgBillTrackerRequest;
 import org.egov.garbageservice.model.GrbgBillTrackerResponse;
 import org.egov.garbageservice.model.GrbgBillTrackerSearchCriteria;
+import org.egov.garbageservice.model.MarkReadyForPrintingRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingResponse;
+import org.egov.garbageservice.model.UlbWardPrintingResult;
 import org.egov.garbageservice.producer.GarbageProducer;
 import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccountRequest;
 import org.egov.garbageservice.model.UserSearchRequest;
 import org.egov.garbageservice.model.contract.OwnerInfo;
+import org.egov.garbageservice.repository.GarbageAccountRepository;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.garbageservice.contract.bill.BillSearchCriteria;
@@ -46,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.garbageservice.util.ResponseInfoFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.mdms.model.MdmsResponse;
@@ -71,6 +77,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.CustomAmountUpdateResponse;
 import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 import org.egov.garbageservice.model.BillIdRequest;
+import org.egov.garbageservice.model.GenerateBillPreviewResponse;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -111,7 +119,13 @@ public class GarbageAccountSchedulerService {
 	
 	@Autowired
 	private GarbageBillTrackerRepository garbageBillTrackerRepository;
-	
+
+	@Autowired
+	private GarbageAccountRepository garbageAccountRepository;
+
+	@Autowired
+	private ResponseInfoFactory responseInfoFactory;
+
 	@Value("${garbage.rebate.grace.days:15}")
 	private Integer rebateGraceDays;
 	
@@ -130,77 +144,91 @@ public class GarbageAccountSchedulerService {
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
+		AtomicInteger skippedCount = new AtomicInteger(0);
 		setFromDateToDate(generateBillRequest);
 		String message = null;
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
 
-		garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
+		// garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts,
+		// generateBillRequest);
 		// create demand and bill for every account
 		if (null != garbageAccounts && !CollectionUtils.isEmpty(garbageAccounts)) {
+
+			Set<String> applicationIds = garbageAccounts.stream().map(GarbageAccount::getGrbgApplicationNumber)
+					.collect(Collectors.toSet());
+
+			GrbgBillTrackerSearchCriteria criteria = GrbgBillTrackerSearchCriteria.builder()
+					.grbgApplicationIds(applicationIds).build();
+
+			List<GrbgBillTracker> existingTrackers = garbageAccountService.getBillCalculatedGarbageAccounts(criteria);
+
+			Map<String, List<GrbgBillTracker>> trackerMap = existingTrackers.stream()
+					.collect(Collectors.groupingBy(GrbgBillTracker::getGrbgApplicationId));
+
 			garbageAccounts.stream().forEach(garbageAccount -> {
 				List<String> errorList = new ArrayList<>();
 				ObjectNode calculationBreakdown = objectMapper.createObjectNode();
 				int numberOfMonths = 0;
 				if (!Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
-				    calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
-				    calculationBreakdown.put("month",
-				        generateBillRequest.getMonths()
-				            .get(generateBillRequest.getMonths().size() - 1));
+					calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
+					calculationBreakdown.put("month",
+							generateBillRequest.getMonths().get(generateBillRequest.getMonths().size() - 1));
 				}
-				    
-				if(null != garbageAccount.getUserUuid()) {
+
+				if (null != garbageAccount.getUserUuid()) {
+					
+					if (validateExistingBillOverlap(generateBillRequest, garbageAccount, trackerMap)) {
+						skippedCount.incrementAndGet();
+						errorList.add("Bill already exists for application "
+								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
+//						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+						return;
+					}
+					
 					Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
 							garbageAccount.getTenantId());
 					// calculate fees from mdms response
-					BigDecimal monthlyAmount =
-						    mdmsService.fetchGarbageAmountFromMDMSResponse(
-						        mdmsResponse, garbageAccount, errorList, calculationBreakdown
-						    );
-					
+					BigDecimal monthlyAmount = mdmsService.fetchGarbageAmountFromMDMSResponse(mdmsResponse,
+							garbageAccount, errorList, calculationBreakdown);
+
 					if (monthlyAmount == null) {
-					    log.warn("Monthly amount is null for account {}", garbageAccount.getGrbgApplicationNumber());
-					    errorList.add("Monthly amount not found from MDMS");
-					    createFailureLog(garbageAccount, generateBillRequest, null, errorList);
-					    return;
+						log.warn("Monthly amount is null for account {}", garbageAccount.getGrbgApplicationNumber());
+						errorList.add("Monthly amount not found from MDMS");
+						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+						return;
 					}
 
 					if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
-					    Long from = generateBillRequest.getFromDateTimestamp();
-					    Long to = generateBillRequest.getToDateTimestamp();
+						Long from = generateBillRequest.getFromDateTimestamp();
+						Long to = generateBillRequest.getToDateTimestamp();
 
-					    if (from != null && to != null) {
-					        LocalDate fromDate = Instant.ofEpochMilli(from).atZone(ZoneId.systemDefault()).toLocalDate();
-					        LocalDate toDate = Instant.ofEpochMilli(to).atZone(ZoneId.systemDefault()).toLocalDate();
-					        
-					        numberOfMonths = (int) ChronoUnit.MONTHS.between(
-					                fromDate.withDayOfMonth(1),
-					                toDate.withDayOfMonth(1)
-					        ) + 1;
-					    }
+						if (from != null && to != null) {
+							LocalDate fromDate = Instant.ofEpochMilli(from).atZone(ZoneId.systemDefault())
+									.toLocalDate();
+							LocalDate toDate = Instant.ofEpochMilli(to).atZone(ZoneId.systemDefault()).toLocalDate();
+
+							numberOfMonths = (int) ChronoUnit.MONTHS.between(fromDate.withDayOfMonth(1),
+									toDate.withDayOfMonth(1)) + 1;
+						}
 					} else {
-					    numberOfMonths = generateBillRequest.getMonths().size();
+						numberOfMonths = generateBillRequest.getMonths().size();
 					}
 					calculationBreakdown.put("monthCount", numberOfMonths);
-	
+
 					BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
 					BigDecimal rebatePercentage = BigDecimal.ZERO;
 					BigDecimal rebateAmount = BigDecimal.ZERO;
 					BigDecimal finalBillAmount = billAmount;
-					
-					if (Boolean.TRUE.equals(generateBillRequest.getIsRebate())) {
-						rebatePercentage =
-					            mdmsService.fetchGarbageRebateRate(
-					                    generateBillRequest.getRequestInfo(),
-					                    garbageAccount.getTenantId()
-					            );
-						
-						if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
-						    rebateAmount = billAmount
-						            .multiply(rebatePercentage)
-						            .divide(BigDecimal.valueOf(100))
-						            .setScale(2, RoundingMode.HALF_UP);
 
-						    finalBillAmount = billAmount.subtract(rebateAmount);
+					if (Boolean.TRUE.equals(generateBillRequest.getIsRebate())) {
+						rebatePercentage = mdmsService.fetchGarbageRebateRate(generateBillRequest.getRequestInfo(),
+								garbageAccount.getTenantId());
+
+						if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
+							rebateAmount = billAmount.multiply(rebatePercentage).divide(BigDecimal.valueOf(100))
+									.setScale(2, RoundingMode.HALF_UP);
+
+							finalBillAmount = billAmount.subtract(rebateAmount);
 						}
 					}
 
@@ -208,78 +236,72 @@ public class GarbageAccountSchedulerService {
 					calculationBreakdown.put("rebatePercentage", rebatePercentage);
 					calculationBreakdown.put("rebateAmount", rebateAmount);
 					calculationBreakdown.put("finalAmount", finalBillAmount);
-					
-					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
-					
-						String billType =
-								Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth()) ||
-								generateBillRequest.getMonths().size() > 1
-						        ? "MULTI_MONTH"
-						        : "MONTHLY";
-						        
-						        AtomicReference<String> demandId = new AtomicReference<>(null);
-						        
-						        BillResponse billResponse =
-						                generateDemandAndBill(generateBillRequest, garbageAccount, finalBillAmount, billType, demandId, numberOfMonths);
 
-	
+					if (billAmount != null && billAmount.compareTo(BigDecimal.ZERO) > 0 && errorList.isEmpty()) {
+
+						String billType = Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
+								|| generateBillRequest.getMonths().size() > 1 ? "MULTI_MONTH" : "MONTHLY";
+
+						AtomicReference<String> demandId = new AtomicReference<>(null);
+
+						BillResponse billResponse = generateDemandAndBill(generateBillRequest, garbageAccount,
+								finalBillAmount, billType, demandId, numberOfMonths);
+
 						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
-									.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,billResponse.getBill().get(0),calculationBreakdown);
+									.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,
+											billResponse.getBill().get(0), calculationBreakdown);
 							grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
 							// add to garbage bill tracker
 							GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
 							tracker.setGarbageBillWithoutRebate(billAmount);
 							tracker.setRebateAmount(rebateAmount);
 							tracker.setGrbgBillAmount(finalBillAmount);
-							
+
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
 							grbgBillTrackers.add(grbgBillTracker);
-							
-							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
-								    .grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
-								    .status(Collections.singleton("ACTIVE"))
-								    .tenantId(garbageAccount.getTenantId())
-								    .build();
+							syncTrackerWithBillStatus(grbgBillTracker, generateBillRequest);
 
-							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository.getBillTracker(prevCriteria);
+							GrbgBillTrackerSearchCriteria prevCriteria = GrbgBillTrackerSearchCriteria.builder()
+									.grbgApplicationIds(Collections.singleton(String.valueOf(garbageAccount.getGrbgApplicationNumber())))
+									.status(new HashSet<>(Arrays.asList("ACTIVE", "ADVANCE_ADJUSTED")))
+									.tenantId(garbageAccount.getTenantId())
+									.build();
+
+							List<GrbgBillTracker> prevTrackers = garbageBillTrackerRepository
+									.getBillTracker(prevCriteria);
 
 							if (!CollectionUtils.isEmpty(prevTrackers)) {
-							    for (GrbgBillTracker prev : prevTrackers) {
-							        if (prev.getUuid().equals(grbgBillTracker.getUuid()) || 
-							            "PAID".equals(prev.getStatus())) {
-							            continue;
-							        }
-							        
-							        prev.setStatus("EXPIRED");
-							        garbageBillTrackerRepository.updateStatusBillTracker(prev);					        
-							    }
+								for (GrbgBillTracker prev : prevTrackers) {
+									if (prev.getUuid().equals(grbgBillTracker.getUuid())
+											|| "PAID".equals(prev.getStatus())) {
+										continue;
+									}
+
+									prev.setStatus("EXPIRED");
+									garbageBillTrackerRepository.updateStatusBillTracker(prev);
+								}
 							}
-							//remove bill if failure exists
+							// remove bill if failure exists
 //							GrbgBillFailure grbgBillFailure	= garbageAccountService.enrichGrbgBillFailure(garbageAccount, generateBillRequest,billResponse,errorList);
 //							garbageAccountService.removeGarbageBillFailure(grbgBillFailure);
 //							triggerNotifications
-							notificationService.triggerNotificationsGenerateBill(garbageAccount, billResponse.getBill().get(0),
-								generateBillRequest.getRequestInfo(),grbgBillTracker);
-							//getting 
-							//calling sms_TRACKER call to make a push to sms_tracker
+							notificationService.triggerNotificationsGenerateBill(garbageAccount,
+									billResponse.getBill().get(0), generateBillRequest.getRequestInfo(),
+									grbgBillTracker);
+							// getting
+							// calling sms_TRACKER call to make a push to sms_tracker
 							StringBuilder smsTrackerUri = new StringBuilder();
 							smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
-							
-							
-							
-							ObjectNode smsRequestJson =
-							        notificationService.buildGenerateBillSmsRequest(
-							                garbageAccount,
-							                billResponse.getBill().get(0),
-							                grbgBillTracker
-							        );
-							
+
+							ObjectNode smsRequestJson = notificationService.buildGenerateBillSmsRequest(garbageAccount,
+									billResponse.getBill().get(0), grbgBillTracker);
+
 							SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 							String fromDateStr = formatter.format(generateBillRequest.getFromDate());
 							String toDateStr = formatter.format(generateBillRequest.getToDate());
-							
+
 							Map<String, Object> smsTrackerRequest = new HashMap<>();
 							smsTrackerRequest.put("uuid", java.util.UUID.randomUUID().toString());
 							smsTrackerRequest.put("amount", billAmount);
@@ -287,12 +309,11 @@ public class GarbageAccountSchedulerService {
 							smsTrackerRequest.put("tenantId", garbageAccount.getTenantId());
 							smsTrackerRequest.put("service", "GARBAGE");
 							if (generateBillRequest.getMonths() != null) {
-							    smsTrackerRequest.put("months", generateBillRequest.getMonths());
+								smsTrackerRequest.put("months", generateBillRequest.getMonths());
 							}
-							smsTrackerRequest.put("monthCount",Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
-								        ? numberOfMonths
-								        : generateBillRequest.getMonths().size()
-								);
+							smsTrackerRequest.put("monthCount",
+									Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth()) ? numberOfMonths
+											: generateBillRequest.getMonths().size());
 							smsTrackerRequest.put("year", generateBillRequest.getYear());
 //							smsTrackerRequest.put("financialYear", generateBillRequest.getFinancialYear());
 							smsTrackerRequest.put("fromDate", fromDateStr);
@@ -303,47 +324,200 @@ public class GarbageAccountSchedulerService {
 							smsTrackerRequest.put("billId", billResponse.getBill().get(0).getId());
 							smsTrackerRequest.put("smsStatus", false);
 							smsTrackerRequest.put("additionalDetail", calculationBreakdown);
-							
+
 							smsTrackerRequest.put("ownerMobileNo", garbageAccount.getMobileNumber());
 							smsTrackerRequest.put("ownerName", garbageAccount.getName());
-							smsTrackerRequest.put("smsRequest",smsRequestJson);  
-							smsTrackerRequest.put("smsResponse", null); 
-							
-							
+							smsTrackerRequest.put("smsRequest", smsRequestJson);
+							smsTrackerRequest.put("smsResponse", null);
+
 							try {
-							    restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
-							    log.info("SMS tracker entry created for billId {}", billResponse.getBill().get(0).getId());
+								restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+								log.info("SMS tracker entry created for billId {}",
+										billResponse.getBill().get(0).getId());
 							} catch (Exception e) {
-							    log.error("Failed to create SMS tracker entry for billId {}", billResponse.getBill().get(0).getId(), e);
+								log.error("Failed to create SMS tracker entry for billId {}",
+										billResponse.getBill().get(0).getId(), e);
 							}
-						}else {
+						} else {
 							errorList.add("Issues In Bill Generation Probably Demand Already Exists");
-							createFailureLog(garbageAccount, generateBillRequest,billResponse,errorList);
+							createFailureLog(garbageAccount, generateBillRequest, billResponse, errorList);
 						}
-					}else {
-						
+					} else {
+
 						errorList.add("Amount could not be calculated");
-						createFailureLog(garbageAccount, generateBillRequest,null,errorList);
+						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 					}
-				}
-				else {
+				} else {
 					errorList.add("Mobile number user not mapped");
-					createFailureLog(garbageAccount, generateBillRequest,null,errorList);
+					createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 				}
 			});
-		}else {
+		} else {
 			message = "Garbage Acc Not Found";
 		}
+		int generatedCount = grbgBillTrackers.size();
+		int skipped = skippedCount.get();
 
-		if(!grbgBillTrackers.isEmpty())
-			message = "Bills Generated Successfully";
-		
+		if (generatedCount > 0 && skipped > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + skipped
+					+ " Application Id(s) due to overlapping bill periods.";
+		} else if (generatedCount > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s).";
+		} else if (skipped > 0) {
+			message = "No bills generated. " + skipped + " Application Id(s) failed due to overlapping bill periods.";
+		}
+
 		sanatizeFailureLog(generateBillRequest);
-		
+
 		return GrbgBillTrackerResponse.builder().grbgBillTrackers(grbgBillTrackers).message(message).build();
 
 	}
+
+	private boolean validateExistingBillOverlap(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
+			Map<String, List<GrbgBillTracker>> trackerMap) {
+
+		List<GrbgBillTracker> trackers = trackerMap.get(garbageAccount.getGrbgApplicationNumber());
+
+		if (CollectionUtils.isEmpty(trackers)) {
+			return false;
+		}
+
+		Date newFrom = generateBillRequest.getFromDate();
+		Date newTo = generateBillRequest.getToDate();
+
+		for (GrbgBillTracker tracker : trackers) {
+
+			if ("CANCELLED".equalsIgnoreCase(tracker.getStatus())) {
+				continue;
+			}
+
+			Date existingFrom = purseToDate(tracker.getFromDate());
+			Date existingTo = purseToDate(tracker.getToDate());
+
+			if (existingFrom == null || existingTo == null) {
+				continue;
+			}
+
+			boolean overlap = !(existingTo.before(newFrom) || existingFrom.after(newTo));
+
+			if (overlap) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 	
+	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
+
+		List<GenerateBillPreviewResponse> previewResponses = new ArrayList<>();
+		setFromDateToDate(generateBillRequest);
+		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
+		garbageAccounts = removeAlreadyBillCalculatedGarbageAccounts(garbageAccounts, generateBillRequest);
+
+		if (garbageAccounts != null && !CollectionUtils.isEmpty(garbageAccounts)) {
+			garbageAccounts.forEach(garbageAccount -> {
+				List<String> errorList = new ArrayList<>();
+				ObjectNode calculationBreakdown = objectMapper.createObjectNode();
+				int numberOfMonths = 0;
+
+				if (!Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+					calculationBreakdown.putPOJO("months", generateBillRequest.getMonths());
+					calculationBreakdown.put("month",
+							generateBillRequest.getMonths().get(generateBillRequest.getMonths().size() - 1));
+				}
+
+				if (garbageAccount.getUserUuid() == null) {
+					errorList.add("Mobile number user not mapped");
+					previewResponses.add(GenerateBillPreviewResponse.builder()
+							.applicationNo(garbageAccount.getGrbgApplicationNumber())
+							.tenantId(garbageAccount.getTenantId()).ownerName(garbageAccount.getName())
+							.mobileNumber(garbageAccount.getMobileNumber())
+							.build());
+					return;
+				}
+
+				Object mdmsResponse = mdmsService.fetchGarbageFeeFromMdms(generateBillRequest.getRequestInfo(),
+						garbageAccount.getTenantId());
+
+				BigDecimal monthlyAmount = mdmsService.fetchGarbageAmountFromMDMSResponse(mdmsResponse, garbageAccount,
+						errorList, calculationBreakdown);
+
+				if (monthlyAmount == null) {
+					errorList.add("Monthly amount not found from MDMS");
+					previewResponses.add(GenerateBillPreviewResponse.builder()
+							.applicationNo(garbageAccount.getGrbgApplicationNumber())
+							.tenantId(garbageAccount.getTenantId()).ownerName(garbageAccount.getName())
+							.mobileNumber(garbageAccount.getMobileNumber())
+							.build());
+					return;
+				}
+
+				if (Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())) {
+					Long from = generateBillRequest.getFromDateTimestamp();
+					Long to = generateBillRequest.getToDateTimestamp();
+
+					if (from != null && to != null) {
+						LocalDate fromDate = Instant.ofEpochMilli(from).atZone(ZoneId.systemDefault()).toLocalDate();
+						LocalDate toDate = Instant.ofEpochMilli(to).atZone(ZoneId.systemDefault()).toLocalDate();
+						numberOfMonths = (int) ChronoUnit.MONTHS.between(fromDate.withDayOfMonth(1),
+								toDate.withDayOfMonth(1)) + 1;
+					}
+				} else {
+					numberOfMonths = generateBillRequest.getMonths().size();
+				}
+
+				calculationBreakdown.put("monthCount", numberOfMonths);
+
+				BigDecimal billAmount = monthlyAmount.multiply(BigDecimal.valueOf(numberOfMonths));
+				BigDecimal rebatePercentage = BigDecimal.ZERO;
+				BigDecimal rebateAmount = BigDecimal.ZERO;
+				BigDecimal finalBillAmount = billAmount;
+
+				if (Boolean.TRUE.equals(generateBillRequest.getIsRebate())) {
+					rebatePercentage = mdmsService.fetchGarbageRebateRate(generateBillRequest.getRequestInfo(),
+							garbageAccount.getTenantId());
+
+					if (rebatePercentage.compareTo(BigDecimal.ZERO) > 0) {
+						rebateAmount = billAmount.multiply(rebatePercentage).divide(BigDecimal.valueOf(100), 2,
+								RoundingMode.HALF_UP);
+						finalBillAmount = billAmount.subtract(rebateAmount);
+					}
+				}
+
+				calculationBreakdown.put("baseAmount", billAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("rebatePercentage",
+						rebatePercentage.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("rebateAmount",
+						rebateAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				calculationBreakdown.put("finalAmount",
+						finalBillAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
+
+				if (billAmount == null || billAmount.compareTo(BigDecimal.ZERO) <= 0) {
+					errorList.add("Amount could not be calculated");
+				}
+
+				Object address = objectMapper.convertValue(garbageAccount.getAddresses(), Object.class);
+
+				previewResponses.add(GenerateBillPreviewResponse.builder()
+						.applicationNo(garbageAccount.getGrbgApplicationNumber()).tenantId(garbageAccount.getTenantId())
+						.ownerName(garbageAccount.getName()).mobileNumber(garbageAccount.getMobileNumber())
+						.monthlyAmount(monthlyAmount.setScale(2, RoundingMode.HALF_UP)).monthCount(numberOfMonths)
+						.garbageBillWithoutRebate(billAmount.setScale(2, RoundingMode.HALF_UP))
+						.rebatePercentage(rebatePercentage.setScale(2, RoundingMode.HALF_UP))
+						.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP))
+						.finalBillAmount(finalBillAmount.setScale(2, RoundingMode.HALF_UP))
+						.calculationDetails(calculationBreakdown).address(address)
+						.build());
+			});
+		}
+
+		return previewResponses;
+	}
+
 	private void sanatizeFailureLog(GenerateBillRequest generateBillRequest) {
 		producer.push(properties.getSanatizeLogger(),generateBillRequest.getUlbNames().get(0));
 	}
@@ -968,6 +1142,127 @@ public class GarbageAccountSchedulerService {
 			throw new CustomException("NOT_FOUND", "No active tracker found for given billId");
 		}
 		return trackers.get(0);
+	}
+	
+	private void syncTrackerWithBillStatus(GrbgBillTracker tracker, GenerateBillRequest generateBillRequest) {
+
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.tenantId(tracker.getTenantId())
+				.consumerCode(Collections.singleton(tracker.getGrbgApplicationId()))
+				.billId(Collections.singleton(tracker.getBillId()))
+				.build();
+
+		List<Bill> bill = billService.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo()).getBill();
+
+		Bill currentBill = bill.get(0);
+
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+
+			ObjectNode additionalDetails;
+
+			if (tracker.getAdditionaldetail() != null && !tracker.getAdditionaldetail().isNull()) {
+				additionalDetails = (ObjectNode) tracker.getAdditionaldetail().deepCopy();
+			} else {
+				additionalDetails = objectMapper.createObjectNode();
+			}
+
+			additionalDetails.put("advanceAdjusted", true);
+			tracker.setAdditionaldetail(additionalDetails);
+			garbageBillTrackerRepository.updateTrackerAdditionalDetails(tracker);
+		}
+
+		tracker.setStatus(currentBill.getStatus().name());
+		garbageBillTrackerRepository.updateStatusBillTracker(tracker);
+	}
+
+	/**
+	 * For every ULB/ward enabled for door plate printing (per the
+	 * ULBS.DdpPrinting MDMS master), finds ddpVerified, approved, active
+	 * garbage accounts in that ULB/ward and marks them ready for printing, in
+	 * id batches per ULB/ward so a single UPDATE doesn't have to cover every
+	 * matching row across the whole tenant at once.
+	 */
+	public MarkReadyForPrintingResponse markReadyForPrinting(MarkReadyForPrintingRequest request) {
+
+		if (StringUtils.isEmpty(request.getTenantId())) {
+			throw new CustomException("INVALID_REQUEST",
+					"TenantId is mandatory to mark accounts ready for printing.");
+		}
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		String userUuid = null != requestInfo && null != requestInfo.getUserInfo()
+				? requestInfo.getUserInfo().getUuid()
+				: "system";
+		int batchSize = null != request.getBatchSize() && request.getBatchSize() > 0 ? request.getBatchSize() : 500;
+		Long now = System.currentTimeMillis();
+
+		List<DdpPrintingUlbWard> ulbWards = mdmsService.fetchDdpPrintingUlbWards(requestInfo, request.getTenantId());
+
+		List<UlbWardPrintingResult> results = new ArrayList<>();
+		int totalMarked = 0;
+
+		for (DdpPrintingUlbWard ulbWard : ulbWards) {
+
+			List<GarbageAccount> accounts = searchDdpVerifiedAccounts(requestInfo, request.getTenantId(), ulbWard);
+
+			List<Long> idsToMark = accounts.stream()
+					.filter(account -> !Boolean.TRUE.equals(account.getIsReadyForPrinting()))
+					.map(GarbageAccount::getId).filter(Objects::nonNull).collect(Collectors.toList());
+
+			int marked = 0;
+			for (int i = 0; i < idsToMark.size(); i += batchSize) {
+				List<Long> batch = idsToMark.subList(i, Math.min(i + batchSize, idsToMark.size()));
+				marked += garbageAccountRepository.markReadyForPrinting(batch, userUuid, now);
+			}
+
+			totalMarked += marked;
+			results.add(UlbWardPrintingResult.builder().ulbName(ulbWard.getUlbName())
+					.wardName(ulbWard.getWardName()).accountsMarkedReady(marked).build());
+
+			log.info("[DdpPrinting] ulb={}, ward={}, ddpVerifiedAccountsFound={}, markedReady={}",
+					ulbWard.getUlbName(), ulbWard.getWardName(), accounts.size(), marked);
+		}
+
+		return MarkReadyForPrintingResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
+				.totalUlbWardsProcessed(ulbWards.size()).totalAccountsMarkedReady(totalMarked).results(results)
+				.build();
+	}
+
+	/**
+	 * Searches ddpVerified, approved, active accounts for one ULB/ward,
+	 * following the same tenantId="{tenantId}.{ulbName}" + wardNames search
+	 * convention used by {@link #getGarbageAccounts}, with an in-memory
+	 * ulb/ward re-check on the address since wardNames alone can't
+	 * disambiguate identically-named wards across different ULBs.
+	 */
+	private List<GarbageAccount> searchDdpVerifiedAccounts(RequestInfo requestInfo, String tenantId,
+			DdpPrintingUlbWard ulbWard) {
+
+		SearchCriteriaGarbageAccountRequest searchRequest = SearchCriteriaGarbageAccountRequest.builder()
+				.requestInfo(requestInfo)
+				.searchCriteriaGarbageAccount(SearchCriteriaGarbageAccount.builder()
+						.tenantId(tenantId + "." + ulbWard.getUlbName())
+						.wardNames(Collections.singletonList(ulbWard.getWardName())).isDdpVerified(true)
+						.status(Collections.singletonList("APPROVED")).isActiveAccount(true).isActiveSubAccount(true)
+						.build())
+				.isSchedulerCall(true).build();
+
+		GarbageAccountResponse response = garbageAccountService.searchGarbageAccounts(searchRequest, false);
+
+		if (null == response || CollectionUtils.isEmpty(response.getGarbageAccounts())) {
+			return Collections.emptyList();
+		}
+
+		return response.getGarbageAccounts().stream()
+				.filter(account -> !CollectionUtils.isEmpty(account.getAddresses())
+						&& ulbWard.getUlbName().equals(account.getAddresses().get(0).getUlbName())
+						&& ulbWard.getWardName().equals(account.getAddresses().get(0).getWardName()))
+				.collect(Collectors.toList());
 	}
 
 }

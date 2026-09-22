@@ -66,6 +66,14 @@ public class EmailProperties {
     @Value("${mail.sender.password}")
     @Getter
     private String mailSenderPassword;
+    
+    @Value("${mail.sender.solan.username}")
+    @Getter
+    public String solanUsername;
+
+    @Value("${mail.sender.solan.password}")
+    @Getter
+    public String solanPassword;
 
     @Value("${mail.smtps.auth}")
     @Getter

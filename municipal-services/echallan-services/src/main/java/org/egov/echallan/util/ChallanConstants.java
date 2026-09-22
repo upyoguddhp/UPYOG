@@ -11,7 +11,6 @@ public class ChallanConstants {
 
     public static final String STATUS_PAID  = "PAID";
     
-
     public static final String KEY_ID = "id";
 
     public static final String KEY_FILESTOREID = "filestoreid";
@@ -92,6 +91,11 @@ public class ChallanConstants {
     public static final String TOTAL_COLLECTION = "totalCollection";
 
     public static final String TOTAL_SERVICES = "totalServices";
+    
+    public static final String SMS_BODY_CREATE_CHALLAN =
+            "Dear {NAME}, your Challan of Rs.{AMOUNT} for {SERVICE} "
+          + "is issued with Challan No:{CHALLANNO}, Dt: {DATE}. "
+          + "Please pay using {URL}. Citizen Seva";
 
     public ChallanConstants() {}
 

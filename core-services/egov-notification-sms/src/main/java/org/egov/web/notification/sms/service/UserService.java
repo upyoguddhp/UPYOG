@@ -5,5 +5,8 @@ import org.egov.web.notification.sms.models.UserSearchResponse;
 public interface UserService {
 
 	UserSearchResponse searchUser(String userUuid);
+	
+	UserSearchResponse searchUserByNumber(String number);
+ 
 
 }

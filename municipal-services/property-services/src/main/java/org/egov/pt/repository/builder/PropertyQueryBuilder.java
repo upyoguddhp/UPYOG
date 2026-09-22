@@ -559,7 +559,10 @@ public class PropertyQueryBuilder {
             "lastmodifiedby = ?, " +
             "lastmodifiedtime = ? " +
             "WHERE propertyid = ? " +
-            "AND bill_status = 'ACTIVE'";
+            "AND bill_status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
+	
+	private static final String PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY = "UPDATE eg_pt_tax_calculator_tracker "
+			+ "SET is_payment_processing = ? " + "WHERE bill_id = ? ";
 	
 	private static final String UPDATE_CUSTOM_TRACKER_AMOUNT =
 		    "UPDATE eg_pt_tax_calculator_tracker "
@@ -874,8 +877,13 @@ public class PropertyQueryBuilder {
 
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("owner.name = ?");
-			preparedStmtList.add(criteria.getName());
+			 if (Boolean.TRUE.equals(criteria.getIsFuzzyNameSearch())) {
+		        builder.append("owner.name LIKE ?");
+		        preparedStmtList.add("%" + criteria.getName() + "%");
+		    } else {
+		        builder.append("owner.name = ?");
+		        preparedStmtList.add(criteria.getName());
+		    }
 		}
 
 		if (null != criteria.getMobileNumber()) {
@@ -1338,13 +1346,14 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
 	
-		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? ");
+		builder.append(" SET bill_status = ?, lastmodifiedby = ?, lastmodifiedtime = ?, advance_paid = ? ");
 		builder.append(" WHERE 1 = 1 ");
-		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID') ");
+		builder.append(" AND (eptct.bill_status = 'ACTIVE' OR eptct.bill_status = 'PARTIALLY_PAID' OR eptct.bill_status = 'ADVANCE_ADJUSTED') ");
 	
 		preparedStmtList.add(tracker.getBillStatus().name());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
 		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+		preparedStmtList.add(tracker.getAdvancePaid());
 	
 		if (tracker.getDemandId() != null) {
 			builder.append(" AND eptct.demand_id = ? ");
@@ -1359,10 +1368,37 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 		return builder.toString();
 	}
 	
+	public String getUpdateAdditionalDetailsQuery(PtTaxCalculatorTracker tracker, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(PT_TAX_CALCULATOR_TRACKER_UPDATE_QUERY);
+
+		builder.append(" SET additionaldetails = CAST(? AS jsonb), ");
+		builder.append(" lastmodifiedby = ?, ");
+		builder.append(" lastmodifiedtime = ? ");
+		builder.append(" WHERE 1 = 1 ");
+
+		preparedStmtList.add(tracker.getAdditionalDetails().toString());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedBy());
+		preparedStmtList.add(tracker.getAuditDetails().getLastModifiedTime());
+
+		if (tracker.getBillId() != null) {
+			builder.append(" AND eptct.bill_id = ? ");
+			preparedStmtList.add(tracker.getBillId());
+		}
+
+		return builder.toString();
+	}
+	
 	public String getExpireActiveTrackersByPropertyIdQuery() {
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
 	}	public String getCustomTrackerUpdateQuery() {
 		return UPDATE_CUSTOM_TRACKER_AMOUNT;
+	}
+	
+	public String getUpdateIsProcessingPaymentQuery(List<Object> preparedStmtList, String billId, boolean isPaymentProcessing) {
+		preparedStmtList.add(isPaymentProcessing);
+		preparedStmtList.add(billId);
+		return PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY;
 	}
 
 }

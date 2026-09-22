@@ -79,6 +79,7 @@ public class BillRepositoryV2 {
 						ps.setString(4, tenantId);
 						ps.setString(5, consumerCode);
 						ps.setString(6, BillStatus.ACTIVE.name());
+						ps.setString(7, BillStatus.ADVANCE_ADJUSTED.name());
 					}
 
 					@Override
@@ -252,8 +253,32 @@ public class BillRepositoryV2 {
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
+		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID)
+				|| status.equals(BillStatus.ADVANCE_ADJUSTED))) {
 			if (status.equals(BillStatus.PAID)) {
+				if ("ADVT".equalsIgnoreCase(updateBillCriteria.getBusinessService())
+						&& BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
+
+					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
+
+					updateBillCriteria.setAdditionalDetails(util.jsonMerge(updateBillCriteria.getAdditionalDetails(),
+							bills.get(0).getAdditionalDetails()));
+					updateBillCriteria.setStatusToBeUpdated(BillStatus.REFUNDED);
+
+					String queryStr = billQueryBuilder.getRefundedBillUpdateQuery(updateBillCriteria, preparedStmtList);
+					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
+				} 
+				if ("chb-services".equalsIgnoreCase(updateBillCriteria.getBusinessService())) {
+
+					updateBillCriteria.setBillIds(Stream.of(bills.get(0).getId()).collect(Collectors.toSet()));
+
+					updateBillCriteria.setAdditionalDetails(util.jsonMerge(updateBillCriteria.getAdditionalDetails(),
+							bills.get(0).getAdditionalDetails()));
+					updateBillCriteria.setStatusToBeUpdated(BillStatus.REFUNDED);
+
+					String queryStr = billQueryBuilder.getRefundedBillUpdateQuery(updateBillCriteria, preparedStmtList);
+					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
+				} 
 			    return -1;
 			}
 			else {
@@ -263,7 +288,8 @@ public class BillRepositoryV2 {
 							util.jsonMerge(updateBillCriteria.getAdditionalDetails(), bills.get(0).getAdditionalDetails()));
 					String queryStr = billQueryBuilder.getBillCancelQuery(updateBillCriteria, preparedStmtList);
 					return jdbcTemplate.update(queryStr, preparedStmtList.toArray());
-				}
+				} 
+				
 				else {
 					return 0;
 				}

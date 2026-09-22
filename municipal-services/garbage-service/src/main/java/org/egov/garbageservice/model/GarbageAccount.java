@@ -28,6 +28,48 @@ public class GarbageAccount {
 	private Long garbageId;
 
 	private String propertyId;
+	
+	private String systemPropertyId;
+	
+	private String himParivarId;
+	
+	private Boolean isDdpVerified;
+
+	private Boolean ddpPrintVerified;
+
+	private Long ddpModifiedDate;
+
+	/**
+	 * Set true in bulk by the DDP printing scheduler once ddpVerified accounts
+	 * in a ULB/ward (as configured in the ULBS.DdpPrinting MDMS master) are
+	 * ready to be handed off for door plate printing.
+	 */
+	private Boolean isReadyForPrinting;
+
+	/**
+	 * Vendor's print-verification outcome, e.g. "VERIFIED"/"REJECTED"; null
+	 * while pending.
+	 */
+	private String vendorPrintVerified;
+
+	private Boolean ulbVerified;
+
+	private Boolean installationDone;
+
+	private String ddpLatitude;
+
+	private String ddpLongitude;
+
+	/**
+	 * Set by the printing vendor once the physical plate has been printed.
+	 */
+	private Boolean ddpPrintingDone;
+
+	/**
+	 * Set by the printing vendor once the printed plate has been dispatched
+	 * to the ULB/installer.
+	 */
+	private Boolean ddpDispatched;
 
 	private String type;
 
@@ -53,6 +95,9 @@ public class GarbageAccount {
 	
 	@Builder.Default
 	private Boolean isOnlyWorkflowCall = false;
+	
+	@Builder.Default
+	private Boolean isDdpUpdateCall = false;
 
 	private String status;
 	

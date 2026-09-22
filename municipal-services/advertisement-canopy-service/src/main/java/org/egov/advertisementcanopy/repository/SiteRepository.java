@@ -394,5 +394,17 @@ public class SiteRepository {
 		statusList =jdbcTemplate.queryForList(query);
         return statusList;
 	}
+	
+	public int makeSiteAvailable(String uuid, String userId) {
+
+		Map<String, Object> paramMap = new HashMap<>();
+
+		paramMap.put("status", "Available");
+		paramMap.put("lastModifiedBy", userId);
+		paramMap.put("lastModifiedDate", System.currentTimeMillis());
+		paramMap.put("uuid", uuid);
+
+		return namedParameterJdbcTemplate.update(queryBuilder.UPDATE_SITE_AVAILABLE_QUERY, paramMap);
+	}
 
 }
