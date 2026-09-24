@@ -89,7 +89,7 @@ public class DdpConstants {
 	@Value("${egov.garbage.account.update.ddp.workflow.endpoint}")
 	private String garbageAccountUpdateDdpWorkflowEndpoint;
 
-	@Value("${egov.property.service.host}")
+	@Value("${egov.property.context.host}")
 	private String propertyServiceHostUrl;
 
 	@Value("${egov.property.search.endpoint}")
