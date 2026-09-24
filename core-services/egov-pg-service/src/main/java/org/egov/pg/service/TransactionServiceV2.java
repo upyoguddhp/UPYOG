@@ -503,6 +503,7 @@ public class TransactionServiceV2 {
 		payload.put("billId", transaction.getBillId());
 		payload.put("txnId", transaction.getTxnId());
 		payload.put("isPaymentProcessing", isPaymentProcessing);
+		payload.put("txnAmount", transaction.getTxnAmount());
 
 		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
 			producer.push(appProperties.getGrbgPaymentProcessingTopic(), payload);
