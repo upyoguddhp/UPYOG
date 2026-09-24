@@ -164,7 +164,7 @@ public class GarbageCollectionService {
 				.garbageId(null == account.getGarbageId() ? null : String.valueOf(account.getGarbageId()))
 				.name(account.getName())
 				.mobileNumber(account.getMobileNumber())
-				.propertyId(account.getPropertyId())
+				.propertyId(account.getSystemPropertyId())
 				.propertyAddress(toPropertyAddress(address))
 				.propertyType(toPropertyType(account))
 				.vendorPrintVerified(account.getVendorPrintVerified())

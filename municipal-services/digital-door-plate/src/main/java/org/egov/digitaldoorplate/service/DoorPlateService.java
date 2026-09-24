@@ -3,10 +3,8 @@ package org.egov.digitaldoorplate.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.digitaldoorplate.model.DoorPlate;
@@ -19,11 +17,11 @@ import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
 import org.egov.digitaldoorplate.model.DoorPlateRequest;
 import org.egov.digitaldoorplate.model.DoorPlateResponse;
 import org.egov.digitaldoorplate.model.QrCodeData;
-import org.egov.digitaldoorplate.model.RemoteGarbageAccount;
-import org.egov.digitaldoorplate.model.RemoteGrbgAddress;
+import org.egov.digitaldoorplate.model.RemoteProperty;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlate;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlateRequest;
 import org.egov.digitaldoorplate.repository.DoorPlateRepository;
+import org.egov.digitaldoorplate.repository.PropertyOwnerRepository;
 import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
 import org.egov.tracer.model.CustomException;
@@ -32,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +47,12 @@ public class DoorPlateService {
 
 	@Autowired
 	private GarbageAccountService garbageAccountService;
+
+	@Autowired
+	private PropertyService propertyService;
+
+	@Autowired
+	private PropertyOwnerRepository propertyOwnerRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -186,10 +190,9 @@ public class DoorPlateService {
 	/**
 	 * Compares the owner/property snapshot embedded in a scanned door plate QR
 	 * code (captured at print time) against the current live record in
-	 * garbage-service, to detect whether the record has since been updated in
-	 * the system.
+	 * property-services (looked up by the QR's PropertyID), to detect whether
+	 * the record has since been updated in the system.
 	 */
-	@SuppressWarnings("unchecked")
 	public DoorPlateQrVerifyResponse verifyQrData(DoorPlateQrVerifyRequest request) {
 
 		validateUserInfo(request.getRequestInfo());
@@ -206,34 +209,30 @@ public class DoorPlateService {
 		} catch (Exception e) {
 			throw new CustomException("INVALID_QR", "Scanned QR data is not in the expected format.");
 		}
-		if (StringUtils.isEmpty(qrSnapshot.getId())) {
-			throw new CustomException("INVALID_QR", "Scanned QR data does not contain the garbage account id.");
+		if (StringUtils.isEmpty(qrSnapshot.getPropertyId())) {
+			throw new CustomException("INVALID_QR", "Scanned QR data does not contain the PropertyID.");
 		}
 
-		Map<String, Object> garbageSearchResponse = garbageAccountService.searchGarbageAccountByUuid(
-				request.getRequestInfo(), request.getTenantId(), qrSnapshot.getId());
+		RemoteProperty property = propertyService.searchPropertyByPropertyId(request.getRequestInfo(),
+				request.getTenantId(), qrSnapshot.getPropertyId());
 
-		Object rawGarbageAccounts = garbageSearchResponse.get("garbageAccounts");
-		if (null == rawGarbageAccounts
-				|| (rawGarbageAccounts instanceof List && ((List<?>) rawGarbageAccounts).isEmpty())) {
-			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
-					"No active garbage account found for id: " + qrSnapshot.getId());
+		RemoteProperty.Owner owner = findPrimaryOwner(property.getOwners());
+		JsonNode addressDetails = null == property.getAddress() ? null : property.getAddress().getAdditionalDetails();
+
+		String mobileNo = propertyOwnerRepository.getOwnerMobileNumber(property.getPropertyId(),
+				null == property.getTenantId() ? request.getTenantId() : property.getTenantId());
+		if (StringUtils.isEmpty(mobileNo) && null != owner) {
+			mobileNo = owner.getMobileNumber();
 		}
-		List<RemoteGarbageAccount> remoteGarbageAccounts = objectMapper.convertValue(rawGarbageAccounts,
-				new TypeReference<List<RemoteGarbageAccount>>() {
-				});
-		RemoteGarbageAccount account = remoteGarbageAccounts.get(0);
-		RemoteGrbgAddress address = CollectionUtils.isEmpty(account.getAddresses()) ? null
-				: account.getAddresses().get(0);
 
 		DoorPlateQrSnapshot dbSnapshot = DoorPlateQrSnapshot.builder()
-				.ownerName(account.getName())
-				.mobileNo(account.getMobileNumber())
-				.propertyId(account.getSystemPropertyId())
-				.id(account.getUuid())
-				.ulbName(null == address ? null : address.getUlbName())
-				.ward(null == address ? null : address.getWardName())
-				.address(toPropertyAddress(address))
+				.ownerName(null == owner ? null : owner.getPropertyOwnerName())
+				.mobileNo(mobileNo)
+				.propertyId(property.getPropertyId())
+				.id(qrSnapshot.getId())
+				.ulbName(readText(addressDetails, "ulbName"))
+				.ward(readText(addressDetails, "wardNumber"))
+				.address(readText(addressDetails, "propertyAddress"))
 				.build();
 
 		List<String> mismatchedFields = findMismatchedFields(qrSnapshot, dbSnapshot);
@@ -330,13 +329,20 @@ public class DoorPlateService {
 		return StringUtils.isEmpty(a) ? StringUtils.isEmpty(b) : a.trim().equalsIgnoreCase(null == b ? "" : b.trim());
 	}
 
-	private String toPropertyAddress(RemoteGrbgAddress address) {
-		if (null == address) {
+	private RemoteProperty.Owner findPrimaryOwner(List<RemoteProperty.Owner> owners) {
+		if (CollectionUtils.isEmpty(owners)) {
 			return null;
 		}
-		return Stream.of(address.getAddress1(), address.getAddress2(), address.getCity())
-				.filter(StringUtils::isNotEmpty)
-				.collect(Collectors.joining(", "));
+		return owners.stream().filter(owner -> Boolean.TRUE.equals(owner.getIsPrimaryOwner())).findFirst()
+				.orElse(owners.get(0));
+	}
+
+	private String readText(JsonNode node, String fieldName) {
+		if (null == node) {
+			return null;
+		}
+		JsonNode value = node.path(fieldName);
+		return value.isMissingNode() || value.isNull() ? null : value.asText();
 	}
 
 	public DoorPlateResponse search(SearchCriteriaDoorPlateRequest searchRequest) {
