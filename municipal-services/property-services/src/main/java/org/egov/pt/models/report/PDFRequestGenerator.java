@@ -330,10 +330,7 @@ public class PDFRequestGenerator {
 				}
 			}
 			BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
-			BigDecimal CurrentpropertyTax = ptTaxCalculatorTracker.getPropertyTax() != null
-					? ptTaxCalculatorTracker.getPropertyTax()
-					: BigDecimal.ZERO;
-			if (totalPaidAmount.compareTo(CurrentpropertyTax) < 0) {
+			if (totalPaidAmount.compareTo(bill.getTotalAmount()) < 0) {
 				paymentStatus = "Partially Paid";
 			} else {
 				paymentStatus = "Paid";

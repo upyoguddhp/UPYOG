@@ -567,7 +567,11 @@ public class PropertyQueryBuilder {
 	        "additionaldetails = CASE " +
 	        "    WHEN ? = true THEN " +
 	        "        jsonb_set( " +
-	        "            COALESCE(additionaldetails, '[{}]'::jsonb), " +
+	        "            CASE " +
+	        "                WHEN jsonb_typeof(COALESCE(additionaldetails, '{}'::jsonb)) = 'array' " +
+	        "                    THEN additionaldetails " +
+	        "                ELSE '[{}]'::jsonb " +
+	        "            END, " +
 	        "            '{0,chequeTxnAmount}', " +
 	        "            to_jsonb(CAST(? AS numeric)), " +
 	        "            true " +
