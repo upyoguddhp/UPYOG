@@ -801,9 +801,9 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
 		
-		public int updatePaymentProcessing(String billId, boolean isPaymentProcessing) {
+		public int updatePaymentProcessing(String billId, boolean isPaymentProcessing, String txnAmount) {
 			List<Object> preparedStmtList = new ArrayList<>();
-			String query = queryBuilder.getUpdateIsProcessingPaymentQuery(preparedStmtList, billId,isPaymentProcessing);
+			String query = queryBuilder.getUpdateIsProcessingPaymentQuery(preparedStmtList, billId,isPaymentProcessing, txnAmount);
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
 	}

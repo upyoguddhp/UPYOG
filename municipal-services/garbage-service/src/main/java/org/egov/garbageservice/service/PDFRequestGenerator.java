@@ -134,9 +134,30 @@ public class PDFRequestGenerator {
 			        .orElse(null);
 
 			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
-			    paymentStatus = "PROCESSING";
+				BigDecimal chequeTxnAmount = BigDecimal.ZERO;
+				JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
+				if (trackerAdditionalDetail != null && trackerAdditionalDetail.has("chequeTxnAmount")
+						&& !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
+					chequeTxnAmount = trackerAdditionalDetail.get("chequeTxnAmount").decimalValue();
+				}
+				BigDecimal adjustedAmount = BigDecimal.ZERO;
+				for (BillDetail billDetail : billObj.getBillDetails()) {
+					if (billDetail.getBillAccountDetails() != null) {
+						for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+							adjustedAmount = accDetail.getAdjustedAmount() != null ? accDetail.getAdjustedAmount()
+									: BigDecimal.ZERO;
+							break;
+						}
+					}
+				}
+				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
+				if (totalPaidAmount.compareTo(tracker.getGrbgBillAmount()) < 0) {
+					paymentStatus = "PARTIALLY_PAID";
+				} else {
+					paymentStatus = "PAID";
+				}
 			} else {
-			    paymentStatus = billObj.getStatus().toString();
+				paymentStatus = billObj.getStatus().toString();
 			}
 
 			grbgObj.get("paymentStatuses").add(paymentStatus);

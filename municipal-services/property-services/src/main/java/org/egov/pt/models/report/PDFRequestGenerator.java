@@ -308,13 +308,42 @@ public class PDFRequestGenerator {
 		}
 
 		if (Boolean.TRUE.equals(ptTaxCalculatorTracker.getIsPaymentProcessing())) {
-		    paymentStatus = "Processing";
+			BigDecimal chequeTxnAmount = BigDecimal.ZERO;
+			JsonNode trackerAdditionalDetails = ptTaxCalculatorTracker.getAdditionalDetails();
+			if (trackerAdditionalDetails != null && trackerAdditionalDetails.isArray()
+					&& !trackerAdditionalDetails.isEmpty()) {
+				JsonNode firstDetail = trackerAdditionalDetails.get(0);
+				if (firstDetail.has("chequeTxnAmount") && !firstDetail.get("chequeTxnAmount").isNull()) {
+					chequeTxnAmount = firstDetail.get("chequeTxnAmount").decimalValue();
+				}
+			}
+			BigDecimal adjustedAmount = BigDecimal.ZERO;
+			if (bill.getBillDetails() != null) {
+				for (BillDetail billDetail : bill.getBillDetails()) {
+					if (billDetail.getBillAccountDetails() != null) {
+						for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+							if (accDetail.getAdjustedAmount() != null) {
+								adjustedAmount = adjustedAmount.add(accDetail.getAdjustedAmount());
+							}
+						}
+					}
+				}
+			}
+			BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
+			BigDecimal CurrentpropertyTax = ptTaxCalculatorTracker.getPropertyTax() != null
+					? ptTaxCalculatorTracker.getPropertyTax()
+					: BigDecimal.ZERO;
+			if (totalPaidAmount.compareTo(CurrentpropertyTax) < 0) {
+				paymentStatus = "Partially Paid";
+			} else {
+				paymentStatus = "Paid";
+			}
 		} else if (bill.getStatus().equals(StatusEnum.PAID)) {
-		    paymentStatus = "Success";
+			paymentStatus = "Success";
 		} else if (bill.getStatus().equals(StatusEnum.PARTIALLY_PAID)) {
-		    paymentStatus = "Partially Paid";
+			paymentStatus = "Partially Paid";
 		} else {
-		    paymentStatus = "Pending";
+			paymentStatus = "Pending";
 		}
 		
 		if (amountPaid.compareTo(BigDecimal.ZERO) > 0) {
