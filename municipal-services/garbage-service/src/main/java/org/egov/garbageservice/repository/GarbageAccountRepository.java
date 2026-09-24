@@ -177,15 +177,17 @@ public class GarbageAccountRepository {
 			+ "WHERE id IN (%s)";
 
 	private static final String UPDATE_DDP_WORKFLOW_BY_UUID = "UPDATE eg_grbg_account SET "
-			+ "vendor_print_verified = COALESCE(:vendorPrintVerified, vendor_print_verified), "
-			+ "ulb_verified = COALESCE(:ulbVerified, ulb_verified), "
-			+ "installation_done = COALESCE(:installationDone, installation_done), "
-			+ "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
-			+ "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
-			+ "ddp_printing_done = COALESCE(:ddpPrintingDone, ddp_printing_done), "
-			+ "ddp_dispatched = COALESCE(:ddpDispatched, ddp_dispatched), "
-			+ "last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate "
-			+ "WHERE uuid = :uuid AND tenant_id = :tenantId";
+	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, vendor_print_verified), "
+	        + "ddp_print_verified = COALESCE(:ddpPrintVerified, ddp_print_verified), "
+	        + "ulb_verified = COALESCE(:ulbVerified, ulb_verified), "
+	        + "installation_done = COALESCE(:installationDone, installation_done), "
+	        + "ddp_latitude = COALESCE(:ddpLatitude, ddp_latitude), "
+	        + "ddp_longitude = COALESCE(:ddpLongitude, ddp_longitude), "
+	        + "ddp_printing_done = COALESCE(:ddpPrintingDone, ddp_printing_done), "
+	        + "ddp_dispatched = COALESCE(:ddpDispatched, ddp_dispatched), "
+	        + "last_modified_by = :lastModifiedBy, "
+	        + "last_modified_date = :lastModifiedDate "
+	        + "WHERE uuid = :uuid AND tenant_id = :tenantId";
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
@@ -877,6 +879,7 @@ public class GarbageAccountRepository {
 		params.put("ddpDispatched", request.getDdpDispatched());
 		params.put("lastModifiedBy", userUuid);
 		params.put("lastModifiedDate", now);
+		params.put("ddpPrintVerified", request.getDdpPrintVerified());
 
 		return namedParameterJdbcTemplate.update(UPDATE_DDP_WORKFLOW_BY_UUID, params);
 	}

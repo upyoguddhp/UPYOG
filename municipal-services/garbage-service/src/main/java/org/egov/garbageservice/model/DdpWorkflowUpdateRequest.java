@@ -52,4 +52,6 @@ public class DdpWorkflowUpdateRequest {
 	 * to the ULB/installer.
 	 */
 	private Boolean ddpDispatched;
+	
+	private Boolean ddpPrintVerified;
 }

@@ -91,6 +91,7 @@ import org.egov.demand.repository.ServiceRequestRepository;
 import org.egov.demand.util.Util;
 import org.egov.demand.web.contract.BillRequestV2;
 import org.egov.demand.web.contract.BillResponseV2;
+import org.egov.demand.web.contract.DemandRequest;
 import org.egov.demand.web.contract.BusinessServiceDetailCriteria;
 import org.egov.demand.web.contract.RequestInfoWrapper;
 import org.egov.demand.web.contract.User;
@@ -111,6 +112,7 @@ import org.egov.demand.model.BillIdRequest;
 import org.egov.demand.model.GrbgBillTracker;
 import org.egov.demand.model.PtTaxCalculatorTracker;
 import org.egov.demand.model.BillCancelRequest;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -562,6 +564,7 @@ public class BillServicev2 {
 				BigDecimal minimumAmtPayableForBill = BigDecimal.ZERO;
 				List<Demand> demandsForSingleCode = consumerCodeAndDemands.getValue();
 				BusinessServiceDetail business = businessMap.get(demandsForSingleCode.get(0).getBusinessService());
+				BillStatus billStatus = BillStatus.ACTIVE;
 				
 				String billId = UUID.randomUUID().toString();
 				String billNumber = getBillNumbers(requestInfo, tenantId, demandForOneTenant.get(0).getBusinessService(), 1).get(0);
@@ -575,6 +578,11 @@ public class BillServicev2 {
 					billDetail.setId(billDetailId);
 					billDetails.add(billDetail);
 					billAmount = billAmount.add(billDetail.getAmount());
+					if (Boolean.FALSE.equals(demand.getIsPaymentCompleted()) && demand.getDemandDetails() != null
+							&& demand.getDemandDetails().stream().anyMatch(detail -> detail.getCollectionAmount() != null
+									&& detail.getCollectionAmount().compareTo(BigDecimal.ZERO) > 0)) {
+						billStatus = BillStatus.ADVANCE_ADJUSTED;
+					}
 				}
 				
 				if ((billAmount.compareTo(BigDecimal.ZERO) >= 0) || (billAmount.compareTo(BigDecimal.ZERO) < 0 && ADVANCE_ALLOWED_BUSINESS_SERVICES.contains(demands.get(0).getBusinessService()))) {
@@ -588,7 +596,7 @@ public class BillServicev2 {
 						.businessService(business.getCode())
 						.payerName(payer.getName())
 						.consumerCode(consumerCode)
-						.status(BillStatus.ACTIVE)
+						.status(billStatus)
 						.billDetails(billDetails)
 						.totalAmount(billAmount)
 						.userId(payer.getUuid())
@@ -704,7 +712,8 @@ public class BillServicev2 {
 	private void addOrUpdateBillAccDetailInTaxCodeAccDetailMap(Map<String, BillAccountDetailV2> taxCodeAccDetailMap,
 			DemandDetail demandDetail, TaxHeadMaster taxHead, String billDetailId) {
 
-		BigDecimal newAmountForAccDeatil = demandDetail.getTaxAmount().subtract(demandDetail.getCollectionAmount());
+		BigDecimal grossAmountForAccDetail = demandDetail.getTaxAmount();
+		BigDecimal adjustedAmountForAccDetail = demandDetail.getCollectionAmount();
 		/*
 		 * BAD - BillAccountDetail
 		 * 
@@ -720,7 +729,9 @@ public class BillServicev2 {
 
 			BillAccountDetailV2 existingAccDetail = taxCodeAccDetailMap.get(taxHead.getCode());
 			BigDecimal existingAmtForAccDetail = existingAccDetail.getAmount();
-			existingAccDetail.setAmount(existingAmtForAccDetail.add(newAmountForAccDeatil));
+			BigDecimal existingAdjustedAmountForAccDetail = existingAccDetail.getAdjustedAmount();
+			existingAccDetail.setAmount(existingAmtForAccDetail.add(grossAmountForAccDetail));
+			existingAccDetail.setAdjustedAmount(existingAdjustedAmountForAccDetail.add(adjustedAmountForAccDetail));
 
 		} else {
 
@@ -728,9 +739,9 @@ public class BillServicev2 {
 					.demandDetailId(demandDetail.getId())
 					.tenantId(demandDetail.getTenantId())
 					.id(UUID.randomUUID().toString())
-					.adjustedAmount(BigDecimal.ZERO)
+					.adjustedAmount(adjustedAmountForAccDetail)
 					.taxHeadCode(taxHead.getCode())
-					.amount(newAmountForAccDeatil)
+					.amount(grossAmountForAccDetail)
 					.order(taxHead.getOrder())
 					.billDetailId(billDetailId)
 					.build();
@@ -802,7 +813,78 @@ public class BillServicev2 {
 
 		if (!CollectionUtils.isEmpty(billRequest.getBills()))
 			billRepository.saveBill(billRequest);
+		try {
+			updateDemandsPaymentStatusAfterBillCreate(billRequest);
+		} catch (Exception e) {
+			log.warn("Failed to update demand payment status after bill creation: {}", e.getMessage());
+		}
 		return getBillResponse(billRequest.getBills());
+	}
+
+	private void updateDemandsPaymentStatusAfterBillCreate(BillRequestV2 billRequest) {
+
+		if (billRequest == null || CollectionUtils.isEmpty(billRequest.getBills()))
+			return;
+
+		Set<String> demandIds = new HashSet<>();
+		String tenantId = null;
+		for (BillV2 bill : billRequest.getBills()) {
+			if (tenantId == null)
+				tenantId = bill.getTenantId();
+			if (bill.getBillDetails() == null)
+				continue;
+			for (BillDetailV2 bd : bill.getBillDetails()) {
+				if (bd.getDemandId() != null)
+					demandIds.add(bd.getDemandId());
+			}
+		}
+
+		if (demandIds.isEmpty())
+			return;
+
+		DemandCriteria demandCriteria = DemandCriteria.builder().demandId(demandIds).tenantId(tenantId).build();
+		List<Demand> demands = demandService.getDemands(demandCriteria, billRequest.getRequestInfo());
+
+		if (CollectionUtils.isEmpty(demands))
+			return;
+
+		for (Demand demand : demands) {
+			util.updateDemandPaymentStatus(demand, true);
+		}
+
+		DemandRequest demandRequest = new DemandRequest(billRequest.getRequestInfo(), demands);
+		demandService.update(demandRequest, null);
+
+		Set<String> paidDemandIds = demands.stream().filter(d -> Boolean.TRUE.equals(d.getIsPaymentCompleted()))
+				.map(Demand::getId).collect(Collectors.toSet());
+
+		if (!paidDemandIds.isEmpty()) {
+			Map<String, Map<String, Set<String>>> tenantBsToBillIds = new HashMap<>();
+			for (BillV2 bill : billRequest.getBills()) {
+				if (bill.getBillDetails() == null)
+					continue;
+				Set<String> billDemandIds = bill.getBillDetails().stream().map(BillDetailV2::getDemandId)
+						.filter(Objects::nonNull).collect(Collectors.toSet());
+				if (billDemandIds.isEmpty())
+					continue;
+				if (paidDemandIds.containsAll(billDemandIds)) {
+					String tenant = bill.getTenantId();
+					String bs = bill.getBusinessService();
+					tenantBsToBillIds.computeIfAbsent(tenant, k -> new HashMap<>())
+							.computeIfAbsent(bs, k -> new HashSet<>()).add(bill.getId());
+				}
+			}
+
+			for (Entry<String, Map<String, Set<String>>> tenantEntry : tenantBsToBillIds.entrySet()) {
+				String tenant = tenantEntry.getKey();
+				for (Entry<String, Set<String>> bsEntry : tenantEntry.getValue().entrySet()) {
+					UpdateBillCriteria criteria = UpdateBillCriteria.builder().billIds(bsEntry.getValue())
+							.tenantId(tenant).businessService(bsEntry.getKey()).statusToBeUpdated(BillStatus.PAID)
+							.build();
+					billRepository.updateBillStatus(criteria);
+				}
+			}
+		}
 	}
 	
 	public static List<String> getOwnerFieldsPlainAccessList() {

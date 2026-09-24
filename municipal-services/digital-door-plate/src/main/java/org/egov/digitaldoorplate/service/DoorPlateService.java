@@ -266,10 +266,10 @@ public class DoorPlateService {
 		}
 		if (StringUtils.isEmpty(request.getVendorPrintVerified()) && null == request.getUlbVerified()
 				&& null == request.getInstallationDone() && null == request.getDdpPrintingDone()
-				&& null == request.getDdpDispatched()) {
+				&& null == request.getDdpDispatched()  && null == request.getDdpPrintVerified()){
 			throw new CustomException("INVALID_REQUEST",
 					"Provide at least one of vendorPrintVerified, ulbVerified, installationDone, "
-							+ "ddpPrintingDone or ddpDispatched to update.");
+							+ "ddpPrintingDone, ddpPrintVerified or ddpDispatched to update.");
 		}
 		if (StringUtils.isNotEmpty(request.getVendorPrintVerified())
 				&& !(DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_VERIFIED
@@ -287,7 +287,7 @@ public class DoorPlateService {
 		garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
 				request.getGarbageAccountUuid(), request.getVendorPrintVerified(), request.getUlbVerified(),
 				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
-				request.getDdpPrintingDone(), request.getDdpDispatched());
+				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified());
 
 		return DoorPlateDdpWorkflowResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))

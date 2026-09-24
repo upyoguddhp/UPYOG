@@ -172,6 +172,7 @@ public class GarbageCollectionService {
 				.installationDone(account.getInstallationDone())
 				.ddpPrintingDone(account.getDdpPrintingDone())
 				.ddpDispatched(account.getDdpDispatched())
+				.ddpPrintVerified(account.getDdpPrintVerified())
 				.garbageCollected(Boolean.TRUE.equals(null == parentCollection ? null : parentCollection.getIsCollected()))
 				.residentAvailable(null == parentCollection ? null : parentCollection.getIsResidentAvailable())
 				.isWasteKeptOutside(null == parentCollection ? null : parentCollection.getIsWasteKeptOutside())

@@ -178,16 +178,18 @@
          width: 120px;
          margin-top: 10px;
          }
-         .footer {
-         position: fixed;
-         bottom: 0;
-         left: 0;
-         right: 0;
-         text-align: center;
-         font-size: 10px;
-         border-top: 1px solid #ccc;
-         padding: 5px;
-         }
+		 .footer {
+		 position: relative;
+		 clear: both;
+		 width: 100%;
+		 box-sizing: border-box;
+		 margin-top: 30px;
+		 text-align: center;
+		 font-size: 10px;
+		 border-top: 1px solid #ccc;
+		 padding: 5px;
+		 page-break-inside: avoid;
+		 }
          .qr-code {
          width: 300px;
          min-height: 300px;
@@ -216,6 +218,13 @@
 		 .bold-dark-text {
 		 font-weight: 700;
 		 color: #000000;
+		 }
+		 table.main {
+		     page-break-inside: auto;
+		 }
+
+		 table.main tr {
+		     page-break-inside: avoid;
 		 }
       </style>
    </head>
@@ -303,6 +312,10 @@
 						<tr>
 						   <th>Amount Paid (INR)</th>
 						   <td><span class="highlight"><span th:text="${amountPaid}"> NA </span></span></td>
+						</tr>
+						<tr>
+							<th>Advance Paid (INR)</th>
+							<td><span class="highlight"><span th:text="${advancePaid}"> NA </span></span></td>
 						</tr>
                         <tr>
                            <th>Period</th>

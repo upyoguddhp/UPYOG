@@ -60,4 +60,6 @@ public class DoorPlateDdpWorkflowRequest {
 	 * Vendor step: printed plate has been dispatched to the ULB/installer.
 	 */
 	private Boolean ddpDispatched;
+	
+	private Boolean ddpPrintVerified;
 }
