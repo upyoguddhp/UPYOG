@@ -181,7 +181,6 @@ public class TransactionServiceV2 {
 				        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
 				        transaction.setPayTo(bankAccount.getPayTo());
 				    }
-				transaction.setPayTo("");
 				URI uri = gatewayService.initiateTxn(transaction);
 				transaction.setRedirectUrl(uri.toString());
 
