@@ -142,16 +142,16 @@ public class PDFRequestGenerator {
 				}
 				BigDecimal adjustedAmount = BigDecimal.ZERO;
 				for (BillDetail billDetail : billObj.getBillDetails()) {
-					if (billDetail.getBillAccountDetails() != null) {
-						for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
-							adjustedAmount = accDetail.getAdjustedAmount() != null ? accDetail.getAdjustedAmount()
-									: BigDecimal.ZERO;
-							break;
-						}
-					}
+				    if (billDetail.getBillAccountDetails() != null) {
+				        for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+				            if (accDetail.getAdjustedAmount() != null) {
+				                adjustedAmount = adjustedAmount.add(accDetail.getAdjustedAmount());
+				            }
+				        }
+				    }
 				}
 				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
-				if (totalPaidAmount.compareTo(tracker.getGrbgBillAmount()) < 0) {
+				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
 					paymentStatus = "PARTIALLY_PAID";
 				} else {
 					paymentStatus = "PAID";
