@@ -156,6 +156,19 @@ public class DemandService {
 
 	}
 	
+	List<Demand> searchDemandbyDemandId(String tenantId, Set<String> demandIds, Set<String> consumerCodes,
+			RequestInfo requestInfo, String businessService) {
+
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		DemandResponse response = demandRepository.searchByDemandID(tenantId, demandIds, consumerCodes, requestInfoWrapper, businessService);
+
+		if (CollectionUtils.isEmpty(response.getDemands())) {
+			return null;
+		} else {
+			return response.getDemands();
+		}
+	}
+	
     public List<Demand> cancelDemand(String tenantId, Set<String> demandIds, RequestInfo requestInfo,
 			String businessService){
         List<Demand> demands = new LinkedList<>();

@@ -190,3 +190,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Private keys (do not commit certificate private keys)
+*.key
+digital-door-plate/src/main/resources/certs/

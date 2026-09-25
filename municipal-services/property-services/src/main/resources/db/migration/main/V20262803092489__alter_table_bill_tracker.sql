@@ -1,0 +1,2 @@
+ALTER TABLE public.eg_pt_tax_calculator_tracker
+ADD COLUMN is_payment_processing boolean DEFAULT false;

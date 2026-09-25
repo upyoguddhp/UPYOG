@@ -100,6 +100,7 @@ import org.egov.pt.models.AuditDetails;
 import org.egov.pt.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.egov.common.contract.response.ResponseInfo;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 
@@ -1078,7 +1079,7 @@ public class PropertyService {
 		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
 		        PtTaxCalculatorTrackerSearchCriteria.builder()
 		        .demandIds(Collections.singleton(demandId))
-		        .billStatus(Collections.singleton(BillStatus.ACTIVE))
+				.billStatus(new HashSet<>(Arrays.asList(BillStatus.ACTIVE, BillStatus.ADVANCE_ADJUSTED)))
 				.build();
 
 		List<PtTaxCalculatorTracker> trackers = repository.getTaxCalculatedProperties(trackerSearchCriteria);
@@ -1091,6 +1092,13 @@ public class PropertyService {
 
 		if (trackers.size() > 1) {
 			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
+		}
+		
+		if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+		    throw new CustomException(
+		            "PAYMENT_PROCESSING",
+		            "Bill cannot be cancelled because payment processing is in progress"
+		    );
 		}
 		
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
@@ -1155,17 +1163,24 @@ public class PropertyService {
 					.tenantId(cancelRequest.getTenantId())
 					.status(StatusEnum.EXPIRED)
 					.build();
+			
+			boolean wasAdvanceAdjusted = previousTracker.getAdditionalDetails() != null
+					&& previousTracker.getAdditionalDetails().isArray() && previousTracker.getAdditionalDetails().size() > 0
+					&& previousTracker.getAdditionalDetails().get(0).path("advanceAdjusted").asBoolean(false);
+
+			Bill.StatusEnum billStatus = wasAdvanceAdjusted ? Bill.StatusEnum.ADVANCE_ADJUSTED : Bill.StatusEnum.ACTIVE;
+			
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
 
-				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				prevBill.setStatus(billStatus);
 				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
 
 				AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 				PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
 					    .uuid(previousTracker.getUuid())
-					    .billStatus(BillStatus.ACTIVE)
+					    .billStatus(BillStatus.valueOf(billStatus.name()))
 					    .auditDetails(prevAudit)
 					    .rebateAmount(previousTracker.getRebateAmount())           
 					    .penaltyAmount(previousTracker.getPenaltyAmount())         
@@ -1376,6 +1391,7 @@ public class PropertyService {
 					
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
+					syncArrearTrackerWithBillStatus(ptTaxCalculatorTracker, genrateArrearRequest.getRequestInfo());
 					arrearGenerated.set(true);
 				} else {
 					throw new CustomException("INVALID_CONSUMERCODE", "Bill not generated");
@@ -1713,6 +1729,56 @@ public class PropertyService {
 	    return ResponseEntity.ok(response);
 	}
 
+	public void UpdatePtTrackerStatus(PtTaxCalculatorTracker tracker) {
+		repository.updateStatus(tracker);
+	}
+	
+	private void syncArrearTrackerWithBillStatus(PtTaxCalculatorTracker tracker, RequestInfo requestInfo) {
+
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(tracker.getTenantId())
+				.consumerCode(Collections.singleton(tracker.getPropertyId())).service("PROPERTY")
+				.billId(Collections.singleton(tracker.getBillId())).build();
+
+		List<Bill> bills = billService.searchBill(billSearchCriteria, requestInfo).getBill();
+
+		if (CollectionUtils.isEmpty(bills)) {
+			return;
+		}
+
+		Bill currentBill = bills.get(0);
+
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+
+			ArrayNode additionalDetails;
+
+			if (tracker.getAdditionalDetails() != null && tracker.getAdditionalDetails().isArray()) {
+				additionalDetails = (ArrayNode) tracker.getAdditionalDetails();
+			} else {
+				additionalDetails = mapper.createArrayNode();
+			}
+
+			ObjectNode detailsObject;
+
+			if (additionalDetails.size() > 0) {
+				detailsObject = (ObjectNode) additionalDetails.get(0);
+			} else {
+				detailsObject = mapper.createObjectNode();
+				additionalDetails.add(detailsObject);
+			}
+
+			detailsObject.put("advanceAdjusted", true);
+
+			tracker.setAdditionalDetails(additionalDetails);
+			repository.updateTrackerAdditionalDetails(tracker);
+		}
+
+		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
+		propertyService.UpdatePtTrackerStatus(tracker);
+	}
 
 
 }
