@@ -2982,6 +2982,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.ddpLongitude(request.getDdpLongitude())
 				.ddpPrintingDone(request.getDdpPrintingDone())
 				.ddpDispatched(request.getDdpDispatched())
+				.ddpRejectionReason(request.getDdpRejectionReason())
+				.remarks(request.getRemarks())
 				.build();
 	}
 
