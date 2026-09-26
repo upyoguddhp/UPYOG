@@ -1405,6 +1405,8 @@ public class GarbageAccountService {
 
 		// replicate existing grbg acc to history table
 
+		GarbageAccount ddpChanges = buildDdpChanges(newGarbageAccount, existingGarbageAccount);
+
 		// update garbage account
 		garbageAccountRepository.update(newGarbageAccount);
 
@@ -1412,6 +1414,51 @@ public class GarbageAccountService {
 			garbageAccountRepository.updateDdpDetails(newGarbageAccount);
 		}
 
+		if (null != ddpChanges) {
+			garbageAccountRepository.upsertDdpDetails(existingGarbageAccount.getUuid(),
+					existingGarbageAccount.getGarbageId(), ddpChanges);
+		}
+
+	}
+
+	/**
+	 * Picks out the eg_grbg_account_ddp fields (ready for printing, vendor/ULB
+	 * verification, installation, lat/long, printing/dispatch, rejection reason,
+	 * remarks) that the request sets to a value different from the current one,
+	 * so unrelated updates never overwrite them. Returns null if none changed.
+	 */
+	private GarbageAccount buildDdpChanges(GarbageAccount newAccount, GarbageAccount existingAccount) {
+
+		if (null != newAccount.getVendorPrintVerified()
+				&& !("VERIFIED".equalsIgnoreCase(newAccount.getVendorPrintVerified())
+						|| "REJECTED".equalsIgnoreCase(newAccount.getVendorPrintVerified()))) {
+			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
+		}
+
+		GarbageAccount changes = GarbageAccount.builder()
+				.isReadyForPrinting(changedValue(newAccount.getIsReadyForPrinting(), existingAccount.getIsReadyForPrinting()))
+				.vendorPrintVerified(changedValue(newAccount.getVendorPrintVerified(), existingAccount.getVendorPrintVerified()))
+				.ulbVerified(changedValue(newAccount.getUlbVerified(), existingAccount.getUlbVerified()))
+				.installationDone(changedValue(newAccount.getInstallationDone(), existingAccount.getInstallationDone()))
+				.ddpLatitude(changedValue(newAccount.getDdpLatitude(), existingAccount.getDdpLatitude()))
+				.ddpLongitude(changedValue(newAccount.getDdpLongitude(), existingAccount.getDdpLongitude()))
+				.ddpPrintingDone(changedValue(newAccount.getDdpPrintingDone(), existingAccount.getDdpPrintingDone()))
+				.ddpDispatched(changedValue(newAccount.getDdpDispatched(), existingAccount.getDdpDispatched()))
+				.ddpRejectionReason(changedValue(newAccount.getDdpRejectionReason(), existingAccount.getDdpRejectionReason()))
+				.remarks(changedValue(newAccount.getRemarks(), existingAccount.getRemarks()))
+				.build();
+
+		boolean anyChange = null != changes.getIsReadyForPrinting() || null != changes.getVendorPrintVerified()
+				|| null != changes.getUlbVerified() || null != changes.getInstallationDone()
+				|| null != changes.getDdpLatitude() || null != changes.getDdpLongitude()
+				|| null != changes.getDdpPrintingDone() || null != changes.getDdpDispatched()
+				|| null != changes.getDdpRejectionReason() || null != changes.getRemarks();
+
+		return anyChange ? changes : null;
+	}
+
+	private <T> T changedValue(T newValue, T existingValue) {
+		return null != newValue && !newValue.equals(existingValue) ? newValue : null;
 	}
 
 	private Map<Long, GarbageAccount> searchGarbageAccountMap(SearchCriteriaGarbageAccount searchCriteriaGarbageAccount,

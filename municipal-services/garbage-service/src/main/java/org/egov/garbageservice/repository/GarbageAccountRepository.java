@@ -207,7 +207,27 @@ public class GarbageAccountRepository {
 	        + "last_modified_date = :lastModifiedDate "
 	        + "WHERE uuid = :uuid AND tenant_id = :tenantId";
 
-	private static final String UPSERT_DDP_WORKFLOW_BY_UUID = "INSERT INTO eg_grbg_account_ddp "
+	private static final String UPSERT_DDP_DETAILS = "INSERT INTO eg_grbg_account_ddp "
+	        + "(garbage_account_uuid, garbage_id, is_ready_for_printing, vendor_print_verified, ulb_verified, "
+	        + "installation_done, ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, "
+	        + "ddp_rejection_reason, remarks) "
+	        + "VALUES (:uuid, :garbageId, COALESCE(:isReadyForPrinting, false), CAST(:vendorPrintVerified AS VARCHAR), "
+	        + "COALESCE(:ulbVerified, false), COALESCE(:installationDone, false), CAST(:ddpLatitude AS VARCHAR), "
+	        + "CAST(:ddpLongitude AS VARCHAR), COALESCE(:ddpPrintingDone, false), COALESCE(:ddpDispatched, false), "
+	        + "CAST(:ddpRejectionReason AS VARCHAR), CAST(:remarks AS VARCHAR)) "
+	        + "ON CONFLICT (garbage_account_uuid) DO UPDATE SET "
+	        + "is_ready_for_printing = COALESCE(:isReadyForPrinting, eg_grbg_account_ddp.is_ready_for_printing), "
+	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, eg_grbg_account_ddp.vendor_print_verified), "
+	        + "ulb_verified = COALESCE(:ulbVerified, eg_grbg_account_ddp.ulb_verified), "
+	        + "installation_done = COALESCE(:installationDone, eg_grbg_account_ddp.installation_done), "
+	        + "ddp_latitude = COALESCE(:ddpLatitude, eg_grbg_account_ddp.ddp_latitude), "
+	        + "ddp_longitude = COALESCE(:ddpLongitude, eg_grbg_account_ddp.ddp_longitude), "
+	        + "ddp_printing_done = COALESCE(:ddpPrintingDone, eg_grbg_account_ddp.ddp_printing_done), "
+	        + "ddp_dispatched = COALESCE(:ddpDispatched, eg_grbg_account_ddp.ddp_dispatched), "
+	        + "ddp_rejection_reason = COALESCE(:ddpRejectionReason, eg_grbg_account_ddp.ddp_rejection_reason), "
+	        + "remarks = COALESCE(:remarks, eg_grbg_account_ddp.remarks)";
+
+	private static final String UPSERT_DDP_WORKFLOW_BY_UUID ="INSERT INTO eg_grbg_account_ddp "
 	        + "(garbage_account_uuid, garbage_id, vendor_print_verified, ulb_verified, installation_done, "
 	        + "ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, ddp_rejection_reason, remarks) "
 	        + "SELECT acc.uuid, acc.garbage_id, CAST(:vendorPrintVerified AS VARCHAR), COALESCE(:ulbVerified, false), "
@@ -784,6 +804,36 @@ public class GarbageAccountRepository {
 			preparedStatementValues.add(searchCriteriaGarbageAccount.getIsReadyForPrinting());
 		}
 
+		if (!CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getVendorPrintVerified())) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" ddp_dtl.vendor_print_verified IN ( ").append(getQueryForCollection(
+					searchCriteriaGarbageAccount.getVendorPrintVerified(), preparedStatementValues)).append(" )");
+		}
+
+		if (searchCriteriaGarbageAccount.getUlbVerified() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" COALESCE(ddp_dtl.ulb_verified, false) = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getUlbVerified());
+		}
+
+		if (searchCriteriaGarbageAccount.getInstallationDone() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" COALESCE(ddp_dtl.installation_done, false) = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getInstallationDone());
+		}
+
+		if (searchCriteriaGarbageAccount.getDdpPrintingDone() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" COALESCE(ddp_dtl.ddp_printing_done, false) = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getDdpPrintingDone());
+		}
+
+		if (searchCriteriaGarbageAccount.getDdpDispatched() != null) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+			whereClause.append(" COALESCE(ddp_dtl.ddp_dispatched, false) = ? ");
+			preparedStatementValues.add(searchCriteriaGarbageAccount.getDdpDispatched());
+		}
+
         return whereClause.toString();
 	}
 	
@@ -891,6 +941,29 @@ public class GarbageAccountRepository {
 		jdbcTemplate.update(String.format(UPDATE_ACCOUNT_LAST_MODIFIED_BY_IDS, placeholders), accountParams.toArray());
 
 		return jdbcTemplate.update(String.format(UPSERT_READY_FOR_PRINTING, placeholders), ids.toArray());
+	}
+
+	/**
+	 * Writes the eg_grbg_account_ddp columns carried on the given account
+	 * (creating the row on first write). Null fields keep their existing value.
+	 * Used by the generic garbage account update flow.
+	 */
+	public void upsertDdpDetails(String accountUuid, Long garbageId, GarbageAccount account) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", accountUuid);
+		params.put("garbageId", garbageId);
+		params.put("isReadyForPrinting", account.getIsReadyForPrinting());
+		params.put("vendorPrintVerified", account.getVendorPrintVerified());
+		params.put("ulbVerified", account.getUlbVerified());
+		params.put("installationDone", account.getInstallationDone());
+		params.put("ddpLatitude", account.getDdpLatitude());
+		params.put("ddpLongitude", account.getDdpLongitude());
+		params.put("ddpPrintingDone", account.getDdpPrintingDone());
+		params.put("ddpDispatched", account.getDdpDispatched());
+		params.put("ddpRejectionReason", account.getDdpRejectionReason());
+		params.put("remarks", account.getRemarks());
+
+		namedParameterJdbcTemplate.update(UPSERT_DDP_DETAILS, params);
 	}
 
 	/**
