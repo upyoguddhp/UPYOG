@@ -101,14 +101,17 @@ public class EgfKafkaListener {
 	
 	@KafkaListener(topics = {"${egov.collection.receipt.voucher.save.topic}","${egov.collection.receipt.voucher.cancel.topic}","${kafka.topics.payment.create.name}","${kafka.topics.payment.cancel.name}"})	
     public void process(ConsumerRecord<String, String> record) {
+		LOGGER.info("at egf 1");
         VoucherResponse voucherResponse = null;
         String voucherNumber = "";
         ReceiptReq recRequest = ReceiptReq.builder().build();
         PaymentRequest payRequest = null;
         FinanceMdmsModel finSerMdms = new FinanceMdmsModel();
         try {
+        	LOGGER.info("at egf 2");
         	String topic = record.topic();
         	if(topic.equals(manager.getCreatePaymentTopicName()) || topic.equals(manager.getCancelPaymentTopicName())){
+        		LOGGER.info("at egf 3");
         		payRequest = objectMapper.readValue(record.value(), PaymentRequest.class);
         		List<Receipt> receipts = new ArrayList<Receipt>();
 				//Wrapper to convert payment request to receipt request
@@ -116,22 +119,27 @@ public class EgfKafkaListener {
         		recRequest.setRequestInfo(payRequest.getRequestInfo());
         		recRequest.setReceipt(receipts);
         	}else{
+        		LOGGER.info("at egf 4");
         		recRequest = objectMapper.readValue(record.value(), ReceiptReq.class);
         	}
         	LOGGER.info("topic : {} ,  request : {}", topic, recRequest);
         	if(voucherService.isTenantEnabledInFinanceModule(recRequest, finSerMdms)){
+        		LOGGER.info("at egf 5");
         		Receipt receipt = recRequest.getReceipt().get(0);
         		BillDetail billDetail = receipt.getBill().get(0).getBillDetails().get(0);
         		String description = "";
         		ProcessStatus status = ProcessStatus.SUCCESS;
         		//Fetching the voucher details for the combination of service code and reference document in ERP
         		if(topic.equals(manager.getVoucherCreateTopic())){
+        			LOGGER.info("at egf 6");
         			VoucherResponse voucherByServiceAndRefDoc = voucherService.getVoucherByServiceAndRefDoc(recRequest.getRequestInfo(), receipt.getTenantId(), billDetail.getBusinessService(), billDetail.getReceiptNumber());
         			if (voucherService.isVoucherCreationEnabled(recRequest.getReceipt().get(0), recRequest.getRequestInfo(), finSerMdms)) {
         				/* Checking existed voucher status if any present
         				 * if voucher is present with status != 4 then terminate the process and printing specific log.
         				 */
+        				LOGGER.info("at egf 7");
         				if(!voucherByServiceAndRefDoc.getVouchers().isEmpty() && !voucherByServiceAndRefDoc.getVouchers().get(0).getStatus().getCode().equals("4")){
+        					LOGGER.info("at egf 8");
         					voucherNumber = voucherByServiceAndRefDoc.getVouchers().get(0).getVoucherNumber();
         					throw new VoucherCustomException(ProcessStatus.NA, "Already voucher exists ("+voucherNumber+") for service "+billDetail.getBusinessService()+" with reference number "+billDetail.getReceiptNumber()+".");
         				}
@@ -141,6 +149,7 @@ public class EgfKafkaListener {
 								r.setTenantId(r.getTenantId().toLowerCase());
 							}
 						});
+						LOGGER.info("at egf 9");
         				voucherResponse = voucherService.createReceiptVoucher(recRequest, finSerMdms, null);
         				voucherNumber = voucherResponse.getVouchers().get(0).getVoucherNumber();
         				receiptService.updateReceipt(recRequest, voucherResponse);
@@ -149,6 +158,7 @@ public class EgfKafkaListener {
         				status = ProcessStatus.SUCCESS;
         			}else{
         				//Todo : Status should be different
+        				LOGGER.info("at egf 10");
         				description = "Voucher creation is not enabled for business service code : "+recRequest.getReceipt().get(0).getBill().get(0).getBillDetails().get(0).getBusinessService();
         				status = ProcessStatus.SUCCESS;
         			}
@@ -160,19 +170,24 @@ public class EgfKafkaListener {
         			 * if status!=4 then proceed ahead to cancel the erp existed voucher.
         			 * if status=4 then terminating execution and feeding data to table with specific message.
         			 */
+        			LOGGER.info("at egf 11");
         			VoucherResponse voucherByServiceAndRefDoc = voucherService.getVoucherByServiceAndRefDoc(recRequest.getRequestInfo(), receipt.getTenantId(), billDetail.getBusinessService(), billDetail.getReceiptNumber());
         			if(!voucherByServiceAndRefDoc.getVouchers().isEmpty()){
+        				LOGGER.info("at egf 12");
         				Voucher voucher = voucherByServiceAndRefDoc.getVouchers().get(0);
         				String erpVoucherNumber = voucher.getVoucherNumber();
         				String reqVoucherNumber = recRequest.getReceipt().get(0).getBill().get(0).getBillDetails().get(0).getVoucherHeader();
         				if(voucher.getStatus().getCode().equals("4")){
+        					LOGGER.info("at egf 13");
         					status = ProcessStatus.NA;
         					description = "Voucher("+erpVoucherNumber+") associated with service "+billDetail.getBusinessService()+" and reference number "+billDetail.getReceiptNumber()
         								+ " is already in Cancelled status.";
         					if(!reqVoucherNumber.isEmpty() && !erpVoucherNumber.equals(reqVoucherNumber)){
+        						LOGGER.info("at egf 14");
         						description += "However, we found that the mapping voucher reference sent("+reqVoucherNumber+") is incorrect.";
         					}
         				}else{
+        					LOGGER.info("at egf 15");
         					description = "Voucher number : "+erpVoucherNumber+" is CANCELLED successfully!";
         					if(!reqVoucherNumber.isEmpty() && !erpVoucherNumber.equals(reqVoucherNumber)){
         						description = "Voucher("+erpVoucherNumber+") associated with service "+billDetail.getBusinessService()
@@ -188,6 +203,7 @@ public class EgfKafkaListener {
         				throw new VoucherCustomException(ProcessStatus.FAILED, "Voucher is not exist for service "+billDetail.getBusinessService()+" with reference number "+billDetail.getReceiptNumber());
         			}
 				} else if (topic.equals(manager.getCreatePaymentTopicName())) {
+					LOGGER.info("at egf 16");
 					// create voucher for collection v2
 					ReceiptReq recRequestTemp = ReceiptReq.builder().requestInfo(recRequest.getRequestInfo()).build();
 					for (Receipt recpt : recRequest.getReceipt()) {
@@ -195,6 +211,7 @@ public class EgfKafkaListener {
 						Bill bill = recpt.getBill().get(0);
 						VoucherResponse voucherByServiceAndRefDoc = voucherService.getVoucherByServiceAndRefDoc(recRequestTemp.getRequestInfo(), recpt.getTenantId(), null, recpt.getPaymentId());
 						if (voucherService.isVoucherCreationEnabled(recpt, recRequestTemp.getRequestInfo(), finSerMdms)) {
+							LOGGER.info("at egf 17");
 							if(!voucherByServiceAndRefDoc.getVouchers().isEmpty() && !voucherByServiceAndRefDoc.getVouchers().get(0).getStatus().getCode().equals("4")){
 	        					voucherNumber = voucherByServiceAndRefDoc.getVouchers().get(0).getVoucherNumber();
 	        					throw new VoucherCustomException(ProcessStatus.NA, String.format("Already voucher exists (%1$s) for service %2$s with reference number: %3$s.", voucherNumber, bill.getBusinessService(), recpt.getPaymentId()));
@@ -206,6 +223,7 @@ public class EgfKafkaListener {
 	        					voucherResponse.getVouchers().addAll(createReceiptVoucher.getVouchers());
 	        				}
 	        				if(voucherNumber.isEmpty()){
+	        					LOGGER.info("at egf 18");
 	        					voucherNumber = voucherResponse.getVouchers().get(0).getVoucherNumber();
 	        				}else{
 	        					voucherNumber = ", " + voucherNumber;
@@ -218,9 +236,11 @@ public class EgfKafkaListener {
 					status = ProcessStatus.SUCCESS;
 					this.getBackupToDB(payRequest,status,description,voucherNumber);
 				}else if (topic.equals(manager.getCancelPaymentTopicName()) && payRequest.getPayment().getPaymentStatus().equals(PaymentStatusEnum.CANCELLED)) {
+					LOGGER.info("at egf 19");
 					String paymentId = payRequest.getPayment().getId();
 					VoucherResponse voucherByServiceAndRefDoc = voucherService.getVoucherByServiceAndRefDoc(recRequest.getRequestInfo(), receipt.getTenantId(), null, paymentId);
 					if(!voucherByServiceAndRefDoc.getVouchers().isEmpty()){
+						LOGGER.info("at egf 20");
 						Set<String> voucherNumbers = voucherByServiceAndRefDoc.getVouchers().stream().map(Voucher::getVoucherNumber).collect(Collectors.toSet());
 						if(voucherByServiceAndRefDoc.getVouchers().stream().map(Voucher::getStatus).anyMatch(stat -> Integer.parseInt(stat.getCode())!=4)){
 							voucherService.cancelReceiptVoucher(recRequest, this.getTenantId(recRequest), voucherNumbers);
@@ -228,6 +248,7 @@ public class EgfKafkaListener {
 							description = String.format("Voucher number : %1$s is CANCELLED successfully for Payment id: %2$s", voucherNumbers, paymentId);
 							this.getBackupToDB(payRequest, ProcessStatus.SUCCESS, description, voucherNumbers.toString());
 						}else{
+							LOGGER.info("at egf 21");
 							String format = String.format("One/All of the Vouchers(%1$s) associated with Payment id %2$s is/are already in Cancelled state.",voucherNumbers,paymentId);
 							throw new VoucherCustomException(ProcessStatus.FAILED, format);
 						}
