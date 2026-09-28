@@ -17,11 +17,9 @@ import org.egov.digitaldoorplate.model.DoorPlateQrVerifyResponse;
 import org.egov.digitaldoorplate.model.DoorPlateRequest;
 import org.egov.digitaldoorplate.model.DoorPlateResponse;
 import org.egov.digitaldoorplate.model.QrCodeData;
-import org.egov.digitaldoorplate.model.RemoteProperty;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlate;
 import org.egov.digitaldoorplate.model.SearchCriteriaDoorPlateRequest;
 import org.egov.digitaldoorplate.repository.DoorPlateRepository;
-import org.egov.digitaldoorplate.repository.PropertyOwnerRepository;
 import org.egov.digitaldoorplate.util.DdpConstants;
 import org.egov.digitaldoorplate.util.ResponseInfoFactory;
 import org.egov.tracer.model.CustomException;
@@ -30,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +47,6 @@ public class DoorPlateService {
 
 	@Autowired
 	private PropertyService propertyService;
-
-	@Autowired
-	private PropertyOwnerRepository propertyOwnerRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -213,27 +207,8 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_QR", "Scanned QR data does not contain the PropertyID.");
 		}
 
-		RemoteProperty property = propertyService.searchPropertyByPropertyId(request.getRequestInfo(),
-				request.getTenantId(), qrSnapshot.getPropertyId());
-
-		RemoteProperty.Owner owner = findPrimaryOwner(property.getOwners());
-		JsonNode addressDetails = null == property.getAddress() ? null : property.getAddress().getAdditionalDetails();
-
-		String mobileNo = propertyOwnerRepository.getOwnerMobileNumber(property.getPropertyId(),
-				null == property.getTenantId() ? request.getTenantId() : property.getTenantId());
-		if (StringUtils.isEmpty(mobileNo) && null != owner) {
-			mobileNo = owner.getMobileNumber();
-		}
-
-		DoorPlateQrSnapshot dbSnapshot = DoorPlateQrSnapshot.builder()
-				.ownerName(null == owner ? null : owner.getPropertyOwnerName())
-				.mobileNo(mobileNo)
-				.propertyId(property.getPropertyId())
-				.id(qrSnapshot.getId())
-				.ulbName(readText(addressDetails, "ulbName"))
-				.ward(readText(addressDetails, "wardNumber"))
-				.address(readText(addressDetails, "propertyAddress"))
-				.build();
+		DoorPlateQrSnapshot dbSnapshot = propertyService.buildQrSnapshot(request.getRequestInfo(),
+				request.getTenantId(), qrSnapshot.getPropertyId(), qrSnapshot.getId());
 
 		List<String> mismatchedFields = findMismatchedFields(qrSnapshot, dbSnapshot);
 
@@ -327,22 +302,6 @@ public class DoorPlateService {
 
 	private boolean fieldsEqual(String a, String b) {
 		return StringUtils.isEmpty(a) ? StringUtils.isEmpty(b) : a.trim().equalsIgnoreCase(null == b ? "" : b.trim());
-	}
-
-	private RemoteProperty.Owner findPrimaryOwner(List<RemoteProperty.Owner> owners) {
-		if (CollectionUtils.isEmpty(owners)) {
-			return null;
-		}
-		return owners.stream().filter(owner -> Boolean.TRUE.equals(owner.getIsPrimaryOwner())).findFirst()
-				.orElse(owners.get(0));
-	}
-
-	private String readText(JsonNode node, String fieldName) {
-		if (null == node) {
-			return null;
-		}
-		JsonNode value = node.path(fieldName);
-		return value.isMissingNode() || value.isNull() ? null : value.asText();
 	}
 
 	public DoorPlateResponse search(SearchCriteriaDoorPlateRequest searchRequest) {
