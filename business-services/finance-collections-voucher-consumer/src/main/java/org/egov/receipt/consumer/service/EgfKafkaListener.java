@@ -149,7 +149,7 @@ public class EgfKafkaListener {
 								r.setTenantId(r.getTenantId().toLowerCase());
 							}
 						});
-						LOGGER.info("at egf 9");
+						LOGGER.info("at egf 9 {}", recRequest);
         				voucherResponse = voucherService.createReceiptVoucher(recRequest, finSerMdms, null);
         				voucherNumber = voucherResponse.getVouchers().get(0).getVoucherNumber();
         				receiptService.updateReceipt(recRequest, voucherResponse);
@@ -216,6 +216,9 @@ public class EgfKafkaListener {
 	        					voucherNumber = voucherByServiceAndRefDoc.getVouchers().get(0).getVoucherNumber();
 	        					throw new VoucherCustomException(ProcessStatus.NA, String.format("Already voucher exists (%1$s) for service %2$s with reference number: %3$s.", voucherNumber, bill.getBusinessService(), recpt.getPaymentId()));
 	        				}
+							recRequestTemp.getReceipt().forEach(r -> r.setTenantId(r.getTenantId().toLowerCase()));
+							LOGGER.info("at egf 17.1 {}",recRequestTemp);
+							LOGGER.info("at egf 17.2 {}",finSerMdms);
 	        				VoucherResponse createReceiptVoucher = voucherService.createReceiptVoucher(recRequestTemp, finSerMdms, COLLECTION_VERSION);
 	        				if(voucherResponse == null){
 	        					voucherResponse = createReceiptVoucher;
