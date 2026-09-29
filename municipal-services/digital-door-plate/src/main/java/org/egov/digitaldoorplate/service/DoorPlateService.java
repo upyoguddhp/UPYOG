@@ -262,8 +262,9 @@ public class DoorPlateService {
 		garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
 				request.getGarbageAccountUuid(), request.getVendorPrintVerified(), request.getUlbVerified(),
 				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
-				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified());
-
+				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified(),
+				request.getDdpRejectionReason());
+		
 		return DoorPlateDdpWorkflowResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.garbageAccountUuid(request.getGarbageAccountUuid())
