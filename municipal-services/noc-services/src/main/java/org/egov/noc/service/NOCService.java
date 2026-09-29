@@ -156,58 +156,58 @@ public class NOCService {
 		String userType = user.getType();
 		List<String> roleCodes = user.getRoles().stream().map(Role::getCode).collect(Collectors.toList());
 
-		if ("CITIZEN".equalsIgnoreCase(userType)) {
-			criteria.setAccountId(Collections.singletonList(user.getUuid()));
-			if (isTenantScoped) {
-				criteria.setStatus(null);
-			}
-		} 
-		else if ("EMPLOYEE".equalsIgnoreCase(userType)) {
-			if (isTenantScoped) {
-				List<Role> tenantRoles = user.getRoles().stream()
-						.filter(role -> criteria.getTenantId().equals(role.getTenantId())).collect(Collectors.toList());
-
-				if (tenantRoles.isEmpty()) {
-					throw new CustomException("UNAUTHORIZED", "Employee not authorized for this tenant");
-				}
-				Set<String> statuses = new HashSet<>();
-
-				if (tenantRoles.stream().anyMatch(r -> "NOC_NODAL".equals(r.getCode()))) {
-					statuses.add("PENDINGFORVERIFICATION");
-					statuses.add("PENDINGFORMODIFICATION");
-				}
-
-				if (tenantRoles.stream().anyMatch(r -> "NOC_APPROVER".equals(r.getCode()))) {
-					statuses.add("PENDINGFORAPPROVAL");
-					statuses.add("APPROVED");
-				}
-
-				if (statuses.isEmpty()) {
-					throw new CustomException("UNAUTHORIZED", "Employee not authorized to search NOCs");
-				}
-
-				criteria.setStatus(new ArrayList<>(statuses));
-			} else {
-				Set<String> statuses = new HashSet<>();
-
-				if (roleCodes.contains("NOC_NODAL")) {
-					statuses.add("PENDINGFORVERIFICATION");
-					statuses.add("PENDINGFORMODIFICATION");
-				}
-
-				if (roleCodes.contains("NOC_APPROVER")) {
-					statuses.add("PENDINGFORAPPROVAL");
-					statuses.add("APPROVED");
-				}
-
-				if (!statuses.isEmpty()) {
-					criteria.setStatus(new ArrayList<>(statuses));
-				}
-			}
-		}
-		else {
-			throw new CustomException("UNAUTHORIZED", "User not authorized to search NOCs");
-		}
+//		if ("CITIZEN".equalsIgnoreCase(userType)) {
+//			criteria.setAccountId(Collections.singletonList(user.getUuid()));
+//			if (isTenantScoped) {
+//				criteria.setStatus(null);
+//			}
+//		} 
+//		else if ("EMPLOYEE".equalsIgnoreCase(userType)) {
+//			if (isTenantScoped) {
+//				List<Role> tenantRoles = user.getRoles().stream()
+//						.filter(role -> criteria.getTenantId().equals(role.getTenantId())).collect(Collectors.toList());
+//
+//				if (tenantRoles.isEmpty()) {
+//					throw new CustomException("UNAUTHORIZED", "Employee not authorized for this tenant");
+//				}
+//				Set<String> statuses = new HashSet<>();
+//
+//				if (tenantRoles.stream().anyMatch(r -> "NOC_NODAL".equals(r.getCode()))) {
+//					statuses.add("PENDINGFORVERIFICATION");
+//					statuses.add("PENDINGFORMODIFICATION");
+//				}
+//
+//				if (tenantRoles.stream().anyMatch(r -> "NOC_APPROVER".equals(r.getCode()))) {
+//					statuses.add("PENDINGFORAPPROVAL");
+//					statuses.add("APPROVED");
+//				}
+//
+//				if (statuses.isEmpty()) {
+//					throw new CustomException("UNAUTHORIZED", "Employee not authorized to search NOCs");
+//				}
+//
+//				criteria.setStatus(new ArrayList<>(statuses));
+//			} else {
+//				Set<String> statuses = new HashSet<>();
+//
+//				if (roleCodes.contains("NOC_NODAL")) {
+//					statuses.add("PENDINGFORVERIFICATION");
+//					statuses.add("PENDINGFORMODIFICATION");
+//				}
+//
+//				if (roleCodes.contains("NOC_APPROVER")) {
+//					statuses.add("PENDINGFORAPPROVAL");
+//					statuses.add("APPROVED");
+//				}
+//
+//				if (!statuses.isEmpty()) {
+//					criteria.setStatus(new ArrayList<>(statuses));
+//				}
+//			}
+//		}
+//		else {
+//			throw new CustomException("UNAUTHORIZED", "User not authorized to search NOCs");
+//		}
 		List<Noc> nocs = nocRepository.getNocData(criteria);
 		if (CollectionUtils.isEmpty(nocs)) {
 			return Collections.emptyList();
