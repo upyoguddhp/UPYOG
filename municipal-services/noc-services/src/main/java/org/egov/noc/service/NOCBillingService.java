@@ -111,8 +111,14 @@ public class NOCBillingService {
 	private BigDecimal fetchNocFeeFromMDMS(Noc noc, RequestInfo requestInfo) {
 	
 	    Map<String, Object> mdmsCriteria = new HashMap<>();
-	    mdmsCriteria.put("tenantId", noc.getTenantId().split("\\.")[0]);
-	    mdmsCriteria.put("schemaCode", "ULBS.NocFee");
+		String[] tenantParts = noc.getTenantId().split("\\.");
+		String ulbName = tenantParts[tenantParts.length - 1];
+		String nocType = noc.getNocType();
+		String uniqueIdentifier = ulbName + "." +noc.getNocType().replace("NOC", "_NOC");
+		
+		mdmsCriteria.put("tenantId", tenantParts[0]);
+		mdmsCriteria.put("schemaCode", "ULBS.NocFee");
+		mdmsCriteria.put("uniqueIdentifiers",Collections.singletonList(uniqueIdentifier));
 	
 	    Map<String, Object> mdmsRequest = new HashMap<>();
 	    mdmsRequest.put("RequestInfo", requestInfo);
