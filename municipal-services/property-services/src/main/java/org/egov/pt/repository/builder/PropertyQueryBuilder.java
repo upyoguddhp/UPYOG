@@ -863,6 +863,12 @@ public class PropertyQueryBuilder {
 					.append(createQuery(criteria.getAddressAdditionalDetailsWardNumbers())).append(")");
 			addToPreparedStatement(preparedStmtList, criteria.getAddressAdditionalDetailsWardNumbers());
 		}
+		
+		if (StringUtils.isNotBlank(criteria.getAddressAdditionalDetailsWardNumber())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("address.additionaldetails->>'wardNumber' = ?");
+			preparedStmtList.add(criteria.getAddressAdditionalDetailsWardNumber());
+		}
 
 		if (!CollectionUtils.isEmpty(criteria.getOwnerOldCustomerIds())) {
 			addClauseIfRequired(preparedStmtList, builder);
