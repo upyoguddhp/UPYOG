@@ -160,7 +160,11 @@ public class GarbageAccountSchedulerService {
 						skippedCount.incrementAndGet();
 						errorList.add("Bill already exists for application "
 								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-//						createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
+							errorList.clear();
+							errorList.add("Demand already exists for the selected period");
+							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+						}
 						return;
 					}
 					
@@ -220,11 +224,24 @@ public class GarbageAccountSchedulerService {
 
 						String billType = Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
 								|| generateBillRequest.getMonths().size() > 1 ? "MULTI_MONTH" : "MONTHLY";
+						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
+							errorList.add("Demand already exists for the selected period");
+							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+							return;
+						}
 
 						AtomicReference<String> demandId = new AtomicReference<>(null);
-
-						BillResponse billResponse = generateDemandAndBill(generateBillRequest, garbageAccount,
-								finalBillAmount, billType, demandId, numberOfMonths);
+						BillResponse billResponse;
+						try {
+							billResponse = generateDemandAndBill(generateBillRequest, garbageAccount,
+									finalBillAmount, billType, demandId, numberOfMonths);
+						} catch (Exception e) {
+							log.error("Failed to generate garbage bill for application {}",
+									garbageAccount.getGrbgApplicationNumber(), e);
+							errorList.add("Bill generation failed: " + e.getMessage());
+							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+							return;
+						}
 
 						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
@@ -384,6 +401,20 @@ public class GarbageAccountSchedulerService {
 		}
 
 		return false;
+	}
+
+	private boolean demandExistsForPeriod(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount) {
+		List<Demand> demands = demandService.searchDemand(garbageAccount.getTenantId(),
+				Collections.singleton(garbageAccount.getGrbgApplicationNumber()), generateBillRequest.getRequestInfo(), "GB");
+
+		if (CollectionUtils.isEmpty(demands)) {
+			return false;
+		}
+
+		long fromDate = generateBillRequest.getFromDate().getTime();
+		long toDate = generateBillRequest.getToDate().getTime();
+		return demands.stream().anyMatch(demand -> demand.getTaxPeriodFrom() != null && demand.getTaxPeriodTo() != null
+				&& demand.getTaxPeriodFrom() == fromDate && demand.getTaxPeriodTo() == toDate);
 	}
 	
 	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
