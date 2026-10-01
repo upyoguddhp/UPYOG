@@ -28,6 +28,7 @@ public class GrbgBillTracker {
 	private String demandId;
 	private String consumerCode;
 	private String status = "ACTIVE";
+	private BigDecimal advancePaid;
 	@Builder.Default
 	private String type = "GENERAL";
 	private BigDecimal grbgBillAmount;
@@ -39,5 +40,6 @@ public class GrbgBillTracker {
 	private BigDecimal penaltyAmount;
 	private BigDecimal rebateAmount;
 	private BigDecimal garbageBillWithoutRebate;
+	private Boolean isPaymentProcessing;
 
 }
