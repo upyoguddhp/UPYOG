@@ -109,11 +109,13 @@ public class TransactionService {
 					.requestInfo(requestInfo).tenantIds(tenantIds).active(true).build();
 	
 			// fetch all bank account
+			if ("RAZORPAY".equals(transactionRequest.getTransaction().getGateway())) {
 			bankAccountResponse = bankAccountService.searchBankAccount(bankAccountSearchCriteria);
 			 if (!CollectionUtils.isEmpty(bankAccountResponse.getBankAccounts())) {
 			        BankAccount bankAccount = bankAccountResponse.getBankAccounts().get(0);
 			        transaction.setPayTo(bankAccount.getPayTo());
 			    }
+			}
 			URI uri = gatewayService.initiateTxn(transaction);
 			transaction.setRedirectUrl(uri.toString());
 

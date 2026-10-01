@@ -1,0 +1,23 @@
+CREATE TABLE ud_user_csc (
+  id SERIAL PRIMARY KEY,
+  csc_id varchar(64) NOT NULL,
+  user_uuid varchar(256) NOT NULL,
+  owner varchar(64),
+  vle_check varchar(16),
+  state_code varchar(16),
+  active_status varchar(16),
+  user_type varchar(32),
+  last_active varchar(64),
+  lg_state_code varchar(16),
+  lg_district_code varchar(16),
+  rap varchar(64),
+  pos varchar(64),
+  pager varchar(64),
+  address text,
+  createddate int8,
+  createdby varchar(256),
+  lastmodifieddate int8,
+  lastmodifiedby varchar(256),
+  CONSTRAINT uk_ud_user_csc_csc_id UNIQUE (csc_id),
+  CONSTRAINT uk_ud_user_csc_user_uuid UNIQUE (user_uuid)
+);

@@ -2,6 +2,72 @@ serviceMaps:
  serviceName: PaymentGateway
  mappings:
  - version: 1.0
+   name: pg-fee-payment-service
+   description: Persists fee payment gateway transactions
+   fromTopic: save-pg-fee-txns
+   isTransaction: true
+   queryMaps:
+    - query: INSERT INTO eg_pg_fee_transactions (uuid, gateway_txn_id, module, tenant_id, consumer_code, order_id, merchant_id, product_id, txn_amount, txn_status, txn_mode, txn_type, gateway_status_msg, gateway_status_code, merchant_receipt_no, ccf_tds, service_uuid, gateway, receipt, additional_details, created_by, created_time, last_modified_time, last_modified_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::numeric, ?, ?, ?, ?, ?, ?, ?::numeric, ?, ?, ?, ?::jsonb, ?, ?, ?, ?);
+      basePath: FeePaymentTransaction
+      jsonMaps:
+       - jsonPath: $.FeePaymentTransaction.uuid
+       - jsonPath: $.FeePaymentTransaction.cscTxnId
+       - jsonPath: $.FeePaymentTransaction.module
+       - jsonPath: $.FeePaymentTransaction.tenantId
+       - jsonPath: $.FeePaymentTransaction.consumerCode
+       - jsonPath: $.FeePaymentTransaction.merchantTxnId
+       - jsonPath: $.FeePaymentTransaction.merchantId
+       - jsonPath: $.FeePaymentTransaction.productId
+       - jsonPath: $.FeePaymentTransaction.txnAmount
+       - jsonPath: $.FeePaymentTransaction.txnStatus
+       - jsonPath: $.FeePaymentTransaction.txnMode
+       - jsonPath: $.FeePaymentTransaction.txnType
+       - jsonPath: $.FeePaymentTransaction.txnStatusMessage
+       - jsonPath: $.FeePaymentTransaction.responseStatus
+       - jsonPath: $.FeePaymentTransaction.merchantReceiptNo
+       - jsonPath: $.FeePaymentTransaction.ccfTds
+       - jsonPath: $.FeePaymentTransaction.serviceUuid
+       - jsonPath: $.FeePaymentTransaction.gateway
+       - jsonPath: $.FeePaymentTransaction.receipt
+       - jsonPath: $.FeePaymentTransaction.additionalDetails
+         type: JSON
+         dbType: JSONB
+       - jsonPath: $.FeePaymentTransaction.cscId
+       - jsonPath: $.FeePaymentTransaction.createdTime
+       - jsonPath: $.FeePaymentTransaction.lastModifiedTime
+       - jsonPath: $.FeePaymentTransaction.lastModifiedBy
+
+ - version: 1.0
+   name: pg-fee-payment-status-update
+   description: Updates fee payment transaction status
+   fromTopic: update-pg-fee-txns
+   isTransaction: true
+   queryMaps:
+    - query: UPDATE eg_pg_fee_transactions SET gateway_txn_id=?, order_id=?, merchant_id=?, product_id=?, txn_mode=?, txn_type=?, gateway_status_msg=?, gateway_status_code=?, merchant_receipt_no=?, ccf_tds=?::numeric, gateway=?, receipt=?, additional_details=?::jsonb, created_by=?, txn_status=?, last_modified_time=?, last_modified_by=? WHERE service_uuid=? AND txn_status='PENDING';
+      basePath: FeePaymentTransaction
+      jsonMaps:
+       - jsonPath: $.FeePaymentTransaction.cscTxnId
+       - jsonPath: $.FeePaymentTransaction.merchantTxnId
+       - jsonPath: $.FeePaymentTransaction.merchantId
+       - jsonPath: $.FeePaymentTransaction.productId
+       - jsonPath: $.FeePaymentTransaction.txnMode
+       - jsonPath: $.FeePaymentTransaction.txnType
+       - jsonPath: $.FeePaymentTransaction.txnStatusMessage
+       - jsonPath: $.FeePaymentTransaction.responseStatus
+       - jsonPath: $.FeePaymentTransaction.merchantReceiptNo
+       - jsonPath: $.FeePaymentTransaction.ccfTds
+       - jsonPath: $.FeePaymentTransaction.gateway
+       - jsonPath: $.FeePaymentTransaction.receipt
+       - jsonPath: $.FeePaymentTransaction.additionalDetails
+         type: JSON
+         dbType: JSONB
+       - jsonPath: $.FeePaymentTransaction.cscId
+       - jsonPath: $.FeePaymentTransaction.txnStatus
+       - jsonPath: $.FeePaymentTransaction.lastModifiedTime
+       - jsonPath: $.FeePaymentTransaction.lastModifiedBy
+       - jsonPath: $.FeePaymentTransaction.serviceUuid
+
+ - version: 1.0
    name: pg-service
    description: Persists transactions
    fromTopic: save-pg-txns

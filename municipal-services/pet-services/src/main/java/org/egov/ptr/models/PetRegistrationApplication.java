@@ -93,6 +93,10 @@ public class PetRegistrationApplication {
 	@JsonProperty("applicationType")
 	private String applicationType;
 
+	@JsonProperty("businessService")
+	@Builder.Default
+	private String businessService = "pet-service";
+
 	public PetRegistrationApplication addDocumentsItem(Document documentsItem) {
 		if (this.documents == null) {
 			this.documents = new ArrayList<>();

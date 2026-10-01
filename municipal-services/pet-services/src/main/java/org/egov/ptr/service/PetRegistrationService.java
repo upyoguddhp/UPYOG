@@ -163,9 +163,10 @@ public class PetRegistrationService {
 	private void validateAndEnrichSearchCriteria(RequestInfo requestInfo,
 			PetApplicationSearchCriteria petApplicationSearchCriteria) {
 		
-		// search criteria for CITIZEN
+		// Restrict CITIZEN and LMK users to applications created by themselves
 		if(null != requestInfo && null != requestInfo.getUserInfo()
-				&& StringUtils.equalsAnyIgnoreCase(requestInfo.getUserInfo().getType(), PTRConstants.USER_TYPE_CITIZEN)) {
+				&& StringUtils.equalsAnyIgnoreCase(requestInfo.getUserInfo().getType(),
+						PTRConstants.USER_TYPE_CITIZEN, PTRConstants.USER_TYPE_LMK)) {
 			petApplicationSearchCriteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		}
 		
