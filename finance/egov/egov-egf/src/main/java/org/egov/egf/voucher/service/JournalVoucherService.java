@@ -186,6 +186,8 @@ public class JournalVoucherService {
     public JournalVoucherService(final JournalVoucherRepository journalVoucherRepository) {
         this.journalVoucherRepository = journalVoucherRepository;
     }
+    
+    private static final Logger log = LoggerFactory.getLogger(JournalVoucherService.class);
 
     public CVoucherHeader getById(final Long id) {
         return journalVoucherRepository.findOne(id);
@@ -196,51 +198,161 @@ public class JournalVoucherService {
     }
 
     @Transactional
-    public CVoucherHeader create(final CVoucherHeader voucherHeader, final Long approvalPosition, final String approvalComent,
-                                 final String additionalRule, final String workFlowAction) {
+    public CVoucherHeader create(final CVoucherHeader voucherHeader,
+            final Long approvalPosition,
+            final String approvalComent,
+            final String additionalRule,
+            final String workFlowAction) {
 
-        voucherHeader.setFiscalPeriodId(
-                fiscalPeriodHibernateDAO.getFiscalPeriodByDate(voucherHeader.getVoucherDate()).getId().intValue());
-        if (voucherHeader.getFundId() != null
-                && voucherHeader.getFundId().getId() != null)
-            voucherHeader.setFundId(fundService.findOne(voucherHeader.getFundId().getId()));
-        if (voucherHeader.getVouchermis().getSchemeid() != null
-                && voucherHeader.getVouchermis().getSchemeid().getId() != null)
-            voucherHeader.getVouchermis().setSchemeid(
-                    schemeService.findById(voucherHeader.getVouchermis().getSchemeid().getId(), false));
-        else
-            voucherHeader.getVouchermis().setSchemeid(null);
-        if (voucherHeader.getVouchermis().getSubschemeid() != null
-                && voucherHeader.getVouchermis().getSubschemeid().getId() != null)
-            voucherHeader.getVouchermis().setSubschemeid(
-                    subSchemeService.findById(voucherHeader.getVouchermis().getSubschemeid().getId(), false));
-        else
-            voucherHeader.getVouchermis().setSubschemeid(null);
+        log.info("17. JournalVoucherService.create() started");
+        log.info("18. VoucherHeader received. ID: {}, WorkFlowAction: {}, ApprovalPosition: {}",
+                voucherHeader.getId(), workFlowAction, approvalPosition);
 
-        populateVoucherNumber(voucherHeader, null);
-        populateCGVNNumber(voucherHeader);
+        try {
 
-        if (!FinancialConstants.JOURNALVOUCHER_NAME_GENERAL.equalsIgnoreCase(voucherHeader.getName()))
-            createBillForVoucherHeader(voucherHeader);
+            voucherHeader.setFiscalPeriodId(
+                    fiscalPeriodHibernateDAO.getFiscalPeriodByDate(voucherHeader.getVoucherDate()).getId().intValue());
 
-        final CVoucherHeader savedVoucherHeader = journalVoucherRepository.save(voucherHeader);
+            log.info("19. Fiscal period set. Fiscal Period ID: {}",
+                    voucherHeader.getFiscalPeriodId());
 
-        voucherHeader.getVouchermis().setSourcePath(
-                "/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id="
-                        + voucherHeader.getId());
-        update(voucherHeader);
+            if (voucherHeader.getFundId() != null
+                    && voucherHeader.getFundId().getId() != null) {
 
-        if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE))
-            voucherHeader.setStatus(FinancialConstants.CREATEDVOUCHERSTATUS);
-        else {
-            voucherHeader.setStatus(FinancialConstants.PREAPPROVEDVOUCHERSTATUS);
-            createVoucherHeaderRegisterWorkflowTransition(savedVoucherHeader, approvalPosition, approvalComent, additionalRule,
-                    workFlowAction);
+                log.info("20. Fund ID found: {}. Fetching fund details",
+                        voucherHeader.getFundId().getId());
+
+                voucherHeader.setFundId(fundService.findOne(voucherHeader.getFundId().getId()));
+
+                log.info("21. Fund details fetched successfully");
+            }
+
+            if (voucherHeader.getVouchermis().getSchemeid() != null
+                    && voucherHeader.getVouchermis().getSchemeid().getId() != null) {
+
+                log.info("22. Scheme ID found: {}. Fetching scheme details",
+                        voucherHeader.getVouchermis().getSchemeid().getId());
+
+                voucherHeader.getVouchermis().setSchemeid(
+                        schemeService.findById(voucherHeader.getVouchermis().getSchemeid().getId(), false));
+
+                log.info("23. Scheme details fetched successfully");
+
+            } else {
+
+                log.info("22. Scheme ID not provided. Setting scheme to null");
+
+                voucherHeader.getVouchermis().setSchemeid(null);
+            }
+
+            if (voucherHeader.getVouchermis().getSubschemeid() != null
+                    && voucherHeader.getVouchermis().getSubschemeid().getId() != null) {
+
+                log.info("24. SubScheme ID found: {}. Fetching subscheme details",
+                        voucherHeader.getVouchermis().getSubschemeid().getId());
+
+                voucherHeader.getVouchermis().setSubschemeid(
+                        subSchemeService.findById(voucherHeader.getVouchermis().getSubschemeid().getId(), false));
+
+                log.info("25. SubScheme details fetched successfully");
+
+            } else {
+
+                log.info("24. SubScheme ID not provided. Setting subscheme to null");
+
+                voucherHeader.getVouchermis().setSubschemeid(null);
+            }
+
+            log.info("26. Populating voucher number");
+
+            populateVoucherNumber(voucherHeader, null);
+
+            log.info("27. Voucher number populated: {}",
+                    voucherHeader.getVoucherNumber());
+
+            log.info("28. Populating CGVN number");
+
+            populateCGVNNumber(voucherHeader);
+
+            log.info("29. CGVN number populated");
+
+            if (!FinancialConstants.JOURNALVOUCHER_NAME_GENERAL.equalsIgnoreCase(voucherHeader.getName())) {
+
+                log.info("30. Voucher is not GENERAL journal. Creating bill for VoucherHeader");
+
+                createBillForVoucherHeader(voucherHeader);
+
+                log.info("31. Bill created successfully");
+            }
+
+            log.info("32. Saving VoucherHeader to database");
+
+            final CVoucherHeader savedVoucherHeader =
+                    journalVoucherRepository.save(voucherHeader);
+
+            log.info("33. VoucherHeader saved successfully. Voucher ID: {}",
+                    savedVoucherHeader.getId());
+
+            voucherHeader.getVouchermis().setSourcePath(
+                    "/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id="
+                            + voucherHeader.getId());
+
+            log.info("34. Voucher source path updated");
+
+            log.info("35. Updating VoucherHeader. Voucher ID: {}",
+                    voucherHeader.getId());
+
+            update(voucherHeader);
+
+            log.info("36. VoucherHeader updated successfully");
+
+            if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE)) {
+
+                log.info("37. WorkFlowAction is CREATEANDAPPROVE. Setting status to CREATEDVOUCHERSTATUS");
+
+                voucherHeader.setStatus(FinancialConstants.CREATEDVOUCHERSTATUS);
+
+            } else {
+
+                log.info("37. WorkFlowAction is {}. Setting status to PREAPPROVEDVOUCHERSTATUS",
+                        workFlowAction);
+
+                voucherHeader.setStatus(FinancialConstants.PREAPPROVEDVOUCHERSTATUS);
+
+                log.info("38. Creating workflow transition for Voucher ID: {}",
+                        savedVoucherHeader.getId());
+
+                createVoucherHeaderRegisterWorkflowTransition(
+                        savedVoucherHeader,
+                        approvalPosition,
+                        approvalComent,
+                        additionalRule,
+                        workFlowAction);
+
+                log.info("39. Workflow transition created successfully");
+            }
+
+            log.info("40. Saving final VoucherHeader. Voucher ID: {}",
+                    savedVoucherHeader.getId());
+
+            final CVoucherHeader finalVoucherHeader =
+                    journalVoucherRepository.save(savedVoucherHeader);
+
+            log.info("41. Final VoucherHeader saved successfully. Voucher ID: {}",
+                    finalVoucherHeader.getId());
+
+            log.info("42. JournalVoucherService.create() completed successfully");
+
+            return finalVoucherHeader;
+
+        } catch (Exception e) {
+
+            log.error("ERROR while creating Journal Voucher. Voucher ID: {}, WorkFlowAction: {}",
+                    voucherHeader.getId(), workFlowAction, e);
+
+            throw e;
         }
-
-        return journalVoucherRepository.save(savedVoucherHeader);
     }
-
     @Transactional
     public CVoucherHeader update(final CVoucherHeader voucherHeader) {
 

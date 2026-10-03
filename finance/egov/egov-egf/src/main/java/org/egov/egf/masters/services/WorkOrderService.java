@@ -80,6 +80,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author venki
  */
@@ -111,6 +114,8 @@ public class WorkOrderService implements EntityTypeService {
 
 	@Autowired
 	private SubSchemeService subSchemeService;
+	
+	private static final Logger log = LoggerFactory.getLogger(WorkOrderService.class);
 
 	public Session getCurrentSession() {
 		return entityManager.unwrap(Session.class);
@@ -132,26 +137,92 @@ public class WorkOrderService implements EntityTypeService {
 	@Transactional
 	public WorkOrder create(WorkOrder workOrder) {
 
-		setAuditDetails(workOrder);
-		if (workOrder.getFund() != null && workOrder.getFund().getId() != null) {
-			workOrder.setFund(fundService.findOne(workOrder.getFund().getId()));
-		}
-		if (workOrder.getScheme() != null && workOrder.getScheme().getId() != null) {
-			workOrder.setScheme(schemeService.findById(workOrder.getScheme().getId(), false));
-		} else {
-			workOrder.setScheme(null);
-		}
-		if (workOrder.getSubScheme() != null && workOrder.getSubScheme().getId() != null) {
-			workOrder.setSubScheme(subSchemeService.findById(workOrder.getSubScheme().getId(), false));
-		} else {
-			workOrder.setSubScheme(null);
-		}
-		if (workOrder.getContractor() != null && workOrder.getContractor().getId() != null) {
-			workOrder.setContractor(contractorService.getById(workOrder.getContractor().getId()));
-		}
-		workOrder = workOrderRepository.save(workOrder);
-		saveAccountDetailKey(workOrder);
-		return workOrder;
+	    log.info("1. WorkOrderService.create() started");
+
+	    log.info("2. Setting audit details");
+	    setAuditDetails(workOrder);
+
+	    if (workOrder.getFund() != null && workOrder.getFund().getId() != null) {
+	        log.info("3. Fund ID found: {}. Fetching fund details",
+	                workOrder.getFund().getId());
+
+	        workOrder.setFund(fundService.findOne(workOrder.getFund().getId()));
+
+	        log.info("4. Fund details fetched successfully");
+	    }
+
+	    if (workOrder.getScheme() != null && workOrder.getScheme().getId() != null) {
+	        log.info("5. Scheme ID found: {}. Fetching scheme details",
+	                workOrder.getScheme().getId());
+
+	        workOrder.setScheme(
+	                schemeService.findById(workOrder.getScheme().getId(), false)
+	        );
+
+	        log.info("6. Scheme details fetched successfully");
+	    } else {
+	        log.info("5. Scheme ID not provided. Setting scheme to null");
+
+	        workOrder.setScheme(null);
+	    }
+
+	    if (workOrder.getSubScheme() != null && workOrder.getSubScheme().getId() != null) {
+	        log.info("7. SubScheme ID found: {}. Fetching subscheme details",
+	                workOrder.getSubScheme().getId());
+
+	        workOrder.setSubScheme(
+	                subSchemeService.findById(workOrder.getSubScheme().getId(), false)
+	        );
+
+	        log.info("8. SubScheme details fetched successfully");
+	    } else {
+	        log.info("7. SubScheme ID not provided. Setting subscheme to null");
+
+	        workOrder.setSubScheme(null);
+	    }
+
+	    if (workOrder.getContractor() != null && workOrder.getContractor().getId() != null) {
+	        log.info("9. Contractor ID found: {}. Fetching contractor details",
+	                workOrder.getContractor().getId());
+
+	        workOrder.setContractor(
+	                contractorService.getById(workOrder.getContractor().getId())
+	        );
+
+	        log.info("10. Contractor details fetched successfully");
+	    }
+
+	    try {
+	        log.info("11. Saving WorkOrder to database");
+
+	        workOrder = workOrderRepository.save(workOrder);
+
+	        log.info("12. WorkOrder saved successfully. WorkOrder ID: {}",
+	                workOrder.getId());
+
+	    } catch (Exception e) {
+	        log.error("ERROR at step 11/12: Failed to save WorkOrder", e);
+	        throw e;
+	    }
+
+	    try {
+	        log.info("13. Saving Account Detail Key for WorkOrder ID: {}",
+	                workOrder.getId());
+
+	        saveAccountDetailKey(workOrder);
+
+	        log.info("14. Account Detail Key saved successfully");
+
+	    } catch (Exception e) {
+	        log.error("ERROR at step 13/14: Failed to save Account Detail Key for WorkOrder ID: {}",
+	                workOrder.getId(), e);
+	        throw e;
+	    }
+
+	    log.info("15. WorkOrderService.create() completed successfully. WorkOrder ID: {}",
+	            workOrder.getId());
+
+	    return workOrder;
 	}
 
 	@Transactional

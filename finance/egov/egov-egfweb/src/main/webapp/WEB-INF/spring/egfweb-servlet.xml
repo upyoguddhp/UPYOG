@@ -78,11 +78,13 @@
   	
     <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources/ directory -->
     <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/css/**" location="/css/"/>
 
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/resources/**"/>
+            <mvc:exclude-mapping path="/css/**"/>
             <bean class="org.egov.infra.web.spring.interceptor.CacheControlInterceptor"/>
         </mvc:interceptor>
         <mvc:interceptor>

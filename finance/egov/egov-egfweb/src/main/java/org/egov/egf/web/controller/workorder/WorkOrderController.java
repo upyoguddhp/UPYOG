@@ -82,6 +82,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author venki
  */
@@ -97,6 +100,8 @@ public class WorkOrderController {
 	private static final String EDIT = "workorder-edit";
 	private static final String VIEW = "workorder-view";
 	private static final String SEARCH = "workorder-search";
+	
+	private static final Logger log = LoggerFactory.getLogger(WorkOrderController.class);
 
 	@Autowired
 	private FundService fundService;
@@ -135,19 +140,37 @@ public class WorkOrderController {
 	}
 
 	@PostMapping(value = "/create")
-	public String create(@Valid @ModelAttribute final WorkOrder workOrder, final BindingResult errors,
-			final Model model, final RedirectAttributes redirectAttrs) throws IOException {
+	public String create(@Valid @ModelAttribute final WorkOrder workOrder,
+	        final BindingResult errors,
+	        final Model model,
+	        final RedirectAttributes redirectAttrs) throws IOException {
 
-		if (errors.hasErrors()) {
-			prepareNewForm(model);
-			return NEW;
-		}
+	    log.info("1. WorkOrder create request received");
 
-		workOrderService.create(workOrder);
+	    if (errors.hasErrors()) {
+	        log.warn("2. WorkOrder validation failed. Number of errors: {}", errors.getErrorCount());
 
-		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.workOrder.success", null, null));
+	        prepareNewForm(model);
 
-		return "redirect:/workorder/result/" + workOrder.getId() + "/create";
+	        log.info("3. Returning to WorkOrder create form due to validation errors");
+	        return NEW;
+	    }
+
+	    log.info("4. WorkOrder validation successful. Calling WorkOrderService.create()");
+	    log.info("5. WorkOrder create request received: {}", workOrder);
+
+	    workOrderService.create(workOrder);
+
+	    log.info("6. WorkOrder created successfully. WorkOrder ID: {}", workOrder.getId());
+
+	    redirectAttrs.addFlashAttribute(
+	            "message",
+	            messageSource.getMessage("msg.workOrder.success", null, null)
+	    );
+
+	    log.info("7. Redirecting to WorkOrder result page. WorkOrder ID: {}", workOrder.getId());
+
+	    return "redirect:/workorder/result/" + workOrder.getId() + "/create";
 	}
 
 	@GetMapping(value = "/edit/{id}")

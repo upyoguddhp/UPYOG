@@ -73,6 +73,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author venki
  *
@@ -90,12 +93,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     private static final String STATE_TYPE = "stateType";
 
     private static final String APPROVAL_POSITION = "approvalPosition";
+    
+    
 
     @Autowired
     private JournalVoucherService journalVoucherService;
 
     @Autowired
     private FinancialUtils financialUtils;
+    
+    private static final Logger log = LoggerFactory.getLogger(CreateJournalVoucherController.class);
 
     public CreateJournalVoucherController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -125,52 +132,139 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     }
 
     @PostMapping(value = "/create")
-    public String create(@Valid @ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,
-            final BindingResult resultBinder, final HttpServletRequest request, @RequestParam @SafeHtml final String workFlowAction) {
+    public String create(@Valid @ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader,
+            final Model model,
+            final BindingResult resultBinder,
+            final HttpServletRequest request,
+            @RequestParam @SafeHtml final String workFlowAction) {
+
+        log.info("1. Journal Voucher create request received");
+        log.info("2. VoucherHeader received: {}", voucherHeader);
+        log.info("3. WorkFlowAction received: {}", workFlowAction);
 
         voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
         voucherHeader.setEffectiveDate(voucherHeader.getVoucherDate());
 
+        log.info("4. Voucher type and effective date set");
+
         populateVoucherName(voucherHeader);
+
+        log.info("5. Voucher name populated: {}", voucherHeader.getName());
+
         populateAccountDetails(voucherHeader);
 
+        log.info("6. Account details populated");
+
         if (resultBinder.hasErrors()) {
+
+            log.warn("7. Journal Voucher validation failed. Number of errors: {}",
+                    resultBinder.getErrorCount());
+
             setDropDownValues(model);
+
             model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
+
             prepareWorkflow(model, voucherHeader, new WorkflowContainer());
+
             prepareValidActionListByCutOffDate(model);
+
             voucherHeader.setVoucherDate(new Date());
-            model.addAttribute(VOUCHER_NUMBER_GENERATION_AUTO, isVoucherNumberGenerationAuto(voucherHeader, model));
+
+            model.addAttribute(
+                    VOUCHER_NUMBER_GENERATION_AUTO,
+                    isVoucherNumberGenerationAuto(voucherHeader, model)
+            );
+
+            log.info("8. Returning to Journal Voucher form due to validation errors");
 
             return JOURNALVOUCHER_FORM;
+
         } else {
+
+            log.info("7. Journal Voucher validation successful");
+
             Long approvalPosition = 0l;
             String approvalComment = "";
+
             if (request.getParameter("approvalComment") != null)
                 approvalComment = request.getParameter("approvalComent");
-            if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
-                approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+
+            if (request.getParameter(APPROVAL_POSITION) != null
+                    && !request.getParameter(APPROVAL_POSITION).isEmpty())
+                approvalPosition = Long.valueOf(
+                        request.getParameter(APPROVAL_POSITION)
+                );
+
+            log.info("8. Approval Position: {}", approvalPosition);
+            log.info("9. Approval Comment: {}", approvalComment);
+
             CVoucherHeader savedVoucherHeader;
+
             try {
-                savedVoucherHeader = journalVoucherService.create(voucherHeader, approvalPosition, approvalComment, null,
-                        workFlowAction);
+
+                log.info("10. Calling journalVoucherService.create()");
+
+                savedVoucherHeader = journalVoucherService.create(
+                        voucherHeader,
+                        approvalPosition,
+                        approvalComment,
+                        null,
+                        workFlowAction
+                );
+
+                log.info("11. Journal Voucher created successfully. Voucher ID: {}",
+                        savedVoucherHeader.getId());
+
+                log.info("12. Voucher Number: {}",
+                        savedVoucherHeader.getVoucherNumber());
+
             } catch (final ValidationException e) {
+
+                log.error("ERROR at step 10: Journal Voucher creation failed due to ValidationException", e);
+
                 setDropDownValues(model);
+
                 model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
+
                 prepareWorkflow(model, voucherHeader, new WorkflowContainer());
+
                 prepareValidActionListByCutOffDate(model);
+
                 voucherHeader.setVoucherDate(new Date());
-                model.addAttribute(VOUCHER_NUMBER_GENERATION_AUTO, isVoucherNumberGenerationAuto(voucherHeader, model));
+
+                model.addAttribute(
+                        VOUCHER_NUMBER_GENERATION_AUTO,
+                        isVoucherNumberGenerationAuto(voucherHeader, model)
+                );
+
                 resultBinder.reject("", e.getErrors().get(0).getMessage());
+
+                log.info("13. Returning to Journal Voucher form with validation error");
+
                 return JOURNALVOUCHER_FORM;
             }
 
-            final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
-                    savedVoucherHeader.getState(), savedVoucherHeader.getId(), approvalPosition,"");
+            log.info("14. Fetching approver details");
 
-            return "redirect:/journalvoucher/success?approverDetails= " + approverDetails + "&voucherNumber="
-                    + savedVoucherHeader.getVoucherNumber() + "&workFlowAction=" + workFlowAction;
+            final String approverDetails = financialUtils.getApproverDetails(
+                    workFlowAction,
+                    savedVoucherHeader.getState(),
+                    savedVoucherHeader.getId(),
+                    approvalPosition,
+                    ""
+            );
 
+            log.info("15. Approver details fetched successfully");
+
+            log.info("16. Redirecting to Journal Voucher success page. Voucher ID: {}",
+                    savedVoucherHeader.getId());
+
+            return "redirect:/journalvoucher/success?approverDetails= "
+                    + approverDetails
+                    + "&voucherNumber="
+                    + savedVoucherHeader.getVoucherNumber()
+                    + "&workFlowAction="
+                    + workFlowAction;
         }
     }
 

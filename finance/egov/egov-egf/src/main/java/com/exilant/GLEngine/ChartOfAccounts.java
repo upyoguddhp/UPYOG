@@ -180,14 +180,15 @@ public class ChartOfAccounts {
 	}
 
 	public void loadAccountData() throws TaskFailedException {
-
+		 LOGGER.info("48.8.1 loadAccountData called");
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("loadAccountData called");
 
 		HashMap<String, HashMap> hm = null;
+		LOGGER.info("48.8.2 loadAccountData called");
 		hm = (HashMap<String, HashMap>) applicationCacheManager.get(ROOTNODE);
 		if (hm == null) {
-
+			LOGGER.info("48.8.3 Null true");
 			coaCache.loadAccountData();
 		}
 	}
@@ -501,26 +502,80 @@ public class ChartOfAccounts {
 	}
 
 	@Transactional
-	public boolean postTransaxtions(final Transaxtion txnList[], final String vDate) throws TaskFailedException {
+	public boolean postTransaxtions(
+	        final Transaxtion txnList[],
+	        final String vDate) throws TaskFailedException {
 
-		if (!checkBudget(txnList))
-			throw new TaskFailedException(FinancialConstants.BUDGET_CHECK_ERROR_MESSAGE);
-		// if objects are lost load them
-		loadAccountData();
-		try {
-			if (!validPeriod(vDate))
-				throw new TaskFailedException(
-						"Voucher Date is not within an open period. Please use an open period for posting");
-			if (!validateTxns(txnList))
-				return false;
-		} catch (final TaskFailedException e) {
-			LOGGER.error(e.getMessage(), e);
-			throw new TaskFailedException(e.getMessage());
-		}
-		// entityManager.flush();
-		if (!postInGL(txnList))
-			return false;
-		return true;
+	    LOGGER.info("48.1 postTransaxtions() START");
+	    LOGGER.info("48.2 Transaction count: " + txnList.length);
+	    LOGGER.info("48.3 Voucher date: " + vDate);
+
+	    LOGGER.info("48.4 Starting budget check");
+
+	    if (!checkBudget(txnList)) {
+
+	        LOGGER.error("48.5 Budget check returned FALSE");
+
+	        throw new TaskFailedException(
+	                FinancialConstants.BUDGET_CHECK_ERROR_MESSAGE);
+	    }
+
+	    LOGGER.info("48.6 Budget check completed successfully");
+
+	    LOGGER.info("48.7 Loading account data");
+
+	    loadAccountData();
+
+	    LOGGER.info("48.8 Account data loaded successfully");
+
+	    try {
+
+	        LOGGER.info("48.9 Validating voucher period");
+
+	        if (!validPeriod(vDate)) {
+
+	            LOGGER.error("48.10 Voucher period validation returned FALSE");
+
+	            throw new TaskFailedException(
+	                    "Voucher Date is not within an open period. Please use an open period for posting");
+	        }
+
+	        LOGGER.info("48.11 Voucher period validation successful");
+
+	        LOGGER.info("48.12 Validating transactions");
+
+	        if (!validateTxns(txnList)) {
+
+	            LOGGER.error("48.13 Transaction validation returned FALSE");
+
+	            return false;
+	        }
+
+	        LOGGER.info("48.14 Transaction validation successful");
+
+	    } catch (final TaskFailedException e) {
+
+	        LOGGER.error(
+	                "ERROR at postTransaxtions() during period/transaction validation",
+	                e);
+
+	        throw new TaskFailedException(e.getMessage());
+	    }
+
+	    LOGGER.info("48.15 Starting postInGL()");
+
+	    if (!postInGL(txnList)) {
+
+	        LOGGER.error("48.16 postInGL() returned FALSE");
+
+	        return false;
+	    }
+
+	    LOGGER.info("48.17 postInGL() completed successfully");
+
+	    LOGGER.info("48.18 postTransaxtions() END - SUCCESS");
+
+	    return true;
 	}
 
 	private void checkfuctreqd(final String glcode, final String fuctid, final DataCollection dc) throws TaskFailedException {
