@@ -171,7 +171,7 @@ public class PaymentUtils {
         receipt.setConsumerCode(paymentDetail.getBill().getConsumerCode());
         receipt.setReceiptDate(paymentDetail.getReceiptDate());
         receipt.setReceiptNumber(paymentDetail.getReceiptNumber());
-        receipt.setTenantId(paymentDetail.getTenantId());
+        receipt.setTenantId(normalizeTenantId(paymentDetail.getTenantId()));
         receipt.setPaymentId(payment.getId());
 //        receipt.setBill(bill);
         this.prepareBillData(payment, paymentDetail, receipt);
@@ -193,7 +193,7 @@ public class PaymentUtils {
         bill.setPayerId(billv2.getPayerId());
         bill.setPayerName(billv2.getPayerName());
 //        bill.setTaxAndPayments(taxAndPayments);
-        bill.setTenantId(billv2.getTenantId());
+        bill.setTenantId(normalizeTenantId(billv2.getTenantId()));
         bill.setBusinessService(paymentDetail.getBusinessService());
 //        bill.setBillDetails(billDetails);
         //prepare billdetails
@@ -237,7 +237,7 @@ public class PaymentUtils {
             bd.setReceiptType(paymentDetail.getReceiptType());
 //            bd.setStateId(stateId);
             bd.setStatus(paymentDetail.getBill().getStatus().name());
-            bd.setTenantId(bdv1.getTenantId());
+            bd.setTenantId(normalizeTenantId(bdv1.getTenantId()));
             bd.setToPeriod(bdv1.getToPeriod());
             bd.setTotalAmount(paymentDetail.getBill().getTotalAmount());
             bd.setVoucherHeader(bdv1.getVoucherHeader());
@@ -268,7 +268,7 @@ public class PaymentUtils {
 		else
 			instrumentType.setName(this.toCamelCase(payment.getPaymentMode().name()));
         instrument.setInstrumentType(instrumentType);
-        instrument.setTenantId(payment.getTenantId());
+        instrument.setTenantId(normalizeTenantId(payment.getTenantId()));
         instrument.setTransactionDate(new Date(payment.getTransactionDate()));
         instrument.setTransactionNumber(payment.getTransactionNumber());
         instrument.setTransactionType(TransactionType.Debit);
@@ -291,4 +291,12 @@ public class PaymentUtils {
 	private String toCamelCase(String str){
     	return new StringBuilder(str.toUpperCase().substring(0,1)).append(str.substring(1).toLowerCase()).toString();
     }
+
+	/**
+	 * Tenant ids are stored in lower case in the downstream services (instrument types,
+	 * vouchers), so a mixed case id such as hp.Shimla must be normalised before use.
+	 */
+	private String normalizeTenantId(String tenantId) {
+		return tenantId != null ? tenantId.toLowerCase() : null;
+	}
 }
