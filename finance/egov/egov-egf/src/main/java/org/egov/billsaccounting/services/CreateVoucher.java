@@ -2712,7 +2712,9 @@ public class CreateVoucher {
 		final String schemaName = defaultIfBlank(ApplicationThreadLocals.getTenantID(),
                 environmentSettings.defaultSchemaName());
 		
-		sequenceName = schemaName + ".sq_" + vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
+//			sequenceName = schemaName + ".sq_" + vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
+//				+ fiscalPeriod.getName();
+		sequenceName = "sq_" + vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
 				+ fiscalPeriod.getName();
 		Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
 

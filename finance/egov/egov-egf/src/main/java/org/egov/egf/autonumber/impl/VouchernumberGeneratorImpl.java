@@ -89,9 +89,9 @@ public class VouchernumberGeneratorImpl implements VouchernumberGenerator {
             throw new ApplicationRuntimeException("Fiscal period is not defined for the voucher date");
         final String schemaName = defaultIfBlank(ApplicationThreadLocals.getTenantID(),
                 environmentSettings.defaultSchemaName());
-        sequenceName = schemaName + ".sq_" + vh.getFundId().getIdentifier() + "_" + vh.getVoucherNumberPrefix() + "_" + fiscalPeriod.getName();
+        //sequenceName = schemaName + ".sq_" + vh.getFundId().getIdentifier() + "_" + vh.getVoucherNumberPrefix() + "_" + fiscalPeriod.getName();
+        sequenceName = "sq_" + vh.getFundId().getIdentifier() + "_" + vh.getVoucherNumberPrefix() + "_" + fiscalPeriod.getName();
         final Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
-
         voucherNumber = String.format("%s/%s/%08d/%02d/%s", vh.getFundId().getIdentifier(), vh.getVoucherNumberPrefix(),
                 nextSequence, vh.getVoucherDate().getMonth() + 1, fiscalPeriod.getcFinancialYear().getFinYearRange());
 
