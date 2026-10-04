@@ -144,7 +144,12 @@ public class MicroServiceUtilImpl implements MicroServiceUtil{
 	 * Function which is used to fetch the finance service mdms data based on Business Service code.
 	 */
 	public void getFinanceServiceMdmsData(String tenantId,String businessServiceCode, RequestInfo requestInfo, FinanceMdmsModel finSerMdms) throws VoucherCustomException{
-		StringBuilder mdmsUrl = new StringBuilder(manager.getMdmsHostUrl()+manager.getMdmsSearchUrl());
+		String mdmsHost = manager.getMdmsHostUrl();
+		String mdmsPath = manager.getMdmsSearchUrl();
+		// avoid a double slash when the host ends with '/' and the path starts with '/'
+		StringBuilder mdmsUrl = new StringBuilder(mdmsHost.endsWith("/") && mdmsPath.startsWith("/")
+				? mdmsHost.substring(0, mdmsHost.length() - 1) + mdmsPath
+				: mdmsHost + mdmsPath);
 		List<ModuleDetail> moduleDetails = new ArrayList<>();
 		this.addFinanceModule(moduleDetails, businessServiceCode);
 		this.addBillingServiceModule(moduleDetails, businessServiceCode);
