@@ -1,8 +1,8 @@
 {
-	"key":"chbBookingCertificate",
+	"key":"nocCertificate",
 	"DataConfigs": {
 	  "version": "1.0.0",
-	  "baseKeyPath":"$.chb",
+	  "baseKeyPath":"$.noc",
 	  "mappings":[
 		{
 		  "direct":[

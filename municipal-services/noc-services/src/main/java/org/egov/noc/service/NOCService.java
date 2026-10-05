@@ -273,39 +273,42 @@ public class NOCService {
         
 		private Resource createResource(NocRequest nocRequest) {
 
-			Map<String, Object> map = new HashMap<>();
-			Map<String, Object> nocObject = new HashMap<>();
+		    Map<String, Object> map = new HashMap<>();
+		    Map<String, Object> nocObject = new HashMap<>();
 
-			Noc noc = nocRequest.getNoc();
-			
-			nocObject.put("applicationNo", noc.getApplicationNo());
-			nocObject.put("nocNo", noc.getNocNo());
-			nocObject.put("nocType", noc.getNocType());
-			nocObject.put("applicationType", noc.getApplicationType());
-			nocObject.put("applicationStatus", noc.getApplicationStatus());
-			nocObject.put("nocReason", noc.getNocReason());
-			nocObject.put("connectionType", noc.getConnectionType());
-			nocObject.put("tenantId", noc.getTenantId());
+		    // Demo values for NOC certificate
+		    nocObject.put("fromDate", "05-10-2026");
+		    nocObject.put("toDate", "05-10-2026");
+		    nocObject.put("siteName", "Demo Property");
+		    nocObject.put("siteAddress", "Shimla, Himachal Pradesh");
+		    nocObject.put("bookedBy", "Jatin Sharma");
+		    nocObject.put("mobileNumber", "9876543210");
+		    nocObject.put("bookingDate", "05-10-2026");
+		    nocObject.put("address", "Demo Address, Shimla, Himachal Pradesh");
+		    nocObject.put("contactNumber", "9876543210");
+		    nocObject.put("pinLocation", "Shimla");
+		    nocObject.put("contactLocation", "Shimla");
+		    nocObject.put("bookingStatus", "APPROVED");
+		    nocObject.put("bookingReference", "NOC/0126/00001");
+		    nocObject.put("perDayCost", "0");
+		    nocObject.put("numberOfDays", "1");
+		    nocObject.put("ulbName", "Shimla Municipal Corporation");
+		    nocObject.put("ulbType", "Municipal Corporation");
+		    nocObject.put("TotalAmount", "0");
+		    nocObject.put("securityAmount", "0");
+		    nocObject.put("approverName", "EMP-0-000112");
 
-			if (noc.getCitizenDetail() != null) {
-				nocObject.put("citizenDetail", noc.getCitizenDetail());
-			}
+		    // Root key expected by DataConfigs baseKeyPath: $.noc
+		    map.put("noc", nocObject);
 
-			if (noc.getPropertyDetail() != null) {
-				nocObject.put("propertyDetail", noc.getPropertyDetail());
-			}
+		    PDFRequest pdfRequest = PDFRequest.builder()
+		            .RequestInfo(nocRequest.getRequestInfo())
+		            .key("nocCertificate")
+		            .tenantId(nocRequest.getNoc().getTenantId())
+		            .data(map)
+		            .build();
 
-			if (noc.getAdditionalDetails() != null) {
-				nocObject.put("additionalDetails", noc.getAdditionalDetails());
-			}
-			
-			nocObject.put("certificateStatus", "APPROVED");
-			map.put("noc", nocObject);
-
-			PDFRequest pdfRequest = PDFRequest.builder().RequestInfo(nocRequest.getRequestInfo()).key("nocCertificate")
-					.tenantId(noc.getTenantId()).data(map).build();
-
-			return reportService.createNoSavePDF(pdfRequest);
+		    return reportService.createNoSavePDF(pdfRequest);
 		}
 		
 		private DmsRequest generateDmsRequest(Resource resource, NocRequest nocRequest) {

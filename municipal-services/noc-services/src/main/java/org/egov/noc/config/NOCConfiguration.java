@@ -31,12 +31,12 @@ public class NOCConfiguration {
 	
 	// Alfresco keys
 	public static final Long ALFRESCO_COMMON_DOCUMENT_ID = 0L;
-	public static final String ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION = "chb service certificate";
+	public static final String ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION = "noc service certificate";
 	public static final String ALFRESCO_COMMON_CERTIFICATE_ID = "";
 	public static final String ALFRESCO_COMMON_CERTIFICATE_TYPE = "PDF";
 	public static final String ALFRESCO_DOCUMENT_TYPE = "CERT";
 	public static final String ALFRESCO_NOC_CERTIFICATE_COMMENT = "Signed Certificate";
-	public static final String ALFRESCO_BUSINESS_SERVICE = "chb-services";
+	public static final String ALFRESCO_BUSINESS_SERVICE = "noc-services";
 	public static final String STATUS_APPROVED = "APPROVED";
 
 	// User Config
