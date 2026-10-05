@@ -99,7 +99,7 @@ public class EgfKafkaListener {
 	@Value("${}")
 	private static final String COLLECTION_VERSION = "V2";
 	
-	@KafkaListener(topics = {"${egov.collection.receipt.voucher.save.topic}","${egov.collection.receipt.voucher.cancel.topic}","${kafka.topics.payment.create.name}","${kafka.topics.payment.cancel.name}"})	
+	@KafkaListener(topics = {"${egov.collection.receipt.voucher.save.topic}","${egov.collection.receipt.voucher.cancel.topic}","${kafka.topics.payment.create.name}","${kafka.topics.payment.cancel.name}","${kafka.topics.payment.voucher.replay.name:egov.collection.payment-voucher-replay}"})	
     public void process(ConsumerRecord<String, String> record) {
 		LOGGER.info("at egf 1");
         VoucherResponse voucherResponse = null;
@@ -110,6 +110,10 @@ public class EgfKafkaListener {
         try {
         	LOGGER.info("at egf 2");
         	String topic = record.topic();
+        	// payments replayed by collection-services (_republishforvoucher) are handled like a new payment
+        	if(topic.equals(manager.getPaymentVoucherReplayTopicName())){
+        		topic = manager.getCreatePaymentTopicName();
+        	}
         	if(topic.equals(manager.getCreatePaymentTopicName()) || topic.equals(manager.getCancelPaymentTopicName())){
         		LOGGER.info("at egf 3");
         		payRequest = objectMapper.readValue(record.value(), PaymentRequest.class);
