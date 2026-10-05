@@ -426,8 +426,11 @@ public class GarbageAccountSchedulerService {
 
 		long fromDate = generateBillRequest.getFromDate().getTime();
 		long toDate = generateBillRequest.getToDate().getTime();
-		return demands.stream().anyMatch(demand -> demand.getTaxPeriodFrom() != null && demand.getTaxPeriodTo() != null
-				&& demand.getTaxPeriodFrom() == fromDate && demand.getTaxPeriodTo() == toDate);
+		
+		return demands.stream()
+				.anyMatch(demand -> Demand.StatusEnum.ACTIVE.equals(demand.getStatus())
+						&& demand.getTaxPeriodFrom() != null && demand.getTaxPeriodTo() != null
+						&& demand.getTaxPeriodFrom() == fromDate && demand.getTaxPeriodTo() == toDate);
 	}
 	
 	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
