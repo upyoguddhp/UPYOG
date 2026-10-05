@@ -159,7 +159,10 @@ public class MicroServiceUtilImpl implements MicroServiceUtil{
         mdmsrequest.setRequestInfo(requestInfo);
         mdmsrequest.setMdmsCriteria(mdmscriteria);
         try {
+       		// the request body is not logged as a whole because RequestInfo carries the auth token
+       		LOGGER.info("MDMS request : url : {}, tenantId : {}, criteria : {}", mdmsUrl, tenantId, mapper.writeValueAsString(mdmscriteria));
        		Map postForObject = mapper.convertValue(serviceRequestRepository.fetchResult(mdmsUrl, mdmsrequest, tenantId), Map.class);
+       		LOGGER.info("MDMS response : tenantId : {}, body : {}", tenantId, postForObject);
        		finSerMdms.setFinanceServiceMdmsData(postForObject);
         }  catch (ServiceCallException e) {
             LOGGER.error("MDMS call failed for tenant: {}", tenantId, e);
@@ -167,6 +170,7 @@ public class MicroServiceUtilImpl implements MicroServiceUtil{
                 ProcessStatus.FAILED,"MDMS service call failed for URL: " + mdmsUrl
             );
         } catch (Exception e) {
+        	LOGGER.error("MDMS call failed for url : {}, tenantId : {}, cause : {}", mdmsUrl, tenantId, e.getMessage(), e);
         	throw new VoucherCustomException(ProcessStatus.FAILED,"Error Occured While calling the URL : "+mdmsUrl);
 		}
 	}
