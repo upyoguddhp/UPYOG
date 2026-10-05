@@ -171,7 +171,7 @@ public class PaymentUtils {
         receipt.setConsumerCode(paymentDetail.getBill().getConsumerCode());
         receipt.setReceiptDate(paymentDetail.getReceiptDate());
         receipt.setReceiptNumber(paymentDetail.getReceiptNumber());
-        receipt.setTenantId(normalizeTenantId(paymentDetail.getTenantId()));
+        receipt.setTenantId(paymentDetail.getTenantId());
         receipt.setPaymentId(payment.getId());
 //        receipt.setBill(bill);
         this.prepareBillData(payment, paymentDetail, receipt);
@@ -193,7 +193,7 @@ public class PaymentUtils {
         bill.setPayerId(billv2.getPayerId());
         bill.setPayerName(billv2.getPayerName());
 //        bill.setTaxAndPayments(taxAndPayments);
-        bill.setTenantId(normalizeTenantId(billv2.getTenantId()));
+        bill.setTenantId(billv2.getTenantId());
         bill.setBusinessService(paymentDetail.getBusinessService());
 //        bill.setBillDetails(billDetails);
         //prepare billdetails
@@ -237,7 +237,7 @@ public class PaymentUtils {
             bd.setReceiptType(paymentDetail.getReceiptType());
 //            bd.setStateId(stateId);
             bd.setStatus(paymentDetail.getBill().getStatus().name());
-            bd.setTenantId(normalizeTenantId(bdv1.getTenantId()));
+            bd.setTenantId(bdv1.getTenantId());
             bd.setToPeriod(bdv1.getToPeriod());
             bd.setTotalAmount(paymentDetail.getBill().getTotalAmount());
             bd.setVoucherHeader(bdv1.getVoucherHeader());
@@ -293,8 +293,9 @@ public class PaymentUtils {
     }
 
 	/**
-	 * Tenant ids are stored in lower case in the downstream services (instrument types,
-	 * vouchers), so a mixed case id such as hp.Shimla must be normalised before use.
+	 * Instrument types are stored per lower case tenant id in egf-instrument and are matched
+	 * case sensitively, so only the instrument tenant is normalised. The other tenant ids are
+	 * left as received because MDMS knows the tenant as hp.Shimla.
 	 */
 	private String normalizeTenantId(String tenantId) {
 		return tenantId != null ? tenantId.toLowerCase() : null;
