@@ -298,7 +298,7 @@ public class MicroserviceUtils {
     @Value("${egov.services.egov-indexer.url}")
     private String egovIndexerUrl;
     
-    @Value("${collection.payment.searchurl.enabled}")
+    @Value("${collection.payment.searchurl.enabled:true}")
     private Boolean paymentSearchEndPointEnabled;
     
     private ObjectMapper mapper;
@@ -1697,7 +1697,7 @@ public class MicroserviceUtils {
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria) {
         PaymentResponse response = null;
         StringBuilder url = new StringBuilder();
-        if (paymentSearchEndPointEnabled) {
+        if (Boolean.TRUE.equals(paymentSearchEndPointEnabled)) {
             url = new StringBuilder(appConfigManager.getEgovCollSerHost())
                     .append(appConfigManager.getCollSerPaymentModuleNameSearch()).append("?");
         } else {
@@ -1709,7 +1709,7 @@ public class MicroserviceUtils {
         reqWrapper.setRequestInfo(requestInfo);
         try {
             preparePaymentSearchQueryString(searchCriteria, url);
-            if (paymentSearchEndPointEnabled) {
+            if (Boolean.TRUE.equals(paymentSearchEndPointEnabled)) {
                 for (String serviceCode :searchCriteria.getBusinessServices()) {
                 response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class,serviceCode);
                 }
