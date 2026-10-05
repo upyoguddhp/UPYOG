@@ -1,5 +1,11 @@
 package org.egov.noc.service;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,15 +38,20 @@ import org.egov.noc.web.model.bpa.BPASearchCriteria;
 import org.egov.noc.web.model.workflow.BusinessService;
 import org.egov.noc.web.model.workflow.ProcessInstance;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
+import org.egov.noc.web.model.DmsRequest;
 import org.egov.noc.workflow.WorkflowIntegrator;
 import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.egov.noc.web.model.PDFRequest;
+import org.egov.noc.service.ReportService;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +89,12 @@ public class NOCService {
 	
 	@Autowired
 	private NOCBillingService nocBillingService;
+	
+	@Autowired
+	private ReportService reportService;
+	
+	@Autowired
+	private AlfrescoService alfrescoService;
 
 	/**
 	 * entry point from controller, takes care of next level logic from controller to create NOC application
@@ -132,6 +149,10 @@ public class NOCService {
 		   String action = nocRequest.getNoc().getWorkflow().getAction();
 		    if ("RETURN_TO_INITIATOR_FOR_PAYMENT".equalsIgnoreCase(action)) {
 		    	 nocBillingService.generateBill(nocRequest);
+		    }
+		    
+		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+		        createCertificate(nocRequest);
 		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
@@ -239,5 +260,69 @@ public class NOCService {
                 criteria.setAccountId(uuids);*/
                 return nocRepository.getNocCount(criteria);
         }
-	
+        
+		private void createCertificate(NocRequest nocRequest) {
+			Resource resource = createResource(nocRequest);
+			DmsRequest dmsRequest = generateDmsRequest(resource, nocRequest);
+			try {
+				String documentReferenceId = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
+			} catch (IOException e) {
+				throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
+			}
+		}
+        
+		private Resource createResource(NocRequest nocRequest) {
+
+			Map<String, Object> map = new HashMap<>();
+			Map<String, Object> nocObject = new HashMap<>();
+
+			Noc noc = nocRequest.getNoc();
+			
+			nocObject.put("applicationNo", noc.getApplicationNo());
+			nocObject.put("nocNo", noc.getNocNo());
+			nocObject.put("nocType", noc.getNocType());
+			nocObject.put("applicationType", noc.getApplicationType());
+			nocObject.put("applicationStatus", noc.getApplicationStatus());
+			nocObject.put("nocReason", noc.getNocReason());
+			nocObject.put("connectionType", noc.getConnectionType());
+			nocObject.put("tenantId", noc.getTenantId());
+
+			if (noc.getCitizenDetail() != null) {
+				nocObject.put("citizenDetail", noc.getCitizenDetail());
+			}
+
+			if (noc.getPropertyDetail() != null) {
+				nocObject.put("propertyDetail", noc.getPropertyDetail());
+			}
+
+			if (noc.getAdditionalDetails() != null) {
+				nocObject.put("additionalDetails", noc.getAdditionalDetails());
+			}
+			
+			nocObject.put("certificateStatus", "APPROVED");
+			map.put("noc", nocObject);
+
+			PDFRequest pdfRequest = PDFRequest.builder().RequestInfo(nocRequest.getRequestInfo()).key("nocCertificate")
+					.tenantId(noc.getTenantId()).data(map).build();
+
+			return reportService.createNoSavePDF(pdfRequest);
+		}
+		
+		private DmsRequest generateDmsRequest(Resource resource, NocRequest nocRequest) {
+			Noc noc = nocRequest.getNoc();
+			RequestInfo requestInfo = nocRequest.getRequestInfo();
+			DmsRequest dmsRequest = DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+					.objectId(noc.getId()).description(config.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+					.id(config.ALFRESCO_COMMON_CERTIFICATE_ID)
+					.type(config.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+					.objectName(config.ALFRESCO_BUSINESS_SERVICE)
+					.comments(config.ALFRESCO_NOC_CERTIFICATE_COMMENT)
+					.status(config.STATUS_APPROVED)
+					.file(resource)
+					.servicetype(config.ALFRESCO_BUSINESS_SERVICE)
+					.documentType(config.ALFRESCO_DOCUMENT_TYPE)
+					.documentId(config.ALFRESCO_COMMON_DOCUMENT_ID)
+					.build();
+			return dmsRequest;
+		}
 }

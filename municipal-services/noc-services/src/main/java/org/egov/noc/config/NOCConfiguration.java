@@ -28,6 +28,16 @@ public class NOCConfiguration {
 	public void initialize() {
 		TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
 	}
+	
+	// Alfresco keys
+	public static final Long ALFRESCO_COMMON_DOCUMENT_ID = 0L;
+	public static final String ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION = "chb service certificate";
+	public static final String ALFRESCO_COMMON_CERTIFICATE_ID = "";
+	public static final String ALFRESCO_COMMON_CERTIFICATE_TYPE = "PDF";
+	public static final String ALFRESCO_DOCUMENT_TYPE = "CERT";
+	public static final String ALFRESCO_NOC_CERTIFICATE_COMMENT = "Signed Certificate";
+	public static final String ALFRESCO_BUSINESS_SERVICE = "chb-services";
+	public static final String STATUS_APPROVED = "APPROVED";
 
 	// User Config
 	@Value("${egov.user.host}")
@@ -135,4 +145,16 @@ public class NOCConfiguration {
 
     @Value("${egov.mdms.v2.search}")
     private String mdmsV2SearchEndpoint;
+    
+	@Value("${egov.report.host}")
+	public String reportHost;
+
+	@Value("${egov.report.endpoint.create}")
+	public String reportCreateEndPoint;
+	
+	@Value("${egov.alfresco.host}")
+	public String alfrescoHost;
+
+	@Value("${egov.alfresco.endpoint.upload}")
+	public String alfrescoUploadEndPoint;
 }
