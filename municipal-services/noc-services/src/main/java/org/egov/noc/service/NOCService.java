@@ -151,9 +151,9 @@ public class NOCService {
 		    	 nocBillingService.generateBill(nocRequest);
 		    }
 		    
-		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
-		        createCertificate(nocRequest);
-		    }
+//		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+//		        createCertificate(nocRequest);
+//		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
