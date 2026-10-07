@@ -67,71 +67,26 @@ public class IdGenRepository {
 
     private String getId(RequestInfo requestInfo, String tenantId, String name, String format, int count) {
 
-        log.info("========== ID GENERATION START ==========");
-        log.info("tenantId : {}", tenantId);
-        log.info("name     : {}", name);
-        log.info("format   : {}", format);
-        log.info("count    : {}", count);
-
         List<IdRequest> reqList = new ArrayList<>();
-
         for (int i = 0; i < count; i++) {
-            IdRequest idRequest = new IdRequest(name, tenantId, format);
-            reqList.add(idRequest);
-
-            log.info("IdRequest [{}] : {}", i, idRequest);
+            reqList.add(new IdRequest(name, tenantId, format));
         }
-
         IdGenerationRequest req = new IdGenerationRequest(requestInfo, reqList);
-
-        log.info("IdGenerationRequest : {}", req);
-
         String uri = UriComponentsBuilder
                 .fromHttpUrl(applicationProperties.getIdGenServiceHost())
                 .path(applicationProperties.getIdGeneration())
                 .build()
                 .toUriString();
-
-        log.info("IDGEN URI : {}", uri);
-
         try {
-            log.info("Calling IDGEN service...");
-
-            IdGenerationResponse idGenerationResponse = restTemplate.postForObject(
-                    uri,
-                    req,
-                    IdGenerationResponse.class
-            );
-
-            log.info("IDGEN response : {}", idGenerationResponse);
-
-            String generatedId = idGenerationResponse
-                    .getIdResponses()
-                    .get(0)
-                    .getId();
-
-            log.info("Generated ID : {}", generatedId);
-            log.info("========== ID GENERATION SUCCESS ==========");
-
-            return generatedId;
-
+            IdGenerationResponse idGenerationResponse = restTemplate.postForObject(uri, req,
+                    IdGenerationResponse.class);
+            return idGenerationResponse.getIdResponses().get(0).getId();
         } catch (HttpClientErrorException e) {
-            log.error("========== IDGEN HTTP ERROR ==========");
-            log.error("Status : {}", e.getStatusCode());
-            log.error("Response body : {}", e.getResponseBodyAsString());
-            log.error("Response headers : {}", e.getResponseHeaders(), e);
-
+            log.error("ID Gen Service failure ", e);
             throw new ServiceCallException(e.getResponseBodyAsString());
-
         } catch (Exception e) {
-            log.error("========== IDGEN UNKNOWN ERROR ==========");
-            log.error("Exception class : {}", e.getClass().getName());
-            log.error("Exception message : {}", e.getMessage(), e);
-
-            throw new org.egov.tracer.model.CustomException(
-                    "IDGEN_SERVICE_ERROR",
-                    "Failed to generate ID, unknown error occurred"
-            );
+            log.error("ID Gen Service failure", e);
+            throw new org.egov.tracer.model.CustomException("IDGEN_SERVICE_ERROR", "Failed to generate ID, unknown error occurred");
         }
     }
 }
