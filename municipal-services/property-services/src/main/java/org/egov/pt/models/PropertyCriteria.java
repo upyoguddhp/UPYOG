@@ -99,6 +99,11 @@ public class PropertyCriteria {
 	private Set<String> addressAdditionalDetailsWardNumbers;
 
 	private Set<String> ownerOldCustomerIds;
+	
+	private String addressAdditionalDetailsWardNumber;
+	
+	@Builder.Default
+	private Boolean isFuzzyNameSearch = false;
 
 	public PropertyCriteria copy() {
 		return PropertyCriteria.builder().tenantId(this.tenantId).propertyIds(copySet(this.propertyIds))
@@ -112,11 +117,13 @@ public class PropertyCriteria {
 				.additionalDetailsPropertyIds(copySet(this.additionalDetailsPropertyIds))
 				.isSearchInternal(this.isSearchInternal).isInboxSearch(this.isInboxSearch)
 				.isDefaulterNoticeSearch(this.isDefaulterNoticeSearch)
+				.isFuzzyNameSearch(this.isFuzzyNameSearch)
 				.isRequestForDuplicatePropertyValidation(this.isRequestForDuplicatePropertyValidation)
 				.isCitizen(this.isCitizen).isRequestForCount(this.isRequestForCount)
 				.isRequestForOldDataEncryption(this.isRequestForOldDataEncryption).createdBy(copySet(this.createdBy))
 				.isSchedulerCall(this.isSchedulerCall)
 				.isActiveUnit(this.isActiveUnit)
+				.addressAdditionalDetailsWardNumber(this.addressAdditionalDetailsWardNumber)
 				.addressAdditionalDetailsWardNumbers(copySet(this.addressAdditionalDetailsWardNumbers))
 				.ownerOldCustomerIds(copySet(this.ownerOldCustomerIds)).build();
 	}
