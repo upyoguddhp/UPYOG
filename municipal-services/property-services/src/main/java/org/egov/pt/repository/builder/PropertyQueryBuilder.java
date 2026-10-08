@@ -1399,17 +1399,16 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
 	}
 	
-<<<<<<< HEAD
+
 	public String getPropertyApproverUserNameQuery() {
 		return PROPERTY_APPROVER_QUERY;
-=======
+	}
 	public String getUpdateIsProcessingPaymentQuery(List<Object> preparedStmtList, String billId, boolean isPaymentProcessing, String txnAmount) {
 		preparedStmtList.add(isPaymentProcessing);
 		preparedStmtList.add(isPaymentProcessing);
 		preparedStmtList.add(txnAmount);
 		preparedStmtList.add(billId);
 		return PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY;
->>>>>>> 9fe1844ae4268e71e7032a836b71beeabd7c8a1c
 	}
 
 }

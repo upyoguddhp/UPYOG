@@ -52,14 +52,11 @@ import org.egov.garbageservice.contract.workflow.ProcessInstanceResponse;
 import org.egov.garbageservice.contract.workflow.State;
 import org.egov.garbageservice.contract.workflow.WorkflowService;
 import org.egov.garbageservice.model.AuditDetails;
-<<<<<<< HEAD
-import org.egov.garbageservice.model.DdpVerificationCount;
-=======
 import org.egov.garbageservice.model.DdpPrintingRecord;
 import org.egov.garbageservice.model.DdpPrintingSearchResponse;
 import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
->>>>>>> 9fe1844ae4268e71e7032a836b71beeabd7c8a1c
+import org.egov.garbageservice.model.DdpVerificationCount;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
 import org.egov.garbageservice.model.GarbageAccountActionResponse;

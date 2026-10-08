@@ -795,7 +795,6 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
 		
-<<<<<<< HEAD
 		public String getPropertyApproverCode(String tenantId) {
 			List<Object> preparedStmtList = new ArrayList<>();
 			preparedStmtList.add(tenantId);
@@ -805,7 +804,8 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			} catch (Exception ex) {
 				return null;
 			}
-=======
+		}
+
 		public int updateTrackerAdditionalDetails(PtTaxCalculatorTracker tracker) {
 			List<Object> preparedStmtList = new ArrayList<>();
 			String query = queryBuilder.getUpdateAdditionalDetailsQuery(tracker, preparedStmtList);
@@ -816,6 +816,5 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			List<Object> preparedStmtList = new ArrayList<>();
 			String query = queryBuilder.getUpdateIsProcessingPaymentQuery(preparedStmtList, billId,isPaymentProcessing, txnAmount);
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
->>>>>>> 9fe1844ae4268e71e7032a836b71beeabd7c8a1c
 		}
 	}

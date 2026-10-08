@@ -2032,7 +2032,6 @@ public class PropertySchedulerService {
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
 	
-<<<<<<< HEAD
 	public void sendPropertyNotice(SendPropertyNoticeRequest request) {
 
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
@@ -2110,7 +2109,8 @@ public class PropertySchedulerService {
 		} catch (Exception e) {
 			log.error("Notice SMS tracker creation failed for billId {}", bill.getId(), e);
 		}
-=======
+	}
+
 	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, CalculateTaxRequest calculateTaxRequest) {
 		
 		if (tracker == null || tracker.getBillId() == null) {
@@ -2145,7 +2145,6 @@ public class PropertySchedulerService {
 		
 		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
      	propertyService.UpdatePtTrackerStatus(tracker);
->>>>>>> 9fe1844ae4268e71e7032a836b71beeabd7c8a1c
 	}
 
 }
