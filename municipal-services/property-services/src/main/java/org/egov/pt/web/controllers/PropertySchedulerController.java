@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 //import org.egov.ptr.web.contracts.alfresco.DMSResponse;
 //import org.egov.ptr.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.web.contracts.SendPropertyEmailRequest;
+import org.egov.pt.web.contracts.SendPropertyNoticeRequest;
 
 import java.io.*;
 import java.util.*;
@@ -119,5 +120,11 @@ public class PropertySchedulerController {
 	public ResponseEntity<?> sendPropertyEmail(@RequestBody SendPropertyEmailRequest request) {
 	    service.sendPropertyEmail(request);
 	    return ResponseEntity.ok("Property email sent successfully");
+	}
+	
+	@PostMapping("/send-property-notice")
+	public ResponseEntity<?> sendPropertyNotice(@RequestBody SendPropertyNoticeRequest request) {
+	    service.sendPropertyNotice(request);
+	    return ResponseEntity.ok("Property Notice sent successfully");
 	}
 }

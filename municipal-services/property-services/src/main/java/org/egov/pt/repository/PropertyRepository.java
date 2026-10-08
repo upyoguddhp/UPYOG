@@ -795,6 +795,17 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
 		
+		public String getPropertyApproverCode(String tenantId) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			preparedStmtList.add(tenantId);
+			try {
+				return jdbcTemplate.queryForObject(queryBuilder.getPropertyApproverUserNameQuery(),
+						preparedStmtList.toArray(), String.class);
+			} catch (Exception ex) {
+				return null;
+			}
+		}
+
 		public int updateTrackerAdditionalDetails(PtTaxCalculatorTracker tracker) {
 			List<Object> preparedStmtList = new ArrayList<>();
 			String query = queryBuilder.getUpdateAdditionalDetailsQuery(tracker, preparedStmtList);
