@@ -1141,11 +1141,12 @@ public class GarbageAccountSchedulerService {
 	}
 
 	/**
-	 * For every ULB/ward enabled for door plate printing (per the
-	 * ULBS.DdpPrinting MDMS master), finds ddpVerified, approved, active
-	 * garbage accounts in that ULB/ward and marks them ready for printing, in
-	 * id batches per ULB/ward so a single UPDATE doesn't have to cover every
-	 * matching row across the whole tenant at once.
+	 * For every ULB/ward added today to the ULBS.DdpPrinting MDMS master
+	 * (per the record's {@code auditDetails.createdTime}), finds
+	 * ddpVerified, approved, active garbage accounts in that ULB/ward and
+	 * marks them ready for printing, in id batches per ULB/ward so a single
+	 * UPDATE doesn't have to cover every matching row across the whole
+	 * tenant at once.
 	 */
 	public MarkReadyForPrintingResponse markReadyForPrinting(MarkReadyForPrintingRequest request) {
 
