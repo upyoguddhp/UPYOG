@@ -172,11 +172,11 @@ public class GarbageAccountSchedulerService {
 						skippedCount.incrementAndGet();
 						errorList.add("Bill already exists for application "
 								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
-							errorList.clear();
-							errorList.add("Demand already exists for the selected period");
-							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
-						}
+//						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
+//							errorList.clear();
+//							errorList.add("Demand already exists for the selected period");
+//							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+//						}
 						return;
 					}
 					
