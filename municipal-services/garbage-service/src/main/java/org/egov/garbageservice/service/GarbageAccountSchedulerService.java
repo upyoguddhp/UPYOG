@@ -76,6 +76,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.egov.garbageservice.model.BillIdRequest;
 import org.egov.garbageservice.model.GenerateBillPreviewResponse;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.math.RoundingMode;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -262,9 +263,9 @@ public class GarbageAccountSchedulerService {
 							grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
 							// add to garbage bill tracker
 							GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
-							tracker.setGarbageBillWithoutRebate(billAmount);
-							tracker.setRebateAmount(rebateAmount);
-							tracker.setGrbgBillAmount(finalBillAmount);
+							tracker.setGarbageBillWithoutRebate(billAmount != null ? billAmount.setScale(0, RoundingMode.HALF_UP) : null);
+							tracker.setRebateAmount(rebateAmount != null ? rebateAmount.setScale(0, RoundingMode.HALF_UP) : null);
+							tracker.setGrbgBillAmount(finalBillAmount != null ? finalBillAmount.setScale(0, RoundingMode.HALF_UP) : null);
 
 							GrbgBillTracker grbgBillTracker = garbageAccountService
 									.saveToGarbageBillTracker(grbgBillTrackerRequest);
@@ -693,8 +694,8 @@ public class GarbageAccountSchedulerService {
 	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
 			BigDecimal billAmount,String Type,AtomicReference<String> demandId, int numberOfMonths) {
 		try {
-			if(!checkUuidNumber(garbageAccount))
-				return null;
+//			if(!checkUuidNumber(garbageAccount))
+//				return null;
 			List<Demand> savedDemands = new ArrayList<>();
 			
 			// generate demand
@@ -920,7 +921,7 @@ public class GarbageAccountSchedulerService {
 	                    .multiply(penaltyRate)
 	                    .divide(BigDecimal.valueOf(100))
 	                    .multiply(BigDecimal.valueOf(monthsOverdue))
-	                    .setScale(2, RoundingMode.HALF_UP);
+	                    .setScale(0, RoundingMode.HALF_UP);
 	            
 	            if (tracker.getGrbgBillWithoutPenalty() == null) {
 	                tracker.setGrbgBillWithoutPenalty(baseAmount);
