@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import java.math.RoundingMode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -406,11 +407,13 @@ public class EnrichmentService {
 				.tenantId(property.getTenantId()).financialYear(calculateTaxRequest.getFinancialYear())
 				.fromDate(calculateTaxRequest.getFromDate()).toDate(calculateTaxRequest.getToDate())
 				.fromDateString(formatter.format(calculateTaxRequest.getFromDate()))
-				.toDateString(formatter.format(calculateTaxRequest.getToDate())).propertyTax(finalPropertyTax)
+				.toDateString(formatter.format(calculateTaxRequest.getToDate()))
+				.propertyTax(finalPropertyTax != null ? finalPropertyTax.setScale(0, RoundingMode.HALF_UP) : null)
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
-				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
+				.billId(null != bill ? bill.getId() : null)
+				.rebateAmount(rebateAmount != null ? rebateAmount.setScale(0, RoundingMode.HALF_UP) : null)
 				.type(calculateTaxRequest.getType())
-				.propertyTaxWithoutRebate(propertyTaxWithoutRebate)
+				.propertyTaxWithoutRebate(propertyTaxWithoutRebate != null ? propertyTaxWithoutRebate.setScale(0, RoundingMode.HALF_UP) : null)
 				.billStatus(trackerStatus)
 				.demandId(demandId)
 				.ward(ward)
