@@ -787,19 +787,35 @@ public class GarbageAccountSchedulerService {
 
 			// fetch/create bill
 			demandId.set(savedDemands.get(0).getId());
+			// consumerCode (and demandId) are enough to locate the demand we just
+			// created - passing mobileNumber here as well used to make billing-service
+			// re-resolve the payer via a fresh, live egov-user lookup by mobile number
+			// (see DemandService.getDemands in billing-service) instead of trusting
+			// consumerCode/demandId directly. If that mobile number didn't currently
+			// resolve to an active user (stale/changed number, deactivated account,
+			// typo, etc.), that lookup came back empty and billing-service silently
+			// returned no bill for a demand that very much existed - leaving it
+			// orphaned. We already know exactly which demand this is, so there's no
+			// need for that lookup at all.
 			GenerateBillCriteria billCriteria = GenerateBillCriteria.builder().tenantId(garbageAccount.getTenantId())
 					.businessService(service)
 					.consumerCode(savedDemands.get(0).getConsumerCode())
-//					.demandId(savedDemands.get(0).getId())
-					.mobileNumber(garbageAccount.getMobileNumber())
+					.demandId(savedDemands.get(0).getId())
 //					.email(garbageAccount.getEmailId())
 					.build();
 			BillResponse billResponse = billService.generateBill(generateBillRequest.getRequestInfo(), billCriteria);
 
+			if (null == billResponse || CollectionUtils.isEmpty(billResponse.getBill())) {
+				log.warn("Bill generation returned no bill for application {} (demandId={}); cancelling the demand "
+						+ "so it doesn't stay orphaned and block future billing attempts for this period",
+						garbageAccount.getGrbgApplicationNumber(), demandId.get());
+				cancelOrphanedDemand(garbageAccount, generateBillRequest, service, demandId.get());
+			}
+
 			return billResponse;
 		} catch (ServiceCallException e) {
 		    String actualMessage = "Server Error";
-			
+
 			if(null != e.getError()) {
 				 try {
 				        ObjectMapper mapper = new ObjectMapper();
@@ -809,6 +825,8 @@ public class GarbageAccountSchedulerService {
 				        log.error("Failed to parse backend error JSON: {}", parseEx.getMessage());
 				    }
 			}
+			cancelOrphanedDemand(garbageAccount, generateBillRequest, Type.equals("ON-DEMAND") ? "GB_BULK" : "GB",
+					demandId.get());
 			if(null != generateBillRequest.getGrbgApplicationNumbers() || null != generateBillRequest.getMobileNumbers()) {
 				throw new CustomException("INVALID_CONSUMERCODE",actualMessage);
 			}else {
@@ -816,6 +834,29 @@ public class GarbageAccountSchedulerService {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Cancels a demand that was just created for a bill that then failed to
+	 * generate, so the demand doesn't stay ACTIVE with no bill ever attached to
+	 * it. Left dangling, a future bill-generation run would see this demand via
+	 * the existing-demand-for-period check and skip the account forever, with no
+	 * bill ever created and no clear signal why.
+	 */
+	private void cancelOrphanedDemand(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
+			String service, String demandIdToCancel) {
+
+		if (StringUtils.isEmpty(demandIdToCancel)) {
+			return;
+		}
+
+		try {
+			demandService.cancelDemand(garbageAccount.getTenantId(), Collections.singleton(demandIdToCancel),
+					generateBillRequest.getRequestInfo(), service);
+		} catch (Exception cancelEx) {
+			log.error("Failed to cancel orphaned demand {} for application {}", demandIdToCancel,
+					garbageAccount.getGrbgApplicationNumber(), cancelEx);
+		}
 	}
 
 	private Date purseToDate(String dateString) {
