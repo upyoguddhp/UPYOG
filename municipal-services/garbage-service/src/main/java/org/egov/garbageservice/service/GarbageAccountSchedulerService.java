@@ -172,11 +172,11 @@ public class GarbageAccountSchedulerService {
 						skippedCount.incrementAndGet();
 						errorList.add("Bill already exists for application "
 								+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
-							errorList.clear();
-							errorList.add("Demand already exists for the selected period");
-							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
-						}
+//						if (demandExistsForPeriod(generateBillRequest, garbageAccount)) {
+//							errorList.clear();
+//							errorList.add("Demand already exists for the selected period");
+//							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+//						}
 						return;
 					}
 					
@@ -902,17 +902,19 @@ public class GarbageAccountSchedulerService {
 	                .map(DemandDetail::getTaxAmount)
 	                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-	            Long expiry = tracker.getExpiryDate();
-	            if (expiry == null || expiry >= System.currentTimeMillis()) {
-	                continue; 
-	            }
-	
-	            LocalDate expiryDate = Instant.ofEpochMilli(expiry)
-	                                          .atZone(ZoneId.systemDefault())
-	                                          .toLocalDate();
-	
-	            long monthsOverdue = ChronoUnit.MONTHS.between(expiryDate, LocalDate.now());
-	            if (monthsOverdue <= 0) monthsOverdue = 1;
+				Long createdTime = tracker.getAuditDetails().getCreatedDate();
+
+				if (createdTime == null) {
+					continue;
+				}
+
+				LocalDate createdDate = Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate();
+				long diffDays = ChronoUnit.DAYS.between(createdDate, LocalDate.now());
+				long monthsOverdue = diffDays / 30;
+
+				if (monthsOverdue <= 0) {
+					continue;
+				}
 	
 	            BigDecimal penalty = baseAmount
 	                    .multiply(penaltyRate)
@@ -1139,11 +1141,12 @@ public class GarbageAccountSchedulerService {
 	}
 
 	/**
-	 * For every ULB/ward enabled for door plate printing (per the
-	 * ULBS.DdpPrinting MDMS master), finds ddpVerified, approved, active
-	 * garbage accounts in that ULB/ward and marks them ready for printing, in
-	 * id batches per ULB/ward so a single UPDATE doesn't have to cover every
-	 * matching row across the whole tenant at once.
+	 * For every ULB/ward added today to the ULBS.DdpPrinting MDMS master
+	 * (per the record's {@code auditDetails.createdTime}), finds
+	 * ddpVerified, approved, active garbage accounts in that ULB/ward and
+	 * marks them ready for printing, in id batches per ULB/ward so a single
+	 * UPDATE doesn't have to cover every matching row across the whole
+	 * tenant at once.
 	 */
 	public MarkReadyForPrintingResponse markReadyForPrinting(MarkReadyForPrintingRequest request) {
 

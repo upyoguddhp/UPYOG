@@ -38,6 +38,9 @@ public class BillSearchCriteria {
 
 	@Default
 	private Boolean retrieveAll = false;
+	
+	@Default
+	private Boolean retrieveDefaulters = false; 
 
 	private Boolean isActive;
 
