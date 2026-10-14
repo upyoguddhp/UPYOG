@@ -87,7 +87,7 @@ serviceMaps:
       queryMaps:
         - query: >
             UPDATE eg_noc
-            SET nocNo = ?, applicationStatus = ?, additionaldetails = ?, lastmodifiedby = ?, lastmodifiedtime = ?
+            SET nocNo = ?, applicationStatus = ?, additionaldetails = ?, certificatetemplate = ?, lastmodifiedby = ?, lastmodifiedtime = ?
             WHERE id = ?;
           basePath: Noc
           jsonMaps:
@@ -96,6 +96,7 @@ serviceMaps:
             - jsonPath: $.Noc.additionalDetails
               type: JSON
               dbType: JSONB
+            - jsonPath: $.Noc.certificateTemplate
             - jsonPath: $.Noc.auditDetails.lastModifiedBy
             - jsonPath: $.Noc.auditDetails.lastModifiedTime
             - jsonPath: $.Noc.id
@@ -177,7 +178,7 @@ serviceMaps:
 
         - query: >
             UPDATE eg_noc
-            SET  applicationStatus = ?, additionaldetails = ?, lastmodifiedby = ?, lastmodifiedtime = ?
+            SET  applicationStatus = ?, additionaldetails = ?, certificatetemplate = ?, lastmodifiedby = ?, lastmodifiedtime = ?
             WHERE id = ?;
           basePath: Noc
           jsonMaps:
@@ -185,6 +186,7 @@ serviceMaps:
             - jsonPath: $.Noc.additionalDetails
               type: JSON
               dbType: JSONB
+            - jsonPath: $.Noc.certificateTemplate
             - jsonPath: $.Noc.auditDetails.lastModifiedBy
             - jsonPath: $.Noc.auditDetails.lastModifiedTime
             - jsonPath: $.Noc.id

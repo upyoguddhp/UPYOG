@@ -110,7 +110,9 @@ public class Noc   {
   
   @JsonProperty("citizenDetail")
   private Object citizenDetail; 
-
+  
+  @JsonProperty("certificateTemplate")
+  private String certificateTemplate;
 
   public Noc id(String id) {
     this.id = id;
@@ -466,8 +468,13 @@ public class Noc   {
 	    this.citizenDetail = citizenDetail;
 	}
 
+	public String getCertificateTemplate() {
+	    return certificateTemplate;
+	}
 
-
+	public void setCertificateTemplate(String certificateTemplate) {
+	    this.certificateTemplate = certificateTemplate;
+	}
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -496,6 +503,7 @@ public class Noc   {
         Objects.equals(this.additionalDetails, noc.additionalDetails) &&
         Objects.equals(this.nocReason, noc.nocReason) &&
         Objects.equals(this.businessService, noc.businessService) &&
+        Objects.equals(this.certificateTemplate, noc.certificateTemplate) &&
         Objects.equals(this.connectionType, noc.connectionType) &&
         Objects.equals(this.propertyDetail, noc.propertyDetail) &&
         Objects.equals(this.citizenDetail, noc.citizenDetail);
@@ -504,7 +512,7 @@ public class Noc   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, tenantId, applicationNo, nocNo, applicationType, nocType, accountId, source, sourceRefId, landId, status, applicationStatus, documents, workflow, auditDetails, additionalDetails, nocReason, businessService, connectionType, propertyDetail, citizenDetail);
+    return Objects.hash(id, tenantId, applicationNo, nocNo, applicationType, nocType, accountId, source, sourceRefId, landId, status, applicationStatus, documents, workflow, auditDetails, additionalDetails, nocReason, businessService, certificateTemplate, connectionType, propertyDetail, citizenDetail);
   }
 
   @Override
@@ -530,6 +538,7 @@ public class Noc   {
     sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
     sb.append("    nocReason: ").append(toIndentedString(nocReason)).append("\n");
     sb.append("    businessService").append(toIndentedString(businessService)).append("\n");
+    sb.append("    certificateTemplate: ").append(toIndentedString(certificateTemplate)).append("\n");
     sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
     sb.append("    propertyDetail: ").append(toIndentedString(propertyDetail)).append("\n");
     sb.append("    citizenDetail: ").append(toIndentedString(citizenDetail)).append("\n");
