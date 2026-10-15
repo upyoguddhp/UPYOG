@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Icon from "./Icons";
 import AccessibilityTools from "../../../../components/AccessibilityTools";
@@ -181,21 +181,121 @@ export const UtilityBar = ({ helpline, hours, languages, selectedLanguage, onLan
 };
 
 /** Brand + primary navigation + login/register. Collapses to a menu on small screens. */
+const MAX_INLINE = 6;
+
 export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRegister, onLogout, onNavigate, onSearch }) => {
   const { t } = useTranslation();
   const tt = (key, text) => t(key, { defaultValue: text });
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState(null);
+  // compact = the links no longer fit next to the brand, so they move into the hamburger menu
+  const [compact, setCompact] = useState(false);
+  const innerRef = useRef(null);
+  const brandRef = useRef(null);
+  const navRef = useRef(null);
+  const needRef = useRef(0);
+  const compactRef = useRef(false);
+  const wrapRef = useRef(null);
+  const heightRef = useRef(0);
+  const [stuck, setStuck] = useState(false);
+  // the first MAX_INLINE links stay in the bar; any further links live in the hamburger menu
+  const inline = nav.slice(0, MAX_INLINE);
+  const extra = nav.slice(MAX_INLINE);
+  const navKey = nav.map((n) => n.label).join("|") + (isLoggedIn ? `|${userName || ""}` : "|guest");
 
   const go = (item) => {
     setOpen(false);
     onNavigate(item);
   };
 
+  const setMode = (v) => {
+    compactRef.current = v;
+    setCompact(v);
+    if (!v) setOpen(false);
+  };
+
+  // labels / language / login state changed: forget the stored width and measure the full row again
+  useLayoutEffect(() => {
+    needRef.current = 0;
+    setMode(false);
+  }, [navKey]);
+
+  useLayoutEffect(() => {
+    const inner = innerRef.current;
+    if (!inner || typeof ResizeObserver === "undefined") return undefined;
+    const check = () => {
+      if (window.innerWidth <= 1180) return setMode(false); // the stylesheet already shows the burger here
+      const cs = getComputedStyle(inner);
+      const gap = parseFloat(cs.columnGap || cs.gap) || 16;
+      const avail = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (!compactRef.current) {
+        const navW = navRef.current ? navRef.current.scrollWidth : 0;
+        const need = (brandRef.current ? brandRef.current.offsetWidth : 0) + navW + gap;
+        if (need > avail + 1) {
+          needRef.current = need;
+          setMode(true);
+        }
+      } else if (needRef.current && avail >= needRef.current + 16) {
+        setMode(false);
+      }
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(inner);
+    if (brandRef.current) ro.observe(brandRef.current);
+    window.addEventListener("resize", check);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { needRef.current = 0; if (!compactRef.current) check(); });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", check);
+    };
+  }, [navKey]);
+
+  // keep the header pinned to the top once the utility bar has scrolled away
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const wrap = wrapRef.current;
+        if (!wrap) return;
+        const top = wrap.getBoundingClientRect().top;
+        setStuck((prev) => {
+          if (!prev) heightRef.current = wrap.firstElementChild ? wrap.firstElementChild.offsetHeight : 0;
+          return top <= 0 && window.scrollY > 0;
+        });
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  // close the open menu with Escape or a click outside the header
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    const onDoc = (e) => {
+      if (innerRef.current && !innerRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDoc);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDoc);
+    };
+  }, [open]);
+
   return (
-    <header className="LandingHeader">
-      <div className="LandingWrap LandingHeader__inner">
-        <a className="LandingBrand" href="/digit-ui/citizen" aria-label={tt("LANDING_HOME", "Home")}>
+    <div ref={wrapRef} className="LandingHeaderWrap" style={stuck ? { minHeight: heightRef.current } : undefined}>
+    <header className={`LandingHeader${compact ? " LandingHeader--compact" : ""}${extra.length ? " LandingHeader--has-more" : ""}${stuck ? " is-stuck" : ""}`}>
+      <div className="LandingWrap LandingHeader__inner" ref={innerRef}>
+        <a className="LandingBrand" ref={brandRef} href="/digit-ui/citizen" aria-label={tt("LANDING_HOME", "Home")}>
           <img className="LandingBrand__hp" src="/digit-ui/images/brand/HPLogo.png" alt="Himachal Pradesh Sarkar" />
           <span className="LandingBrand__text">
             <img className="LandingBrand__wordmark" src="/digit-ui/images/brand/CitizenSevaLogo.png" alt={tt("LANDING_BRAND", "Citizen Seva")} />
@@ -205,7 +305,7 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
 
         <button
           type="button"
-          className="LandingHeader__toggle"
+          className={`LandingHeader__toggle${open ? " is-open" : ""}`}
           aria-expanded={open}
           aria-controls="landing-nav"
           aria-label={tt("LANDING_MENU", "Menu")}
@@ -214,12 +314,12 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
           <span /><span /><span />
         </button>
 
-        <nav id="landing-nav" className={`LandingNav ${open ? "is-open" : ""}`} aria-label={tt("LANDING_NAV", "Primary")}>
-          {nav.map((item) =>
+        <nav id="landing-nav" ref={navRef} className={`LandingNav ${open ? "is-open" : ""}`} aria-label={tt("LANDING_NAV", "Primary")}>
+          {nav.map((item, idx) =>
             item.children && item.children.length ? (
               <div
                 key={item.id}
-                className={`LandingNav__group ${openGroup === item.id ? "is-open" : ""}`}
+                className={`LandingNav__group${idx >= MAX_INLINE ? " LandingNav__extra" : ""} ${openGroup === item.id ? "is-open" : ""}`}
                 onMouseEnter={() => setOpenGroup(item.id)}
                 onMouseLeave={() => setOpenGroup(null)}
               >
@@ -244,7 +344,7 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
                 </ul>
               </div>
             ) : (
-              <button key={item.id} type="button" className={item.active ? "is-active" : ""} onClick={() => go(item)}>
+              <button key={item.id} type="button" className={`${item.active ? "is-active" : ""}${idx >= MAX_INLINE ? " LandingNav__extra" : ""}`} onClick={() => go(item)}>
                 {item.label}
               </button>
             )
@@ -272,8 +372,28 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
             )}
           </span>
         </nav>
+
+        {extra.length > 0 && (
+          <div className={`LandingNav__morePanel${open ? " is-open" : ""}`} role="menu" aria-label={tt("LANDING_MORE", "More")}>
+            {extra.map((item) =>
+              item.children && item.children.length ? (
+                <div key={item.id} className="LandingNav__moreGroup">
+                  <span>{item.label}</span>
+                  {item.children.map((c) => (
+                    <button key={c.id} type="button" role="menuitem" onClick={() => go(c)}>{c.label}</button>
+                  ))}
+                </div>
+              ) : (
+                <button key={item.id} type="button" role="menuitem" className={item.active ? "is-active" : ""} onClick={() => go(item)}>
+                  {item.label}
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
     </header>
+    </div>
   );
 };
 

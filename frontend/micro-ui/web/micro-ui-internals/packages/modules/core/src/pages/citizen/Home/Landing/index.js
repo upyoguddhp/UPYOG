@@ -8,6 +8,8 @@ import HowItWorks from "./HowItWorks";
 import HelpCenter from "./HelpCenter";
 import HeroVideo from "./HeroVideo";
 import Welcome from "./Welcome";
+import NewsTicker from "./NewsTicker";
+import BackToTop from "./BackToTop";
 import { UtilityBar, SiteHeader, SiteFooter, StatsBand, NewsUpdates } from "./SiteChrome";
 import { getHelpLinks, openLink } from "../../../../components/ActionDock/helpLinks";
 import { ALL_SERVICES_URL, LOGIN_URL, popularSearches, siteDefaults } from "./config";
@@ -226,7 +228,10 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
           </div>
         </section>
 
+        <NewsTicker items={uiHomePage?.newsAndNotifications} onOpen={go} />
+
         <Welcome
+          onOpen={go}
           onOrgChart={() => siteGo("/digit-ui/citizen/organization-chart")}
           onServices={() => document.getElementById("landing-services")?.scrollIntoView({ behavior: "smooth" })}
         />
@@ -268,6 +273,8 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
         </div>
         </div>
       </main>
+
+      <BackToTop />
 
       <SiteFooter
         stateInfo={stateInfo}

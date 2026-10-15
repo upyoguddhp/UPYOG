@@ -89,3 +89,22 @@ export const heroVideosHimachal = [
 export const BHASHINI_ENABLED = true;
 export const BHASHINI_SCRIPT = "https://translation-plugin.bhashini.co.in/v4/website_translation_utility.js";
 export const BHASHINI_CSS = "https://translation-plugin.bhashini.co.in/v4/website_translation_utility.css";
+
+/**
+ * Leadership shown beside "About". Drop the photos in web/public/images/leaders/ (served from
+ * /digit-ui/images/leaders/); a missing photo falls back to a silhouette. `name` is optional.
+ */
+export const leaders = [
+  { id: "cm", titleKey: "LANDING_LEADER_CM", title: "Hon'ble Chief Minister", name: "", photo: "/digit-ui/images/leaders/chief-minister.jpg", profileUrl: "/digit-ui/citizen/organization-chart", contactUrl: "/digit-ui/citizen/contact-us" },
+  { id: "minister", titleKey: "LANDING_LEADER_MINISTER", title: "Hon'ble Minister, Urban Development", name: "", photo: "/digit-ui/images/leaders/minister.jpg", profileUrl: "/digit-ui/citizen/organization-chart", contactUrl: "/digit-ui/citizen/contact-us" },
+  { id: "secretary", titleKey: "LANDING_LEADER_SECRETARY", title: "Secretary, Urban Development", name: "", photo: "/digit-ui/images/leaders/secretary.jpg", profileUrl: "/digit-ui/citizen/organization-chart", contactUrl: "/digit-ui/citizen/contact-us" },
+  { id: "director", titleKey: "LANDING_LEADER_DIRECTOR", title: "Director, Urban Development", name: "", photo: "/digit-ui/images/leaders/director.jpg", profileUrl: "/digit-ui/citizen/organization-chart", contactUrl: "/digit-ui/citizen/contact-us" },
+];
+
+/** Shown when MDMS uiHomePage.newsAndNotifications is empty (ticker and "What's new"). */
+export const defaultNews = [
+  { key: "LANDING_NEWS_PT", title: "Pay your property tax online and get an instant receipt", navigationUrl: "/digit-ui/citizen/pt-home" },
+  { key: "LANDING_NEWS_TL", title: "Apply for or renew a trade licence from home", navigationUrl: "/digit-ui/citizen/tl-home" },
+  { key: "LANDING_NEWS_PGR", title: "How to lodge a grievance and track it with an ID", navigationUrl: "/digit-ui/citizen/pgr-home" },
+  { key: "LANDING_NEWS_CERT", title: "Download your certificates and receipts any time", navigationUrl: "/digit-ui/citizen/all-services" },
+];
