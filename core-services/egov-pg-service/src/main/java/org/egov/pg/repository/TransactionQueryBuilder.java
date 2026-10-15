@@ -145,6 +145,16 @@ class TransactionQueryBuilder {
 					preparedStmtList))
 			.append(" )");
 		}
+		
+		if (Objects.nonNull(transactionCriteria.getIsSettlementResponseNull())) {
+			isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, builder);
+
+			if (transactionCriteria.getIsSettlementResponseNull()) {
+				builder.append(" (pg.settlement_response IS NULL OR pg.settlement_response = 'null'::jsonb) ");
+			} else {
+				builder.append(" (pg.settlement_response IS NOT NULL AND pg.settlement_response <> 'null'::jsonb) ");
+			}
+		}
 
 		return builder.toString();
 	}

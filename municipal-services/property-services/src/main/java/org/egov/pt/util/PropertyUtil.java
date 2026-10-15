@@ -94,7 +94,11 @@ public class PropertyUtil extends CommonUtils {
 					if (isSearchOpen) {
 						owner.addUserDetail(getMaskedOwnerInfo(info));
 					} else {
+						String fatherName = owner.getFatherOrHusbandName();
 						owner.addUserDetail(info);
+						if (info.getFatherOrHusbandName() == null) {
+						    owner.setFatherOrHusbandName(fatherName);
+						}
 					}
 				}
 			});

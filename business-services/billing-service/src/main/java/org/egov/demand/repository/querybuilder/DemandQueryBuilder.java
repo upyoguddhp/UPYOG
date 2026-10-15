@@ -92,8 +92,8 @@ public class DemandQueryBuilder {
 
 	public static final String DEMAND_INSERT_QUERY = "INSERT INTO egbs_demand_v1 "
 			+ "(id,consumerCode,consumerType,businessService,payer,taxPeriodFrom,taxPeriodTo,"
-			+ "minimumAmountPayable,createdby,lastModifiedby,createdtime,lastModifiedtime,tenantid, status, additionaldetails, billexpirytime, fixedBillExpiryDate) "
-			+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			+ "minimumAmountPayable,createdby,lastModifiedby,createdtime,lastModifiedtime,tenantid, status, additionaldetails, billexpirytime, ispaymentcompleted, fixedBillExpiryDate) "
+			+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	public static final String DEMAND_DETAIL_INSERT_QUERY = "INSERT INTO egbs_demanddetail_v1 "
 			+ "(id,demandid,taxHeadCode,taxamount,collectionamount,"
@@ -131,6 +131,12 @@ public class DemandQueryBuilder {
             "SET adjustedamount = amount " +
             "WHERE demanddetailid IN (" +
             "SELECT id FROM egbs_demanddetail_v1 WHERE demandid = ?)";
+	
+	public static final String DEMAND_DETAIL_COLLECTION_AMOUNT_UPDATE = "UPDATE egbs_demanddetail_v1 " +
+            "SET collectionamount = ?, " +
+            "    lastmodifiedby = ?, " +
+            "    lastmodifiedtime = ? " +
+            "WHERE id = ?";
 
 	public String getDemandQueryForConsumerCodes(Map<String,Set<String>> businessConsumercodeMap,List<Object> preparedStmtList, String tenantId){
 		

@@ -1,0 +1,1 @@
+ALTER TABLE eg_user ADD isdataprotectionaccepted boolean DEFAULT false;

@@ -117,6 +117,8 @@ public class Bill {
 	  PAID("PAID"),
 
 	  EXPIRED("EXPIRED"),
+	  
+	  ADVANCE_ADJUSTED("ADVANCE_ADJUSTED"),
 		
 	  PARTIALLY_PAID("PARTIALLY_PAID");
 

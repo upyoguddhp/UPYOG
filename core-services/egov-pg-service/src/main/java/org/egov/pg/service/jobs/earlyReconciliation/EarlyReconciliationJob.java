@@ -64,13 +64,25 @@ public class EarlyReconciliationJob implements Job {
                         .txnStatus(Transaction.TxnStatusEnum.PENDING).build(),
                 System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(startTime),
                 System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(endTime));
+        
+		List<Transaction> failureTxns = transactionRepository.fetchTransactionsByTimeRange(TransactionCriteria.builder()
+				       .txnStatus(Transaction.TxnStatusEnum.FAILURE).build(),
+				System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(startTime),
+				System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(endTime));
 
-        log.info("Attempting to reconcile {} pending transactions", pendingTxns.size());
+		log.info("Attempting to reconcile {} pending and {} failure transactions", pendingTxns.size(),failureTxns.size());
 
         for (Transaction txn : pendingTxns) {
             log.info(transactionService.updateTransaction(requestInfo, Collections.singletonMap(PgConstants.PG_TXN_IN_LABEL, txn
                     .getTxnId
                     ())).toString());
+        }
+        
+        for (Transaction ftxn : failureTxns) {
+            log.info(transactionService.updateTransaction(
+                    requestInfo,
+                    Collections.singletonMap(PgConstants.PG_TXN_IN_LABEL, ftxn.getTxnId())
+            ).toString());
         }
 
     }

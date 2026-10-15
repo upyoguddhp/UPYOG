@@ -92,8 +92,14 @@ public class GrbgConstants {
 	public static final String USER_ROLE_SECRETARY = "SECRETARY";
 
 	public static final String GARBAGE_MODEL = "Garbage";
-	
+
 	public static final String GARBAGE_PENALTY_TAX_HEAD = "GARBAGE_PENALTY";
+
+	/**
+	 * MDMS v2 schemaCode listing the ULB/ward combinations currently enabled
+	 * for door plate printing (see {@code MdmsService.fetchDdpPrintingUlbWards}).
+	 */
+	public static final String MDMS_SCHEMA_CODE_DDP_PRINTING = "ULBS.DdpPrinting";
 
 
 	// Alfresco keys
@@ -145,6 +151,9 @@ public class GrbgConstants {
 
 	@Value("${egov.demand.search.endpoint}")
 	public String demandSearchEndpoint;
+	
+	@Value("${egov.demand.search.by.criteria.endpoint}")
+	public String demandSearchByCriteriaEndpoint;
 
 	@Value("${egov.demand.update.endpoint}")
 	public String demandUpdateEndpoint;
@@ -175,6 +184,12 @@ public class GrbgConstants {
 
 	@Value("${mdms.v2.searchEndpoint}")
 	private String mdmsV2SearchEndpoint;
+
+	@Value("${egov.property.service.host}")
+	private String propertyServiceHostUrl;
+
+	@Value("${egov.property.search.endpoint}")
+	private String propertySearchEndpoint;
 
 	@Value("${garbage.service.host}")
 	private String grbgServiceHostUrl;
