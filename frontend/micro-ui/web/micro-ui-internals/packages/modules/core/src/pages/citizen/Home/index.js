@@ -19,12 +19,14 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { CitizenSideBar } from "../../../components/TopBarSideBar/SideBar/CitizenSideBar";
 import StaticCitizenSideBar from "../../../components/TopBarSideBar/SideBar/StaticCitizenSideBar";
+import LandingPage from "./Landing";
 
 const Home = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const tenantId = Digit.ULBService.getCitizenCurrentTenant(true);
-  const { data: { stateInfo, uiHomePage } = {}, isLoading } = Digit.Hooks.useStore.getInitData();
+  // No mandatory city: falls back to the state tenant, services ask for the ULB where needed
+  const tenantId = Digit.ULBService.getCitizenCurrentTenant();
+  const { data: { stateInfo, uiHomePage, modules, languages, tenants } = {}, isLoading } = Digit.Hooks.useStore.getInitData();
   let isMobile = window.Digit.Utils.browser.isMobile();
   if(window.Digit.SessionStorage.get("TL_CREATE_TRADE")) window.Digit.SessionStorage.set("TL_CREATE_TRADE",{})
    
@@ -42,11 +44,6 @@ const Home = () => {
     },
   });
 
-  if (!tenantId) {
-    Digit.SessionStorage.get("locale") === null
-      ? history.push(`/digit-ui/citizen/select-language`)
-      : history.push(`/digit-ui/citizen/select-location`);
-  }
 
   const appBannerWebObj = uiHomePage?.appBannerDesktop;
   const appBannerMobObj = uiHomePage?.appBannerMobile;
@@ -136,51 +133,32 @@ const Home = () => {
   sessionStorage.removeItem("landmark"); 
   sessionStorage.removeItem("propertyid");
 
+  const whatsNew = conditionsToDisableNotificationCountTrigger() ? (
+    EventsDataLoading ? (
+      <Loader />
+    ) : (
+      <div className="WhatsNewSection">
+        <div className="headSection">
+          <h2>{t(whatsNewSectionObj?.headerLabel)}</h2>
+          <p onClick={() => history.push(whatsNewSectionObj?.sideOption?.navigationUrl)}>{t(whatsNewSectionObj?.sideOption?.name)}</p>
+        </div>
+        <WhatsNewCard {...EventsData?.[0]} />
+      </div>
+    )
+  ) : null;
+
+  // The landing is a standalone website page (own header / footer, no platform side bar).
   return isLoading ? (
     <Loader />
   ) : (
-    <div className="HomePageContainer" style={{width:"100%"}}>
-      {/* <div className="SideBarStatic">
-        <StaticCitizenSideBar />
-      </div> */}
-      <div className="HomePageWrapper">
-        {<div className="BannerWithSearch">
-          {isMobile ? <img src={"https://nugp-assets.s3.ap-south-1.amazonaws.com/nugp+asset/Banner+UPYOG+%281920x500%29B+%282%29.jpg"} /> : <img src={"https://nugp-assets.s3.ap-south-1.amazonaws.com/nugp+asset/Banner+UPYOG+%281920x500%29A.jpg"} />}
-          {/* <div className="Search">
-            <StandaloneSearchBar placeholder={t("CS_COMMON_SEARCH_PLACEHOLDER")} />
-          </div> */}
-          <div className="ServicesSection">
-          <CardBasedOptions style={{marginTop:"-30px"}} {...allCitizenServicesProps} />
-          <CardBasedOptions style={isMobile ? {marginTop:"-30px"} : {marginTop:"-30px"}} {...allInfoAndUpdatesProps} />
-        </div>
-        </div>}
-
-
-        {(whatsAppBannerMobObj || whatsAppBannerWebObj) && (
-          <div className="WhatsAppBanner">
-            {isMobile ? (
-              <img src={"https://nugp-assets.s3.ap-south-1.amazonaws.com/nugp+asset/Banner+UPYOG+%281920x500%29B+%282%29.jpg"} onClick={() => handleClickOnWhatsAppBanner(whatsAppBannerMobObj)} style={{"width":"100%"}}/>
-            ) : (
-              <img src={"https://nugp-assets.s3.ap-south-1.amazonaws.com/nugp+asset/Banner+UPYOG+%281920x500%29B+%282%29.jpg"} onClick={() => handleClickOnWhatsAppBanner(whatsAppBannerWebObj)} style={{"width":"100%"}}/>
-            )}
-          </div>
-        )}
-
-        {conditionsToDisableNotificationCountTrigger() ? (
-          EventsDataLoading ? (
-            <Loader />
-          ) : (
-            <div className="WhatsNewSection">
-              <div className="headSection">
-                <h2>{t(whatsNewSectionObj?.headerLabel)}</h2>
-                <p onClick={() => history.push(whatsNewSectionObj?.sideOption?.navigationUrl)}>{t(whatsNewSectionObj?.sideOption?.name)}</p>
-              </div>
-              <WhatsNewCard {...EventsData?.[0]} />
-            </div>
-          )
-        ) : null}
-      </div>
-    </div>
+    <LandingPage
+      uiHomePage={uiHomePage}
+      stateInfo={stateInfo}
+      modules={modules}
+      languages={languages}
+      tenants={tenants}
+      whatsNew={whatsNew}
+    />
   );
 };
 

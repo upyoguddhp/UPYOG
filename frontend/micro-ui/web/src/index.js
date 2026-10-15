@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { initLibraries } from "@upyog/digit-ui-libraries";
-// import "@egovernments/digit-ui-css/dist/index.css";
+import "@upyog-niua/upyog-css/dist/index.css";
 import "./index.css";
 import App from './App';
 import { TLCustomisations } from './Customisations/tl/TLCustomisation';

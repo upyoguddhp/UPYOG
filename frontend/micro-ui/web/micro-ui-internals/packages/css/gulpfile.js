@@ -2,6 +2,7 @@ const { series, src, dest, watch, task } = require("gulp");
 const clean = require("gulp-clean");
 const postcss = require("gulp-postcss");
 const sass = require("gulp-sass");
+sass.compiler = require("sass");
 const postcssPresetEnv = require("postcss-preset-env");
 const cleanCSS = require("gulp-clean-css");
 const rename = require("gulp-rename");

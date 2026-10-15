@@ -6,6 +6,8 @@ const createProxy = createProxyMiddleware({
 module.exports = function (app) {
   [
     "/egov-mdms-service",
+    "/hpud-dms-service",
+    "/rdf-monitoring",
     "/egov-location",
     "/localization",
     "/egov-workflow-v2",
@@ -22,6 +24,7 @@ module.exports = function (app) {
     "/vehicle",
     "/vendor",
     "/property-services",
+    "/garbage-service",
     "/fsm-calculator/v1/billingSlab/_search",
   ].forEach((location) =>
     app.use(location, createProxy)

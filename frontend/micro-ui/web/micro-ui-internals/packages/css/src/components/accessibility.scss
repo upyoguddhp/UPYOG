@@ -1,0 +1,369 @@
+/* ==========================================================================
+   Accessibility tools (core module → components/AccessibilityTools)
+   Panel UI + page-level modes applied as classes on <html> (see settings.js).
+   ========================================================================== */
+
+/* ---------- panel ---------- */
+.A11yTools {
+  position: relative;
+  display: inline-flex;
+  font-family: "Roboto", sans-serif;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    color: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    &:hover,
+    &[aria-expanded="true"] {
+      background: rgba(255, 255, 255, 0.18);
+    }
+  }
+}
+
+.A11yPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -60px;
+  z-index: 60;
+  width: min(392px, 94vw);
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  background: #fff;
+  color: #16203f;
+  border: 1px solid #e3e8f4;
+  border-radius: 16px;
+  box-shadow: 0 18px 44px rgba(20, 36, 90, 0.24);
+  text-align: left;
+
+  &__head {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e3e8f4;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 10px;
+  }
+  &__reset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+    height: 42px;
+    border: 0;
+    border-radius: 12px;
+    background: #1f3a8a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+.A11yTile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 70px;
+  padding: 8px 6px;
+  border: 2px solid #e3e8f4;
+  border-radius: 12px;
+  background: #fff;
+  color: #16203f;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: #2f6bff;
+    background: #f5f8ff;
+  }
+  &.is-active {
+    border-color: #1f3a8a;
+    background: #e8f0ff;
+  }
+  &:focus-visible {
+    outline: 3px solid #2f6bff;
+    outline-offset: 2px;
+  }
+  &__icon {
+    color: #1f3a8a;
+  }
+  &__label {
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.25;
+  }
+  &__steps {
+    display: inline-flex;
+    gap: 4px;
+    i {
+      width: 18px;
+      height: 4px;
+      border-radius: 2px;
+      background: #cfd6ea;
+      &.is-on {
+        background: #1f3a8a;
+      }
+    }
+  }
+  &__tick {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1e9e62;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
+
+/* ---------- utility bar extras ---------- */
+.LandingUtility__iconBtn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #d7e0ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  &:hover,
+  &[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+  }
+}
+.LandingUtility__search {
+  position: relative;
+  display: inline-flex;
+}
+.LandingUtility__searchPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -40px;
+  z-index: 60;
+  width: min(340px, 92vw);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  color: #16203f;
+  border: 1px solid #e3e8f4;
+  border-radius: 14px;
+  box-shadow: 0 18px 44px rgba(20, 36, 90, 0.24);
+
+  strong {
+    font-size: 15px;
+  }
+  .LandingBtn {
+    align-self: flex-end;
+  }
+}
+.LandingUtility__searchRow {
+  display: flex;
+  gap: 8px;
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    margin: 0;
+    padding: 0 12px;
+    border: 1px solid #cfd6ea;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #16203f;
+  }
+  button {
+    width: 42px;
+    height: 42px;
+    border: 1px solid #cfd6ea;
+    border-radius: 10px;
+    background: #f5f7fc;
+    color: #1f3a8a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &.is-listening {
+      color: #d64545;
+      border-color: #d64545;
+    }
+  }
+}
+.LandingUtility__searchError {
+  color: #d64545;
+  font-size: 12.5px;
+}
+.LandingUtility__bhashini {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* ================= page-level accessibility modes (classes on <html>) ================= */
+html.a11y-zoom #root {
+  zoom: var(--a11y-zoom, 1);
+}
+
+/* text spacing */
+html.a11y-spacing-1 body *:not(.A11yPanel):not(.A11yPanel *) { letter-spacing: 0.04em !important; word-spacing: 0.08em !important; }
+html.a11y-spacing-2 body *:not(.A11yPanel):not(.A11yPanel *) { letter-spacing: 0.08em !important; word-spacing: 0.16em !important; }
+html.a11y-spacing-3 body *:not(.A11yPanel):not(.A11yPanel *) { letter-spacing: 0.12em !important; word-spacing: 0.24em !important; }
+
+/* line height */
+html.a11y-lh-1 body *:not(.A11yPanel):not(.A11yPanel *) { line-height: 1.6 !important; }
+html.a11y-lh-2 body *:not(.A11yPanel):not(.A11yPanel *) { line-height: 1.9 !important; }
+html.a11y-lh-3 body *:not(.A11yPanel):not(.A11yPanel *) { line-height: 2.3 !important; }
+
+/* highlight links */
+html.a11y-links a,
+html.a11y-links [role="link"] {
+  background: #ffeb3b !important;
+  color: #0000c8 !important;
+  text-decoration: underline !important;
+  outline: 2px solid #0000c8 !important;
+  outline-offset: 1px;
+}
+
+/* dyslexia friendly font */
+html.a11y-dyslexia body *:not(svg):not(svg *) {
+  font-family: "OpenDyslexic", "Lexend", "Comic Sans MS", "Trebuchet MS", sans-serif !important;
+}
+
+/* hide images */
+html.a11y-hide-images img,
+html.a11y-hide-images video,
+html.a11y-hide-images picture,
+html.a11y-hide-images .LandingHeroVideo,
+html.a11y-hide-images [style*="background-image"] {
+  visibility: hidden !important;
+}
+
+/* bigger cursor */
+html.a11y-cursor,
+html.a11y-cursor body *,
+html.a11y-cursor a,
+html.a11y-cursor button {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M4 2l15 10-6 1.5 3.5 7.5-3 1.4-3.5-7.6L5 19z' fill='black' stroke='white' stroke-width='1.4'/></svg>") 4 2, auto !important;
+}
+
+/* colour filters (dark / invert / saturation) applied to the page roots so fixed UI keeps working */
+html.a11y-filter #root > *,
+html.a11y-filter .ActionDock {
+  filter: var(--a11y-filter, none);
+}
+html.a11y-theme-dark img,
+html.a11y-theme-dark video,
+html.a11y-theme-dark .LandingHeroVideo__svg {
+  filter: invert(1) hue-rotate(180deg);
+}
+/* sections that are already dark are inverted back so they stay dark */
+html.a11y-theme-dark .LandingUtility,
+html.a11y-theme-dark .LandingHeroBand,
+html.a11y-theme-dark .LandingStats,
+html.a11y-theme-dark .LandingFooter,
+html.a11y-theme-dark .ActionDock__chat,
+html.a11y-theme-dark .LandingBtn--primary {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* ADHD reading mask: the page dims except a band around the pointer */
+html.a11y-adhd::before,
+html.a11y-adhd::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: rgba(10, 18, 50, 0.62);
+  pointer-events: none;
+}
+html.a11y-adhd::before {
+  top: 0;
+  height: calc(var(--a11y-y, 40vh) - 56px);
+}
+html.a11y-adhd::after {
+  top: calc(var(--a11y-y, 40vh) + 56px);
+  bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .A11yPanel {
+    right: -120px;
+  }
+  .LandingUtility__searchPanel {
+    right: -80px;
+  }
+}
+
+/* accessibility icon inside the platform top bar */
+.TopBarA11yBtn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  margin-right: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(20, 36, 90, 0.35);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover,
+  &[aria-expanded="true"] {
+    background: rgba(20, 36, 90, 0.6);
+  }
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+  }
+  &--dark {
+    background: #eef1f8;
+    color: #1f3a8a;
+    &:hover,
+    &[aria-expanded="true"] {
+      background: #dfe6f7;
+    }
+  }
+}
+.RightMostTopBarOptions .A11yTools {
+  align-items: center;
+}

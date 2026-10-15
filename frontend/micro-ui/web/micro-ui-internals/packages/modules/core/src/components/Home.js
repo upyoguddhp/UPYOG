@@ -101,7 +101,7 @@ const CitizenHome = ({ modules, getCitizenMenu, fetchedCitizen, isLoading }) => 
               if (mdmsDataObj?.links?.length > 0) {
                 return (
                   <CitizenHomeCard
-                    header={t(mdmsDataObj?.header)}
+                    header={t(mdmsDataObj?.header, { defaultValue: code })}
                     links={mdmsDataObj?.links?.filter((ele) => ele?.link)?.sort((x, y) => x?.orderNumber - y?.orderNumber)}
                     Icon={() => iconSelector(code)}
                     Info={
