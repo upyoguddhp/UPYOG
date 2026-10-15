@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.response.ResponseInfo;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @Data
@@ -18,8 +18,8 @@ public class MdmsResponseV2 {
 
     @JsonProperty("ResponseInfo")
     @Valid
-    private ResponseInfo responseInfo = null;
+    private ResponseInfo responseInfo;
 
     @JsonProperty("mdms")
-    private List<Mdms> mdms = null;
+    private List<Mdms> mdms;
 }

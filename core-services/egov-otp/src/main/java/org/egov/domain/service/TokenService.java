@@ -13,7 +13,7 @@ import org.egov.domain.model.ValidateRequest;
 import org.egov.persistence.repository.TokenRepository;
 import org.egov.web.util.OtpConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,15 +64,14 @@ public class TokenService {
 
 		for (Token t : tokens.getTokens()) {
 
-			if (!otpConfiguration.isEncryptOTP() && validateRequest.getOtp().equalsIgnoreCase(t.getNumber())
-					|| otpConfiguration.isEncryptOTP()
-							&& passwordEncoder.matches(validateRequest.getOtp(), t.getNumber())) {
-				tokenRepository.markAsValidated(t);
-				return t;
-			}
-		}
-		throw new TokenValidationFailureException();
-	}
+            if (!otpConfiguration.isEncryptOTP() && validateRequest.getOtp().equalsIgnoreCase(t.getNumber())
+             || otpConfiguration.isEncryptOTP()  && passwordEncoder.matches(validateRequest.getOtp(), t.getNumber())) {
+                tokenRepository.markAsValidated(t);
+                return t;
+            }
+        }
+        throw new TokenValidationFailureException();
+    }
 
 	public Token search(TokenSearchCriteria searchCriteria) {
 		return tokenRepository.findBy(searchCriteria);

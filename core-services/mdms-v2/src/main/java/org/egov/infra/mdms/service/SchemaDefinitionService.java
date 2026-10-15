@@ -1,5 +1,4 @@
 package org.egov.infra.mdms.service;
-
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.utils.MultiStateInstanceUtil;
@@ -11,8 +10,11 @@ import org.egov.infra.mdms.service.validator.SchemaDefinitionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 @Builder
@@ -26,8 +28,13 @@ public class SchemaDefinitionService {
     private MultiStateInstanceUtil multiStateInstanceUtil;
 
     @Autowired
-    public SchemaDefinitionService(SchemaDefinitionRepository schemaDefinitionRepository, ApplicationConfig applicationConfig,
-                                   SchemaDefinitionEnricher schemaDefinitionEnricher, SchemaDefinitionValidator schemaDefinitionValidator, MultiStateInstanceUtil multiStateInstanceUtil){
+    public SchemaDefinitionService(
+            SchemaDefinitionRepository schemaDefinitionRepository,
+            ApplicationConfig applicationConfig,
+            SchemaDefinitionEnricher schemaDefinitionEnricher,
+            SchemaDefinitionValidator schemaDefinitionValidator,
+            MultiStateInstanceUtil multiStateInstanceUtil) {
+
         this.schemaDefinitionRepository = schemaDefinitionRepository;
         this.applicationConfig = applicationConfig;
         this.schemaDefinitionEnricher = schemaDefinitionEnricher;
@@ -36,43 +43,132 @@ public class SchemaDefinitionService {
     }
 
     /**
-     * This method processes requests for schema definition creation.
-     * @param schemaDefinitionRequest
-     * @return
+     * Processes requests for schema definition creation.
      */
-    public List<SchemaDefinition> create(SchemaDefinitionRequest schemaDefinitionRequest) {
+    public List<SchemaDefinition> create(
+            SchemaDefinitionRequest schemaDefinitionRequest) {
 
-        // Set incoming tenantId as state level tenantId as schema is always created at state level
-        String tenantId = schemaDefinitionRequest.getSchemaDefinition().getTenantId();
-        schemaDefinitionRequest.getSchemaDefinition().setTenantId(multiStateInstanceUtil.getStateLevelTenant(tenantId));
+        String tenantId = schemaDefinitionRequest
+                .getSchemaDefinition()
+                .getTenantId();
 
-        // Validate schema create request
-        schemaDefinitionValidator.validateCreateRequest(schemaDefinitionRequest);
+        // Resolve the state-level tenant.
+        schemaDefinitionRequest.getSchemaDefinition()
+                .setTenantId(
+                        multiStateInstanceUtil.getStateLevelTenant(tenantId)
+                );
 
-        // Enrich schema create request
-        schemaDefinitionEnricher.enrichCreateRequest(schemaDefinitionRequest);
+        schemaDefinitionValidator.validateCreateRequest(
+                schemaDefinitionRequest
+        );
 
-        // Invoke repository method to emit schema creation event
+        schemaDefinitionEnricher.enrichCreateRequest(
+                schemaDefinitionRequest
+        );
+
+        // Mark operation for audit tracking.
+        schemaDefinitionRequest.getSchemaDefinition()
+                .setOperation(Operation.CREATE.name());
+
         schemaDefinitionRepository.create(schemaDefinitionRequest);
 
-        return Arrays.asList(schemaDefinitionRequest.getSchemaDefinition());
+        return Arrays.asList(
+                schemaDefinitionRequest.getSchemaDefinition()
+        );
     }
 
     /**
-     * This method processes the requests for schema definition search.
-     * @param schemaDefSearchRequest
-     * @return
+     * Processes schema definition delete requests.
+     * The persister handles audit logging and deletion.
      */
-    public List<SchemaDefinition> search(SchemaDefSearchRequest schemaDefSearchRequest) {
+    public List<SchemaDefinition> delete(SchemaDeleteRequest request) {
 
-        // Set incoming tenantId as state level tenantId as schema is created at state level
-        String tenantId = schemaDefSearchRequest.getSchemaDefCriteria().getTenantId();
-        schemaDefSearchRequest.getSchemaDefCriteria().setTenantId(multiStateInstanceUtil.getStateLevelTenant(tenantId));
+        String tenantId = multiStateInstanceUtil.getStateLevelTenant(
+                request.getTenantId()
+        );
 
-        // Fetch schema definitions based on the given criteria
-        List<SchemaDefinition> schemaDefinitions = schemaDefinitionRepository.search(schemaDefSearchRequest.getSchemaDefCriteria());
+        SchemaDefCriteria criteria = SchemaDefCriteria.builder()
+                .tenantId(tenantId)
+                .codes(Arrays.asList(request.getCode()))
+                .build();
+
+        List<SchemaDefinition> schemaDefinitions =
+                schemaDefinitionRepository.search(criteria);
+
+        if (schemaDefinitions.isEmpty()) {
+            throw new RuntimeException("Schema definition not found");
+        }
+
+        // Ensure the delete request uses the resolved tenant.
+        request.setTenantId(tenantId);
+
+        // Mark operation for audit tracking.
+        request.setOperation(Operation.DELETE.name());
+
+        // Publish the delete request to Kafka.
+        schemaDefinitionRepository.delete(request);
+
+        return Arrays.asList(
+                SchemaDefinition.builder()
+                        .tenantId(tenantId)
+                        .code(request.getCode())
+                        .build()
+        );
+    }
+
+    /**
+     * Processes schema definition search requests.
+     */
+    public List<SchemaDefinition> search(
+            SchemaDefSearchRequest schemaDefSearchRequest) {
+
+        String tenantId = schemaDefSearchRequest
+                .getSchemaDefCriteria()
+                .getTenantId();
+
+        // Resolve the state-level tenant.
+        schemaDefSearchRequest.getSchemaDefCriteria()
+                .setTenantId(
+                        multiStateInstanceUtil.getStateLevelTenant(tenantId)
+                );
+
+        List<SchemaDefinition> schemaDefinitions =
+                schemaDefinitionRepository.search(
+                        schemaDefSearchRequest.getSchemaDefCriteria()
+                );
+
+        // Return unique module codes when requested.
+        if (Boolean.TRUE.equals(
+                schemaDefSearchRequest.getSchemaDefCriteria()
+                        .getIsGetAllCodes())) {
+
+            Map<String, SchemaDefinition> uniqueCodes = new TreeMap<>();
+
+            schemaDefinitions.forEach(schemaDefinition -> {
+                String code = schemaDefinition.getCode();
+
+                if (code != null && !code.isEmpty()) {
+                    String moduleName = code.split("\\.")[0];
+
+                    if (!uniqueCodes.containsKey(moduleName)) {
+                        schemaDefinition.setCode(moduleName);
+                        schemaDefinition.setDefinition(null);
+                        schemaDefinition.setDescription(null);
+                        schemaDefinition.setAuditDetails(null);
+                        schemaDefinition.setId(null);
+                        schemaDefinition.setTenantId(null);
+                        schemaDefinition.setIsActive(null);
+
+                        uniqueCodes.put(moduleName, schemaDefinition);
+                    }
+                }
+            });
+
+            schemaDefinitions = new ArrayList<>(
+                    uniqueCodes.values()
+            );
+        }
 
         return schemaDefinitions;
     }
-
 }

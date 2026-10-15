@@ -1,19 +1,38 @@
 package org.egov.ptr.repository;
 
-import lombok.extern.slf4j.Slf4j;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.egov.ptr.models.PetApplicationSearchCriteria;
 import org.egov.ptr.models.PetRegistrationApplication;
 import org.egov.ptr.repository.builder.PetApplicationQueryBuilder;
 import org.egov.ptr.repository.rowmapper.PetApplicationRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
+import lombok.extern.slf4j.Slf4j;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 
+
+
+/**
+ * The PetRegistrationRepository class is responsible for database operations
+ * related to pet registration applications. It provides methods to:
+ * 
+ * - Retrieve pet registration applications based on search criteria.
+ * - Fetch tenant IDs for pet applications.
+ * 
+ * This class uses:
+ * - PetApplicationQueryBuilder to dynamically construct SQL queries.
+ * - JdbcTemplate for executing SQL queries and interacting with the database.
+ * - PetApplicationRowMapper to map database rows to Java objects.
+ */
 @Slf4j
 @Repository
 public class PetRegistrationRepository {
@@ -33,6 +52,7 @@ public class PetRegistrationRepository {
 		log.info("Final query: " + query);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
+<<<<<<< HEAD
 	
 	public List<Map<String, Object>> getAllCounts() {
 		List<Map<String, Object>> statusList = null;
@@ -41,4 +61,13 @@ public class PetRegistrationRepository {
         return statusList;
 	}
 	
+=======
+
+	public List<String> fetchPetApplicationTenantIds() {
+		List<Object> preparedStmtList = new ArrayList<>();
+		return jdbcTemplate.query(queryBuilder.TENANTIDQUERY, preparedStmtList.toArray(),
+				new SingleColumnRowMapper<>(String.class));
+
+	}
+>>>>>>> niua-upstream/niua-dev-2.0
 }

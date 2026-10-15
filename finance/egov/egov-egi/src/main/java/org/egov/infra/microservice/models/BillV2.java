@@ -45,17 +45,16 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-
 package org.egov.infra.microservice.models;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.infra.validation.SanitizeHtml;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -78,108 +77,103 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class BillV2 {
-    // TODO some of the fields are mandatory in yml, lets discuss billdetail and
-    // billaccountdetail also for more clarity
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("id")
-    private String id = null;
+    private String id;
 
-    @SafeHtml
+    @SanitizeHtml
+    @JsonProperty("userId")
+    private String userId;
+
+    @SanitizeHtml
     @JsonProperty("mobileNumber")
-    private String mobileNumber = null;
+    private String mobileNumber;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("paidBy")
-    private String paidBy = null;
+    private String paidBy;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("payerName")
-    private String payerName = null;
+    private String payerName;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("payerAddress")
-    private String payerAddress = null;
+    private String payerAddress;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("payerEmail")
-    private String payerEmail = null;
+    private String payerEmail;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("payerId")
-    private String payerId = null;
+    private String payerId;
 
     @JsonProperty("status")
-    private StatusEnum status = null;
+    private StatusEnum status;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("reasonForCancellation")
-    private String reasonForCancellation = null;
+    private String reasonForCancellation;
 
     @JsonProperty("isCancelled")
-    private Boolean isCancelled = null;
+    private Boolean isCancelled;
 
     @JsonProperty("additionalDetails")
-    private JsonNode additionalDetails = null;
+    private JsonNode additionalDetails;
 
     @JsonProperty("billDetails")
     @Valid
-    private List<BillDetailV2> billDetails = null;
+    private List<BillDetailV2> billDetails;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("tenantId")
-    private String tenantId = null;
+    private String tenantId;
 
     @JsonProperty("auditDetails")
-    private AuditDetails auditDetails = null;
+    private AuditDetails auditDetails;
 
     @JsonProperty("collectionModesNotAllowed")
-    private List<String> collectionModesNotAllowed = null;
+    private List<String> collectionModesNotAllowed;
 
     @JsonProperty("partPaymentAllowed")
-    private Boolean partPaymentAllowed = null;
+    private Boolean partPaymentAllowed;
 
     @JsonProperty("isAdvanceAllowed")
     private Boolean isAdvanceAllowed;
 
     @JsonProperty("minimumAmountToBePaid")
-    private BigDecimal minimumAmountToBePaid = null;
+    private BigDecimal minimumAmountToBePaid;
 
     @JsonProperty("businessService")
-    private String businessService = null;
+    private String businessService;
 
     @JsonProperty("totalAmount")
-    private BigDecimal totalAmount = null;
+    private BigDecimal totalAmount;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("consumerCode")
-    private String consumerCode = null;
+    private String consumerCode;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("billNumber")
-    private String billNumber = null;
+    private String billNumber;
 
     @JsonProperty("billDate")
-    private Long billDate = null;
+    private Long billDate;
 
     @JsonProperty("amountPaid")
     private BigDecimal amountPaid;
 
-    @SafeHtml
+    @SanitizeHtml
     @JsonProperty("fileStoreId")
     private String fileStoreId;
-    
-    @SafeHtml
-    @JsonProperty("userId")
-    private String userId;
 
     public enum StatusEnum {
         ACTIVE("ACTIVE"),
-
         CANCELLED("CANCELLED"),
-
         PAID("PAID"),
-
         EXPIRED("EXPIRED");
 
         private String value;
@@ -212,22 +206,17 @@ public class BillV2 {
             }
             return null;
         }
-
     }
 
     public Boolean addBillDetail(BillDetailV2 billDetail) {
-
         if (CollectionUtils.isEmpty(billDetails)) {
-
             billDetails = new ArrayList<>();
             return billDetails.add(billDetail);
         } else {
-
             if (!billDetails.contains(billDetail))
                 return billDetails.add(billDetail);
             else
                 return false;
         }
     }
-
 }

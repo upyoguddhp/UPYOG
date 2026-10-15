@@ -1,9 +1,15 @@
 package org.upyog.chb.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+<<<<<<< HEAD
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+import lombok.extern.slf4j.Slf4j;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.springframework.stereotype.Repository;
 import org.upyog.chb.config.CommunityHallBookingConfiguration;
 import org.upyog.chb.web.models.billing.Demand;
@@ -12,6 +18,7 @@ import org.upyog.chb.web.models.billing.DemandResponse;
 
 import java.util.List;
 
+<<<<<<< HEAD
 @Repository
 public class DemandRepository {
 
@@ -23,6 +30,49 @@ public class DemandRepository {
 
 	@Autowired
 	private ObjectMapper mapper;
+=======
+/**
+ * This class is responsible for interacting with the billing service to manage demands
+ * related to the Community Hall Booking module.
+ * 
+ * Purpose:
+ * - To create and retrieve demands for community hall bookings.
+ * - To handle communication with external services for demand-related operations.
+ * 
+ * Dependencies:
+ * - ServiceRequestRepository: Used to send HTTP requests to external services.
+ * - CommunityHallBookingConfiguration: Provides configuration properties for demand operations.
+ * - ObjectMapper: Used to serialize and deserialize JSON objects.
+ * 
+ * Features:
+ * - Provides methods to create demands for bookings.
+ * - Handles exceptions and ensures proper error reporting using CustomException.
+ * - Uses configuration properties to determine service endpoints and other settings.
+ * 
+ * Methods:
+ * 1. saveDemand:
+ *    - Creates new demands for community hall bookings.
+ *    - Sends the demand creation request to the billing service.
+ * 
+ * Usage:
+ * - This class is used by the service layer to manage demands for bookings.
+ * - It ensures consistent and reusable logic for demand-related operations.
+ */
+@Repository
+@Slf4j
+public class DemandRepository {
+
+	private final ServiceRequestRepository serviceRequestRepository;
+	private final CommunityHallBookingConfiguration config;
+	private final ObjectMapper mapper;
+
+	public DemandRepository(ServiceRequestRepository serviceRequestRepository,
+			CommunityHallBookingConfiguration config, ObjectMapper mapper) {
+		this.serviceRequestRepository = serviceRequestRepository;
+		this.config = config;
+		this.mapper = mapper;
+	}
+>>>>>>> niua-upstream/niua-dev-2.0
 
 	/**
 	 * Creates demand
@@ -35,6 +85,7 @@ public class DemandRepository {
 		StringBuilder url = new StringBuilder(config.getBillingHost());
 		url.append(config.getDemandCreateEndpoint());
 		DemandRequest request = new DemandRequest(requestInfo, demand);
+<<<<<<< HEAD
 		System.out.println("Request object for fetchResult: " + request);
 		System.out.println("URL for fetchResult: " + url);
 		Object result = serviceRequestRepository.fetchResult(url, request);
@@ -43,6 +94,16 @@ public class DemandRepository {
 		try {
 			response = mapper.convertValue(result, DemandResponse.class);
 			System.out.println("Demand response mapper: " + response);
+=======
+		log.info("Request object for fetchResult: " + request);
+		log.info("URL for fetchResult: " + url);
+		Object result = serviceRequestRepository.fetchResult(url, request);
+		log.info("Result from fetchResult method: " + result);
+		DemandResponse response = null;
+		try {
+			response = mapper.convertValue(result, DemandResponse.class);
+			log.info("Demand response mapper: " + response);
+>>>>>>> niua-upstream/niua-dev-2.0
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Failed to parse response of create demand");
 		}

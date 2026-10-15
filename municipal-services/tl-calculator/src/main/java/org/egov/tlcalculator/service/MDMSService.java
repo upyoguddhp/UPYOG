@@ -115,6 +115,7 @@ public class MDMSService {
         HashMap<String,Object> calculationType = new HashMap<>();
         try {
             LinkedHashMap tradeLicenseData = JsonPath.read(mdmsData,TLCalculatorConstants.MDMS_TRADELICENSE_PATH);
+            log.info("tradeLicenseData===",tradeLicenseData);
             if(tradeLicenseData.size()==0)
                 return defaultMap();
 
@@ -171,7 +172,7 @@ public class MDMSService {
      * @return MDMS Search URL
      */
     private StringBuilder getMdmsSearchUrl() {
-        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsSearchEndpoint());
+        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
     }
 
 

@@ -2,8 +2,38 @@ package org.upyog.chb.constants;
 
 import java.math.BigDecimal;
 
+<<<<<<< HEAD
 public class CommunityHallBookingConstants {
 
+=======
+/**
+ * This class defines constants used throughout the Community Hall Booking module.
+ * 
+ * Purpose:
+ * - To centralize all constant values for better maintainability and readability.
+ * - To avoid hardcoding values directly in the codebase.
+ * 
+ * Categories of Constants:
+ * 1. User Messages:
+ *    - Messages displayed to users for various actions like booking creation, updates, etc.
+ * 
+ * 2. JSON Path Codes:
+ *    - Paths used for extracting data from MDMS (Master Data Management System) responses.
+ * 
+ * 3. Master Data Keys:
+ *    - Keys used to identify specific master data modules or fields in the MDMS.
+ * 
+ * Usage:
+ * - These constants are referenced across the application wherever the corresponding
+ *   values are required, ensuring consistency and reducing duplication.
+ */
+
+public class CommunityHallBookingConstants {
+
+	private CommunityHallBookingConstants() {
+	}
+
+>>>>>>> niua-upstream/niua-dev-2.0
 	public static final String COMMUNITY_HALL_BOOKING_INIT_CREATED = "Your community hall booking details saved successfully";
 	
 	public static final String COMMUNITY_HALL_BOOKING_CREATED = "Your community hall booking created successfully";
@@ -30,6 +60,23 @@ public class CommunityHallBookingConstants {
 	public static final String CHB_COMMNUITY_HALLS = "CommunityHalls";
 	public static final String CHB_HALL_CODES = "HallCode";
 	
+<<<<<<< HEAD
+=======
+	public static final String CHB_PARK_CODES = "ParkCode";
+	public static final String CHB_PARKS = "Parks";
+
+	public static final String CHB_GUEST_HOUSE_CODES = "GuestHouseCode";
+	public static final String CHB_GUEST_HOUSES = "GuestHouses";
+
+	public static final String CHB_STADIUMS = "Stadiums";
+	public static final String CHB_STADIUM_CODES = "StadiumCode";
+
+	public static final String CHB_CREMATORIUM_CODES = "CrematoriumCode";
+	public static final String CHB_CREMATORIUMS = "Crematoriums";
+	
+	public static final String CHB_VENUE_TYPE_DATA = "VenueType";
+	
+>>>>>>> niua-upstream/niua-dev-2.0
 	//Check what is the role of common fields config
 	public static final String CHB_DOCUMENTS = "Documents";
 	
@@ -40,10 +87,21 @@ public class CommunityHallBookingConstants {
 
 	public static final String EMPLOYEE = "EMPLOYEE";
 	public static final String CITIZEN = "CITIZEN";
+<<<<<<< HEAD
+=======
+	
+>>>>>>> niua-upstream/niua-dev-2.0
 	public static final String INVALID_SEARCH = "INVALID SEARCH";
 	public static final String CHB_WORKFLOW_ERROR = "CHB_WORKFLOW_ERROR";
 	public static final String DUPLICATE_DOCUMENT_UPLOADED = "DUPLICATE_DOCUMENT_UPLOADED";
 	public static final String MULTIPLE_HALL_CODES_ERROR = "MULTIPLE_HALL_CODES_ERROR";
+<<<<<<< HEAD
+=======
+	public static final String EMPTY_DOCUMENT_ERROR = "EMPTY_DOCUMENT_ERROR";
+	public static final String INVALID_BOOKING_DATE = "INVALID_BOOKING_DATE";
+	public static final String INVALID_BOOKING_TIME = "INVALID_BOOKING_TIME";
+	public static final String INVALID_BOOKING_DATE_RANGE= "INVALID_BOOKING_DATE_RANGE";
+>>>>>>> niua-upstream/niua-dev-2.0
 	
 	
 	// NOTIFICATION PLACEHOLDER
@@ -68,7 +126,11 @@ public class CommunityHallBookingConstants {
 	public static final String CHANNEL_NAME_EVENT = "EVENT";
 
 	public static final String CHANNEL_NAME_EMAIL = "EMAIL";
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> niua-upstream/niua-dev-2.0
 	public static final String MODULE = "module";
 
 	public static final String ACTION = "action";
@@ -113,5 +175,33 @@ public class CommunityHallBookingConstants {
 	public static final String CHB_APPLICANT_DETAIL_PLAIN_DECRYPTION_KEY = "CHBApplicantDetailDecrypDisabled";
 
 	public static final String CHB_APPLICANT_DETAIL_PLAIN_DECRYPTION_PURPOSE = "CHBApplicantDetailDecryptionDisabled";
+<<<<<<< HEAD
+=======
+	
+	public static final String DATE_FORMAT = "dd-MM-yyyy";
+	// Workflow related constants
+
+	public static final String CHB_STATUS_BOOKED = "BOOKED";
+
+	public static final String CHB_ACTION_MOVETOEMPLOYEE = "MOVETOEMPLOYEE";
+
+	public static final String CHB_REFUND_WORKFLOW_BUSINESSSERVICE = "booking-refund";
+
+	public static final String CHB_REFUND_WORKFLOW_MODULENAME = "chb-services";
+
+	public static final String CHB_TENANTID = "pg";
+		
+    public static final String NOTIFICATION_PAY_NOW = "PAY NOW";
+	
+	public static final String NOTIFICATION_DOWNLOAD_RECEIPT = "Download Receipt";
+	
+	public static final String NOTIFICATION_ACTION = "{Action Button}";
+	
+	public static final String NOTIFICATION_ACTION_BUTTON = "{/Action Button}";
+	
+	public static final String NOTIFICATION_EMAIL = "{EMAIL_ID}";
+	
+	public static final String MESSAGE_TEXT = "MESSAGE_TEXT";
+>>>>>>> niua-upstream/niua-dev-2.0
 
 }

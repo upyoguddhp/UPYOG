@@ -2,6 +2,7 @@ package org.egov.garbageservice.repository.builder;
 
 import org.springframework.stereotype.Component;
 
+<<<<<<< HEAD
 @Component
 public class GrbgAddressQueryBuilder {
 
@@ -12,4 +13,21 @@ public class GrbgAddressQueryBuilder {
     								+ " SET address_type = ?, address1 = ?, address2 = ?, city = ?, state = ?, pincode = ?, is_active = ? " 
     								+ ", zone = ?, ulb_name = ?, ulb_type = ?, ward_name = ?, garbage_id = ?, additional_detail = ? :: JSONB "
     								+ " WHERE uuid = ?";
+=======
+/**
+ * Holds SQL query constants for inserting, updating, and deleting garbage address records.
+ */
+@Component
+public class GrbgAddressQueryBuilder {
+
+    public static final String CREATE_QUERY = "INSERT INTO ug_grbg_address (uuid, garbage_id, address_type, address1, address2, city, state, pincode, is_active, zone, ulb_name, ulb_type, ward_name, additional_detail) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? :: JSONB)";
+
+    public static final String UPDATE_QUERY = "UPDATE ug_grbg_address "
+            + " SET address_type = ?, address1 = ?, address2 = ?, city = ?, state = ?, pincode = ?, is_active = ? "
+            + ", zone = ?, ulb_name = ?, ulb_type = ?, ward_name = ?, garbage_id = ?, additional_detail = ? :: JSONB "
+            + " WHERE uuid = ?";
+
+    public static final String DELETE_QUERY = "DELETE FROM ug_grbg_address WHERE garbage_id = ?";
+>>>>>>> niua-upstream/niua-dev-2.0
 }

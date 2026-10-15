@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { Redirect, Route, Switch, useHistory, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import EmployeeApp from "./pages/employee";
 import CitizenApp from "./pages/citizen";
 
 export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData }) => {
-  const history = useHistory();
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
+
   const innerWidth = window.innerWidth;
   const cityDetails = Digit.ULBService.getCurrentUlb();
   const userDetails = Digit.UserService.getUser();
@@ -13,10 +14,13 @@ export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData }) 
   const { stateInfo } = storeData || {};
   const DSO = Digit.UserService.hasAccess(["FSM_DSO"]);
   let CITIZEN = userDetails?.info?.type === "CITIZEN" || !window.location.pathname.split("/").includes("employee") ? true : false;
-
+// console.log("DigitAppDigitAppDigitApp",stateCode, modules, appTenants, logoUrl, initData)
   if (window.location.pathname.split("/").includes("employee")) CITIZEN = false;
 
   useEffect(() => {
+    // 🔹 scroll to top on route change (replaces history.listen)
+    window?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
     if (!pathname?.includes("application-details")) {
       if (!pathname?.includes("inbox")) {
         Digit.SessionStorage.del("fsm/inbox/searchParams");
@@ -28,6 +32,9 @@ export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData }) 
     if (!pathname?.includes("dss")) {
       Digit.SessionStorage.del("DSS_FILTERS");
     }
+    if (!pathname?.includes("landing")) {
+      Digit.SessionStorage.del("DSS_FILTERS_CUMILATIVETRANSACTIONS");
+    }
     if (pathname?.toString() === "/upyog-ui/employee") {
       Digit.SessionStorage.del("SEARCH_APPLICATION_DETAIL");
       Digit.SessionStorage.del("WS_EDIT_APPLICATION_DETAILS");
@@ -36,10 +43,6 @@ export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData }) 
       Digit.SessionStorage.del("WS_DISCONNECTION");
     }
   }, [pathname]);
-
-  history.listen(() => {
-    window?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  });
 
   const handleUserDropdownSelection = (option) => {
     option.func();
@@ -64,16 +67,19 @@ export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData }) 
     initData,
   };
   return (
-    <Switch>
-      <Route path="/upyog-ui/employee">
-        <EmployeeApp {...commonProps} />
-      </Route>
-      <Route path="/upyog-ui/citizen">
-        <CitizenApp {...commonProps} />
-      </Route>
-      <Route>
-        <Redirect to="/upyog-ui/citizen" />
-      </Route>
-    </Switch>
+    <Routes>
+      <Route
+        path="/upyog-ui/employee/*"
+        element={<EmployeeApp {...commonProps} />}
+      />
+      <Route
+        path="/upyog-ui/citizen/*"
+        element={<CitizenApp {...commonProps} />}
+      />
+      <Route
+        path="*"
+        element={<Navigate to="/upyog-ui/citizen" />}
+      />
+    </Routes>
   );
 };

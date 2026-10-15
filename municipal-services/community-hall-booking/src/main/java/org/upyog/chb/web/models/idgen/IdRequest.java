@@ -6,7 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
 import javax.validation.constraints.NotNull;
+=======
+import jakarta.validation.constraints.NotNull;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 /**
  * <h1>IdRequest</h1>

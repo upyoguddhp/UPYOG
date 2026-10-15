@@ -22,4 +22,10 @@ public class CalculationType {
 	String feeType;
 	BigDecimal amount;
 	boolean taxApplicable;
+<<<<<<< HEAD
 }
+=======
+	String communityHallCode;
+	String calculationDurationType;
+}
+>>>>>>> niua-upstream/niua-dev-2.0

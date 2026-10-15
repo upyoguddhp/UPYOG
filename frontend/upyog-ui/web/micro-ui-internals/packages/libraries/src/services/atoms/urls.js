@@ -1,11 +1,13 @@
 const Urls = {
   MDMS: `/egov-mdms-service/v1/_search`,
+  MDMSV2: `/mdms-v2/v1/_search`,
   WorkFlow: `/egov-workflow-v2/egov-wf/businessservice/_search`,
   WorkFlowProcessSearch: `/egov-workflow-v2/egov-wf/process/_search`,
   localization: `/localization/messages/v1/_search`,
   location: {
     localities: `/egov-location/location/v11/boundarys/_search?hierarchyTypeCode=ADMIN&boundaryType=Locality`,
     revenue_localities: `/egov-location/location/v11/boundarys/_search?hierarchyTypeCode=REVENUE&boundaryType=Locality`,
+    gramPanchayats: `/egov-location/location/v11/boundarys/_search?hierarchyTypeCode=REVENUE&boundaryType=GP`,
   },
 
   pgr_search: `/pgr-services/v2/request/_search`,
@@ -29,8 +31,13 @@ const Urls = {
 
   UserSearch: "/user/_search",
   UserLogout: "/user/_logout",
-
+  UserCreate:"/user/users/_createnovalidate",
+  UserUpdateAddressV2:"/user/_updateAddress",
+  UserSearchNewV2: "/user/users/v2/_search", 
   Shortener: "/egov-url-shortening/shortener",
+  UserCreateAddressV2: "/user/_createAddress", 
+  employeeDashboardSearch: "/employee-dashboard/_search",
+  employeeRoleBaseDashboardSearch: "/employee-dashboard/v2/_search",
 
   fsm: {
     search: "/fsm/v1/_search",
@@ -51,6 +58,7 @@ const Urls = {
     updateDriver: "/vendor/driver/v1/_update",
     vehicleTripCreate: "/vehicle/trip/v1/_create",
     advanceBalanceCalculate: "/fsm-calculator/v1/_advancebalancecalculate",
+    workerSearch: "/individual/v1/_search",
   },
 
   payment: {
@@ -76,14 +84,27 @@ const Urls = {
     update: "/property-services/property/_update",
     pt_calculation_estimate: "/pt-calculator-v2/propertytax/v2/_estimate",
     assessment_create: "/property-services/assessment/_create",
+    assessment_createUlb:"/pt-calculator-v2/assessment/_jobscheduler",
     assessment_search: "/property-services/assessment/_search",
     payment_search: "/collection-services/payments/PT/_search",
     pt_calculate_mutation: "/pt-calculator-v2/propertytax/mutation/_calculate",
     cfcreate: "/service-request/service/v1/_create",
     cfdefinitionsearch: "/service-request/service/definition/v1/_search",
     cfsearch: "/service-request/service/v1/_search",
+    defaulterNotice:"/egov-pdf/download/PT/ptdefaulternotice",
+    getDefaulterNoticeStatus:"/pdf-service/v1/_getBulkDefaulterNoticeRecordsDetails"
+    
   },
 
+  ptr: {  
+    
+    create:"/pet-services/pet-registration/_create",
+    search:"/pet-services/pet-registration/_search",
+    update:"/pet-services/pet-registration/_update",
+    fetch_payment_details: "/billing-service/bill/v2/_fetchbill",
+    payment_search: "/collection-services/payments/pet-services/_search",
+    
+  },
   dss: {
     dashboardConfig: "/dashboard-analytics/dashboard/getDashboardConfig",
     getCharts: "/dashboard-analytics/dashboard/getChartV2",
@@ -101,6 +122,26 @@ const Urls = {
     bill_download: "/egov-pdf/download/BILL/consolidatedbill",
     count: "/echallan-services/eChallan/v1/_count",
   },
+
+  challangeneration: {
+    search: "/echallan-services/eChallan/v1/_search",
+    create: "/challan-services/Challan/v1/_create",
+    fetch_bill: "/billing-service/bill/v2/_fetchbill?",
+    search_bill: "/egov-searcher/bill-genie/mcollectbills/_get",
+    search_bill_pt: "/egov-searcher/bill-genie/billswithaddranduser/_get",
+    update: "/echallan-services/eChallan/v1/_update",
+    download_pdf: "/egov-pdf/download/UC/mcollect-challan",
+    receipt_download: "/egov-pdf/download/PAYMENT/consolidatedreceipt",
+    bill_download: "/egov-pdf/download/BILL/consolidatedbill",
+    count: "/echallan-services/eChallan/v1/_count",
+    reciept_search: "/collection-services/payments/:businessService/_search",
+    generate_pdf: "/pdf-service/v1/_create",
+    file_fetch: "/filestore/v1/files/url",
+    create_new: "/challan-generation/challan/_create",
+    search_new: "/challan-generation/challan/_search",
+    update_new: "/challan-generation/challan/_update",
+  },
+  
   hrms: {
     search: "/egov-hrms/employees/_search",
     count: "/egov-hrms/employees/_count",
@@ -121,7 +162,7 @@ const Urls = {
     count: "/egov-hrms/employees/_count",
   },
   obps: {
-    scrutinyDetails: "/edcr/rest/dcr/scrutinydetails",
+    scrutinyDetails: "/edcr/rest/dcr/edcrdetails",
     comparisionReport: "/edcr/rest/dcr/occomparison",
     create: "/bpa-services/v1/bpa/_create",
     nocSearch: "/noc-services/v1/noc/_search",
@@ -136,11 +177,14 @@ const Urls = {
     edcrreportdownload: "/bpa-services/v1/bpa/_permitorderedcr",
     getSearchDetails: "/inbox/v1/dss/_search",
   },
-
   edcr: {
     create: "/edcr/rest/dcr/scrutinize",
+    anonymousCreate: "/edcr/rest/dcr/anonymousScrutinize"
   },
-
+  preApproved:{
+    search: "/bpa-services/v1/preapprovedplan/_search",
+    estimate: "/bpa-calculator/_estimate",
+  },
   events: {
     search: "/egov-user-event/v1/events/_search",
     update: "/egov-user-event/v1/events/lat/_update",
@@ -155,6 +199,10 @@ const Urls = {
     sewarage_create: "/sw-services/swc/_create",
     water_search: "/ws-services/wc/_search",
     sewarage_search: "/sw-services/swc/_search",
+    wsDemandSearch: "/ws-calculator/waterCalculator/_getConnectionForDemand",
+    swDemandSearch: "/sw-calculator/sewerageCalculator/_getConnectionForDemand",
+    wsDemandSearchGen: "/ws-calculator/waterCalculator/_generateDemand",
+    swDemandSearchGen: "/sw-calculator/sewerageCalculator/_generateDemand",
     water_update: "/ws-services/wc/_update",
     sewarage_update: "/sw-services/swc/_update",
     ws_calculation_estimate: "/ws-calculator/waterCalculator/_estimate",
@@ -165,6 +213,7 @@ const Urls = {
     billAmendmentCreate: "/billing-service/amendment/_create",
     billAmendmentUpdate: "/billing-service/amendment/_update",
     ws_meter_conncetion_create: "/ws-calculator/meterConnection/_create",
+    ws_meter_conncetion_bulk_create: "/ws-calculator/meterConnection/_bulkReading",
     sw_meter_conncetion_create: "/sw-calculator/meterConnection/_create",
     wns_group_bill: "/egov-pdf/download/WNS/wnsgroupbill",
     cancel_group_bill: "/pdf-service/v1/_cancelProcess",
@@ -173,8 +222,75 @@ const Urls = {
     sewerage_applyAdhocTax: "/sw-calculator/sewerageCalculator/_applyAdhocTax",
     getSearchDetails: "/inbox/v1/dss/_search",
     disconnection_notice: "/pdf-service/v1/_createnosave",
+    meter_search:"/ws-calculator/meterConnection/_search"
   },
 
+   asset: {
+    create: "/asset-services/v1/assets/_create",
+    search: "/asset-services/v1/assets/_search",
+    update: "/asset-services/v1/assets/_update",
+    assign: "/asset-services/v1/assets/assignment/_create",
+    depriciationProcess:"/asset-services/v1/assets/depreciation/_process",  
+    maintenance:"/asset-services/maintenance/v1/_create",  
+    edit_maintenance:"/asset-services/maintenance/v1/_update", 
+    assets_Reciept_Search: "/asset-services/v1/assets/_search",    
+    assetDisposedCreate: "/asset-services/v1/disposal/_create",
+    depriciationList:"/asset-services/v1/assets/depreciation/list",   
+    maintenanceList:"/asset-services/maintenance/v1/_search", 
+    return_asset: "/asset-services/v1/assets/assignment/_update",  
+    disposalList:"/asset-services/v1/disposal/_search",
+    assetAssignable:"/asset-services/v1/assets/assignment/_search",   
+  },
+  ew: {
+    create: "/ewaste-services/ewaste-request/_create",
+    search: "/ewaste-services/ewaste-request/_search",
+    update: "/ewaste-services/ewaste-request/_update",
+  },
+
+
+  chb: {
+    create: "/chb-services/booking/v1/_create",
+    search: "/chb-services/booking/v1/_search",
+    update: "/chb-services/booking/v1/_update",
+    slot_search: "/chb-services/booking/v1/_slot-search",
+    estimateCreate: "/chb-services/booking/v1/_estimate"
+  },
+  ads: {
+    create: "/adv-services/booking/v1/_create",
+    search: "/adv-services/booking/v1/_search",
+    update: "/adv-services/booking/v1/_update",
+    slot_search: "/adv-services/booking/v1/_slot-search",
+    estimateCreate: "/adv-services/booking/v1/_estimate"
+
+  },
+
+  cm: {
+    search: "/verification-service/validity/_search"
+  },
+   // urls for making api calls for pgr-ai module
+   pgrAi:{
+    PGR_Create_AI:"/pgr-ai-services/v1/request/_create",
+    PGR_Search_AI: "/pgr-ai-services/v1/request/_search",
+    PGR_Update_AI:"/pgr-ai-services/v1/request/_update"
+  },
+
+  gis: {
+        gis_dx_PT: "/gis-dx-service/gis-dx/v1/_search/PT",
+        gis_dx_ASSET: "/gis-dx-service/gis-dx/v1/_search/ASSET",
+   },
+
+digiLocker:{
+  authorization:"/requester-services-dx/digilocker/authorization/url",
+  register :"/requester-services-dx/digilocker/authorization/url/citizen",
+  token:"/requester-services-dx/digilocker/token/citizen",
+  issueDoc:"/requester-services-dx/digilocker/issuedfiles",
+  uri:"/requester-services-dx/digilocker/file",
+  oauth:"/user/digilocker/oauth/token"
+},
+eSign:{
+  pdfUrl:"/requester-services-dx/eSign/process",
+  fileStoreSearch:"/requester-services-dx/eSign/filestoreId/v1/_search"
+  },
   engagement: {
     document: {
       search: "/egov-document-uploader/egov-du/document/_search",
@@ -189,11 +305,21 @@ const Urls = {
       delete: "/egov-survey-services/egov-ss/survey/_delete",
       submitResponse: "/egov-survey-services/egov-ss/survey/response/_submit",
       showResults: "/egov-survey-services/egov-ss/survey/response/_results",
+      createSurvey: "/service-request/service/definition/v1/_create",
+      cfdefinitionsearch: "/service-request/service/definition/v1/_search",
+      submitSurveyResponse: "/service-request/service/v1/_create",
+      selectedSurveySearch: "/service-request/service/v1/_search",
+      updateSurvey:"/service-request/service/definition/v1/_update",
     },
   },
 
   noc: {
     nocSearch: "/noc-services/v1/noc/_search",
+  },
+  firenoc: {
+    create: "/firenoc-services/v1/_create",
+    update: "/firenoc-services/v1/_update",
+    search: "/firenoc-services/v1/_search",
   },
   reports: {
     reportSearch: "/report/",
@@ -204,6 +330,54 @@ const Urls = {
   access_control: "/access/v1/actions/mdms/_get",
   billgenie: "/egov-searcher",
   audit: "/inbox/v1/elastic/_search",
+
+  wt:{
+    create: "/request-service/water-tanker/v1/_create",
+    update: "/request-service/water-tanker/v1/_update",
+    search: "/request-service/water-tanker/v1/_search",
+  },
+  mt:{
+    create: "/request-service/mobile-toilet/v1/_create",
+    update: "/request-service/mobile-toilet/v1/_update",
+    search: "/request-service/mobile-toilet/v1/_search",
+  },
+
+ est: {
+    create: "/estate-management/estate/asset/v1/_create", // create first call - for creation 
+    search: "/estate-management/estate/asset/v1/_search", // table  - second screen post call = only tenant id
+    allotment: "/estate-management/estate/allotment/v1/_create", //crate allotment first call - for creation 
+    allotmentSearch: "/estate-management/estate/allotment/v1/_search", // table - second screen post call = only tenant id
+  },
+  
+  tp: {
+    create: "/tp-services/tree-pruning/v1/_create",
+    update: "/tp-services/tree-pruning/v1/_update",
+    search: "/tp-services/tree-pruning/v1/_search",
+    generateDigipin: "/requester-services-dx/digipin/v1/_generate",
+  },
+
+  vendor: {
+    create: "/vendor-services/vendor/_create",
+    search: "/vendor-services/vendor/_search",
+    additionaldetailsCreate: "/vendor-management/api/v1/_create",
+    vendorcommonSearch: "/vendor-management/api/v1/vendorPlusAdditional/_search"
+  },
+  ndc: {
+    create: "/ndc-services/ndc/_create",
+    search: "/ndc-services/ndc/_search",
+    update: "/ndc-services/ndc/_update",
+    billingCalculate: "/ndc-calculator/v1/_calculate",
+  },
+
+  upyogBot: {
+    iframeUrl: "/upyog-voice-bot",
+  },
+
+ gc: {
+    create: "/gc-services/garbage-accounts/_create",
+    search: "/gc-services/garbage-accounts/_search",
+    update: "/gc-services/garbage-accounts/_update",
+  }
 };
 
 export default Urls;

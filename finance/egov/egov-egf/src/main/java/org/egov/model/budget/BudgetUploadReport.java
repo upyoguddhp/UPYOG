@@ -92,6 +92,16 @@ public class BudgetUploadReport {
         this.uploadedTime = uploadedTime;
     }
 
+    private String uploadedTime;
+
+    public String getUploadedTime() {
+        return uploadedTime;
+    }
+
+    public void setUploadedTime(String uploadedTime) {
+        this.uploadedTime = uploadedTime;
+    }
+
     public Fund getFund() {
         return fund;
     }

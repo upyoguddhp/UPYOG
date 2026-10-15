@@ -1,0 +1,221 @@
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { Config } from "../../../config/config";
+/**
+ * Main Parent Component which is handling all the sub / Child components 
+ * in this page it is taking config file to render all the componets one by one and also 
+ * with the help of config this parent component knows which file have to render first.
+ * 
+ * It is saving all the filled data in session page by page and extracting it inside params and sending in every component
+ * through formdata.
+ * 
+ * This page also handles the Routing of Check page and Acknowledgement page
+ */
+const SVCreate = ({ parentRoute }) => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const history = Digit.Hooks.useCustomNavigate();
+  const stateId = Digit.ULBService.getStateId();
+  let config = [];
+  const [params, setParams, clearParams] = Digit.Hooks.useSessionStorage("SV_CREATES", {});
+
+  const FLOW_SEGMENTS = ["apply", "edit", "renew-application"];
+  const pathParts = pathname.split("/");
+  const flowIndex = pathParts.findIndex((seg) => FLOW_SEGMENTS.includes(seg));
+  const basePath = flowIndex !== -1 ? pathParts.slice(0, flowIndex + 1).join("/") : pathParts.slice(0, -1).join("/");
+
+  const vendingApplicationNo=sessionStorage.getItem("vendingApplicationID")?sessionStorage.getItem("vendingApplicationID"):null;
+  const { data: vendingApplicationData } = Digit.Hooks.sv.useSvSearchApplication(
+    {
+      tenantId:Digit.ULBService.getCitizenCurrentTenant(true),
+      filters: { applicationNumber: vendingApplicationNo,isDraftApplication:false },
+        enabled: vendingApplicationNo?true:false
+    },
+  );
+  // addin the Ids of both spouse and dependent if both exist so that while updating the data we can send the Ids to update the correct details
+  const vendorSpouseDetails = vendingApplicationData?.SVDetail?.[0]?.vendorDetail?.find((item)=>item.relationshipType==="SPOUSE") || {};
+  const vendorDependentDetails = vendingApplicationData?.SVDetail?.[0]?.vendorDetail?.filter(item => item.relationshipType === "DEPENDENT") || [];  const spouseId = vendorSpouseDetails?.id; 
+  const dependentIds = vendorDependentDetails.map(dep => dep.id);
+
+  sessionStorage.setItem("spouseId",spouseId) || null;
+  sessionStorage.setItem("dependentIds",JSON.stringify(dependentIds));  
+  const vendingData=vendingApplicationData?.SVDetail?.[0]
+
+  const { data: vendingDraftData } = Digit.Hooks.sv.useSvSearchApplication(
+    {
+      tenantId:Digit.ULBService.getCitizenCurrentTenant(true),
+      filters: {isDraftApplication:true} ,
+    },
+  );
+
+  const vending_draft_data=vendingDraftData?.SVDetail?.[0]
+
+  const goNext = (skipStep, index, isAddMultiple, key) => {  
+    let currentPath = pathname.split("/").pop(),
+      lastchar = currentPath.charAt(currentPath.length - 1),
+      isMultiple = false,
+      nextPage;
+
+    if (Number(parseInt(currentPath)) || currentPath == "0" || currentPath == "-1") {
+      if (currentPath == "-1" || currentPath == "-2") {
+        currentPath = pathname.slice(0, -3);
+        currentPath = currentPath.split("/").pop();
+        isMultiple = true;
+      } else {
+        currentPath = pathname.slice(0, -2);
+        currentPath = currentPath.split("/").pop();
+        isMultiple = true;
+      }
+    } else {
+      isMultiple = false;
+    }
+
+    if (!isNaN(lastchar)) {
+      isMultiple = true;
+    }
+
+    let { nextStep = {} } = config.find((routeObj) => routeObj.route === currentPath) || {};
+
+    let redirectWithHistory = (url) => history(url);
+    let replaceWithHistory = (url) => history(url, { replace: true });
+
+    if (skipStep) {
+      redirectWithHistory = replaceWithHistory;
+    }
+
+    if (isAddMultiple) {
+      nextStep = key;
+    }
+
+    if (nextStep === null) {
+      return redirectWithHistory(`${basePath}/check`);
+    }
+
+    if (!isNaN(nextStep?.split("/").pop())) {
+      nextPage = `${nextStep}`;
+    }
+     else {
+      nextPage = isMultiple && nextStep !== "map" ? `${nextStep}/${index}` : `${nextStep}`;
+    }
+    if (currentPath === nextPage) {
+      return;
+    }
+
+    redirectWithHistory(`${basePath}/${nextPage}`);
+  };
+
+  if(params && Object.keys(params).length>0 && window.location.href.includes("/info") && sessionStorage.getItem("docReqScreenByBack") !== "true")
+    {
+      clearParams();
+      queryClient.invalidateQueries({ queryKey: ["SV_CREATES"] });
+    }
+
+  const svcreate = async () => {
+    history(`${basePath}/acknowledgement`, { replace: true });
+  };
+
+  function handleSelect(key, data, skipStep, index, isAddMultiple = false) {
+    if (key === "owners") {
+      let owners = params.owners || [];
+      owners[index] = data;
+      setParams({ ...params, ...{ [key]: [...owners] } });
+    } else if (key === "units") {
+      let units = params.units || [];
+      units = data;
+      setParams({ ...params, units });
+    } else {
+      setParams({ ...params, ...{ [key]: { ...params[key], ...data } } });
+    }
+    goNext(skipStep, index, isAddMultiple, key);
+  }
+
+  const handleSkip = () => {};
+  const handleMultiple = () => {};
+
+  const onSuccess = () => {
+    clearParams();
+    // Updated: TanStack Query v5 requires invalidateQueries to accept an object with queryKey instead of a direct string.
+    queryClient.invalidateQueries({ queryKey: ["SV_CREATES"] });
+    sessionStorage.removeItem("CategoryDocument");
+    sessionStorage.removeItem("vendingApplicationID");
+    sessionStorage.removeItem("ApplicationId");
+    sessionStorage.removeItem("applicationStatus");
+    sessionStorage.removeItem("Response");
+    sessionStorage.removeItem("addressIdOne");
+    sessionStorage.removeItem("addressIdTwo");
+    sessionStorage.removeItem("vendorIds");
+    sessionStorage.removeItem("bankIds");
+    sessionStorage.removeItem("venId");
+    sessionStorage.removeItem("spouseId");
+    sessionStorage.removeItem("dependentIds");
+  };
+  
+  let commonFields = Config;
+  commonFields.forEach((obj) => {
+    config = config.concat(obj.body.filter((a) => !a.hideInCitizen));
+  });
+  
+  config.indexRoute = "info";
+
+  const SVCheckPage = Digit?.ComponentRegistryService?.getComponent("CheckPage");
+  const SVAcknowledgement = Digit?.ComponentRegistryService?.getComponent("SVAcknowledgement");
+
+  return (
+    <Routes>
+      {config.map((routeObj, index) => {
+        const { component, texts, inputs, key } = routeObj;
+        const Component = typeof component === "string" ? Digit.ComponentRegistryService.getComponent(component) : component;
+        const user = Digit.UserService.getUser().info.type;
+        return (
+         <Route
+            path={routeObj.route}   //  clean consistent indentation
+            key={index}
+            element={
+              <Component
+                config={{ texts, inputs, key }}  //  clean consistent indentation
+                onSelect={handleSelect}
+                onSkip={handleSkip}
+                t={t}
+                formData={params}
+                onAdd={handleMultiple}
+                userType={user}
+                editdata={pathname.includes("apply") ? {} : vendingData}
+                previousData={vending_draft_data}
+              />
+            }
+          />
+        );
+      })}
+
+      <Route
+        path="check/:isPayment?"
+        element={
+          <SVCheckPage
+            onSubmit={svcreate}
+            value={params}
+            editdata={pathname.includes("apply") ? {} : vendingData}
+            renewalData={pathname.includes("apply") ? {} : vendingData}
+          />
+        }
+      />
+      <Route
+        path="acknowledgement"
+        element={
+          <SVAcknowledgement
+            data={params}
+            onSuccess={onSuccess}
+          />
+        }
+      />
+      <Route
+        path="*"
+        element={<Navigate to={`${config.indexRoute}`} replace />}
+      />
+    </Routes>
+  );
+};
+
+export default SVCreate;

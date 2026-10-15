@@ -3,13 +3,14 @@ import { calculateService } from "../services/calculateService";
 import { validateCalculationReq } from "../utils/modelValidation";
 import { constants } from "../config/constants";
 import { mdmsData } from "../services/mdmsService";
-import get from "lodash/get";
-import some from "lodash/some";
+import { get, some, isEmpty } from "lodash";
 
 const calculalte = async (req, res, pool, next) => {
   console.log("calculalte");
   let errors = validateCalculationReq(req.body);
-  if (errors.length <= 0) errors = await calculateValidate(req.body, errors);
+  var header = JSON.parse(JSON.stringify(req.headers));
+
+  if (errors.length <= 0) errors = await calculateValidate(req.body, errors, header);
 
   if (errors.length > 0) {
     next({
@@ -27,9 +28,9 @@ const calculalte = async (req, res, pool, next) => {
   res.send(calculalteResponse);
 };
 
-const calculateValidate = async (body, errors) => {
+const calculateValidate = async (body, errors, header) => {
   let CalulationCriteria = body.CalulationCriteria;
-  let mdms = await mdmsData(body.RequestInfo, CalulationCriteria[0].tenantId);
+  let mdms = await mdmsData(body.RequestInfo, CalulationCriteria[0].tenantId, header);
   let teantnts = get(
     mdms,
     `MdmsRes.${constants.MDMS_MODULENAME_TENANT}.${

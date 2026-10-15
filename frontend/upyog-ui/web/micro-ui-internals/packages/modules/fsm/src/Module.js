@@ -1,7 +1,7 @@
-import { CitizenHomeCard, CitizenTruck, Loader } from "@egovernments/digit-ui-react-components";
+import { CitizenHomeCard, CitizenTruck, Loader } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link } from "react-router-dom";
 import FSMCard from "./components/FsmCard";
 import CheckSlum from "./pageComponents/CheckSlum";
 // import SelectAddress from "./pageComponents/SelectAddress";
@@ -17,14 +17,17 @@ import SelectName from "./pageComponents/SelectName";
 // import SelectPincode from "./pageComponents/SelectPincode";
 import FSMSelectPincode from "./pageComponents/FSMSelectPincode";
 import SelectPitType from "./pageComponents/SelectPitType";
+import SelectRoadDetails from "./pageComponents/SelectRoadDetails";
 import SelectPropertySubtype from "./pageComponents/SelectPropertySubtype";
 import SelectPropertyType from "./pageComponents/SelectPropertyType";
+import SelectPropertyID from "./pageComponents/SelectPropertyID";
+import SelectTripNo from "./pageComponents/SelectTripNo";
 import SelectSlumName from "./pageComponents/SelectSlumName";
 // import SelectStreet from "./pageComponents/SelectStreet";
 import FSMSelectStreet from "./pageComponents/FSMSelectStreet";
 import SelectTankSize from "./pageComponents/SelectTankSize";
 import SelectTripData from "./pageComponents/SelectTripData";
-import SelectTripNo from "./pageComponents/SelectTripNo";
+// import SelectTripNo from "./pageComponents/SelectTripNo";
 import SelectPaymentPreference from "./pageComponents/SelectPaymentPreference";
 import SelectVehicle from "./pageComponents/SelectVehicleType";
 import CitizenApp from "./pages/citizen";
@@ -58,10 +61,17 @@ import AdvanceCollection from "./pageComponents/AdvanceCollection";
 import SelectTrips from "./pageComponents/SelectTrips";
 import PlusMinusInput from "./pageComponents/PlusMinusInput";
 import ConfirmationBox from "./components/Confirmation";
+import SelectLocalityOrGramPanchayat from "./pageComponents/SelectLocalityOrGramPanchayat";
+import AddWorker from "./pages/employee/FSMRegistry/Worker/AddWorker"
+import EditWorker from "./pages/employee/FSMRegistry/Worker/EditWorker";
+import WorkerDetails from "./pages/employee/FSMRegistry/Worker/WorkerDetails";
+import TqmCard from "./components/TqmCard";
+import { ReportSearchApplication, EnhancedReport } from "@nudmcdgnpm/digit-ui-module-reports";
+
 
 const FSMModule = ({ stateCode, userType, tenants }) => {
   const moduleCode = "FSM";
-  const { path, url } = useRouteMatch();
+  const { path, url } = Digit.Hooks.useModuleBasePath();
   const language = Digit.StoreData.getCurrentLanguage();
   const { isLoading, data: store } = Digit.Services.useStore({ stateCode, moduleCode, language });
 
@@ -97,11 +107,11 @@ const FSMLinks = ({ matchPath, userType }) => {
   if (userType === "citizen") {
     const links = [
       {
-        link: `${matchPath}/new-application`,
+        link: `/new-application`,
         i18nKey: t("CS_HOME_APPLY_FOR_DESLUDGING"),
       },
       {
-        link: `${matchPath}/my-applications`,
+        link: `/my-applications`,
         i18nKey: t("CS_HOME_MY_APPLICATIONS"),
       },
     ];
@@ -141,10 +151,10 @@ const FSMLinks = ({ matchPath, userType }) => {
               </div>
               <div className="body">
                 <span className="link">
-                  <Link to={`${matchPath}/inbox`}>{t("ES_TITLE_INBOX")}</Link>
+                  <Link to={`/inbox`}>{t("ES_TITLE_INBOX")}</Link>
                 </span>
                 <span className="link">
-                  <Link to={`${matchPath}/new-application/`}>{t("ES_TITLE_NEW_DESULDGING_APPLICATION")}</Link>
+                  <Link to={`/new-application/`}>{t("ES_TITLE_NEW_DESULDGING_APPLICATION")}</Link>
                 </span>
               </div>
             </div>
@@ -158,6 +168,7 @@ const FSMLinks = ({ matchPath, userType }) => {
 const componentsToRegister = {
   SelectPropertySubtype,
   SelectPropertyType,
+  SelectPropertyID,
   // SelectAddress,
   FSMSelectAddress,
   // SelectStreet,
@@ -168,6 +179,7 @@ const componentsToRegister = {
   FSMSelectPincode,
   SelectTankSize,
   SelectPitType,
+  SelectRoadDetails,
   SelectTripNo,
   // SelectGeolocation,
   FSMSelectGeolocation,
@@ -212,6 +224,13 @@ const componentsToRegister = {
   SelectTrips,
   PlusMinusInput,
   ConfirmationBox,
+  SelectLocalityOrGramPanchayat,
+  AddWorker,
+  EditWorker,
+  WorkerDetails,
+  TqmCard,
+  EnhancedReport,
+  ReportSearchApplication
 };
 
 export const initFSMComponents = () => {

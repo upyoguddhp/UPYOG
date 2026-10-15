@@ -1,5 +1,6 @@
 package org.egov.asset.kafka;
 
+<<<<<<< HEAD
 import java.util.HashMap;
 
 import org.egov.asset.web.models.Asset;
@@ -12,11 +13,16 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+=======
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 @Slf4j
 @Component
 public class Consumer {
 
+<<<<<<< HEAD
 	/*
 	 * Uncomment the below line to start consuming record from kafka.topics.consumer
 	 * Value of the variable kafka.topics.consumer should be overwritten in
@@ -43,4 +49,11 @@ public class Consumer {
 		log.debug("Asset Received: " + asset.getApplicationNo());
 
 	}
+=======
+    /*
+     * Uncomment the below line to start consuming record from kafka.topics.consumer
+     * Value of the variable kafka.topics.consumer should be overwritten in
+     * application.properties
+     */
+>>>>>>> niua-upstream/niua-dev-2.0
 }

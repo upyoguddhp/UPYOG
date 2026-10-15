@@ -5,22 +5,45 @@
 	<artifactId>noc-services</artifactId>
 	<packaging>jar</packaging>
 	<name>noc-services</name>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>2.9.0-SNAPSHOT</version>
 	<properties>
 		<log4j2.version>2.17.1</log4j2.version>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<lombok.version>1.18.8</lombok.version>
+		<lombok.version>1.18.22</lombok.version>
 		<springfox-version>2.7.0</springfox-version>
-		<logback.version>1.2.0</logback.version>
+		<logback.version>1.4.14</logback.version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.6.RELEASE</version>
+		<version>3.2.2</version>
 	</parent>
+	<dependencyManagement>
+	    <dependencies>
+	      <dependency>
+	        <groupId>io.opentelemetry</groupId>
+	        <artifactId>opentelemetry-bom</artifactId>
+	        <version>1.35.0</version>
+	        <type>pom</type>
+	        <scope>import</scope>
+	      </dependency>
+	      <dependency>
+	        <groupId>io.opentelemetry.instrumentation</groupId>
+	        <artifactId>opentelemetry-instrumentation-bom-alpha</artifactId>
+	        <version>2.1.0-alpha</version>
+	        <type>pom</type>
+	        <scope>import</scope>
+	      </dependency>
+	    </dependencies>
+	  </dependencyManagement>
 	<dependencies>
+		<dependency>
+	      <groupId>io.opentelemetry</groupId>
+	      <artifactId>opentelemetry-api</artifactId>
+	      <version>1.35.0</version>
+	    </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -28,7 +51,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-			<version>5.2.20.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -76,12 +98,18 @@
 		<dependency>
 			<groupId>org.egov.services</groupId>
 			<artifactId>tracer</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.9.1-SNAPSHOT</version>
+			<exclusions>
+		    <exclusion>
+		      <groupId>io.opentelemetry</groupId>
+		      <artifactId>opentelemetry-api</artifactId>
+		    </exclusion>
+	  		</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.egov.services</groupId>
 			<artifactId>services-common</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -97,18 +125,22 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.2.jre7</version>
+			<version>42.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.egov</groupId>
 			<artifactId>mdms-client</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>2.9.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -127,22 +159,50 @@
 			<version>7.2.0</version>
 			<type>pom</type>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web-services</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>4.0.3</version> <scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.15.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>5.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-jdbc-template</artifactId>
+			<version>5.12.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
 			<id>repo.egovernments.org</id>
 			<name>eGov ERP Releases Repository</name>
-			<url>https://nexus-repo.egovernments.org/nexus/content/repositories/releases/</url>
+			<url>https://upyog-nexus.niua.org/nexus/content/repositories/releases/</url>
 		</repository>
 		<repository>
 			<id>repo.egovernments.org.snapshots</id>
 			<name>eGov ERP Releases Repository</name>
-			<url>https://nexus-repo.egovernments.org/nexus/content/repositories/snapshots/</url>
+			<url>https://upyog-nexus.niua.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>repo.egovernments.org.public</id>
 			<name>eGov Public Repository Group</name>
-			<url>https://nexus-repo.egovernments.org/nexus/content/groups/public/</url>
+			<url>https://upyog-nexus.niua.org/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 	<build>

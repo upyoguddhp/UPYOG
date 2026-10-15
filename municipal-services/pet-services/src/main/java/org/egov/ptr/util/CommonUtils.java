@@ -2,17 +2,23 @@ package org.egov.ptr.util;
 
 import static java.util.Objects.isNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Optional;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
-import org.egov.mdms.model.MdmsCriteria;
-import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.mdms.model.ModuleDetail;
 import org.egov.ptr.config.PetConfiguration;
 import org.egov.ptr.models.AuditDetails;
 import org.egov.ptr.models.PetRegistrationRequest;
@@ -23,16 +29,17 @@ import org.egov.ptr.web.contracts.IdRequest;
 import org.egov.ptr.web.contracts.IdResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.Getter;
 
 @Getter
+@Component
 public class CommonUtils {
 
 	@Autowired
@@ -96,6 +103,7 @@ public class CommonUtils {
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
 
+<<<<<<< HEAD
 	/*********************** MDMS Utitlity Methods *****************************/
 
 	/**
@@ -134,6 +142,8 @@ public class CommonUtils {
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 	/**************************
 	 * JSON MERGE UTILITY METHODS
 	 ****************************************/
@@ -171,4 +181,62 @@ public class CommonUtils {
 		}
 		return mainNode;
 	}
+
+	public long calculateNextMarch31InEpoch() {
+		LocalDate today = LocalDate.now();
+		LocalDate nextMarch31 = LocalDate.of(today.getYear(), Month.MARCH, 31);
+		if (today.isAfter(nextMarch31)) {
+			nextMarch31 = nextMarch31.plusYears(1);
+		}
+		LocalDateTime nextMarch31At1159PM = LocalDateTime.of(nextMarch31, LocalTime.of(23, 59));
+		return nextMarch31At1159PM.atZone(ZoneId.systemDefault()).toEpochSecond();
+	}
+
+	public long getTodaysEpoch() {
+		LocalDate today = LocalDate.now();
+		LocalDateTime startOfDay = today.atStartOfDay();
+		return startOfDay.atZone(ZoneId.systemDefault()).toEpochSecond();
+	}
+
+	public static long getFinancialYearStart() {
+
+		YearMonth currentYearMonth = YearMonth.now();
+		int year = currentYearMonth.getYear();
+		int month = currentYearMonth.getMonthValue();
+
+		// If current month is Jan-March, start year should be last year
+		if (month < Month.APRIL.getValue()) {
+			year -= 1;
+		}
+
+		LocalDateTime startOfYear = LocalDateTime.of(year, Month.APRIL, 1, 0, 0, 0);
+		return startOfYear.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+	}
+
+	public static long getFinancialYearEnd() {
+
+		YearMonth currentYearMonth = YearMonth.now();
+		int year = currentYearMonth.getYear();
+		int month = currentYearMonth.getMonthValue();
+
+		// If current month is Jan-March, end year should be current year
+		if (month < Month.APRIL.getValue()) {
+			year -= 1;
+		}
+
+		LocalDateTime endOfYear = LocalDateTime.of(year + 1, Month.MARCH, 31, 23, 59, 59, 999000000);
+		return endOfYear.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+	}
+
+	public String getFinancialYearEndDate() {
+
+		LocalDate today = LocalDate.now();
+		int year = today.getMonthValue() > Month.MARCH.getValue() ? today.getYear() + 1 : today.getYear();
+		LocalDate financialYearEndDate = LocalDate.of(year, Month.MARCH, 31);
+		return financialYearEndDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+	}
+
 }

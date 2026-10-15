@@ -54,10 +54,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -135,7 +137,7 @@ import org.egov.services.voucher.GeneralLedgerService;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -502,8 +504,9 @@ public class CreateVoucher {
 						egBilldetails.getDebitamount() == null ? BigDecimal.ZERO : egBilldetails.getDebitamount());
 				detailMap.put(VoucherConstant.CREDITAMOUNT,
 						egBilldetails.getCreditamount() == null ? BigDecimal.ZERO : egBilldetails.getCreditamount());
-				final String glcode = persistenceService.getSession().createQuery(
-						"select glcode from CChartOfAccounts where id = ?").setParameter(0, egBilldetails.getGlcodeid().longValue())
+				final String glcode = persistenceService.getSession()
+						.createQuery("select glcode from CChartOfAccounts where id = :id")
+						.setParameter("id", egBilldetails.getGlcodeid().longValue())
 						.list().get(0).toString();
 				detailMap.put(VoucherConstant.GLCODE, glcode);
 				accountdetails.add(detailMap);
@@ -1109,107 +1112,109 @@ public class CreateVoucher {
 			final List<HashMap<String, Object>> accountcodedetails,
 			final List<HashMap<String, Object>> subledgerdetails) throws ApplicationRuntimeException {
 		CVoucherHeader vh;
-		Vouchermis mis;
 
 		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("start | createVoucher API");
+			LOGGER.debug("Start | createVoucher API");
+
 		try {
-                        if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
-                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
-                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
-                            validateReferenceDocument(referenceDocument,serviceName);
-                        }
-		        validateMandateFields(headerdetails);
+			// Validate reference doc if present
+			if (headerdetails.containsKey(VoucherConstant.SERVICE_NAME) &&
+				headerdetails.containsKey(VoucherConstant.REFERENCEDOC)) {
+				String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
+				String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
+				validateReferenceDocument(referenceDocument, serviceName);
+			}
+
+			// Validate mandatory fields, lengths, MIS, transactions, functions
+			validateMandateFields(headerdetails);
 			validateLength(headerdetails);
 			validateVoucherMIS(headerdetails);
 			validateTransaction(accountcodedetails, subledgerdetails);
 			validateFunction(headerdetails, accountcodedetails);
+
+			// Create voucher header
 			vh = createVoucherHeader(headerdetails);
-			mis = createVouchermis(headerdetails);
+
+			// Create voucher MIS
+			Vouchermis mis = createVouchermis(headerdetails);
 			mis.setVoucherheaderid(vh);
 			vh.setVouchermis(mis);
-			// insertIntoVoucherHeader(vh);
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("start | insertIntoVoucherHeader");
-			final String vdt = formatter.format(vh.getVoucherDate());
-			String fiscalPeriod = null;
-			try {
-				CFiscalPeriod fp = getFiscalPeriod(vdt);
-                                fiscalPeriod = fp.getId().toString();
-                                vh.setFiscalName(fp.getName());
-			} catch (final TaskFailedException e) {
-				throw new ApplicationRuntimeException("error while getting fiscal period");
-			}
-			if (null == fiscalPeriod)
+			// --- FISCAL YEAR FIX ---
+			Date voucherDate = vh.getVoucherDate();
+			CFiscalPeriod fy = getFiscalPeriodForDate(voucherDate);
+			if (fy == null) {
 				throw new ApplicationRuntimeException(
-						"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
-								+ fiscalPeriod);
-			vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
+					"Voucher Date not within an open fiscal period or FY not open for posting"
+				);
+			}
+			vh.setFiscalPeriodId(fy.getId().intValue());
+			vh.setFiscalName(fy.getName());
 
+			// Set CGVN number
 			vh.setCgvn(getCGVNNumber(vh));
 
+			// Check for duplicate voucher number
 			try {
-				if (!isUniqueVN(vh.getVoucherNumber(), vdt))
-					throw new ValidationException(
-							Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // or the format expected by isUniqueVN
+				String voucherDateStr = formatter.format(vh.getVoucherDate());
+
+				if (!isUniqueVN(vh.getVoucherNumber(), voucherDateStr)) {
+				    throw new ValidationException(
+				        Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
+				}
+
 			} catch (final ValidationException e) {
 				LOGGER.error(ERR, e);
 				throw e;
 			}
-            /*
-             * catch (final Exception e) { LOGGER.error(ERR, e); throw new
-             * ApplicationRuntimeException(e.getMessage()); }
-             */
+
+			// Persist header with auditing
 			voucherService.applyAuditing(vh);
-			if (LOGGER.isInfoEnabled())
-				LOGGER.info("++++++++++++++++++" + vh.toString());
 			voucherService.persist(vh);
-			if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
-					.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
-				final StringBuffer sourcePath = new StringBuffer();
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Voucher Header Id  : " + vh.getId());
+
+			// Fix sourcePath if needed
+			if (vh.getVouchermis().getSourcePath() != null && vh.getModuleId() == null &&
+				vh.getVouchermis().getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
+				StringBuffer sourcePath = new StringBuffer();
 				sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
 				vh.getVouchermis().setSourcePath(sourcePath.toString());
 				voucherService.applyAuditing(vh);
 				voucherService.update(vh);
 			}
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("End | insertIntoVoucherHeader");
-
-			// insertIntoRecordStatus(vh);
-			final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
-					subledgerdetails, vh);
-			// persistenceService.getSession().flush();
-			// engine = ChartOfAccounts.getInstance();
-			// setChartOfAccounts();
-			Transaxtion txnList[] = new Transaxtion[transactions.size()];
-			txnList = transactions.toArray(txnList);
-			final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
+			// Create transactions
+			List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails, subledgerdetails, vh);
+			Transaxtion[] txnList = transactions.toArray(new Transaxtion[0]);
+			SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
 			if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
 				throw new ApplicationRuntimeException("Voucher creation Failed");
-			
-			// Generating EVENT to push the generated voucher to ES index.
+
+			// Publish event
 			finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
+
+		} catch (final ValidationException ve) {
+			List<ValidationError> errors = new ArrayList<>();
+			errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			throw new ValidationException(errors);
+		} catch (final TaskFailedException e) {
+			LOGGER.error(ERR, e);
+			throw new ApplicationRuntimeException(e.getMessage());
 		}
 
-        catch (final ValidationException ve) {
-            final List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
-            throw new ValidationException(errors);
-        } catch (final TaskFailedException e) {
-            LOGGER.error(ERR, e);
-            throw new ApplicationRuntimeException(e.getMessage());
-        }
-           
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("End | createVoucher API");
-		return vh;
 
+		return vh;
+	}
+
+	// --- HELPER TO GET OPEN FISCAL PERIOD ---
+	private CFiscalPeriod getFiscalPeriodForDate(Date voucherDate) {
+		Query query = persistenceService.getSession().createQuery(
+			"from CFiscalPeriod where :date between startingDate and endingDate and isActiveForPosting = true"
+		);
+		query.setParameter("date", voucherDate);
+		return (CFiscalPeriod) query.uniqueResult();
 	}
 
 	public void validateReferenceDocument(String referenceDocument, String serviceName) {
@@ -1554,141 +1559,95 @@ public class CreateVoucher {
 	@Transactional
 	@SuppressWarnings("deprecation")
 	public CVoucherHeader createVoucherHeader(final HashMap<String, Object> headerdetails) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("START | createVoucherHeader");
-		// Connection con = null;
-		Query query = null;
-		final CVoucherHeader cVoucherHeader = new CVoucherHeader();
-		try {
-			// String voucherSubType="";
-			cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
-			String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
-			cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
-			String vNumGenMode = null;
+    if (LOGGER.isDebugEnabled())
+        LOGGER.debug("START | createVoucherHeader");
 
-			// -- Voucher Type checking. --START
-			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
-				vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");
-			else
-				vNumGenMode = voucherTypeForULB.readVoucherTypes(voucherType);
-			// --END --
-			voucherType = voucherType.toUpperCase().replaceAll(" ", "");
+    CVoucherHeader cVoucherHeader = new CVoucherHeader();
+    try {
+        cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
 
-			String voucherSubType = null;
-			if (headerdetails.get(VoucherConstant.VOUCHERSUBTYPE) != null) {
-				voucherSubType = (String) headerdetails.get(VoucherConstant.VOUCHERSUBTYPE);
-				voucherSubType = voucherSubType.toUpperCase().replaceAll(" ", "");
-			}
+        String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
+        cVoucherHeader.setType(voucherType);
 
-			// why it is type,subtype where api expects subtype,type ?
-			// if()
-			final String voucherNumberPrefix = getVoucherNumberPrefix(voucherType, voucherSubType);
-			String voucherNumber = null;
-			if (headerdetails.get(VoucherConstant.DESCRIPTION) != null)
-				cVoucherHeader.setDescription(headerdetails.get(VoucherConstant.DESCRIPTION).toString());
-			final Date voucherDate = (Date) headerdetails.get(VoucherConstant.VOUCHERDATE);
-			cVoucherHeader.setVoucherDate(voucherDate);
-			Fund fundByCode = fundDAO.fundByCode(headerdetails.get(VoucherConstant.FUNDCODE).toString());
+        String voucherSubType = null;
+        if (headerdetails.get(VoucherConstant.VOUCHERSUBTYPE) != null) {
+            voucherSubType = headerdetails.get(VoucherConstant.VOUCHERSUBTYPE).toString().toUpperCase().replaceAll(" ", "");
+        }
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Voucher Type is :" + voucherType);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("vNumGenMode is  :" + vNumGenMode);
+        String voucherNumberPrefix = getVoucherNumberPrefix(voucherType, voucherSubType);
+        cVoucherHeader.setVoucherNumberPrefix(voucherNumberPrefix);
 
-			if (headerdetails.get(VoucherConstant.VOUCHERNUMBER) != null)
-				cVoucherHeader.setVoucherNumber(headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString());
-			if (null != headerdetails.get(VoucherConstant.MODULEID))
-				vNumGenMode = "Auto";
+        if (headerdetails.get(VoucherConstant.DESCRIPTION) != null)
+            cVoucherHeader.setDescription(headerdetails.get(VoucherConstant.DESCRIPTION).toString());
 
-			cVoucherHeader.setFundId(fundByCode);
-			if (vNumGenMode.equals("Auto")) {
-				cVoucherHeader.setVoucherNumberPrefix(voucherNumberPrefix);
-				VouchernumberGenerator v = beanResolver.getAutoNumberServiceFor(VouchernumberGenerator.class);
+        Date voucherDate = (Date) headerdetails.get(VoucherConstant.VOUCHERDATE);
+        cVoucherHeader.setVoucherDate(voucherDate);
 
-				final String strVoucherNumber = v.getNextNumber(cVoucherHeader);
+        // Set fund
+        Fund fundByCode = fundDAO.fundByCode(headerdetails.get(VoucherConstant.FUNDCODE).toString());
+        cVoucherHeader.setFundId(fundByCode);
 
-				cVoucherHeader.setVoucherNumber(strVoucherNumber);
-			}
-			/*
-			 * if("Auto".equalsIgnoreCase(vNumGenMode) || null !=
-			 * headerdetails.get(VoucherConstant.MODULEID)){
-			 * if(LOGGER.isDebugEnabled()) LOGGER.debug(
-			 * "Generating auto voucher number"); SimpleDateFormat df = new
-			 * SimpleDateFormat(DD_MM_YYYY); String vDate =
-			 * df.format(voucherDate);
-			 * cVoucherHeader.setVoucherNumber(cmImpl.getTxnNumber
-			 * (fundId.toString(),voucherNumberPrefix,vDate,con)); }else {
-			 * voucherNumber =
-			 * headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString();
-			 * query=persistenceService.getSession().createQuery(
-			 * "select f.identifier from Fund f where id=:fundId");
-			 * query.setInteger("fundId", fundId); String fundIdentifier =
-			 * query.uniqueResult().toString();
-			 * cVoucherHeader.setVoucherNumber(new
-			 * StringBuffer().append(fundIdentifier
-			 * ).append(voucherNumberPrefix). append(voucherNumber).toString());
-			 * }
-			 */
+		LOGGER.info("======================Voucher Number====================");
+		LOGGER.info(headerdetails.get(VoucherConstant.VOUCHERNUMBER));
+        // Generate voucher number if not provided
+        if (headerdetails.get(VoucherConstant.VOUCHERNUMBER) != null && headerdetails.get(VoucherConstant.VOUCHERNUMBER) != "")
+            cVoucherHeader.setVoucherNumber(headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString());
+        else {
+            VouchernumberGenerator v = beanResolver.getAutoNumberServiceFor(VouchernumberGenerator.class);
+            cVoucherHeader.setVoucherNumber(v.getNextNumber(cVoucherHeader));
+        }
 
-			if (headerdetails.containsKey(VoucherConstant.MODULEID)
-					&& null != headerdetails.get(VoucherConstant.MODULEID)) {
-				cVoucherHeader.setModuleId(Integer.valueOf(headerdetails.get(VoucherConstant.MODULEID).toString()));
-				cVoucherHeader.setIsConfirmed(Integer.valueOf(1));
-			} else {
-				// Fix Me
-				/*
-				 * PersistenceService<AppConfig, Integer> appConfigSer;
-				 * appConfigSer = new PersistenceService<AppConfig, Integer>();
-				 * appConfigSer.setSessionFactory(new SessionFactory());
-				 * appConfigSer.setType(AppConfig.class); AppConfig appConfig=
-				 * (AppConfig) appConfigSer.find(
-				 * "from AppConfig where key_name =?",
-				 * "JournalVoucher_ConfirmonCreate"); if(null != appConfig &&
-				 * null!= appConfig.getValues() ){ for (AppConfigValues
-				 * appConfigVal : appConfig.getValues()) { cVoucherHeader.
-				 * setIsConfirmed(Integer.valueOf(appConfigVal.getValue())); } }
-				 */
-			}
+        // Fiscal Year Fix: Set FiscalPeriodId and FiscalName
+        CFiscalPeriod fy = getFiscalPeriodForDate(voucherDate);
+        if (fy == null)
+            throw new ApplicationRuntimeException(
+                    "Voucher Date not within an open fiscal period or FY not open for posting");
+        cVoucherHeader.setFiscalPeriodId(fy.getId().intValue());
+        cVoucherHeader.setFiscalName(fy.getName());
 
-			if (headerdetails.containsKey(VoucherConstant.STATUS) && null != headerdetails.get(VoucherConstant.STATUS))
-				cVoucherHeader.setStatus(Integer.valueOf(headerdetails.get(VoucherConstant.STATUS).toString()));
-			else {
-				final List list = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-						"DEFAULTVOUCHERCREATIONSTATUS");
-				cVoucherHeader.setStatus(Integer.parseInt(((AppConfigValues) list.get(0)).getValue()));
-			}
+        // Set module, confirmation, and status
+        if (headerdetails.containsKey(VoucherConstant.MODULEID) && headerdetails.get(VoucherConstant.MODULEID) != null) {
+            cVoucherHeader.setModuleId(Integer.valueOf(headerdetails.get(VoucherConstant.MODULEID).toString()));
+            cVoucherHeader.setIsConfirmed(1);
+        } else {
+            cVoucherHeader.setIsConfirmed(0);
+        }
 
-			if (null != headerdetails.get(VoucherConstant.ORIGIONALVOUCHER)) {
+        if (headerdetails.containsKey(VoucherConstant.STATUS) && headerdetails.get(VoucherConstant.STATUS) != null)
+            cVoucherHeader.setStatus(Integer.valueOf(headerdetails.get(VoucherConstant.STATUS).toString()));
+        else {
+            List list = appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "DEFAULTVOUCHERCREATIONSTATUS");
+            cVoucherHeader.setStatus(Integer.parseInt(((AppConfigValues) list.get(0)).getValue()));
+        }
 
-				final Long origionalVId = Long
-						.parseLong(headerdetails.get(VoucherConstant.ORIGIONALVOUCHER).toString());
-				query = persistenceService.getSession().createQuery("from CVoucherHeader where id=:id");
-				query.setLong("id", origionalVId);
-				if (query.list().size() == 0)
-					throw new ApplicationRuntimeException("Not a valid origional voucherheader id");
-				else
-					cVoucherHeader.setOriginalvcId(origionalVId);
-			}
+        // Original and reference voucher
+        if (headerdetails.get(VoucherConstant.ORIGIONALVOUCHER) != null) {
+            Long originalVId = Long.parseLong(headerdetails.get(VoucherConstant.ORIGIONALVOUCHER).toString());
+            Query query = persistenceService.getSession().createQuery("from CVoucherHeader where id=:id");
+            query.setParameter("id", originalVId);
+            if (query.list().size() == 0)
+                throw new ApplicationRuntimeException("Not a valid original voucherheader id");
+            else
+                cVoucherHeader.setOriginalvcId(originalVId);
+        }
 
-			cVoucherHeader.setRefvhId((Long) headerdetails.get(VoucherConstant.REFVOUCHER));
-			cVoucherHeader.setEffectiveDate(new Date());
-			Object billNumber = headerdetails.get(VoucherConstant.BILLNUMBER);
-                        cVoucherHeader.setBillNumber(billNumber != null ? billNumber.toString() : "");
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug(
-						"Printing Voucher Details------------------------------------------------------------------------------");
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug(cVoucherHeader.toString());
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug(
-						"Printing Voucher Details------------------------------------------------------------------------------");
+        cVoucherHeader.setRefvhId((Long) headerdetails.get(VoucherConstant.REFVOUCHER));
+        cVoucherHeader.setEffectiveDate(new Date());
+
+        Object billNumber = headerdetails.get(VoucherConstant.BILLNUMBER);
+        cVoucherHeader.setBillNumber(billNumber != null ? billNumber.toString() : "");
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Printing Voucher Details------------------------------------------------------------------------------");
+            LOGGER.debug(cVoucherHeader.toString());
+            LOGGER.debug("Printing Voucher Details------------------------------------------------------------------------------");
+        }
+
 		} catch (final ValidationException e) {
 			LOGGER.error(e.getMessage());
 			throw e;
-        } /*
-           * catch (final Exception e) { LOGGER.error(e); throw new
-           * Exception(e.getMessage()); }
-           */
+		}
+
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createVoucherHeader");
 		return cVoucherHeader;
@@ -1965,7 +1924,7 @@ public class CreateVoucher {
 				throw new ApplicationRuntimeException("glcode is missing");
 			final Query querytds = persistenceService.getSession()
 					.createQuery("select t.id from Recovery t where t.chartofaccounts.glcode=:glcode");
-			querytds.setString("glcode", glcode);
+			querytds.setParameter("glcode", glcode);
 			querytds.setCacheable(true);
 			if (null != querytds.list() && querytds.list().size() > 0
 					&& null == subdetailDetailMap.get(VoucherConstant.TDSID)
@@ -1985,9 +1944,9 @@ public class CreateVoucher {
 
 			final Query query = persistenceService.getSession()
 					.createQuery("from CChartOfAccountDetail cd,CChartOfAccounts c where "
-							+ "cd.glCodeId = c.id and c.glcode=:glcode");
+							+ "cd.glCodeId = c and c.glcode=:glcode");
 
-			query.setString(VoucherConstant.GLCODE, glcode);
+			query.setParameter(VoucherConstant.GLCODE, glcode);
 			query.setCacheable(true);
 
 			if (null == query.list() || query.list().size() == 0)
@@ -1999,9 +1958,9 @@ public class CreateVoucher {
 				detailtypeid = subdetailDetailMap.get(VoucherConstant.DETAILTYPEID).toString();
 				final Session session = persistenceService.getSession();
 				final Query qry = session.createQuery("from CChartOfAccountDetail cd,CChartOfAccounts c where "
-						+ "cd.glCodeId = c.id and c.glcode=:glcode and cd.detailTypeId.id=:detailTypeId");
-				qry.setString(VoucherConstant.GLCODE, glcode);
-				qry.setInteger("detailTypeId", Integer.valueOf(detailtypeid));
+						+ "cd.glCodeId = c and c.glcode=:glcode and cd.detailTypeId.id=:detailTypeId");
+				qry.setParameter(VoucherConstant.GLCODE, glcode);
+				qry.setParameter("detailTypeId", Integer.valueOf(detailtypeid));
 				qry.setCacheable(true);
 				if (null == qry.list() || qry.list().size() == 0)
 					throw new ApplicationRuntimeException(
@@ -2014,8 +1973,8 @@ public class CreateVoucher {
 				final Session session = persistenceService.getSession();
 				final Query qry = session.createQuery(
 						"from Accountdetailkey adk where adk.accountdetailtype.id=:detailtypeid and adk.detailkey=:detailkey");
-				qry.setInteger(VoucherConstant.DETAILTYPEID, Integer.valueOf(detailtypeid));
-				qry.setInteger("detailkey", Integer.valueOf(detailKeyId));
+				qry.setParameter(VoucherConstant.DETAILTYPEID, Integer.valueOf(detailtypeid));
+				qry.setParameter("detailkey", Integer.valueOf(detailKeyId));
 				qry.setCacheable(true);
 				if (null == qry.list() || qry.list().size() == 0)
 					throw new ApplicationRuntimeException("Subledger data is not valid for account code " + glcode);
@@ -2396,40 +2355,40 @@ public class CreateVoucher {
 			Query pstmt3 = null;
 			Query pstmt4 = null;
 
-			final String glQry = "select id from generalledger where voucherheaderid= ?";
-			final String glidQry = "select id from generalledgerdetail where generalledgerid= ?";
-			final String delQry = "delete from EG_REMITTANCE_GLDTL where gldtlid= ?";
-			final String delQrr = "delete from generalledgerdetail where generalledgerid=?";
-			final String delgl = " delete from generalledger where voucherheaderid=?";
-			final String delvh = " delete from voucherdetail where voucherheaderid=?";
-			pstmt1 = persistenceService.getSession().createSQLQuery(glQry);
-			pstmt1.setFloat(0, vh.getId());
+			final String glQry = "select id from generalledger where voucherheaderid= ?1";
+			final String glidQry = "select id from generalledgerdetail where generalledgerid= ?1";
+			final String delQry = "delete from EG_REMITTANCE_GLDTL where gldtlid= ?1";
+			final String delQrr = "delete from generalledgerdetail where generalledgerid= ?1";
+			final String delgl = " delete from generalledger where voucherheaderid= ?1";
+			final String delvh = " delete from voucherdetail where voucherheaderid= ?1";
+			pstmt1 = persistenceService.getSession().createNativeQuery(glQry);
+			pstmt1.setParameter(1, vh.getId());
 
 			final List<Object[]> rs = pstmt1.list();
 			List<Object[]> rs1 = null;
 			boolean delete = false;
 			while (rs != null && rs.size() > 0) {
-				pstmt2 = persistenceService.getSession().createSQLQuery(glidQry);
-				pstmt2.setLong(0, Long.parseLong(rs.get(1).toString()));
+				pstmt2 = persistenceService.getSession().createNativeQuery(glidQry);
+				pstmt2.setParameter(1, Long.parseLong(rs.get(1).toString()));
 				rs1 = pstmt2.list();
 				while (rs1 != null && rs1.size() > 0) {
 					delete = true;
-					pstmt3 = persistenceService.getSession().createSQLQuery(delQry);
-					pstmt3.setLong(0, Long.parseLong(rs1.get(1).toString()));
+					pstmt3 = persistenceService.getSession().createNativeQuery(delQry);
+					pstmt3.setParameter(1, Long.parseLong(rs1.get(1).toString()));
 					pstmt3.executeUpdate();
 				}
 				if (delete) {
-					pstmt4 = persistenceService.getSession().createSQLQuery(delQrr);
-					pstmt4.setLong(0, Long.parseLong(rs1.get(1).toString()));
+					pstmt4 = persistenceService.getSession().createNativeQuery(delQrr);
+					pstmt4.setParameter(1, Long.parseLong(rs1.get(1).toString()));
 					pstmt4.executeUpdate();
 				}
 			}
-			pstmt1 = persistenceService.getSession().createSQLQuery(delgl);
-			pstmt1.setLong(0, vh.getId());
+			pstmt1 = persistenceService.getSession().createNativeQuery(delgl);
+			pstmt1.setParameter(1, vh.getId());
 			pstmt1.executeUpdate();
 
-			pstmt1 = persistenceService.getSession().createSQLQuery(delvh);
-			pstmt1.setLong(0, vh.getId());
+			pstmt1 = persistenceService.getSession().createNativeQuery(delvh);
+			pstmt1.setParameter(1, vh.getId());
 			pstmt1.executeUpdate();
 
 		} catch (final HibernateException e) {
@@ -2755,53 +2714,186 @@ public class CreateVoucher {
 	public void setAppConfigValuesService(final AppConfigValueService appConfigValuesService) {
 		this.appConfigValuesService = appConfigValuesService;
 	}
+public boolean isUniqueVN(String vcNum, final String vcDate) {
+    boolean isUnique = false;
+    vcNum = vcNum.toUpperCase().trim();
+    
+    if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Checking uniqueness for VoucherNumber: " + vcNum + ", VoucherDate: " + vcDate);
+    }
+    
+    Query pst = null;
+    List<?> rs = null;
+    
+    try {
+        // Parse the input voucher date - handle multiple date formats
+        Date voucherDate = parseVoucherDate(vcDate);
+        LOGGER.info("---------------Fetch FY as per voucher date-----------------");
+		LOGGER.info(voucherDate.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Parsed voucher date: " + voucherDate);
+        }
+        
+        // Query 1: Get financial year dates based on voucher date
+        final String query1 = "SELECT startingDate, endingDate FROM financialYear " +
+                              "WHERE startingDate <= ?1 AND endingDate >= ?2";
+        pst = persistenceService.getSession().createNativeQuery(query1)
+                .setParameter(1, voucherDate)
+                .setParameter(2, voucherDate);
+        rs = pst.list();
+        
+        // Validate that financial year exists
+        if (rs == null || rs.isEmpty()) {
+            LOGGER.error("No financial year found for voucher date: " + vcDate);
+            throw new ApplicationRuntimeException(
+                "No financial year found for the given voucher date: " + vcDate);
+        }
+        LOGGER.info("---------------After Fetch FY as per voucher date-----------------");
 
-	public boolean isUniqueVN(String vcNum, final String vcDate) {
-		boolean isUnique = false;
-		String fyStartDate = "", fyEndDate = "";
-		vcNum = vcNum.toUpperCase();
-		Query pst = null;
-		List<Object[]> rs = null;
-		try {
-			final StringBuilder query1 = new StringBuilder(
-					"SELECT to_char(startingDate, 'DD-Mon-YYYY') AS \"startingDate\",").append(
-							" to_char(endingDate, 'DD-Mon-YYYY') AS \"endingDate\" FROM financialYear WHERE startingDate <= ?")
-							.append(" AND endingDate >= ?");
-			pst = persistenceService.getSession().createSQLQuery(query1.toString())
-					.setParameter(0, formatter.parse(vcDate)).setParameter(1, formatter.parse(vcDate));
-			rs = pst.list();
-			if (rs != null && rs.size() > 0)
-				for (final Object[] element : rs) {
-					fyStartDate = element[0].toString();
-					fyEndDate = element[1].toString();
-				}
-			final StringBuilder query2 = new StringBuilder("SELECT id FROM voucherHeader WHERE voucherNumber = ? ")
-					.append(" AND voucherDate>= ? AND voucherDate<=? and status!=4");
-			pst = persistenceService.getSession().createSQLQuery(query2.toString())
-					.setParameter(0, vcNum)
-					.setParameter(1, formatter.parse(fyStartDate))
-					.setParameter(2, formatter.parse(fyEndDate));
-			rs = pst.list();
-			if (rs != null && rs.size() > 0) {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Duplicate Voucher Number");
-			} else
-				isUnique = true;
-		} catch (final ParseException ex) {
-			LOGGER.error("error in finding unique VoucherNumber");
-			throw new ApplicationRuntimeException("error in finding unique VoucherNumber");
-		} finally {
+        Date fyStartDate = null;
+        Date fyEndDate = null;
+        
+        // Extract the financial year dates
+        Object[] firstResult = (Object[]) rs.get(0);
+        fyStartDate = (Date) firstResult[0];
+        fyEndDate = (Date) firstResult[1];
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Financial Year Start: " + fyStartDate + ", End: " + fyEndDate);
+        }
+        
+        // Query 2: Check if voucher number exists in this financial year
+        final String query2 = "SELECT id FROM voucherHeader " +
+                              "WHERE UPPER(voucherNumber) = ?1 " +
+                              "AND voucherDate >= ?2 " +
+                              "AND voucherDate <= ?3 " +
+                              "AND status != 4";
+        
+        pst = persistenceService.getSession().createNativeQuery(query2)
+                .setParameter(1, vcNum)
+                .setParameter(2, fyStartDate)
+                .setParameter(3, fyEndDate);
+        rs = pst.list();
+        LOGGER.info("---------------Fetch VH as per voucher date-----------------");
 
-		}
-		return isUnique;
-	}
+        if (rs != null && !rs.isEmpty()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Duplicate Voucher Number found: " + vcNum);
+            }
+            isUnique = false;
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Voucher Number is unique: " + vcNum);
+            }
+            isUnique = true;
+        }
+        
+    } catch (final ParseException pex) {
+        LOGGER.error("Invalid voucher date format. Received: " + vcDate + 
+                     ". Supported formats: dd-MMM-yyyy, dd/MM/yyyy, dd/M/yy, dd/M/yyyy", pex);
+        throw new ApplicationRuntimeException(
+            "Invalid voucher date format. Received: " + vcDate + 
+            ". Supported formats: dd-MMM-yyyy (27-Jan-2026), dd/MM/yyyy (27/01/2026), dd/M/yy (27/1/26)");
+        
+    } catch (final HibernateException hex) {
+        LOGGER.error("Database error while checking voucher uniqueness", hex);
+        throw new ApplicationRuntimeException(
+            "Database error while checking voucher uniqueness: " + hex.getMessage());
+        
+    } catch (final Exception ex) {
+        LOGGER.error("Unexpected error while checking voucher uniqueness", ex);
+        throw new ApplicationRuntimeException(
+            "Unexpected error while checking voucher uniqueness: " + ex.getMessage());
+    }
+    
+    return isUnique;
+}
+
+/**
+ * Parse voucher date in multiple formats:
+ * - dd-MMM-yyyy (27-Jan-2026)
+ * - dd/MM/yyyy (27/01/2026)
+ * - dd/M/yyyy (27/1/2026)
+ * - dd/M/yy (27/1/26)
+ * 
+ * @param dateStr the date string to parse
+ * @return parsed Date object
+ * @throws ParseException if date cannot be parsed
+ */
+private Date parseVoucherDate(final String dateStr) throws ParseException {
+    if (dateStr == null || dateStr.trim().isEmpty()) {
+        throw new ParseException("Voucher date cannot be empty", 0);
+    }
+    
+    String trimmedDate = dateStr.trim();
+    
+    // Format 1: dd-MMM-yyyy (27-Jan-2026)
+    try {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+        sdf1.setLenient(false);
+        return sdf1.parse(trimmedDate);
+    } catch (ParseException e1) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Date format dd-MMM-yyyy not matched, trying next format");
+        }
+    }
+    
+    // Format 2: dd/MM/yyyy (27/01/2026)
+    try {
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        sdf2.setLenient(false);
+        return sdf2.parse(trimmedDate);
+    } catch (ParseException e2) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Date format dd/MM/yyyy not matched, trying next format");
+        }
+    }
+    
+    // Format 3: dd/M/yyyy or dd/M/yy (27/1/2026 or 27/1/26)
+    try {
+        if (trimmedDate.contains("/")) {
+            String[] parts = trimmedDate.split("/");
+            if (parts.length == 3) {
+                int day = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int year = Integer.parseInt(parts[2]);
+                
+                // Handle 2-digit year (e.g., 26 -> 2026)
+                if (year < 100) {
+                    year += 2000;
+                }
+                
+                Calendar cal = Calendar.getInstance();
+                cal.setLenient(false);
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, month - 1); // 0-based month
+                cal.set(Calendar.DAY_OF_MONTH, day);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                
+                return cal.getTime();
+            }
+        }
+    } catch (IllegalArgumentException e3) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Date format dd/M/yyyy or dd/M/yy not matched");
+        }
+    }
+    
+    // If all formats fail, throw comprehensive error
+    throw new ParseException(
+        "Unable to parse voucher date: " + trimmedDate + 
+        ". Supported formats: dd-MMM-yyyy (27-Jan-2026), dd/MM/yyyy (27/01/2026), dd/M/yy (27/1/26)", 0);
+}
 
 	public CFiscalPeriod getFiscalPeriod(final String vDate) throws TaskFailedException {
 		CFiscalPeriod fiscalPeriod = null;
-		final String sql = "select id from fiscalperiod  where ? between startingdate and endingdate";
+		final String sql = "select id from fiscalperiod  where ?1 between startingdate and endingdate";
 		try {
-			final Query pst = persistenceService.getSession().createSQLQuery(sql).addEntity(CFiscalPeriod.class)
-					.setParameter(0, formatter.parse(vDate));
+			final Query pst = persistenceService.getSession().createNativeQuery(sql).addEntity(CFiscalPeriod.class)
+					.setParameter(1, formatter.parse(vDate));
 			final List<CFiscalPeriod> rset = pst.list();
 			fiscalPeriod = rset != null ? rset.get(0) : null;
 		} catch (final HibernateException | ParseException e) {

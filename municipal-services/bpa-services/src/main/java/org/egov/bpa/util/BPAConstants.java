@@ -12,6 +12,14 @@ public class BPAConstants {
 	public static final String BPA_BusinessService = "BPA";
 
 	public static final String BPA_MODULE_CODE = "BPA";
+	
+	public static final String BUSINESSSERVICE_PREAPPROVEDPLAN = "BPA-PAP";
+	
+	public static final String NOC_BYPASS_DETAILS = "nocBypassDetails";
+	
+	public static final String EDCR_SUGGESTED_REQUIRED_NOCs_PATH="$.edcrDetail[0].planDetail.planInformation.requiredNOCs";
+	
+	public static final String RISKTYPE = "riskType";
 
 	public static final String BPA_LOW_MODULE_CODE = "BPA_LOW";
 
@@ -389,6 +397,9 @@ public class BPAConstants {
 	public static final String DOWNLOAD_PERMIT_LINK_PLACEHOLDER = "{DOWNLOAD_PERMIT_LINK}";
 
 	public static final String PAYMENT_LINK_PLACEHOLDER = "{PAYMENT_LINK}";
+	
+	public static final String TENANTID_MDC_STRING = "TENANTID";
+
 
 
 }

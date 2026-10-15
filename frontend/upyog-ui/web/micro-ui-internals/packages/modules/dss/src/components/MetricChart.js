@@ -1,8 +1,8 @@
-import { DownwardArrow, Rating, UpwardArrow } from "@egovernments/digit-ui-react-components";
+import { DownwardArrow, UpwardArrow } from "@nudmcdgnpm/digit-ui-react-components";
+import {Rating} from "@nudmcdgnpm/digit-ui-react-components";
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import FilterContext from "./FilterContext";
-//import {ReactComponent as Arrow_Downward} from "../images/Arrow_Downward.svg";
 import { ArrowDownwardElement } from "./ArrowDownward";
 import { ArrowUpwardElement } from "./ArrowUpward";
 
@@ -11,22 +11,32 @@ const MetricData = ({ t, data, code, indexValuesWithStar }) => {
   const insight = data?.insight?.value?.replace(/[+-]/g, "")?.split("%");
   return (
     <div>
-      <p className="heading-m" style={{ textAlign: "right", paddingTop: "0px", whiteSpace: "nowrap" }}>
+      <div className="heading-m" style={{ textAlign: "right", paddingTop: "0px", whiteSpace: "nowrap" }}>
         {indexValuesWithStar?.includes(code) ? (
           <Rating toolTipText={t("COMMON_RATING_LABEL")} currentRating={Math.round(data?.headerValue * 10) / 10} styles={{ width: "unset", marginBottom:"unset" }} starStyles={{ width: "25px" }} />
         ) : data?.headerName.includes("AVG") ? (
           `${Digit.Utils.dss.formatter(data?.headerValue, data?.headerSymbol, "Unit", true)} ${
-            code === "totalSludgeTreated" ? t(`DSS_KL`) : ""
+             code === "fsmtotalsludgetreated" || code === "totalSludgeTreated" ? t(`DSS_KL`) : ""
           }`
         ):
+
+        data?.headerName.includes("DSS_STATE_GDP_REVENUE_COLLECTION") ||  data?.headerName.includes("DSS_STATE_GDP_PT_REVENUE_COLLECTION") ?(`${Number(data?.headerValue*100).toFixed(4)}`):
+        data?.headerName.includes("DSS_PT_TAX_REVENUE_PER_HOUSEHOLD")|| data?.headerName.includes("DSS_NON_TAX_REVENUE_PER_HOUSEHOLD") ?(`${Digit.Utils.dss.formatter(data?.headerValue, data?.headerSymbol, "Unit", true)}`):
+        data?.headerName.includes("NSS_OBPS_SLA_COMPLIANCE_OC") ||  data?.headerName.includes("NSS_OBPS__SLA_COMPLIANCE_PERMIT") ? 
+        (
+          `${Digit.Utils.dss.formatter(data?.headerValue, data?.headerSymbol, value?.denomination, true, t)} % ${
+            code === "fsmtotalsludgetreated" || code === "totalSludgeTreated"? t(`DSS_KL`) : ""
+          }`
+        ):
+
         
         (
           `${Digit.Utils.dss.formatter(data?.headerValue, data?.headerSymbol, value?.denomination, true, t)} ${
-            code === "totalSludgeTreated" ? t(`DSS_KL`) : ""
+            code === "fsmtotalsludgetreated" || code === "totalSludgeTreated"? t(`DSS_KL`) : ""
           }`
         )}
-      </p>
-      {data?.insight && (
+      </div>
+      {/* {data?.insight && (
         <div
           style={{
             width: "100%",
@@ -42,7 +52,7 @@ const MetricData = ({ t, data, code, indexValuesWithStar }) => {
               )}`}
           </p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
@@ -75,7 +85,7 @@ const MetricChartRow = ({ data, setChartDenomination, index, moduleCode, indexVa
           },
         }));
       index === 0 && setChartDenomination(response?.responseData?.data?.[0]?.headerSymbol);
-      if (response?.responseData?.visualizationCode === "todaysLastYearCollectionv3") {
+      if (response?.responseData?.visualizationCode.includes("todaysLastYearCollectionv3")) {
 
         const today = new Date();
         const previousYearDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
@@ -107,7 +117,7 @@ const MetricChartRow = ({ data, setChartDenomination, index, moduleCode, indexVa
             className="tooltiptext"
             style={{
               fontSize: "medium",
-              width: t(`TIP_${data.name}`).length < 50 ? "fit-content" : 400,
+              width : t(`TIP_${data.name}`).length < 50 ? 200 : 400,
               height: 50,
               whiteSpace: "normal",
             }}
@@ -123,7 +133,7 @@ const MetricChartRow = ({ data, setChartDenomination, index, moduleCode, indexVa
 
   const getWidth = (data) => {
     if (isMobile) return "auto";
-    else return t(`TIP_${data.name}`).length < 50 ? "fit-content" : 400;
+    else return t(`TIP_${data.name}`).length < 50 ? 200 : 400;
     // if (isMobile) return t(`TIP_${data.name}`).length < 50 ? "fit-content" : 300;
     // else return t(`TIP_${data.name}`).length < 50 ? "fit-content" : 400;
   };
@@ -171,6 +181,7 @@ const MetricChart = ({ data, setChartDenomination, moduleCode }) => {
     "nssPtCitizenFeedbackScore",
     "sdssPtCitizenFeedbackScore",
     "sdssOverviewCitizenFeedbackScore",
+    "AvgCitizenRating"
   ];
   return (
     <>

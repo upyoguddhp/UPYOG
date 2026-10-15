@@ -6,7 +6,11 @@ CREATE TABLE IF NOT EXISTS eg_asset_assetdetails (
     id character varying(64),
     bookRefNo character varying(256) NOT NULL,
     name character varying(256) NOT NULL,
+<<<<<<< HEAD
     description character varying(256),
+=======
+    description text,
+>>>>>>> niua-upstream/niua-dev-2.0
     classification character varying(256),
     parentCategory character varying(256),
     category character varying(256),
@@ -16,10 +20,15 @@ CREATE TABLE IF NOT EXISTS eg_asset_assetdetails (
     approvalNo character varying(64) DEFAULT NULL,
     tenantId character varying(256),
     status character varying(64),
+<<<<<<< HEAD
     action character varying(256),
     businessservice character varying(64) DEFAULT NULL,
     additionalDetails JSONB,
     assetDetails JSONB,
+=======
+    businessservice character varying(64) DEFAULT NULL,
+    additionalDetails JSONB,
+>>>>>>> niua-upstream/niua-dev-2.0
     createdTime bigint,
     lastModifiedTime bigint,
     approvalDate bigint,
@@ -28,14 +37,25 @@ CREATE TABLE IF NOT EXISTS eg_asset_assetdetails (
     createdby character varying(256),
     lastmodifiedby character varying(256),
     remarks character varying(256),
+<<<<<<< HEAD
     CONSTRAINT pk_eg_asset_assetdetails PRIMARY KEY (id)
 );
 
+=======
+    financialYear character varying(64),
+    sourceOfFinance character varying(256),
+    CONSTRAINT pk_eg_asset_assetdetails PRIMARY KEY (id)
+);
+>>>>>>> niua-upstream/niua-dev-2.0
 CREATE TABLE IF NOT EXISTS eg_asset_auditdetails (
     id character varying(64),
     bookRefNo character varying(256) NOT NULL,
     name character varying(256) NOT NULL,
+<<<<<<< HEAD
     description character varying(256),
+=======
+    description text,
+>>>>>>> niua-upstream/niua-dev-2.0
     classification character varying(256),
     parentCategory character varying(256),
     category character varying(256),
@@ -45,7 +65,10 @@ CREATE TABLE IF NOT EXISTS eg_asset_auditdetails (
     approvalNo character varying(64) DEFAULT NULL,
     tenantId character varying(256),
     status character varying(64),
+<<<<<<< HEAD
     action character varying(256),
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
     businessservice character varying(64) DEFAULT NULL,
     additionalDetails JSONB,
     createdTime bigint,
@@ -54,7 +77,14 @@ CREATE TABLE IF NOT EXISTS eg_asset_auditdetails (
     applicationDate bigint,
     accountid character varying(64),
     createdby character varying(256),
+<<<<<<< HEAD
     lastmodifiedby character varying(256)
+=======
+    lastmodifiedby character varying(256),
+    remarks character varying(256),
+    financialYear character varying(64),
+    sourceOfFinance character varying(256)
+>>>>>>> niua-upstream/niua-dev-2.0
 );
 
 CREATE TABLE IF NOT EXISTS eg_asset_addressDetails (
@@ -76,8 +106,13 @@ CREATE TABLE IF NOT EXISTS eg_asset_addressDetails (
     locality_code character varying(256),
     locality_name character varying(256),
     locality_label character varying(256),
+<<<<<<< HEAD
     locality_latitude NUMERIC(10, 6),
     locality_longitude NUMERIC(10, 6),
+=======
+    locality_latitude character varying(64),
+    locality_longitude character varying(64),
+>>>>>>> niua-upstream/niua-dev-2.0
     locality_children JSONB,
     locality_materializedPath character varying(256),
     asset_id character varying(64),  -- Foreign Key
@@ -105,6 +140,7 @@ CREATE TABLE IF NOT EXISTS public.eg_asset_document
 
 COMMENT ON TABLE eg_asset_assetdetails IS 'Table to store asset details';
 
+<<<<<<< HEAD
 -- public.seq_eg_asset_application_no
 
 -- DROP SEQUENCE public.seq_eg_asset_application_no;
@@ -116,4 +152,6 @@ CREATE SEQUENCE public.seq_eg_asset_application_no
 	START 1
 	CACHE 1
 	NO CYCLE;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 

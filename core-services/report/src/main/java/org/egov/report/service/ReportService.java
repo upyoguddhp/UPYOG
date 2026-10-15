@@ -79,6 +79,7 @@ public class ReportService {
                 if (cd.getType() != null) {
                     TypeEnum te = TypeEnum.valueOf(cd.getType().toString().toUpperCase());
                     reportheader.setType(te);
+                    reportheader.setShowColumn(cd.getShowColumn());
                     reportheader.setRowTotal(cd.getRowTotal());
                     reportheader.setColumnTotal(cd.getColumnTotal());
                     reportHeaders.add(reportheader);
@@ -222,23 +223,27 @@ public class ReportService {
     }
 
 
+ 
     public ReportResponse getReportData(ReportRequest reportRequest, String moduleName, String reportName, String authToken) {
         ReportDefinitions rds = ReportApp.getReportDefs();
-        log.info("search for "+ moduleName+ " "+reportName);
-        ReportDefinition reportDefinition = rds.getReportDefinition(moduleName+ " "+reportName);
-        log.info("reportDefinition is "+reportDefinition);
-        List<Map<String, Object>> maps = reportRepository.getData(reportRequest, reportDefinition,authToken);
-        // Call decryption service if decryption is required for the report
-        if ((reportDefinition.getdecryptionPathId()!= null)&&(reportRequest.getRequestInfo()!=null)&&(reportRequest.getRequestInfo().getUserInfo()!=null))
-        {
+        log.info("search for " + moduleName + " " + reportName);
+        ReportDefinition reportDefinition = rds.getReportDefinition(moduleName + " " + reportName);
+        log.info("reportDefinition is " + reportDefinition);
+        List<Map<String, Object>> maps = reportRepository.getData(reportRequest, reportDefinition, authToken);
+
+        // ✅ Updated decryption logic
+        if ((reportDefinition.getdecryptionPathId() != null)
+                && (reportRequest.getRequestInfo() != null)
+                && (reportRequest.getRequestInfo().getUserInfo() != null)) {
             try {
-                maps = encryptionService.decryptJson(reportRequest.getRequestInfo(), maps,
-                        reportDefinition.getdecryptionPathId(), "Retrieve Report Data", Map.class);
+            	 maps = encryptionService.decryptJson(reportRequest.getRequestInfo(), maps,
+                         reportDefinition.getdecryptionPathId(), "Retrieve Report Data", Map.class);
             } catch (IOException e) {
                 log.error("IO exception while decrypting report: " + e.getMessage());
                 throw new CustomException("REPORT_DECRYPTION_ERROR", "Error while decrypting report data");
             }
         }
+
         List<SourceColumn> columns = reportDefinition.getSourceColumns();
         ReportResponse reportResponse = new ReportResponse();
         populateData(columns, maps, reportResponse);
@@ -246,6 +251,8 @@ public class ReportService {
 
         return reportResponse;
     }
+
+
 
     private void populateData(List<SourceColumn> columns, List<Map<String, Object>> maps,
                               ReportResponse reportResponse) {

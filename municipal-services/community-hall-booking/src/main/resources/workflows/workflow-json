@@ -31,33 +31,60 @@
       "tenantId": "pg"
     }
   },
+<<<<<<< HEAD
     "BusinessServices": [
         {
             "tenantId": "pg",
             "businessService": "chb",
             "business": "chb-services",
             "businessServiceSla": null,
+=======
+  "BusinessServices": [
+        {
+            "tenantId": "pg",
+            "businessService": "booking-refund",
+            "business": "chb-services",
+            "businessServiceSla": "",
+>>>>>>> niua-upstream/niua-dev-2.0
             "states": [
                 {
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
+<<<<<<< HEAD
                     "docUploadRequired": true,
+=======
+                    "docUploadRequired": false,
+>>>>>>> niua-upstream/niua-dev-2.0
                     "isStartState": true,
                     "isTerminateState": false,
                     "isStateUpdatable": true,
                     "actions": [
                         {
+<<<<<<< HEAD
                             "action": "APPLY",
                             "nextState": "APPLIED",
                             "roles": [
                                 "CITIZEN"
                             ]
+=======
+                            "action": "MOVETOEMPLOYEE",
+                            "nextState": "REFUNDPENDING",
+                            "roles": [
+                                "CHB_APPROVER",
+                                "CHB_CEMP",
+                                "SYSTEM",
+                                "CITIZEN",
+                                "CHB_INTERNAL_MICROSERVICE_ROLE"
+                            ],
+                            "active": true
+>>>>>>> niua-upstream/niua-dev-2.0
                         }
                     ]
                 },
                 {
                     "sla": null,
+<<<<<<< HEAD
                     "state": "APPLIED",
                     "applicationStatus": "APPLIED",
                     "docUploadRequired": false,
@@ -96,24 +123,103 @@
                             "roles": [
                                 "CHB_APPROVER"
                             ]
+=======
+                    "state": "REFUNDPENDING",
+                    "applicationStatus": "REFUNDPENDING",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "CHB_APPROVER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+                        },
+                        {
+                            "action": "FORWARDFORINSPECTION",
+                            "nextState": "INSPECTIONPENDING",
+                            "roles": [
+                                "CHB_APPROVER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+>>>>>>> niua-upstream/niua-dev-2.0
                         }
                     ]
                 },
                 {
                     "sla": null,
+<<<<<<< HEAD
                     "state": "APPROVED",
                     "applicationStatus": "APPROVED",
+=======
+                    "state": "INSPECTIONPENDING",
+                    "applicationStatus": "INSPECTIONPENDING",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "CHB_VERIFIER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+                        },
+                        {
+                            "action": "VERIFY",
+                            "nextState": "REFUNDAPPROVALPENDING",
+                            "roles": [
+                                "CHB_VERIFIER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+                        }
+                    ]
+                },
+                {
+                    "sla": null,
+                    "state": "REFUNDAPPROVALPENDING",
+                    "applicationStatus": "REFUNDAPPROVALPENDING",
+>>>>>>> niua-upstream/niua-dev-2.0
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": false,
                     "isStateUpdatable": false,
                     "actions": [
                         {
+<<<<<<< HEAD
                             "action": "REFUND",
                             "nextState": "BOOKING_COMPLETED",
                             "roles": [
                                 "CHB_APPROVER"
                             ]
+=======
+                            "action": "APPROVE",
+                            "nextState": "REFUNDAPPROVED",
+                            "roles": [
+                                "CHB_APPROVER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+                        },
+                        {
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "CHB_APPROVER",
+                                "CHB_CEMP"
+                            ],
+                            "active": true
+>>>>>>> niua-upstream/niua-dev-2.0
                         }
                     ]
                 },
@@ -129,8 +235,13 @@
                 },
                 {
                     "sla": null,
+<<<<<<< HEAD
                     "state": "BOOKING_COMPLETED",
                     "applicationStatus": "BOOKING_COMPLETED",
+=======
+                    "state": "REFUNDAPPROVED",
+                    "applicationStatus": "REFUNDAPPROVED",
+>>>>>>> niua-upstream/niua-dev-2.0
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": true,

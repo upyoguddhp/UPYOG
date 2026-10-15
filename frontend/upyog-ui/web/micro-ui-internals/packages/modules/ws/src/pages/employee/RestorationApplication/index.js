@@ -1,0 +1,45 @@
+import { Loader } from "@nudmcdgnpm/digit-ui-react-components";
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { newConfig as newConfigWS } from "../../../config/wsDisconnectionConfig";
+
+const DisconnectionApplication = () => {
+  const { t } = useTranslation();
+  const { path: modulePath } = Digit.Hooks.useModuleBasePath();
+  const basePath = useMemo(() => `${modulePath}/new-restoration`, [modulePath]);
+  const stateId = Digit.ULBService.getStateId();
+  let { data: newConfig, isLoading } = Digit.Hooks.ws.useWSConfigMDMS.WSDisconnectionConfig(stateId, {});
+
+  let config = [];
+
+  if (!isLoading) {
+    newConfig.forEach((obj) => {
+      config = config.concat(obj.body.filter((a) => !a.hideInCitizen));
+    });
+    config.indexRoute = "new-restoration";
+  } else {
+    return <Loader />
+  }
+
+  return (
+    <Routes>
+      {config.map((routeObj, index) => {
+        const { component, texts, inputs, key, isSkipEnabled } = routeObj;
+        const Component = Digit.ComponentRegistryService.getComponent("WSRestorationForm");
+        return (
+          <Route
+            path=""
+            key={index}
+            element={<Component config={{ texts, inputs, key, isSkipEnabled }} t={t} userType={"employee"} />}
+          />
+        );
+      })}
+
+      <Route path="*" element={<Navigate to="" replace />} />
+    </Routes>
+  );
+};
+
+export default DisconnectionApplication;
+

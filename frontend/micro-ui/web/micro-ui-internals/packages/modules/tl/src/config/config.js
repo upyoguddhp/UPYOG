@@ -195,14 +195,15 @@ export const newConfig = [
         {
             "type": "component",
             "route": "proof",
-            "component": "Proof",
+            "component": "TLProof",
             "withoutLabel": true,
             "texts": {
                 "headerCaption": "TL_OWNERS_DETAILS",
                 "header": "TL_OWNERS_PHOTOGRAPH_HEADER",
                 "cardText": "",
                 "nextText": "CS_COMMON_NEXT",
-                "submitBarLabel": "CS_COMMON_NEXT"
+                "submitBarLabel": "CS_COMMON_NEXT",
+                "isAsteriskRequired" : true
             },
             "key": "owners",
             "nextStep": null,
@@ -260,7 +261,7 @@ export const newConfig = [
         type: "component",
         route: "vehicle-type",
         isMandatory: true,
-        component: "SelectVehicleType",
+        component: "TLSelectVehicleType",
         texts: {
           headerCaption: "TL_STRUCTURE_SUBTYPE_CAPTION",
           header: "TL_VEHICLE_TYPE_HEADER",
@@ -386,7 +387,7 @@ export const newConfig = [
         type: "component",
         route: "owner-ship-details",
         isMandatory: true,
-        component: "SelectOwnerShipDetails",
+        component: "TLSelectOwnerShipDetails",
         texts: {
           headerCaption: "TL_TRADE_OWNERSHIP_CAPTION",
           header: "TL_PROVIDE_OWNERSHIP_DETAILS",
@@ -402,7 +403,7 @@ export const newConfig = [
         type: "component",
         route: "owner-details",
         key: "owners",
-        component: "SelectOwnerDetails",
+        component: "TLSelectOwnerDetails",
         texts: {
           headerCaption: "",
           header: "TL_OWNERSHIP_INFO_SUB_HEADER",
@@ -440,12 +441,13 @@ export const newConfig = [
         type: "component",
         route: "proof-of-identity",
         isMandatory: true,
-        component: "SelectProofIdentity",
+        component: "TLSelectProofIdentity",
         texts: {
           headerCaption: "TL_OWNERS_DETAILS",
           header: "TL_PROOF_IDENTITY_HEADER",
           cardText: "",
           submitBarLabel: "CS_COMMON_NEXT",
+          isAsteriskRequired : true,
           addMultipleText: "PT_COMMON_ADD_APPLICANT_LABEL",
         },
         key: "owners",

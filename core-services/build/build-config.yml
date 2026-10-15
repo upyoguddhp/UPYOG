@@ -46,6 +46,14 @@ config:
       - work-dir: "egov-filestore/src/main/resources/db"
         image-name: "egov-filestore-db"
 
+  - name: "builds/core-services/egov-pg-service"
+    build:
+      - work-dir: "egov-pg-service"
+        image-name: "egov-pg-service"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "egov-pg-service/src/main/resources/db"
+        image-name: "egov-pg-service-db"      
+
   - name: "builds/core-services/egov-idgen"
     build:
       - work-dir: "egov-idgen"
@@ -88,7 +96,7 @@ config:
     build:
       - work-dir: "egov-notification-mail"
         image-name: "egov-notification-mail"
-        dockerfile: "build/maven/Dockerfile"
+        dockerfile: "build/maven/Dockerfile"     
 
   - name: "builds/core-services/egov-notification-sms"
     build:
@@ -109,14 +117,6 @@ config:
       - work-dir: "egov-persister"
         image-name: "egov-persister"
         dockerfile: "build/maven/Dockerfile"
-
-  - name: "builds/core-services/egov-pg-service"
-    build:
-      - work-dir: "egov-pg-service"
-        image-name: "egov-pg-service"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "egov-pg-service/src/main/resources/db"
-        image-name: "egov-pg-service-db"
 
   - name: "builds/core-services/egov-searcher"
     build:
@@ -171,6 +171,18 @@ config:
       - work-dir: "zuul"
         image-name: "zuul"
         dockerfile: "build/maven/Dockerfile"
+        
+  - name: "builds/core-services/gateway"
+    build:
+      - work-dir: "gateway"
+        image-name: "gateway"
+        dockerfile: "build/maven/Dockerfile"      
+
+  - name: "builds/core-services/gateway"
+    build:
+      - work-dir: "gateway"
+        image-name: "gateway"
+        dockerfile: "build/maven/Dockerfile"      
 
   - name: "builds/core-services/internal-gateway"
     build:
@@ -272,4 +284,4 @@ config:
         image-name: "egov-document-uploader"
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "egov-document-uploader/src/main/resources/db"
-        image-name: "egov-document-uploader-db"
+        image-name: "egov-document-uploader-db"     

@@ -1,4 +1,4 @@
-import { ModuleCardFullWidth } from "@egovernments/digit-ui-react-components";
+import { ModuleCardFullWidth } from "@nudmcdgnpm/digit-ui-react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -7,7 +7,7 @@ const nationalScreenURLs = {
   propertytax: { key: "national-propertytax", stateKey: "propertytax", label: "NURT_PROPERTY_TAX", active: true, nActive: true },
   tradelicense: { key: "national-tradelicense", stateKey: "tradelicense", label: "NURT_TRADE_LICENCE", active: true, nActive: true },
   pgr: { key: "national-pgr", stateKey: "pgr", label: "NURT_COMPLAINS", active: true, nActive: true },
-  fsm: { key: "fsm", stateKey: "fsm", label: "CS_HOME_FSM_SERVICES", active: true, nActive: false },
+  fsm: { key: "national-fssm", stateKey: "fsm", label: "CS_HOME_FSM_SERVICES", active: true, nActive: true },
   mCollect: { key: "national-mcollect", stateKey: "mCollect", label: "NURT_MCOLLECT", active: true, nActive: true },
   ws: { key: "national-ws", stateKey: "ws", label: "NURT_WATER_SEWERAGE", active: true, nActive: true },
   obps: { key: "nss-obps", stateKey: "obps", label: "DSS_BUILDING_PERMISSION", active: true, nActive: true },
@@ -15,6 +15,12 @@ const nationalScreenURLs = {
   bnd: {key:"nss-birth-death",stateKey:"birth-death",label:"BIRTH_AND_DEATH",active:true,nActive:true},
   faqs: {key:"national-faqs",stateKey:"national-faqs",label:"DSS_FAQS",active:false,nActive:true,others:true},
   finance: {key:"national-finance",stateKey:"finance",label:"DSS_FINANCE",active:true,nActive:false},
+  sv: {key:"national-sv",stateKey:"streetVending",label:"DSS_STREET_VENDING",active:true,nActive:false},
+  ptr: {key:"national-ptr",stateKey:"petRegistration",label:"DSS_PET_REGISTRATION",active:true,nActive:false},
+  ewaste: {key:"national-ewaste",stateKey:"ewaste",label:"DSS_EWASTE_MANAGEMENT",active:true,nActive:false},
+  echallan: {key:"national-echallan",stateKey:"echallan",label:"DSS_ECHALLAN",active:true,nActive:false},
+  adv: {key:"national-adv",stateKey:"adv",label:"DSS_ADV",active:true,nActive:false},
+  chb: {key:"national-chb",stateKey:"chb",label:"DSS_CHB",active:true,nActive:false},
   about: {key:"national-about",stateKey:"national-about",label:"DSS_ABOUT_DASHBOARD",active:false,nActive:true,others:true},
 };
 
@@ -36,7 +42,6 @@ const NDSSCard = () => {
     .filter((ele) => ele["nActive"] === true)
     .map((obj) => ({
       label: t(obj?.label),
-      link: `/upyog-ui/employee/dss/dashboard/${obj?.key}`,
       link: obj?.others?`/upyog-ui/employee/dss/${obj?.key}`:`/upyog-ui/employee/dss/dashboard/${obj?.key}`,
     }));
 

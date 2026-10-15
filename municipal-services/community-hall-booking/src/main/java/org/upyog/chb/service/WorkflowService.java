@@ -7,6 +7,7 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +16,14 @@ import org.upyog.chb.constants.WorkflowStatus;
 import org.upyog.chb.repository.ServiceRequestRepository;
 import org.upyog.chb.web.models.CommunityHallBookingDetail;
 import org.upyog.chb.web.models.CommunityHallBookingRequest;
+=======
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.upyog.chb.config.CommunityHallBookingConfiguration;
+import org.upyog.chb.repository.ServiceRequestRepository;
+import org.upyog.chb.web.models.VenueBookingDetail;
+import org.upyog.chb.web.models.VenueBookingRequest;
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.upyog.chb.web.models.workflow.BusinessService;
 import org.upyog.chb.web.models.workflow.BusinessServiceResponse;
 import org.upyog.chb.web.models.workflow.ProcessInstance;
@@ -29,6 +38,7 @@ import digit.models.coremodels.RequestInfoWrapper;
 @Service
 public class WorkflowService {
 
+<<<<<<< HEAD
 	@Autowired
 	private CommunityHallBookingConfiguration configs;
 
@@ -50,11 +60,28 @@ public class WorkflowService {
 	public State callWorkFlow(ProcessInstanceRequest workflowReq) {
 
 		ProcessInstanceResponse response = null;
+=======
+	private final CommunityHallBookingConfiguration configs;
+	private final ServiceRequestRepository restRepo;
+	private final ObjectMapper mapper;
+
+	public WorkflowService(CommunityHallBookingConfiguration configs, ServiceRequestRepository restRepo,
+			ObjectMapper mapper) {
+		this.configs = configs;
+		this.restRepo = restRepo;
+		this.mapper = mapper;
+	}
+
+	public State callWorkFlow(ProcessInstanceRequest workflowReq) {
+
+		ProcessInstanceResponse response;
+>>>>>>> niua-upstream/niua-dev-2.0
 		StringBuilder url = new StringBuilder(configs.getWfHost().concat(configs.getWfTransitionPath()));
 		Object responseObject = restRepo.fetchResult(url, workflowReq);
 		response = mapper.convertValue(responseObject, ProcessInstanceResponse.class);
 		return response.getProcessInstances().get(0).getState();
 	}
+<<<<<<< HEAD
 	
 	/**
 	 * method to prepare process instance request 
@@ -89,12 +116,34 @@ public class WorkflowService {
 //		Workflow workflow = application.getWorkflow();	
 //		Asset asset = request.getProperty();
 		ProcessInstance workflow = null != bookingDetail.getWorkflow() ? bookingDetail.getWorkflow() : new ProcessInstance();
+=======
+
+	public State updateWorkflow(VenueBookingRequest bookingRequest) {
+
+		VenueBookingDetail bookingDetail = bookingRequest.getVenueBookingApplication();
+
+		ProcessInstanceRequest workflowReq = getProcessInstanceForHallBooking(bookingDetail,
+				bookingRequest.getRequestInfo());
+
+		return callWorkFlow(workflowReq);
+	}
+
+	private ProcessInstanceRequest getProcessInstanceForHallBooking(VenueBookingDetail bookingDetail,
+			RequestInfo requestInfo) {
+
+		ProcessInstance workflow = null != bookingDetail.getWorkflow() ? bookingDetail.getWorkflow()
+				: new ProcessInstance();
+>>>>>>> niua-upstream/niua-dev-2.0
 
 		ProcessInstance processInstance = new ProcessInstance();
 		processInstance.setBusinessId(bookingDetail.getBookingNo());
 		processInstance.setAction(workflow.getAction());
 		processInstance.setModuleName(workflow.getModuleName());
+<<<<<<< HEAD
 		processInstance.setTenantId("hp");//bookingDetail.getTenantId()
+=======
+		processInstance.setTenantId(bookingDetail.getTenantId());
+>>>>>>> niua-upstream/niua-dev-2.0
 		processInstance.setBusinessService(workflow.getBusinessService());
 		processInstance.setDocuments(workflow.getDocuments());
 		processInstance.setComment(workflow.getComment());
@@ -111,6 +160,7 @@ public class WorkflowService {
 			processInstance.setAssignes(users);
 		}
 
+<<<<<<< HEAD
 		//return processInstance;
 		return ProcessInstanceRequest.builder()
 				.requestInfo(requestInfo)
@@ -125,12 +175,23 @@ public class WorkflowService {
 	 * @param requestInfo The RequestInfo object of the request
 	 * @return BusinessService for the the given tenantId
 	 */
+=======
+		return ProcessInstanceRequest.builder().requestInfo(requestInfo)
+				.processInstances(Arrays.asList(processInstance)).build();
+
+	}
+
+>>>>>>> niua-upstream/niua-dev-2.0
 	public BusinessService getBusinessService(String tenantId, String businessService, RequestInfo requestInfo) {
 
 		StringBuilder url = getSearchURLWithParams(tenantId, businessService);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object responseObject = restRepo.fetchResult(url, requestInfoWrapper);
+<<<<<<< HEAD
 		BusinessServiceResponse response = null;
+=======
+		BusinessServiceResponse response;
+>>>>>>> niua-upstream/niua-dev-2.0
 		try {
 			response = mapper.convertValue(responseObject, BusinessServiceResponse.class);
 		} catch (IllegalArgumentException e) {
@@ -144,12 +205,15 @@ public class WorkflowService {
 		return response.getBusinessServices().get(0);
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Creates url for search based on given tenantId
 	 *
 	 * @param tenantId The tenantId for which url is generated
 	 * @return The search url
 	 */
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 	private StringBuilder getSearchURLWithParams(String tenantId, String businessService) {
 
 		StringBuilder url = new StringBuilder(configs.getWfHost());
@@ -161,6 +225,7 @@ public class WorkflowService {
 		return url;
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Returns boolean value to specifying if the state is updatable
 	 * 
@@ -168,11 +233,14 @@ public class WorkflowService {
 	 * @param businessService The BusinessService of the application flow
 	 * @return State object to be fetched
 	 */
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 	public Boolean isStateUpdatable(String stateCode, BusinessService businessService) {
 		for (State state : businessService.getStates()) {
 			if (state.getState() != null && state.getState().equalsIgnoreCase(stateCode))
 				return state.getIsStateUpdatable();
 		}
+<<<<<<< HEAD
 		return null;
 	}
 
@@ -185,6 +253,14 @@ public class WorkflowService {
 
 		StringBuilder url = new StringBuilder(configs.getWfHost());
 		//url.append(configs.getWfProcessInstanceSearchPath());
+=======
+		return Boolean.FALSE;
+	}
+
+	private StringBuilder getWorkflowSearchURLWithParams(String tenantId, String businessId) {
+
+		StringBuilder url = new StringBuilder(configs.getWfHost());
+>>>>>>> niua-upstream/niua-dev-2.0
 		url.append("?tenantId=");
 		url.append(tenantId);
 		url.append("&businessIds=");
@@ -192,11 +268,14 @@ public class WorkflowService {
 		return url;
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Fetches the workflow object for the given assessment
 	 * 
 	 * @return
 	 */
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 	public State getCurrentState(RequestInfo requestInfo, String tenantId, String businessId) {
 
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
@@ -204,7 +283,11 @@ public class WorkflowService {
 		StringBuilder url = getWorkflowSearchURLWithParams(tenantId, businessId);
 
 		Object responseObject = restRepo.fetchResult(url, requestInfoWrapper);
+<<<<<<< HEAD
 		ProcessInstanceResponse response = null;
+=======
+		ProcessInstanceResponse response;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 		try {
 			response = mapper.convertValue(responseObject, ProcessInstanceResponse.class);
@@ -219,4 +302,8 @@ public class WorkflowService {
 		return null;
 	}
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> niua-upstream/niua-dev-2.0

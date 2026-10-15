@@ -20,6 +20,7 @@ import org.egov.waterconnection.web.models.collection.BillResponse;
 import org.egov.waterconnection.web.models.collection.Payment;
 import org.egov.waterconnection.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,7 @@ public class CalculationService {
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
-    
+
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
 
@@ -52,6 +53,7 @@ public class CalculationService {
 	private WaterDao waterDao;
 
 	@Autowired
+	@Lazy
 	private WaterService waterService;
 
 	@Autowired
@@ -151,17 +153,6 @@ public class CalculationService {
 		}
 		return isNoPayment;
 	}
-
-	private StringBuilder getFetchBillURL(String tenantId, String connectionNo) {
-
-		return new StringBuilder().append(config.getBillingServiceHost())
-				.append(config.getFetchBillEndPoint()).append(WCConstants.URL_PARAMS_SEPARATER)
-				.append(WCConstants.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
-				.append(WCConstants.SEPARATER).append(WCConstants.CONSUMER_CODE_SEARCH_FIELD_NAME)
-				.append(connectionNo).append(WCConstants.SEPARATER)
-				.append(WCConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
-				.append(WCConstants.WATER_TAX_SERVICE_CODE);
-	}
 	
 	private StringBuilder getFetchBillURLForReconnect(String tenantId, String connectionNo) {
 
@@ -172,5 +163,16 @@ public class CalculationService {
 				.append(connectionNo).append(WCConstants.SEPARATER)
 				.append(WCConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
 				.append("WSReconnection");
+	}
+
+	private StringBuilder getFetchBillURL(String tenantId, String connectionNo) {
+
+		return new StringBuilder().append(config.getBillingServiceHost())
+				.append(config.getFetchBillEndPoint()).append(WCConstants.URL_PARAMS_SEPARATER)
+				.append(WCConstants.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(WCConstants.SEPARATER).append(WCConstants.CONSUMER_CODE_SEARCH_FIELD_NAME)
+				.append(connectionNo).append(WCConstants.SEPARATER)
+				.append(WCConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
+				.append(WCConstants.WATER_TAX_SERVICE_CODE);
 	}
 }

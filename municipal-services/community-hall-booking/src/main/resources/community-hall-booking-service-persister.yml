@@ -8,6 +8,7 @@ serviceMaps:
    queryMaps:
 
        - query: INSERT INTO public.community_hall_booking_init(booking_id, tenant_id, community_hall_id, booking_status, booking_details, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?); 
+<<<<<<< HEAD
          basePath: hallsBookingApplication
          jsonMaps:
           - jsonPath: $.hallsBookingApplication.bookingId
@@ -29,6 +30,29 @@ serviceMaps:
           - jsonPath: $.hallsBookingApplication.lastModifiedBy
           
           - jsonPath: $.hallsBookingApplication.lastModifiedDate
+=======
+         basePath: venueBookingApplication
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.bookingId
+
+          - jsonPath: $.venueBookingApplication.tenantId
+          
+          - jsonPath: $.venueBookingApplication.communityHallId
+          
+          - jsonPath: $.venueBookingApplication.bookingStatus
+
+          - jsonPath: $.venueBookingApplication.bookingDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.venueBookingApplication.createdBy
+          
+          - jsonPath: $.venueBookingApplication.createdDate
+          
+          - jsonPath: $.venueBookingApplication.lastModifiedBy
+          
+          - jsonPath: $.venueBookingApplication.lastModifiedDate
+>>>>>>> niua-upstream/niua-dev-2.0
 
 
 
@@ -38,6 +62,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
+<<<<<<< HEAD
        - query: INSERT INTO public.eg_chb_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, community_hall_code, booking_status, special_category, purpose, purpose_description, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: hallsBookingApplication
          jsonMaps:
@@ -173,11 +198,168 @@ serviceMaps:
           - jsonPath: $.hallsBookingApplication.address.localityCode
           
           
+=======
+       - query: INSERT INTO public.eg_chb_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id,venue_type, venue_code, booking_status, special_category, purpose, purpose_description, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?);
+         basePath: venueBookingApplication
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.bookingId
+          
+          - jsonPath: $.venueBookingApplication.bookingNo
+
+          - jsonPath: $.venueBookingApplication.paymentDate
+          
+          - jsonPath: $.venueBookingApplication.applicationDate
+
+          - jsonPath: $.venueBookingApplication.tenantId
+
+          - jsonPath: $.venueBookingApplication.venueType
+
+          - jsonPath: $.venueBookingApplication.venueCode
+          
+          - jsonPath: $.venueBookingApplication.bookingStatus
+        
+          - jsonPath: $.venueBookingApplication.specialCategory.category
+          
+          - jsonPath: $.venueBookingApplication.purpose.purpose
+          
+          - jsonPath: $.venueBookingApplication.purposeDescription
+
+          - jsonPath: $.venueBookingApplication.receiptNo
+
+          - jsonPath: $.venueBookingApplication.auditDetails.createdBy
+          
+          - jsonPath: $.venueBookingApplication.auditDetails.createdTime
+          
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedBy
+
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedTime
+          
+       - query: INSERT INTO public.eg_chb_slot_detail(slot_id, booking_id, unit_code, capacity, booking_date, booking_from_time, booking_to_time, status, 
+               createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?);
+         basePath: venueBookingApplication.bookingSlotDetails.*
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.slotId
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.bookingId
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.unitCode
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.capacity
+          
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.bookingDate
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.bookingFromTime
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.bookingToTime
+
+          - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.status
+
+          - jsonPath: $.venueBookingApplication.auditDetails.createdBy
+          
+          - jsonPath: $.venueBookingApplication.auditDetails.createdTime
+
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedBy
+
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedTime
+          
+       - query: INSERT INTO public.eg_chb_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby,
+               lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: venueBookingApplication.documents.*
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.documents.*.documentDetailId
+
+          - jsonPath: $.venueBookingApplication.documents.*.bookingId
+
+          - jsonPath: $.venueBookingApplication.documents.*.documentType
+
+          - jsonPath: $.venueBookingApplication.documents.*.fileStoreId
+
+          - jsonPath: $.venueBookingApplication.auditDetails.createdBy
+
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedBy
+
+          - jsonPath: $.venueBookingApplication.auditDetails.createdTime
+
+          - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedTime
+          
+       - query: INSERT INTO public.eg_chb_applicant_detail(applicant_detail_id, booking_id, applicant_name, applicant_email_id, applicant_mobile_no, applicant_alternate_mobile_no, account_no, ifsc_code, bank_name, bank_branch_name, account_holder_name, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: venueBookingApplication.applicantDetail
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.applicantDetail.applicantDetailId
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.bookingId
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.applicantName
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.applicantEmailId
+          
+          - jsonPath: $.venueBookingApplication.applicantDetail.applicantMobileNo
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.applicantAlternateMobileNo
+          
+          - jsonPath: $.venueBookingApplication.applicantDetail.accountNumber
+          
+          - jsonPath: $.venueBookingApplication.applicantDetail.ifscCode
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.bankName
+          
+          - jsonPath: $.venueBookingApplication.applicantDetail.bankBranchName
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.accountHolderName
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.auditDetails.createdBy
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.auditDetails.lastModifiedBy
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.auditDetails.createdTime
+
+          - jsonPath: $.venueBookingApplication.applicantDetail.auditDetails.lastModifiedTime
+       
+       - query: INSERT INTO public.eg_chb_address_detail(address_id, applicant_detail_id, door_no, house_no, street_name, address_line_1, landmark, city, city_code, locality, locality_code, pincode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: venueBookingApplication.address
+
+         jsonMaps:
+          - jsonPath: $.venueBookingApplication.address.addressId
+
+          - jsonPath: $.venueBookingApplication.address.applicantDetailId
+
+          - jsonPath: $.venueBookingApplication.address.doorNo
+
+          - jsonPath: $.venueBookingApplication.address.houseNo
+
+          - jsonPath: $.venueBookingApplication.address.streetName
+
+          - jsonPath: $.venueBookingApplication.address.addressLine1
+
+          - jsonPath: $.venueBookingApplication.address.landmark
+
+          - jsonPath: $.venueBookingApplication.address.city
+
+          - jsonPath: $.venueBookingApplication.address.cityCode
+
+          - jsonPath: $.venueBookingApplication.address.locality
+
+          - jsonPath: $.venueBookingApplication.address.localityCode
+
+          - jsonPath: $.venueBookingApplication.address.pincode
+          
+       - query: INSERT INTO public.eg_chb_booking_detail_audit SELECT * FROM public.eg_chb_booking_detail WHERE booking_id = ?;
+         basePath: venueBookingApplication
+         jsonMaps:
+            - jsonPath: $.venueBookingApplication.bookingId
+
+       - query: INSERT INTO public.eg_chb_slot_detail_audit SELECT * FROM public.eg_chb_slot_detail WHERE slot_id = ?;
+         basePath: venueBookingApplication.bookingSlotDetails.*
+         jsonMaps:
+            - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.slotId
+
+>>>>>>> niua-upstream/niua-dev-2.0
  - version: 1.0
    description: Update community hall booking details after application is changed
    fromTopic: update-community-hall-booking
    isTransaction: true
    queryMaps:
+<<<<<<< HEAD
        - query: UPDATE public.eg_chb_booking_detail SET booking_status= ?, payment_date = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE booking_id = ?;
          basePath: hallsBookingApplication
          jsonMaps:
@@ -195,3 +377,34 @@ serviceMaps:
            - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
            - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
            - jsonPath: $.hallsBookingApplication.bookingId
+=======
+       - query: UPDATE public.eg_chb_booking_detail SET booking_status= ?, payment_date = ?, receipt_no = ?, lastmodifiedby = ?, lastmodifiedtime = ?, permission_letter_filestore_id = ?, payment_receipt_filestore_id = ? WHERE booking_id = ?;
+         basePath: venueBookingApplication
+         jsonMaps:
+           - jsonPath: $.venueBookingApplication.bookingStatus
+           - jsonPath: $.venueBookingApplication.paymentDate
+           - jsonPath: $.venueBookingApplication.receiptNo
+           - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedBy
+           - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedTime
+           - jsonPath: $.venueBookingApplication.permissionLetterFilestoreId
+           - jsonPath: $.venueBookingApplication.paymentReceiptFilestoreId
+           - jsonPath: $.venueBookingApplication.bookingId
+
+       - query: UPDATE public.eg_chb_slot_detail SET status=?, lastmodifiedby=?, lastmodifiedtime=? WHERE slot_id=?
+         basePath: venueBookingApplication.bookingSlotDetails.*
+         jsonMaps:
+           - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.status
+           - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedBy
+           - jsonPath: $.venueBookingApplication.auditDetails.lastModifiedTime
+           - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.slotId
+
+       - query: INSERT INTO public.eg_chb_booking_detail_audit SELECT * FROM public.eg_chb_booking_detail WHERE booking_id = ?;
+         basePath: venueBookingApplication
+         jsonMaps:
+            - jsonPath: $.venueBookingApplication.bookingId
+
+       - query: INSERT INTO public.eg_chb_slot_detail_audit SELECT * FROM public.eg_chb_slot_detail WHERE slot_id = ?;
+         basePath: venueBookingApplication.bookingSlotDetails.*
+         jsonMaps:
+            - jsonPath: $.venueBookingApplication.bookingSlotDetails.*.slotId
+>>>>>>> niua-upstream/niua-dev-2.0

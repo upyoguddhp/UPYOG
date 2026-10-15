@@ -1,7 +1,8 @@
 package digit.service;
 
-import digit.models.coremodels.AuditDetails;
+//import digit.models.coremodels.AuditDetails;
 import digit.web.models.*;
+import org.egov.common.contract.models.AuditDetails;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.stereotype.Component;
 
@@ -102,5 +103,19 @@ public class ServiceRequestEnrichmentService {
         serviceRequest.getService().getAttributes().forEach(attributeValue -> {
             attributeValue.setValue(attributeCodeVsValueMap.get(attributeValue.getAttributeCode()));
         });
+    }
+
+    public void updateServiceDefinitionRequest(ServiceDefinitionRequest serviceDefinitionRequest) {
+    	ServiceDefinition serviceDefinition = serviceDefinitionRequest.getServiceDefinition();
+        RequestInfo requestInfo = serviceDefinitionRequest.getRequestInfo();
+
+        AuditDetails auditDetails = new AuditDetails();
+        auditDetails.setCreatedBy(requestInfo.getUserInfo().getUuid());
+        auditDetails.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+        auditDetails.setCreatedTime(System.currentTimeMillis());
+        auditDetails.setLastModifiedTime(System.currentTimeMillis());
+
+        serviceDefinition.setAuditDetails(auditDetails);
+
     }
 }

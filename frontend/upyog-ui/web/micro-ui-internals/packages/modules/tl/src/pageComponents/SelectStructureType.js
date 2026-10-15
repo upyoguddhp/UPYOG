@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { TypeSelectCard } from "@egovernments/digit-ui-react-components";
-import { FormStep, RadioOrSelect, RadioButtons } from "@egovernments/digit-ui-react-components";
+import { TypeSelectCard } from "@nudmcdgnpm/digit-ui-react-components";
+import { RadioOrSelect, RadioButtons } from "@nudmcdgnpm/digit-ui-react-components";
 import Timeline from "../components/TLTimeline";
-
+import {FormStep} from "@nudmcdgnpm/digit-ui-react-components"
 const SelectStructureType = ({ t, config, onSelect, userType, formData }) => {
   const [StructureType, setStructureType] = useState(formData?.TradeDetails?.StructureType);
   const isEdit = window.location.href.includes("/edit-application/")||window.location.href.includes("renew-trade");

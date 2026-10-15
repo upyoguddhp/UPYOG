@@ -1,12 +1,7 @@
 package com.ingestpipeline.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.elasticsearch.action.search.SearchRequest;
@@ -59,6 +54,12 @@ public class ElasticService implements IESService {
 
 	@Value("${services.esindexer.host}")
 	private String indexerServiceHost;
+
+	@Value("${services.esindexer.username}")
+	private String userName;
+
+	@Value("${services.esindexer.password}")
+	private String password;
 	@Value("${es.target.index.name}")
 	private String targetIndexName;
 
@@ -156,19 +157,22 @@ public class ElasticService implements IESService {
     public Map search(String index, String searchQuery) throws Exception {
 
         String url = indexServiceHost + index + indexServiceHostSearch;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
+        HttpHeaders headers = getHttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+		LOGGER.info("Headers: " + headers.toString());
         LOGGER.info("searching ES for query::" + searchQuery + "::on::" + index + "::ON URL::" + url);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(searchQuery, headers);
 
         try {
 			ResponseEntity<Object> response = retryTemplate.postForEntity(url,requestEntity);
-
+			LOGGER.error("--response inside search: " , response);
             Map responseNode = new ObjectMapper().convertValue(response.getBody(), Map.class);
+            LOGGER.error("--responseNode inside search: " , responseNode);
 			Map hits = (Map)responseNode.get("hits");
-            if((Integer)hits.get("total") >=1)
+			LOGGER.error("--hits inside search : " , hits);
+			Map hitsTotalMap = (Map)hits.get("total");
+            if((Integer)hitsTotalMap.get("value") >=1)
                 return (Map)((ArrayList)hits.get("hits")).get(0);
 
         } catch (HttpClientErrorException e) {
@@ -176,11 +180,15 @@ public class ElasticService implements IESService {
             LOGGER.error("client error while searching ES : " + e.getMessage());
 
         }
+         catch (Exception e) {
+        	 LOGGER.error("EXCEPTION on ES search : " , e.getMessage());
+         }
         return null;
     }
 	
 	@Override
 	public Boolean push(Map requestBody) throws Exception {
+		LOGGER.info("----INSIDE push of ElasticService----  collectionIndexName: "+collectionIndexName);
 
 		Object id = requestBody.get(Constants.IDENTIFIER);
 		Object trxid = ((Map)requestBody.get(Constants.DATA_OBJECT)).get(Constants.TRANSACTION_ID);
@@ -194,9 +202,9 @@ public class ElasticService implements IESService {
 		LOGGER.info("url ## " +url);
 
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
+		HttpHeaders headers = getHttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+		LOGGER.info("Headers: " + headers.toString());
 		LOGGER.info("Posting request to ES on ::" + collectionIndexName + " with doc id:: "+docId);
 
 		JsonNode request = new ObjectMapper().convertValue(requestBody, JsonNode.class);
@@ -223,7 +231,7 @@ public class ElasticService implements IESService {
 
 	@Override
 	public Boolean push(TargetData requestBody) throws Exception {
-
+		LOGGER.info("----INSIDE push of ElasticService(TargetData)----targetIndexName: " +targetIndexName );
 		Long currentDateTime = new Date().getTime();
 		String url = indexerServiceHost + targetIndexName + DOC_TYPE + requestBody.getId();
 
@@ -311,10 +319,13 @@ public class ElasticService implements IESService {
 	
 	@Override
     public List searchMultiple(String index, String searchQuery) throws Exception {
-
+		LOGGER.info("searchMultiple ES for query: " + searchQuery + " on " + index);
         String url = indexServiceHost + index + indexServiceHostSearch;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        //HttpHeaders headers = new HttpHeaders();
+        //headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpHeaders headers = getHttpHeaders();
+        LOGGER.info("headers inside searchMultiple" +headers);
+        
 
         LOGGER.info("searching searchMultiple ES for query::" + searchQuery + "::on::" + index + "::ON URL::" + url);
 
@@ -322,11 +333,17 @@ public class ElasticService implements IESService {
 
         try {
 			ResponseEntity<Object> response = retryTemplate.postForEntity(url,requestEntity);
-
+			LOGGER.error("--response inside searchMultiple : " , response);
             Map responseNode = new ObjectMapper().convertValue(response.getBody(), Map.class);
+            LOGGER.error("--responseNode inside searchMultiple : " , responseNode);
 			Map hits = (Map)responseNode.get("hits");
-            if((Integer)hits.get("total") >=1)
-                return (List) ((ArrayList)hits.get("hits"));
+			LOGGER.error("--hits inside searchMultiple : " , hits);
+			Map hitsTotalMap = (Map)hits.get("total");
+            if((Integer)hitsTotalMap.get("value") >=1)
+            	return (List) hits.get("hits");
+            
+//            if((Integer)hits.get("total") >=1)
+//                return (List) ((ArrayList)hits.get("hits"));
 
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
@@ -434,8 +451,21 @@ public class ElasticService implements IESService {
 	
 	private HttpHeaders getHttpHeaders() { 
 		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", getESEncodedCredentials());
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		List<MediaType> mediaTypes = new ArrayList<>();
+		mediaTypes.add(MediaType.APPLICATION_JSON);
+		headers.setAccept(mediaTypes);
 		return headers;
+	}
+
+	public String getESEncodedCredentials() {
+		String credentials = userName + ":" + password;
+		byte[] credentialsBytes = credentials.getBytes();
+		byte[] base64CredentialsBytes = Base64.getEncoder().encode(credentialsBytes);
+		return "Basic " + new String(base64CredentialsBytes);
 	}
 
 

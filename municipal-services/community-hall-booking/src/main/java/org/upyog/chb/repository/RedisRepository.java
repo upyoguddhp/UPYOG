@@ -2,6 +2,7 @@ package org.upyog.chb.repository;
 
 import org.springframework.stereotype.Repository;
 
+<<<<<<< HEAD
 @Repository
 //@Slf4j
 public class RedisRepository {
@@ -26,4 +27,11 @@ public class RedisRepository {
 	 * { return availabilityDetail.getTenantId() + ":" +
 	 * availabilityDetail.hashCode(); }
 	 */
+=======
+/**
+ * Placeholder repository for future Redis-backed slot availability caching.
+ */
+@Repository
+public class RedisRepository {
+>>>>>>> niua-upstream/niua-dev-2.0
 }

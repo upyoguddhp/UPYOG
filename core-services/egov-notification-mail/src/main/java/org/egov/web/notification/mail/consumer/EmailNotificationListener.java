@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EmailNotificationListener {
 
@@ -27,25 +30,11 @@ public class EmailNotificationListener {
 
     @KafkaListener(topics = "${kafka.topics.notification.mail.name}")
     public void listen(final HashMap<String, Object> record) {
-    	//EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
-        //emailService.sendEmail(emailRequest.getEmail());
-        System.out.println("Printing Records for Kakfka Water topic");
-        
-      	
-
-    	try {
-			EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
-			emailService.sendEmail(emailRequest.getEmail());
-		} catch (IllegalArgumentException ex) {
-			Email emailRequest = objectMapper.convertValue(record, Email.class);
-	        emailService.sendEmail(emailRequest);
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
-    	System.out.println("Printing Records for Kakfka Water topic");
-    	
-        System.out.println("Recors is ================================"+record);
+       // log.info("Entering mail topic");
+    	EmailRequest emailRequest = objectMapper.convertValue(record, EmailRequest.class);
+        emailService.sendEmail(emailRequest.getEmail());
+       //log.info("Printing Records");
+       //log.info("Recors is ================================"+record);
 
         
     }

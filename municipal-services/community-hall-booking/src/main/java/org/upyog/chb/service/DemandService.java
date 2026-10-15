@@ -7,7 +7,10 @@ import java.util.List;
 
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.springframework.stereotype.Service;
 import org.upyog.chb.config.CommunityHallBookingConfiguration;
 import org.upyog.chb.constants.CommunityHallBookingConstants;
@@ -15,8 +18,14 @@ import org.upyog.chb.repository.DemandRepository;
 import org.upyog.chb.util.CommunityHallBookingUtil;
 import org.upyog.chb.util.MdmsUtil;
 import org.upyog.chb.validator.CommunityHallBookingValidator;
+<<<<<<< HEAD
 import org.upyog.chb.web.models.CommunityHallBookingDetail;
 import org.upyog.chb.web.models.CommunityHallBookingRequest;
+=======
+import org.upyog.chb.web.models.VenueBookingDetail;
+import org.upyog.chb.web.models.VenueBookingRequest;
+import org.upyog.chb.web.models.BookingSlotDetail;
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.upyog.chb.web.models.CommunityHallDemandEstimationCriteria;
 import org.upyog.chb.web.models.billing.Demand;
 import org.upyog.chb.web.models.billing.DemandDetail;
@@ -27,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DemandService {
 
+<<<<<<< HEAD
 	@Autowired
 	private CommunityHallBookingConfiguration config;
 	
@@ -57,6 +67,28 @@ public class DemandService {
 		String consumerCode = bookingRequest.getHallsBookingApplication().getBookingNo();
 		
 		CommunityHallBookingDetail bookingDetail = bookingRequest.getHallsBookingApplication();
+=======
+	private final CommunityHallBookingConfiguration config;
+	private final CalculationService calculationService;
+	private final DemandRepository demandRepository;
+	private final CommunityHallBookingValidator bookingValidator;
+	private final MdmsUtil mdmsUtil;
+
+	public DemandService(CommunityHallBookingConfiguration config, CalculationService calculationService,
+			DemandRepository demandRepository, CommunityHallBookingValidator bookingValidator, MdmsUtil mdmsUtil) {
+		this.config = config;
+		this.calculationService = calculationService;
+		this.demandRepository = demandRepository;
+		this.bookingValidator = bookingValidator;
+		this.mdmsUtil = mdmsUtil;
+	}
+
+	public List<Demand> createDemand(VenueBookingRequest bookingRequest, boolean generateDemand) {
+		String tenantId = bookingRequest.getVenueBookingApplication().getTenantId();
+		String consumerCode = bookingRequest.getVenueBookingApplication().getBookingNo();
+		
+		VenueBookingDetail bookingDetail = bookingRequest.getVenueBookingApplication();
+>>>>>>> niua-upstream/niua-dev-2.0
 		User user =bookingRequest.getRequestInfo().getUserInfo();
 		
 		User owner = User.builder().name(user.getName()).emailId(user.getEmailId())
@@ -76,7 +108,11 @@ public class DemandService {
 		List<Demand> demands = new ArrayList<>();
 		demands.add(demand);
 		if(!generateDemand) {
+<<<<<<< HEAD
 			BigDecimal totalAmount = demandDetails.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+=======
+			BigDecimal totalAmount = demandDetails.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add).abs();
+>>>>>>> niua-upstream/niua-dev-2.0
 			demand.setAdditionalDetails(totalAmount);
 			return demands;
 		}
@@ -92,6 +128,7 @@ public class DemandService {
 			throw new CustomException(CommunityHallBookingConstants.MULTIPLE_HALL_CODES_ERROR, "Booking of multiple halls are not allowed");
 		}
 		
+<<<<<<< HEAD
 		String tenantId = estimationCriteria.getTenantId().split("\\.")[0];
 		if (estimationCriteria.getTenantId().split("\\.").length == 1) {
 			throw new CustomException(CommunityHallBookingConstants.INVALID_TENANT, "Please provide valid tenant id for booking creation");
@@ -116,4 +153,26 @@ public class DemandService {
 	
 	
 
+=======
+		if (estimationCriteria.getTenantId().split("\\.").length == 1) {
+			throw new CustomException(CommunityHallBookingConstants.INVALID_TENANT, "Please provide valid tenant id for booking creation");
+		}
+		
+		String tenantId = estimationCriteria.getTenantId();
+		
+		VenueBookingDetail bookingDetail = VenueBookingDetail.builder().tenantId(tenantId)
+				.bookingSlotDetails(estimationCriteria.getBookingSlotDetails())
+				.venueCode(estimationCriteria.getVenueCode()).build();
+		VenueBookingRequest bookingRequest = VenueBookingRequest.builder().venueBookingApplication(bookingDetail)
+				.requestInfo(estimationCriteria.getRequestInfo()).build();
+		mdmsUtil.mDMSCall(bookingRequest.getRequestInfo(), tenantId);
+		return createDemand(bookingRequest, false);
+	}
+	
+	private LocalDate getMaxBookingDate(VenueBookingDetail bookingDetail) {
+		return bookingDetail.getBookingSlotDetails().stream().map(BookingSlotDetail::getBookingDate)
+				.max(LocalDate::compareTo)
+		        .orElseThrow(() -> new CustomException("INVALID_BOOKING_DATE", "Booking date is not valid."));
+	}
+>>>>>>> niua-upstream/niua-dev-2.0
 }

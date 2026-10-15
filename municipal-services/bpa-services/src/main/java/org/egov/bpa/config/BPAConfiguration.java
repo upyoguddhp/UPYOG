@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -161,6 +161,9 @@ public class BPAConfiguration {
 	@Value("${egov.bpa.calculator.calculate.endpoint}")
 	private String calulatorEndPoint;
 
+	@Value("${egov.bpa.calculator.estimate.endpoint}")
+	private String BpaCalculationEstimateEndpoint;
+	
 	@Value("${egov.billingservice.host}")
 	private String billingHost;
 
@@ -173,6 +176,12 @@ public class BPAConfiguration {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
+	
+//	@Value("${mdms.v2.host}")
+//    private String mdmsHost;
+//
+//    @Value("${mdms.v2.search.endpoint}")
+//    private String mdmsEndPoint;
 
 	// Allowed Search Parameters
 	@Value("${citizen.allowed.search.params}")
@@ -210,8 +219,8 @@ public class BPAConfiguration {
 	private Boolean isExternalWorkFlowEnabled;
 
 	// USER EVENTS
-	@Value("${egov.ui.app.host}")
-	private String uiAppHost;
+	@Value("#{${egov.ui.app.host.map}}")
+	private Map<String, String>  uiAppHostMap;
 
 	@Value("${egov.usr.events.create.topic}")
 	private String saveUserEventsTopic;
@@ -346,5 +355,17 @@ public class BPAConfiguration {
 
 	@Value("${egov.bpa.application.details.link}")
 	private String applicationDetailsLink;
+	
+	@Value("${persister.save.preapprovedplan.topic}")
+	private String savePreApprovedPlanTopicName;
+
+	@Value("${persister.update.preapprovedplan.topic}")
+	private String updatePreApprovedPlanTopicName;
+
+	  @Value("${egov.idgen.bpa.drawingNum.name}")
+	  private String drawingNoIdGenName;
+
+	  @Value("${egov.idgen.bpa.drawingNum.format}")
+	  private String drawingNoIdGenFormat;
 
 }

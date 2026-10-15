@@ -1,9 +1,10 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient as TanstackQueryClient, QueryClientProvider as TanstackQueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { getI18n } from "react-i18next";
-import { Body, Loader } from "@egovernments/digit-ui-react-components";
+import { Body, Loader } from "@nudmcdgnpm/digit-ui-react-components";
 import { DigitApp } from "./App";
 import SelectOtp from "./pages/citizen/Login/SelectOtp";
 import AcknowledgementCF from "./components/AcknowledgementCF";
@@ -11,8 +12,10 @@ import CitizenFeedback from "./components/CitizenFeedback";
 
 import getStore from "./redux/store";
 import ErrorBoundary from "./components/ErrorBoundaries";
+import EmployeeDashboard from "./components/EmployeeDashboard";
 import { useState } from "react";
-
+import EDCRAcknowledgement from "./pages/citizen/Home/EDCR/EDCRAcknowledgement"
+import CreateAnonymousEDCR from "./pages/citizen/Home/EDCR";
 const DigitUIWrapper = ({ stateCode, enabledModules, moduleReducers }) => {
   const { isLoading, data: initData } = Digit.Hooks.useInitStore(stateCode, enabledModules);
   if (isLoading) {
@@ -27,9 +30,9 @@ const DigitUIWrapper = ({ stateCode, enabledModules, moduleReducers }) => {
           <DigitApp
             initData={initData}
             stateCode={stateCode}
-            modules={initData?.modules}
-            appTenants={initData.tenants}
-            logoUrl={initData?.stateInfo?.logoUrl}
+            modules={initData?.modules || []}
+            appTenants={initData?.tenants || []}
+            logoUrl={initData?.stateInfo?.logoUrl || ""}
           />
         </Body>
       </Router>
@@ -38,7 +41,6 @@ const DigitUIWrapper = ({ stateCode, enabledModules, moduleReducers }) => {
 };
 
 export const DigitUI = ({ stateCode, registry, enabledModules, moduleReducers }) => {
-  const [privacy, setPrivacy] = useState(Digit.Utils.getPrivacyObject() || {});
   const userType = Digit.UserService.getType();
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -46,14 +48,20 @@ export const DigitUI = ({ stateCode, registry, enabledModules, moduleReducers })
         staleTime: 15 * 60 * 1000,
         cacheTime: 50 * 60 * 1000,
         retryDelay: (attemptIndex) => Infinity,
-        retry:false
-        /*
-          enable this to have auto retry incase of failure
-          retryDelay: attemptIndex => Math.min(1000 * 3 ** attemptIndex, 60000)
-         */
+        retry: false,
       },
     },
   });
+  const tanstackQueryClient = new TanstackQueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 15 * 60 * 1000,
+        gcTime: 50 * 60 * 1000,
+        retry: false,
+      },
+    },
+  });
+  const [privacy, setPrivacy] = useState(Digit.Utils.getPrivacyObject() || {});
 
   const ComponentProvider = Digit.Contexts.ComponentProvider;
   const PrivacyProvider = Digit.Contexts.PrivacyProvider;
@@ -64,6 +72,7 @@ export const DigitUI = ({ stateCode, registry, enabledModules, moduleReducers })
     <div>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
+          <TanstackQueryClientProvider client={tanstackQueryClient}>
           <ComponentProvider.Provider value={registry}>
             <PrivacyProvider.Provider
               value={{
@@ -102,6 +111,7 @@ export const DigitUI = ({ stateCode, registry, enabledModules, moduleReducers })
               <DigitUIWrapper stateCode={stateCode} enabledModules={enabledModules} moduleReducers={moduleReducers} />
             </PrivacyProvider.Provider>
           </ComponentProvider.Provider>
+          </TanstackQueryClientProvider>
         </QueryClientProvider>
       </ErrorBoundary>
     </div>
@@ -112,6 +122,9 @@ const componentsToRegister = {
   SelectOtp,
   AcknowledgementCF,
   CitizenFeedback,
+  EmployeeDashboard,
+  EDCRAcknowledgement,
+  CreateAnonymousEDCR,
 };
 
 export const initCoreComponents = () => {

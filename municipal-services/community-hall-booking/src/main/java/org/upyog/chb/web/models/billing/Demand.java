@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.User;
 import org.upyog.chb.web.models.AuditDetails;
 
+<<<<<<< HEAD
 import javax.validation.Valid;
+=======
+import jakarta.validation.Valid;
+>>>>>>> niua-upstream/niua-dev-2.0
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,9 +108,12 @@ public class Demand {
 	@JsonProperty("status")
 	private StatusEnum status;
 
+<<<<<<< HEAD
 //    public Demand addDemandDetailsItem(DemandDetail demandDetailsItem) {
 //        this.demandDetails.add(demandDetailsItem);
 //        return this;
 //    }
 
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 }

@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,12 +19,14 @@ import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.repository.ServiceRequestRepository;
+import org.egov.vehicle.repository.VehicleRepository;
 import org.egov.vehicle.trip.util.VehicleTripConstants;
 import org.egov.vehicle.util.Constants;
 import org.egov.vehicle.util.VehicleErrorConstants;
 import org.egov.vehicle.web.model.Vehicle;
 import org.egov.vehicle.web.model.VehicleRequest;
 import org.egov.vehicle.web.model.VehicleSearchCriteria;
+import org.egov.vehicle.web.model.user.ModuleRoleMapping;
 import org.egov.vehicle.web.model.user.User;
 import org.egov.vehicle.web.model.user.UserDetailResponse;
 import org.egov.vehicle.web.model.user.UserRequest;
@@ -50,23 +53,68 @@ public class UserService {
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Autowired
+	private VehicleRepository repository;
+	
+	@Autowired
+	private ModuleRoleService moduleRoleService;
+
 	/**
 	 * 
 	 * @param vendorRequest
 	 */
 	@SuppressWarnings("null")
-	public void manageOwner(VehicleRequest vendorRequest) {
+	public void manageOwner(VehicleRequest vehicleRequest, boolean isUpdate) {
 
-		Vehicle vehicle = vendorRequest.getVehicle();
+		Vehicle vehicle = vehicleRequest.getVehicle();
 		User owner = vehicle.getOwner();
 
 		UserDetailResponse userDetailResponse = null;
 		if (owner != null) {
 			userDetailResponse = userExists(owner);
-			if (userDetailResponse != null && !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-				owner = userDetailResponse.getUser().get(0);
-			} else {
-				owner = createVehicleOwner(owner, vendorRequest.getRequestInfo());
+
+			if (userDetailResponse != null && CollectionUtils.isEmpty(userDetailResponse.getUser()) && !isUpdate) {
+
+				Boolean notFoundUser = Boolean.FALSE;
+				for (int j = 0; j < userDetailResponse.getUser().size(); j++) {
+					User user = userDetailResponse.getUser().get(j);
+
+					if ((user.getUserName().equalsIgnoreCase(user.getMobileNumber())
+							&& user.getName().equalsIgnoreCase(owner.getName()))
+							|| user.getName().equalsIgnoreCase(owner.getName())) {
+						// found user with mobilenumber username not same and name as equal to the
+						// applicnat name provided by ui
+						// then consider that user as applicant
+						owner = user;
+						break;
+					} else {
+						notFoundUser = Boolean.TRUE;
+					}
+
+				}
+				// users exists with mobile number but non of them have the same Name so create new
+				// user
+				if (notFoundUser) {
+					owner = createVehicleOwner(owner, vehicleRequest);
+
+				}
+
+			 else {
+				if (!isUpdate) {
+					// User with mobile number itself not found then create new user and consider
+					// the new user as applicant.
+					owner = createVehicleOwner(owner, vehicleRequest);
+				} else {
+
+					HashMap<String, String> errorMap = new HashMap<>();
+					owner = updateUserDetails(owner, vehicleRequest.getRequestInfo(), errorMap);
+
+				}
+			}
+
+				HashMap<String, String> errorMap = new HashMap<>();
+				updateUserDetails(owner, vehicleRequest.getRequestInfo(), errorMap);
+
 			}
 			vehicle.setOwner(owner);
 
@@ -77,6 +125,22 @@ public class UserService {
 
 	}
 
+	private User updateUserDetails(User vehicleInfo, RequestInfo requestInfo, HashMap<String, String> errorMap) {
+		User userUpdated = new User();
+		UserRequest userRequest = UserRequest.builder().user(vehicleInfo).requestInfo(requestInfo).build();
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getUserHost()).append(config.getUserContextPath()).append(config.getUserUpdateEndpoint());
+		UserDetailResponse userResponse = ownerCall(userRequest, uri);
+		if (userResponse != null && !userResponse.getUser().isEmpty()) {
+			userUpdated = userResponse.getUser().get(0);
+		} else {
+			errorMap.put(VehicleErrorConstants.INVALID_VEHICLE_OWNER,
+					"Unable to Update UserDetails to the existing Vehicle !");
+		}
+		return userUpdated;
+
+	}
+
 	/**
 	 * create Employee in HRMS for Vendor owner
 	 * 
@@ -84,24 +148,27 @@ public class UserService {
 	 * @param requestInfo
 	 * @return
 	 */
-	private User createVehicleOwner(User owner, RequestInfo requestInfo) {
+		public User createVehicleOwner(User owner, VehicleRequest vehicleRequest) {
+		ModuleRoleMapping roleMapping = moduleRoleService.getModuleRoleMapping(vehicleRequest, ModuleRoleMapping.MappingType.DRIVER);
 
 		if (!isUserValid(owner)) {
 			throw new CustomException(VehicleErrorConstants.INVALID_OWNER_ERROR,
 					"Dob, relationShip, relation ship name and gender are mandaotry !");
 		}
 		if (owner.getRoles() != null) {
-			owner.getRoles().add(getRolObj(Constants.DSO_DRIVER, Constants.DSO_DRIVER_ROLE_NAME));
+			owner.getRoles().add(getRolObj(roleMapping.getRoleCode(), roleMapping.getRoleName()));
 		} else {
-			owner.setRoles(Arrays.asList(getRolObj(Constants.DSO_DRIVER, Constants.DSO_DRIVER_ROLE_NAME)));
+			owner.setRoles(Arrays.asList(getRolObj(roleMapping.getRoleCode(), roleMapping.getRoleName())));
 		}
 
 		addUserDefaultFields(owner.getTenantId(), null, owner);
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 				.append(config.getUserCreateEndpoint());
+
 		setUserName(owner);
+
 		owner.setType(Constants.CITIZEN);
-		UserDetailResponse userDetailResponse = userCall(new UserRequest(requestInfo, owner), uri);
+		UserDetailResponse userDetailResponse = userCall(new UserRequest(vehicleRequest.getRequestInfo(), owner), uri);
 		log.debug("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
 		return userDetailResponse.getUser().get(0);
 	}
@@ -131,7 +198,7 @@ public class UserService {
 	 */
 	private void setUserName(User owner) {
 		String uuid = UUID.randomUUID().toString();
-		owner.setUserName(owner.getMobileNumber());
+		owner.setUserName(uuid);
 		owner.setUuid(uuid);
 
 	}
@@ -180,6 +247,9 @@ public class UserService {
 
 		if (!StringUtils.isEmpty(owner.getMobileNumber())) {
 			ownerSearchRequest.setMobileNumber(owner.getMobileNumber());
+		}
+		if (!StringUtils.isEmpty(owner.getName())) {
+			ownerSearchRequest.setName(owner.getName());
 		}
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return ownerCall(ownerSearchRequest, uri);

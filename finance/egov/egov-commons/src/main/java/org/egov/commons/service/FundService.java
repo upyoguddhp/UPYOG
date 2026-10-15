@@ -53,15 +53,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.Metamodel;
 
 import org.egov.commons.Fund;
 import org.egov.commons.contracts.FundSearchRequest;
@@ -105,11 +105,7 @@ public class FundService {
 	}
 
 	public List<Fund> findAll() {
-		//return fundRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
-		List<Fund> funds = fundRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
-	    return funds.stream()
-	                .peek(fund -> fund.setName(fund.getName() + " - " + fund.getCode()))
-	                .collect(Collectors.toList());
+		return fundRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
 	}
 
 	public Fund findByName(final String name) {
@@ -121,7 +117,7 @@ public class FundService {
 	}
 
 	public Fund findOne(final Long id) {
-		return fundRepository.findOne(id);
+		return fundRepository.findById(id).orElse(null);
 	}
 
 	public List<Fund> search(final FundSearchRequest fundSearchRequest) {
@@ -147,8 +143,14 @@ public class FundService {
 		}
 		if (fundSearchRequest.getIsactive().booleanValue())
 			predicates.add(cb.equal(funds.get("isactive"), true));
+		/*
+		 * Hibernate 6 migration note:
+		 * Criteria comparisons are now type checked strictly. parentId is mapped as a
+		 * Fund association, but the request supplies a Long id. Comparing parentId.id
+		 * avoids a Fund-vs-Long SemanticException.
+		 */
 		if (fundSearchRequest.getParentId() != null)
-			predicates.add(cb.equal(funds.get("parentId"), fundSearchRequest.getParentId()));
+			predicates.add(cb.equal(funds.get("parentId").get("id"), fundSearchRequest.getParentId()));
 
 		createQuery.where(predicates.toArray(new Predicate[] {}));
 		final TypedQuery<Fund> query = entityManager.createQuery(createQuery);

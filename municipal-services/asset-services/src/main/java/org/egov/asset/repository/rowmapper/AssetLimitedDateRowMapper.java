@@ -1,5 +1,19 @@
 package org.egov.asset.repository.rowmapper;
 
+<<<<<<< HEAD
+=======
+import org.egov.asset.web.models.Asset;
+import org.egov.asset.web.models.AssetAssignment;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.postgresql.util.PGobject;
+
+
+>>>>>>> niua-upstream/niua-dev-2.0
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+<<<<<<< HEAD
 import org.egov.asset.web.models.Asset;
 import org.egov.asset.web.models.AssetAssignment;
 import org.springframework.dao.DataAccessException;
@@ -23,6 +38,25 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
     @Override
 	public List<Asset> extractData(ResultSet rs) throws SQLException, DataAccessException {
     	
+=======
+@Component
+@SuppressWarnings("java:S2638")
+public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>> {
+
+    private final ObjectMapper objectMapper;
+    
+    public AssetLimitedDateRowMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    /**
+     * extract the data from the resultset and prepare the BPA Object
+     *
+     * @see org.springframework.jdbc.core.ResultSetExtractor#extractData(java.sql.ResultSet)
+     */
+    @Override
+    public List<Asset> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+>>>>>>> niua-upstream/niua-dev-2.0
         Map<String, Asset> assetMap = new LinkedHashMap<>();
 
         while (rs.next()) {
@@ -30,6 +64,7 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
             String tenantId = rs.getString("tenantId");
             Asset currentAsset = assetMap.get(id);
             if (currentAsset == null) {
+<<<<<<< HEAD
                 
                 currentAsset = Asset.builder()
                 	    .id(id)
@@ -43,6 +78,28 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
                 	    .department(rs.getString("department"))
                 	    .status(rs.getString("status"))
                 	    .build();
+=======
+
+                currentAsset = Asset.builder()
+                        .id(id)
+                        .tenantId(tenantId)
+                        .assetBookRefNo(rs.getString("bookrefno"))
+                        .applicationNo(rs.getString("applicationNo"))
+                        .assetClassification(rs.getString("classification"))
+                        .assetParentCategory(rs.getString("parentCategory"))
+                        .assetCategory(rs.getString("category"))
+                        .assetSubCategory(rs.getString("subCategory"))
+                        .assetName(rs.getString("name"))
+                        .department(rs.getString("department"))
+                        .status(rs.getString("status"))
+                        .bookValue(rs.getDouble("bookValue"))
+                        .assetUsage(rs.getString("assetUsage"))
+                        .assetStatus(rs.getString("assetstatus"))
+                        .applicationDate(rs.getLong("createdtime"))
+                        .location(rs.getString("location"))
+                        .assetAssignable(rs.getBoolean("assetAssignable"))
+                        .build();
+>>>>>>> niua-upstream/niua-dev-2.0
 
                 assetMap.put(id, currentAsset);
             }
@@ -53,6 +110,7 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
     }
 
     private void addChildrenToProperty(ResultSet rs, Asset asset) throws SQLException {
+<<<<<<< HEAD
 	        
 	    // Mapping AssignmDetails
 	    AssetAssignment assetAssignment = new AssetAssignment();
@@ -65,5 +123,30 @@ public class AssetLimitedDateRowMapper implements ResultSetExtractor<List<Asset>
 	    	assetAssignment.setReturnDate(rs.getLong("returnDate"));
 	    	assetAssignment.setIsAssigned(rs.getBoolean("isAssigned"));
 	    	asset.setAssetAssignment(assetAssignment);
+=======
+
+        // Mapping AssignmDetails
+        AssetAssignment assetAssignment = new AssetAssignment();
+        assetAssignment.setAssignmentId(rs.getString("assignmentId"));
+        assetAssignment.setAssignedUserName(rs.getString("assignedUserName"));
+        assetAssignment.setEmployeeCode(rs.getString("employeeCode"));
+        assetAssignment.setDesignation(rs.getString("designation"));
+        assetAssignment.setDepartment(rs.getString("department"));
+        assetAssignment.setAssignedDate(rs.getLong("assignedDate"));
+        assetAssignment.setReturnDate(rs.getLong("returnDate"));
+        assetAssignment.setIsAssigned(rs.getBoolean("isAssigned"));
+        asset.setAssetAssignment(assetAssignment);
+
+        //AdditionalDetails Mapping
+        PGobject additionalDetails = (PGobject) rs.getObject("additionalDetails");
+        if (additionalDetails != null) {
+            try {
+                JsonNode additionalDetailsNode = objectMapper.readTree(additionalDetails.getValue());
+                asset.setAdditionalDetails(additionalDetailsNode);
+            } catch (Exception e) {
+                throw new SQLException("Failed to parse additionalDetails JSON for asset " + asset.getId(), e);
+            }
+        }
+>>>>>>> niua-upstream/niua-dev-2.0
     }
 }

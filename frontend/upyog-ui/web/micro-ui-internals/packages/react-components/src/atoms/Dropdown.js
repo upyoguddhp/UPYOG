@@ -128,13 +128,17 @@ const Dropdown = (props) => {
   }
 
   function onSelect(val) {
+    // Always clear typeahead filter so the input shows the selected label,
+    // not the leftover search text (e.g. "Bu" after picking Building).
+    setFilterVal("");
     if (val !== selectedOption || props.allowMultiselect) {
       props.select(val);
       setSelectedOption(val);
       setDropdownStatus(false);
+      setforceSet((n) => n + 1);
     } else {
       setSelectedOption(val);
-      setforceSet(forceSet + 1);
+      setforceSet((n) => n + 1);
     }
   }
 
@@ -147,7 +151,9 @@ const Dropdown = (props) => {
   function selectOption(ind) {
     onSelect(filteredOption[ind]);
   }
-
+  // if (props?.option?.[0]?.label == "PropertyType") {
+  //   filteredOption = props.option
+  // }
   if(props.isBPAREG && selectedOption)
   {
     let isSelectedSameAsOptions = props.option?.filter((ob) => ob?.code === selectedOption?.code)?.length > 0;

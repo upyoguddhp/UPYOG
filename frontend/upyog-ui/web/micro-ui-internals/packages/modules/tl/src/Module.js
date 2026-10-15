@@ -1,20 +1,23 @@
-import { Header, CitizenHomeCard, CaseIcon, HomeLink } from "@egovernments/digit-ui-react-components";
+import { Header, CitizenHomeCard, CaseIcon, HomeLink } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useRouteMatch } from "react-router-dom";
 import TradeLicense from "../src/pageComponents/TradeLicense";
 import TLSelectGeolocation from "../src/pageComponents/TLSelectGeolocation";
 import TLSelectAddress from "./pageComponents/TLSelectAddress";
 import TLSelectPincode from "./pageComponents/TLSelectPincode";
-import Proof from "./pageComponents/Proof";
-import SelectOwnerShipDetails from "./pageComponents/SelectOwnerShipDetails";
-import SelectOwnerDetails from "./pageComponents/SelectOwnerDetails";
-import SelectOwnerAddress from "./pageComponents/SelectOwnerAddress";
-import SelectProofIdentity from "./pageComponents/SelectProofIdentity";
+// import Proof from "./pageComponents/Proof";
+import TLProof from "./pageComponents/TLProof";
+// import SelectOwnerShipDetails from "./pageComponents/SelectOwnerShipDetails";
+import TLSelectOwnerShipDetails from "./pageComponents/TLSelectOwnerShipDetails";
+// import SelectOwnerDetails from "./pageComponents/SelectOwnerDetails";
+import TLSelectOwnerDetails from "./pageComponents/TLSelectOwnerDetails";
+// import SelectOwnerAddress from "./pageComponents/SelectOwnerAddress";
+// import SelectProofIdentity from "./pageComponents/SelectProofIdentity";
+import TLSelectProofIdentity from "./pageComponents/TLSelectProofIdentity";
 import SelectOwnershipProof from "./pageComponents/SelectOwnershipProof";
 import SelectTradeName from "./pageComponents/SelectTradeName";
 import SelectStructureType from "./pageComponents/SelectStructureType";
-import SelectStreet from "./pageComponents/SelectStreet";
+import TLSelectVehicleType from "./pageComponents/TLSelectVehicleType";
 import SelectVehicleType from "./pageComponents/SelectVehicleType";
 import SelectBuildingType from "./pageComponents/SelectBuildingType";
 import SelectCommencementDate from "./pageComponents/SelectCommencementDate";
@@ -24,7 +27,7 @@ import SelectAccessoriesDetails from "./pageComponents/SelectAccessoriesDetails"
 import TLCheckPage from "./pages/citizen/Create/CheckPage";
 import TLDocument from "./pageComponents/TLDocumets";
 import TLAcknowledgement from "./pages/citizen/Create/TLAcknowledgement";
-import MyApplications from "./pages/citizen/Applications/Application";
+import TLMyApplications from "./pages/citizen/Applications/Application";
 import TradeLicenseList  from "./pages/citizen/Renewal/TradeLicenseList";
 import TLWFApplicationTimeline from "./pageComponents/TLWFApplicationTimeline";  
 import SelectOtherTradeDetails from "./pageComponents/SelectOtherTradeDetails";
@@ -39,7 +42,7 @@ import TLAccessoriesEmployee from "./pageComponents/TLAccessoriesEmployee";
 import TLDocumentsEmployee from "./pageComponents/TLDocumentsEmployee";
 import TLCard from "./components/TLCard";
 import TLInfoLabel from "./pageComponents/TLInfoLabel";
-import SearchApplication from "./components/SearchApplication"
+import SearchLicenseApplication from "./components/SearchApplication";
 import SearchLicense from "./components/SearchLicense"
 import TL_INBOX_FILTER from "./components/inbox/InboxFilter";
 import NewApplication from "./pages/employee/NewApplication";
@@ -55,12 +58,13 @@ import RenewTrade from "./pages/citizen/Renewal/renewTrade";
 import SearchTradeComponent from "./pages/citizen/SearchTrade";
 import SelectTradeUnitsInitial from "./pageComponents/SelectTradeUnitsInitial";
 import TLTradeUnitsEmployeeInitial from "./pageComponents/TLTradeUnitsEmployeeInitial";
-
+// import CommonRedirect from "./pageComponents/CommonRedirect"
 import CitizenApp from "./pages/citizen";
 import EmployeeApp from "./pages/employee";
+import { ReportSearchApplication, EnhancedReport } from "@nudmcdgnpm/digit-ui-module-reports";
 
 export const TLModule = ({ stateCode, userType, tenants }) => {
-  const { path, url } = useRouteMatch();
+  const { path, url } = Digit.Hooks.useModuleBasePath();
 
   const moduleCode = "TL";
   const language = Digit.StoreData.getCurrentLanguage();
@@ -84,15 +88,15 @@ export const TLLinks = ({ matchPath, userType }) => {
 
   const links = [
     {
-      link: `${matchPath}/tradelicence/new-application`,
+      link: `/tradelicence/new-application`,
       i18nKey: t("TL_CREATE_TRADE"),
     },
     {
-      link: `${matchPath}/tradelicence/renewal-list`,
+      link: `/tradelicence/renewal-list`,
       i18nKey: t("TL_RENEWAL_HEADER"),
     },
     {
-      link: `${matchPath}/tradelicence/my-application`,
+      link: `/tradelicence/my-application`,
       i18nKey: t("TL_MY_APPLICATIONS_HEADER"),
     },
   ];
@@ -107,6 +111,7 @@ const componentsToRegister = {
   TradeLicense,
   SelectTradeName,
   SelectStructureType,
+  TLSelectVehicleType,
   SelectVehicleType,
   SelectBuildingType,
   SelectCommencementDate,
@@ -116,11 +121,15 @@ const componentsToRegister = {
   TLSelectGeolocation,
   TLSelectAddress,
   TLSelectPincode,
-  Proof,
-  SelectOwnerShipDetails,
-  SelectOwnerDetails,
-  SelectOwnerAddress,
-  SelectProofIdentity,
+  // Proof,
+  TLProof,
+  // SelectOwnerShipDetails,
+  TLSelectOwnerShipDetails,
+  // SelectOwnerDetails,
+  TLSelectOwnerDetails,
+  // SelectOwnerAddress,
+  // SelectProofIdentity,
+  TLSelectProofIdentity,
   SelectOwnershipProof,
   TLSelectStreet,
   TLSelectLandmark,
@@ -129,13 +138,13 @@ const componentsToRegister = {
   TLDocument,
   TLAcknowledgement,
   TradeLicenseList,
-  MyApplications,
+  TLMyApplications,
   TLOwnerDetailsEmployee,
   TLTradeDetailsEmployee,
   TLTradeUnitsEmployee,
   TLAccessoriesEmployee,
   TLDocumentsEmployee,
-  SearchApplication,
+  SearchLicenseApplication,
   SearchLicense,
   TL_INBOX_FILTER,
   TLInfoLabel,
@@ -153,10 +162,13 @@ const componentsToRegister = {
   SelectOtherTradeDetails,
   SelectTradeUnitsInitial,
   TLTradeUnitsEmployeeInitial,
+  // CommonRedirect,
+  EnhancedReport,
+  ReportSearchApplication
 };
 
 export const initTLComponents = () => {
-  Object.entries(componentsToRegister).forEach(([key, value]) => {
+  Object.entries(componentsToRegister)?.forEach(([key, value]) => {
     Digit.ComponentRegistryService.setComponent(key, value);
   });
 };

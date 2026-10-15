@@ -1,6 +1,7 @@
 package org.egov.user.repository.rowmapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.user.domain.model.Address;
 import org.egov.user.domain.model.Role;
 import org.egov.user.domain.model.User;
@@ -10,15 +11,20 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.isNull;
 import static org.egov.user.domain.model.enums.AddressType.CORRESPONDENCE;
 import static org.egov.user.domain.model.enums.AddressType.PERMANENT;
 
 @Service
+@Slf4j
 public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
 
     private ObjectMapper objectMapper;
@@ -32,7 +38,7 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
     public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
         Map<Long, User> usersMap = new LinkedHashMap<>();
-
+        ResultSetMetaData rsMeta = rs.getMetaData();
         while (rs.next()) {
 
             Long userId = rs.getLong("id");
@@ -46,11 +52,11 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
                         .password(rs.getString("password")).passwordExpiryDate(rs.getTimestamp("pwdexpirydate"))
                         .mobileNumber(rs.getString("mobilenumber")).altContactNumber(rs.getString("altcontactnumber"))
                         .emailId(rs.getString("emailid")).active(rs.getBoolean("active")).name(rs.getString("name")).
-                                lastModifiedBy(rs.getLong("lastmodifiedby")).lastModifiedDate(rs.getTimestamp("lastmodifieddate"))
+                        lastModifiedBy(rs.getLong("lastmodifiedby")).lastModifiedDate(rs.getTimestamp("lastmodifieddate"))
                         .pan(rs.getString("pan")).aadhaarNumber(rs.getString("aadhaarnumber")).createdBy(rs.getLong("createdby"))
                         .createdDate(rs.getTimestamp("createddate")).guardian(rs.getString("guardian")).signature(rs.getString("signature"))
                         .accountLocked(rs.getBoolean("accountlocked")).photo(rs.getString("photo"))
-                        .identificationMark(rs.getString("identificationmark")).uuid(rs.getString("uuid"))
+                        .identificationMark(rs.getString("identificationmark")).uuid(rs.getString("uuid")).digilockerid(rs.getString("digilockerid"))
                         .accountLockedDate(rs.getLong("accountlockeddate")).alternateMobileNumber(rs.getString("alternatemobilenumber"))
                         .build();
 
@@ -91,11 +97,19 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
             Role role = populateRole(rs);
             Address address = populateAddress(rs, user);
 
-            if (!isNull(role))
-                user.addRolesItem(role);
+            log.debug("UserResultSetExtractor - userId: {}, uuid: {}, role: {}, current roles count: {}",
+                    userId, user.getUuid(), role, user.getRoles() != null ? user.getRoles().size() : 0);
 
-            if (!isNull(address))
+            if (!isNull(role)) {
+                user.addRolesItem(role);
+                log.debug("Added role to user. Total roles now: {}", user.getRoles().size());
+            } else {
+                log.debug("Role is null, not adding to user");
+            }
+
+            if (!isNull(address)) {
                 user.addAddressItem(address);
+            }
 
         }
 
@@ -104,13 +118,20 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
 
     private Role populateRole(ResultSet rs) throws SQLException {
         String code = rs.getString("role_code");
+        String tenantId = rs.getString("role_tenantid");
+        log.debug("populateRole - role_code: {}, role_tenantid: {}", code, tenantId);
+
         if (code == null) {
+            log.debug("populateRole - returning null due to null role_code");
             return null;
         }
-        return Role.builder()
-                .tenantId(rs.getString("role_tenantid"))
+
+        Role role = Role.builder()
+                .tenantId(tenantId)
                 .code(code)
                 .build();
+        log.debug("populateRole - created role: {}", role);
+        return role;
     }
 
     private Address populateAddress(ResultSet rs, User user) throws SQLException {
@@ -129,11 +150,6 @@ public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
                 .userId(rs.getLong("addr_userid"))
                 .tenantId(rs.getString("addr_tenantid"))
                 .build();
-
-        if (address.getType().equals(PERMANENT) && isNull(user.getPermanentAddress()))
-            user.setPermanentAddress(address);
-        if (address.getType().equals(CORRESPONDENCE) && isNull(user.getCorrespondenceAddress()))
-            user.setCorrespondenceAddress(address);
 
         return address;
 

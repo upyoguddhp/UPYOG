@@ -43,7 +43,37 @@ const getMohallaLocale = (value = "", tenantId = "") => {
   const ulbCamel = (ulb) => ulb.toLowerCase().split(" ").map(capitalize).join(" ");
   const getBPAAcknowledgement=async(application,tenantInfo,t)=>{
     
-    const owner=application?.landInfo?.owners
+    const owners=application?.landInfo?.owners
+
+    const getOwnersForNewApplication =()=>{
+        let values = [];
+        owners.map((owner) => {
+            let doc = [
+                {  
+                    title: t("CORE_COMMON_NAME"), 
+                    value:owner?.name|| "NA"
+                },
+                { 
+                    title: t("BPA_APPLICANT_GENDER_LABEL"), 
+                    value: owner?.gender || "NA"
+                },
+                { 
+                    title: t("CORE_COMMON_MOBILE_NUMBER"), 
+                    value: owner?.mobileNumber || "NA"
+                },
+                { 
+                    title: t("CORE_COMMON_EMAIL_ID"), 
+                    value: owner?.emailId || "NA"
+                },
+                { 
+                    title: application?.businessService==="BPA-PAP" ? t("PRIMARY_OWNER_LABEL") : t("BPA_IS_PRIMARY_OWNER_LABEL"), 
+                    value: application?.businessService==="BPA-PAP" ? owners.length===1 ? "Single Owner" : "Multiple Owner" : owner?.isPrimaryOwner || "NA"
+                }
+            ];
+               values.push(...doc);
+          });
+          return values
+    }
     return{
         t: t,
         tenantId: tenantInfo?.code,
@@ -57,7 +87,7 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                 title : t("BPA_BASIC_DETAILS_TITLE"),
                 values:[
                     { 
-                        title: application?.businessService !== t("BPA_OC") ? t("BPA_EDCR_NO_LABEL") : t("BPA_OC_EDCR_NO_LABEL"), 
+                        title: application?.businessService ==="BPA-PAP" ? t("BPA_DRAWING_NUMBER") : application?.businessService !== t("BPA_OC") ? t("BPA_EDCR_NO_LABEL") : t("BPA_OC_EDCR_NO_LABEL"), 
                         value: application?.edcrNumber || "NA" 
                     },
                     { 
@@ -66,15 +96,19 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                     },
                     { 
                         title: t("BPA_BASIC_DETAILS_APPLICATION_TYPE_LABEL"), 
-                        value: t(`WF_BPA_${application?.data?.edcrDetails?.appliactionType}`) || "NA"
+                        value: t(`WF_BPA_${application?.data?.edcrDetails?.appliactionType||application?.data?.applicationType}`) || "NA"
+                    },
+                    {
+                        title: t("BPA_IS_PREAPPROVED"), 
+                        value:application?.additionalDetails?.isPreApproved ? application?.additionalDetails?.isPreApproved: application?.businessService==="BPA-PAP" ? "true" : "false"
                     },
                     { 
                         title: t("BPA_BASIC_DETAILS_SERVICE_TYPE_LABEL"), 
-                        value:t(`${application?.data?.edcrDetails?.applicationSubType}`) || "NA"
+                        value:t(`${application?.data?.edcrDetails?.applicationSubType||application?.data?.edcrDetails?.drawingDetail?.serviceType}`) || "NA"
                     },
                     { 
                         title: t("BPA_BASIC_DETAILS_OCCUPANCY_LABEL"), 
-                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.occupancy 
+                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.occupancy ||application?.data?.edcrDetails?.drawingDetail?.occupancy
                     },
                     { 
                         title: t("BPA_BASIC_DETAILS_RISK_TYPE_LABEL"), 
@@ -82,7 +116,7 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                     },
                     { 
                         title: t("BPA_BASIC_DETAILS_APPLICATION_NAME_LABEL"), 
-                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.applicantName || "NA"
+                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.applicantName || application?.additionalDetails?.applicantName
                     },
                     
                 ]
@@ -93,15 +127,15 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                 values: [
                     { 
                         title: t("BPA_BOUNDARY_PLOT_AREA_LABEL"),
-                        value: `${application?.data?.edcrDetails?.planDetail?.planInformation?.plotArea} sq.ft` || "NA"
+                        value: `${application?.data?.edcrDetails?.planDetail?.planInformation?.plotArea|| application?.data?.edcrDetails?.drawingDetail?.plotArea} sq.ft` || "NA"
                     },
                     { 
                         title: t("BPA_PLOT_NUMBER_LABEL"), 
-                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.plotNo || "NA"  
+                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.plotNo || application?.additionalDetails?.plotNo||"NA"  
                     },
                     { 
                         title: t("BPA_KHATHA_NUMBER_LABEL"), 
-                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.khataNo || "NA"  
+                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.khataNo || application?.additionalDetails?.khataNo||"NA"  
                     },
                     { 
                         title: t("BPA_HOLDING_NUMBER_LABEL"), 
@@ -113,10 +147,11 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                     },
                     { 
                         title: t("BPA_APPLICATION_DEMOLITION_AREA_LABEL"), 
-                        value: t(`${application?.data?.edcrDetails?.planDetail?.planInformation?.demolitionArea} sq.mtrs`) || "NA"
+                        value: application?.data?.edcrDetails?.planDetail?.planInformation?.demolitionArea ? `${application?.data?.edcrDetails?.planDetail?.planInformation?.demolitionArea} sq mts`:"NA"
                     } 
                 ]
              },
+             application?.nocDocuments?.NocDetails[0] ? 
              {
                 title: t(`BPA_NOC_DETAILS_SUMMARY`) , 
                 values: [
@@ -131,36 +166,18 @@ const getMohallaLocale = (value = "", tenantId = "") => {
                     },
                     
                 ],    
-             },
+             }:null,
              {
                 title: t("BPA_APPLICANT_DETAILS_HEADER"),
-                values:  [
-                    {  
-                        title: t("CORE_COMMON_NAME"), 
-                        value:application?.landInfo?.owners[0]?.name|| "NA"
-                    },
-                    { 
-                        title: t("BPA_APPLICANT_GENDER_LABEL"), 
-                        value: application?.landInfo?.owners[0]?.gender || "NA"
-                    },
-                    { 
-                        title: t("CORE_COMMON_MOBILE_NUMBER"), 
-                        value: application?.landInfo?.owners[0]?.mobileNumber || "NA"
-                    },
-                    { 
-                        title: t("CORE_COMMON_EMAIL_ID"), 
-                        value: application?.landInfo?.owners[0]?.emailId || "NA"
-                    },
-                    { 
-                        title: t("BPA_IS_PRIMARY_OWNER_LABEL"), 
-                        value: application?.landInfo?.owners[0]?.isPrimaryOwner || "NA"
-                    }
-
-                ]
+                values:  getOwnersForNewApplication()
             },
             {
                 title : t("BPA_NEW_TRADE_DETAILS_HEADER_DETAILS"),
                 values:[
+                    { 
+                        title: t("BPA_DETAILS_PROPERTYID"), 
+                        value: application?.additionalDetails?.propertyID ||"NA"
+                    },
                     { 
                         title: t("BPA_DETAILS_PIN_LABEL"), 
                         value: application?.landInfo?.address?.pincode || "NA"

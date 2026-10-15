@@ -1,7 +1,10 @@
 package org.egov.tl.util;
 
+<<<<<<< HEAD
 import static org.egov.tl.util.TLConstants.*;
 
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,10 +31,18 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+=======
+import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.egov.tl.util.TLConstants.*;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 @Component
 @Slf4j
@@ -198,7 +209,7 @@ public class TradeUtil {
      * @return url for mdms search endpoint
      */
     public StringBuilder getMdmsSearchUrl() {
-        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
+        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsV1EndPoint());
     }
 
 

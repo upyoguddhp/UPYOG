@@ -2,12 +2,12 @@ package org.egov.noc.web.model.bpa;
 
 import java.util.Objects;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import org.egov.noc.web.model.AuditDetails;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,64 +23,64 @@ import lombok.NoArgsConstructor;
  */
 @ApiModel(description = "Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. ")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address   {
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("tenantId")
   private String tenantId = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("doorNo")
   private String doorNo = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("plotNo")
   private String plotNo = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("id")
   private String id = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("landmark")
   private String landmark = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("city")
   private String city = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("district")
   private String district = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("region")
   private String region = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("state")
   private String state = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("country")
   private String country = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("pincode")
   private String pincode = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("additionDetails")
   private String additionDetails = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("buildingName")
   private String buildingName = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("street")
   private String street = null;
 
@@ -332,7 +332,7 @@ public class Address   {
   **/
   @ApiModelProperty(value = "Name of the building")
   
-  @Size(min=2,max=64)   public String getBuildingName() {
+  @Size(min=0,max=64)   public String getBuildingName() {
     return buildingName;
   }
 
@@ -351,7 +351,7 @@ public class Address   {
   **/
   @ApiModelProperty(value = "Street Name")
   
-  @Size(min=2,max=64)   public String getStreet() {
+  @Size(min=0,max=64)   public String getStreet() {
     return street;
   }
 

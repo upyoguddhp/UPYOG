@@ -1,5 +1,4 @@
 package org.egov.infra.mdms.service;
-
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.utils.MultiStateInstanceUtil;
 import org.egov.infra.mdms.model.*;
@@ -22,18 +21,19 @@ import java.util.List;
 public class MDMSServiceV2 {
 
     private MdmsDataValidator mdmsDataValidator;
-
     private MdmsDataEnricher mdmsDataEnricher;
-
     private MdmsDataRepository mdmsDataRepository;
-
     private SchemaUtil schemaUtil;
-
     private MultiStateInstanceUtil multiStateInstanceUtil;
 
     @Autowired
-    public MDMSServiceV2(MdmsDataValidator mdmsDataValidator, MdmsDataEnricher mdmsDataEnricher,
-                         MdmsDataRepository mdmsDataRepository, SchemaUtil schemaUtil, MultiStateInstanceUtil multiStateInstanceUtil) {
+    public MDMSServiceV2(
+            MdmsDataValidator mdmsDataValidator,
+            MdmsDataEnricher mdmsDataEnricher,
+            MdmsDataRepository mdmsDataRepository,
+            SchemaUtil schemaUtil,
+            MultiStateInstanceUtil multiStateInstanceUtil) {
+
         this.mdmsDataValidator = mdmsDataValidator;
         this.mdmsDataEnricher = mdmsDataEnricher;
         this.mdmsDataRepository = mdmsDataRepository;
@@ -42,75 +42,160 @@ public class MDMSServiceV2 {
     }
 
     /**
-     * This method processes the requests that come for master data creation.
-     * @param mdmsRequest
-     * @return
+     * Processes requests for master data creation.
      */
     public List<Mdms> create(MdmsRequest mdmsRequest) {
 
-        // Fetch schema against which data is getting created
+        // Fetch the schema against which data is being created.
         JSONObject schemaObject = schemaUtil.getSchema(mdmsRequest);
 
-        // Perform validations on incoming request
-        mdmsDataValidator.validateCreateRequest(mdmsRequest, schemaObject);
+        // Validate the incoming request.
+        mdmsDataValidator.validateCreateRequest(
+                mdmsRequest, schemaObject);
 
-        // Enrich incoming master data
-        mdmsDataEnricher.enrichCreateRequest(mdmsRequest, schemaObject);
+        // Enrich the master data.
+        mdmsDataEnricher.enrichCreateRequest(
+                mdmsRequest, schemaObject);
 
-        // Emit MDMS create event to be listened by persister
+        // Mark the operation for audit tracking.
+        mdmsRequest.getMdms()
+                .setOperation(Operation.CREATE.name());
+
+        // Publish the create event.
         mdmsDataRepository.create(mdmsRequest);
 
         return Arrays.asList(mdmsRequest.getMdms());
     }
 
     /**
-     * This method processes the requests that come for master data search.
-     * @param mdmsCriteriaReqV2
-     * @return
+     * Processes master data search requests.
      */
     public List<Mdms> search(MdmsCriteriaReqV2 mdmsCriteriaReqV2) {
 
         /*
-         * Set incoming tenantId as state level tenantId for fallback in case master data for
-         * concrete tenantId does not exist.
+         * Search the requested tenant and its fallback tenants.
          */
-        String tenantId = mdmsCriteriaReqV2.getMdmsCriteria().getTenantId();
+        String tenantId = mdmsCriteriaReqV2
+                .getMdmsCriteria()
+                .getTenantId();
 
         List<Mdms> masterDataList = new ArrayList<>();
-        List<String> subTenantListForFallback = FallbackUtil.getSubTenantListForFallBack(tenantId);
 
-        // Make a call to repository and get list of master data
-        for(String subTenantId : subTenantListForFallback) {
-            mdmsCriteriaReqV2.getMdmsCriteria().setTenantId(subTenantId);
-            masterDataList = mdmsDataRepository.searchV2(mdmsCriteriaReqV2.getMdmsCriteria());
+        List<String> subTenantListForFallback =
+                FallbackUtil.getSubTenantListForFallBack(tenantId);
 
-            if(!CollectionUtils.isEmpty(masterDataList))
+        for (String subTenantId : subTenantListForFallback) {
+
+            mdmsCriteriaReqV2.getMdmsCriteria()
+                    .setTenantId(subTenantId);
+
+            masterDataList = mdmsDataRepository.searchV2(
+                    mdmsCriteriaReqV2.getMdmsCriteria());
+
+            if (!CollectionUtils.isEmpty(masterDataList)) {
                 break;
+            }
         }
 
         return masterDataList;
     }
 
     /**
-     * This method processes the requests that come for master data update.
-     * @param mdmsRequest
-     * @return
+     * Processes master data delete requests.
+     * The persister handles audit logging and deletion.
      */
-    public List<Mdms> update(MdmsRequest mdmsRequest) {
+    public List<Mdms> delete(
+            MdmsRequest mdmsRequest,
+            String schemaCode) {
 
-        // Fetch schema against which data is getting created
-        JSONObject schemaObject = schemaUtil.getSchema(mdmsRequest);
+        String tenantId = multiStateInstanceUtil.getStateLevelTenant(
+                mdmsRequest.getMdms().getTenantId());
 
-        // Validate master data update request
-        mdmsDataValidator.validateUpdateRequest(mdmsRequest, schemaObject);
+        Mdms existing = mdmsDataRepository.getById(
+                tenantId,
+                mdmsRequest.getMdms().getId());
 
-        // Enrich master data update request
-        mdmsDataEnricher.enrichUpdateRequest(mdmsRequest);
+        if (existing == null) {
+            throw new RuntimeException("Master data not found");
+        }
 
-        // Emit MDMS update event to be listened by persister
-        mdmsDataRepository.update(mdmsRequest);
+        // Preserve the existing record details.
+        mdmsRequest.getMdms()
+                .setTenantId(existing.getTenantId());
+
+        mdmsRequest.getMdms()
+                .setSchemaCode(existing.getSchemaCode());
+
+        mdmsRequest.getMdms()
+                .setUniqueIdentifier(existing.getUniqueIdentifier());
+
+        // Mark the operation for audit tracking.
+        mdmsRequest.getMdms()
+                .setOperation(Operation.DELETE.name());
+
+        // Publish the delete event.
+        mdmsDataRepository.delete(mdmsRequest);
 
         return Arrays.asList(mdmsRequest.getMdms());
     }
 
+    /**
+     * Processes master data update requests.
+     */
+    public List<Mdms> update(MdmsRequest mdmsRequest) {
+
+        // Fetch the schema against which data is being updated.
+        JSONObject schemaObject = schemaUtil.getSchema(mdmsRequest);
+
+        // Validate the update request.
+        mdmsDataValidator.validateUpdateRequest(
+                mdmsRequest, schemaObject);
+
+        // Enrich the update request.
+        mdmsDataEnricher.enrichUpdateRequest(mdmsRequest);
+
+        String tenantId = multiStateInstanceUtil.getStateLevelTenant(
+                mdmsRequest.getMdms().getTenantId());
+
+        // Fetch the existing master data.
+        Mdms existing = mdmsDataRepository.getById(
+                tenantId,
+                mdmsRequest.getMdms().getId());
+
+        if (existing == null) {
+            throw new RuntimeException("Master data not found");
+        }
+
+        // Preserve existing record details.
+        mdmsRequest.getMdms()
+                .setTenantId(existing.getTenantId());
+
+        mdmsRequest.getMdms()
+                .setSchemaCode(existing.getSchemaCode());
+
+        mdmsRequest.getMdms()
+                .setUniqueIdentifier(existing.getUniqueIdentifier());
+
+        // Preserve creation audit details.
+        if (existing.getAuditDetails() != null
+                && mdmsRequest.getMdms().getAuditDetails() != null) {
+
+            mdmsRequest.getMdms().getAuditDetails()
+                    .setCreatedBy(
+                            existing.getAuditDetails().getCreatedBy());
+
+            mdmsRequest.getMdms().getAuditDetails()
+                    .setCreatedTime(
+                            existing.getAuditDetails().getCreatedTime());
+        }
+
+        // Mark the operation for audit tracking.
+        mdmsRequest.getMdms()
+                .setOperation(Operation.UPDATE.name());
+
+        // Publish the update event.
+        mdmsDataRepository.update(mdmsRequest);
+
+        return Arrays.asList(mdmsRequest.getMdms());
+    }
 }

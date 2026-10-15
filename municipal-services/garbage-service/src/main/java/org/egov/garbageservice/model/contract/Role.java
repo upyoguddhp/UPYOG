@@ -47,7 +47,21 @@
  */
 package org.egov.garbageservice.model.contract;
 
+<<<<<<< HEAD:municipal-services/garbage-service/src/main/java/org/egov/garbageservice/model/contract/Role.java
 import javax.validation.constraints.NotNull;
+=======
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
+>>>>>>> niua-upstream/niua-dev-2.0:finance/egov/egov-egiweb/src/test/java/org/egov/egi/web/controller/AbstractContextControllerTest.java
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -68,6 +82,7 @@ public class Role {
 	    this.name = name;
 	}
 
+<<<<<<< HEAD:municipal-services/garbage-service/src/main/java/org/egov/garbageservice/model/contract/Role.java
 	public String getName() {
 		return name;
 	}
@@ -75,6 +90,16 @@ public class Role {
 	public void setName(String name) {
 		this.name = name;
 	}
+=======
+        // Spring 6 removed Tiles integration (org.springframework.web.servlet.view.tiles3).
+        // Production rendering uses Struts' own Tiles result type + JSP taglib (see egov-egiweb
+        // web.xml / tiles.xml), which is untouched by this change. This test only needs a
+        // no-op ViewResolver so standaloneSetup doesn't fail to resolve a view name.
+        ViewResolver noOpViewResolver = (viewName, locale) -> (View) (model, request, response) -> { };
+
+        mvcBuilder = standaloneSetup(controller).setValidator(validator)
+                .setViewResolvers(noOpViewResolver);
+>>>>>>> niua-upstream/niua-dev-2.0:finance/egov/egov-egiweb/src/test/java/org/egov/egi/web/controller/AbstractContextControllerTest.java
 
 	public String getCode() {
 		return code;

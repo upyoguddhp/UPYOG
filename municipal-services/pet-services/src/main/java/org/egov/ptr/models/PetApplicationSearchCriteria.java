@@ -26,6 +26,10 @@ public class PetApplicationSearchCriteria {
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 
+	// filter based on multiple application numbers
+	@JsonProperty("listOfApplicationNumbers")
+	private List<String> listOfApplicationNumbers;
+
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
 
@@ -41,10 +45,21 @@ public class PetApplicationSearchCriteria {
 	@JsonProperty("breedType")
 	private String breedType = null;
 
+<<<<<<< HEAD
 	@JsonProperty("createdBy")
 	private String createdBy;
 
 	@JsonProperty("isBannedPet")
 	private Boolean isBannedPet;
+=======
+	@JsonProperty("validityDate")
+	private Long validityDate = null;
+
+	@JsonProperty("expireFlag")
+	private Boolean expireFlag = null;
+
+	@JsonProperty("applicationType")
+	private String applicationType = null;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 }

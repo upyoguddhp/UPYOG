@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FormStep, RadioButtons } from "@egovernments/digit-ui-react-components";
+import { RadioButtons } from "@nudmcdgnpm/digit-ui-react-components";
 import Timeline from "../../components/CPTTimeline";
+import {FormStep} from "@nudmcdgnpm/digit-ui-react-components"
 
 const KnowYourProperty = ({ t, config, onSelect, userType, formData }) => {
   const [KnowProperty, setKnowProperty] = useState(formData?.PropDetails?.KnowProperty);

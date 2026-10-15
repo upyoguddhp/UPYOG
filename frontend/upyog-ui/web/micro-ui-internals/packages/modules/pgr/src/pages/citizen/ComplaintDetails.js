@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LinkButton } from "@nudmcdgnpm/digit-ui-react-components";
 
 import { LOCALIZATION_KEY } from "../../constants/Localization";
 
@@ -16,7 +17,7 @@ import {
   ImageViewer,
   Loader,
   Toast,
-} from "@egovernments/digit-ui-react-components";
+} from "@nudmcdgnpm/digit-ui-react-components";
 
 import TimeLine from "../../components/TimeLine";
 
@@ -54,7 +55,7 @@ const ComplaintDetailsPage = (props) => {
   let { id } = useParams();
 
   let tenantId = Digit.SessionStorage.get("CITIZEN.COMMON.HOME.CITY")?.code || Digit.ULBService.getCurrentTenantId(); // ToDo: fetch from state
-  const { isLoading, error, isError, complaintDetails, revalidate } = Digit.Hooks.pgr.useComplaintDetails({ tenantId, id });
+  const { isLoading, error, isError, data:complaintDetails, refetch:revalidate } = Digit.Hooks.pgr.useComplaintDetails({ tenantId, id });
 
   const [imageShownBelowComplaintDetails, setImageToShowBelowComplaintDetails] = useState({});
 
@@ -69,6 +70,7 @@ const ComplaintDetailsPage = (props) => {
   const [disableComment, setDisableComment] = useState(true);
 
   const [loader, setLoader] = useState(false);
+  const [viewTimeline, setViewTimeline]=useState(false);
 
   useEffect(() => {
     (async () => {
@@ -90,7 +92,14 @@ const ComplaintDetailsPage = (props) => {
   function onCloseImageZoom() {
     setImageZoom(null);
   }
-
+  
+  const handleViewTimeline=()=>{ 
+    const timelineSection=document.getElementById('timeline');
+      if(timelineSection){
+        timelineSection.scrollIntoView({behavior: 'smooth'});
+      } 
+      setViewTimeline(true);   
+  };
   const onWorkFlowChange = (data) => {
     let timeline = data?.timeline;
     timeline && timeline[0].timeLineActions?.filter((e) => e === "COMMENT").length ? setDisableComment(false) : setDisableComment(true);
@@ -132,14 +141,18 @@ const ComplaintDetailsPage = (props) => {
   return (
     <React.Fragment>
       <div className="complaint-summary">
+        <div style={{display:"flex",justifyContent:"space-between",maxWidth:"960px"}}>
         <Header>{t(`${LOCALIZATION_KEY.CS_HEADER}_COMPLAINT_SUMMARY`)}</Header>
-
-        {Object.keys(complaintDetails).length > 0 ? (
+        <div style={{ color:"#A52A2A"}}>
+        <LinkButton label={t("VIEW_TIMELINE")}  onClick={handleViewTimeline} ></LinkButton>
+        </div>
+        </div>
+        {Object?.keys(complaintDetails || {}).length > 0 ? (
           <React.Fragment>
             <Card>
               <CardSubHeader>{t(`SERVICEDEFS.${complaintDetails.audit.serviceCode.toUpperCase()}`)}</CardSubHeader>
               <StatusTable>
-                {Object.keys(complaintDetails.details).map((flag, index, arr) => (
+                {Object?.keys(complaintDetails.details).map((flag, index, arr) => (
                   <Row
                     key={index}
                     label={t(flag)}
@@ -158,9 +171,11 @@ const ComplaintDetailsPage = (props) => {
               {imageZoom ? <ImageViewer imageSrc={imageZoom} onClose={onCloseImageZoom} /> : null}
             </Card>
             <Card>
+            <div id="timeline">
               {complaintDetails?.service && (
                 <WorkflowComponent getWorkFlow={onWorkFlowChange} complaintDetails={complaintDetails} id={id} zoomImage={zoomImage} />
               )}
+              </div>
             </Card>
             {/* <Card>
       <CardSubHeader>{t(`${LOCALIZATION_KEY.CS_COMMON}_COMMENTS`)}</CardSubHeader>

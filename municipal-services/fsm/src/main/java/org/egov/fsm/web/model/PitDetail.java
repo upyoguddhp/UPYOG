@@ -2,7 +2,7 @@ package org.egov.fsm.web.model;
 
 import javax.validation.constraints.DecimalMax;
 
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +19,7 @@ import lombok.ToString;
  * cature the pit details 
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -30,15 +30,15 @@ import lombok.ToString;
 @Setter
 public class PitDetail   {
  
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("type")
   private String type = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("id")
   private String id = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("tenantId")
   private String tenantId = null;
   

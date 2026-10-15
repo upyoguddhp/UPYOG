@@ -46,8 +46,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
 
+<<<<<<< HEAD
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+=======
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+>>>>>>> niua-upstream/niua-dev-2.0
 import java.util.ArrayList;
 import java.util.List;
 

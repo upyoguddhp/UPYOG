@@ -1,0 +1,50 @@
+{
+  "name": "@egovernments/digit-ui-css",
+  "version": "1.8.1",
+  "license": "MIT",
+  "author": "NUDMCDG Team, NIUA",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "vite build --watch",
+    "build:prod": "vite build",
+    "prepublish": "yarn build:prod"
+  },
+  "browserslist": [
+    "> 3%",
+    "last 2 versions"
+  ],
+  "style": "./dist/index.css",
+  "exports": {
+    ".": "./dist/index.css"
+  },
+  "dependencies": {
+    "normalize.css": "8.0.1"
+  },
+  "devDependencies": {
+    "sass": "^1.62.0",
+    "autoprefixer": "10.4.14",
+    "cssnano": "^6.0.1",
+    "postcss": "8.4.26",
+    "postcss-import": "^15.1.0",
+    "postcss-preset-env": "^8.5.0",
+    "postcss-scss": "^4.0.9",
+    "tailwindcss": "1.9.6",
+    "vite": "^6.0.0"
+  },
+  "files": [
+    "dist/index.css",
+    "svg/**/*.svg",
+    "img/**/*.png",
+    "src/**/*.scss",
+    "src/**/*.css"
+  ],
+  "keywords": [
+    "upyog",
+    "nudm",
+    "niua",
+    "workbench-ui",
+    "css"
+  ]
+}

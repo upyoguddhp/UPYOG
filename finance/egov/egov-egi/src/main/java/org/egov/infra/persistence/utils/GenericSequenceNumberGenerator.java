@@ -52,18 +52,23 @@ import static org.egov.infra.utils.ApplicationConstant.UNDERSCORE;
 
 import java.io.Serializable;
 
-import org.hibernate.exception.SQLGrammarException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Generic db sequence number generator class, this class first try to return the next val
- * for the given DB sequenceName, if sequence does not exist then it creates a new DB sequence
- * with the given sequenceName and return the next val for the DB sequence.
+ * Generic PostgreSQL sequence helper used by voucher / bill / application
+ * number generation.
+ *
+ * LTS Migration Fix (Hibernate 6 + WildFly JTA):
+ * Check whether a sequence exists before requesting its next value.
  */
 @Service
 public class GenericSequenceNumberGenerator {
+
+    private static final Logger LOGGER =
+            Logger.getLogger(GenericSequenceNumberGenerator.class);
 
     private static final String DISALLOWED_CHARACTERS = "[\\/ -]";
 
@@ -75,12 +80,18 @@ public class GenericSequenceNumberGenerator {
 
     @Transactional
     public Serializable getNextSequence(String sequenceName) {
-        String normalizedSequenceName = /*ApplicationThreadLocals.getTenantID()*/"shimla."+ sequenceName.replaceAll(DISALLOWED_CHARACTERS, UNDERSCORE);
-        try {
-           return this.databaseSequenceProvider.getNextSequence(normalizedSequenceName);
-        } catch (SQLGrammarException e) {
+
+        String normalizedSequenceName =
+                sequenceName.replaceAll(DISALLOWED_CHARACTERS, UNDERSCORE);
+
+        if (!this.databaseSequenceProvider.sequenceExists(normalizedSequenceName)) {
+            LOGGER.info(
+                    "Creating missing voucher/application sequence "
+                            + normalizedSequenceName);
+
             this.databaseSequenceCreator.createSequence(normalizedSequenceName);
         }
+
         return this.databaseSequenceProvider.getNextSequence(normalizedSequenceName);
     }
 }

@@ -1,7 +1,13 @@
 package org.egov.garbageservice.util;
 
+<<<<<<< HEAD
 import java.util.Map;
 
+=======
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.apache.commons.lang3.StringUtils;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +15,25 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import lombok.extern.slf4j.Slf4j;
 
+=======
+import java.util.Map;
+
+/**
+ * Shared HTTP client for POST calls to external eGov microservices (MDMS, billing, workflow, etc.).
+ * Uses RestTemplate and maps responses to Map; wraps HttpClientErrorException as ServiceCallException.
+ */
+>>>>>>> niua-upstream/niua-dev-2.0
 @Repository
 @Slf4j
 public class RestCallRepository {
 
+<<<<<<< HEAD
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -43,5 +59,32 @@ public class RestCallRepository {
 		return response;
 
 	}
+=======
+    @Autowired
+    private RestTemplate restTemplate;
+
+    /**
+     * Fetches results from the given API and request and handles errors.
+     */
+    public Object fetchResult(StringBuilder uri, Object request) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        Object response = null;
+        try {
+            response = restTemplate.postForObject(uri.toString(), request, Map.class);
+        } catch (HttpClientErrorException e) {
+            log.error("External Service threw an Exception: ", e);
+            if (!StringUtils.isEmpty(e.getResponseBodyAsString())) {
+                throw new ServiceCallException(e.getResponseBodyAsString());
+            }
+        } catch (Exception e) {
+            log.error("Exception while fetching from searcher: ", e);
+            log.info("req: " + (request));
+        }
+
+        return response;
+
+    }
+>>>>>>> niua-upstream/niua-dev-2.0
 
 }

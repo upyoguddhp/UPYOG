@@ -88,6 +88,10 @@ public class IngestValidator {
 	public static final String MDMS_NATIONALTENANTS_PATH = "$.MdmsRes.tenant.nationalInfo";
 
 	public static final String MDMS_PROPERTYTYPE_PATH = "$.MdmsRes.tenant.propertyType";
+	
+	public static final String MDMS_PAYMENTCHANNEL_PATH = "$.MdmsRes.common-masters.PaymentChannel";
+
+    public static final String MDMS_NATIONALTENANTUSER_PATH = "$.MdmsRes.tenant.nationalInfoUser";
 
 //    public void verifyCrossStateRequest(Data data, RequestInfo requestInfo){
 //        String employeeUlb = requestInfo.getUserInfo().getTenantId();
@@ -149,56 +153,96 @@ public class IngestValidator {
 
     public void verifyDataStructure(Data ingestData){
 
+        /*What happens: The method first checks basic fields like:
+        Date: Makes sure the date is in the correct format
+        ULB, Ward, Region, State: Makes sure these text fields don't contain numbers where they shouldn't 
+        */
         validateDateFormat(ingestData.getDate());
-        validateStringNotNumeric(ingestData.getWard());
         validateStringNotNumeric(ingestData.getUlb());
+        validateStringNotNumeric(ingestData.getWard());
         validateStringNotNumeric(ingestData.getRegion());
         validateStringNotNumeric(ingestData.getState());
+
+
+        /*What happens:
+            Removes colons (:) from ward names and replaces them with spaces
+            Converts state names to camelCase format (like "new york" becomes "newYork") 
+        */
         if(ingestData.getWard().contains(":"))
         	ingestData.setWard(ingestData.getWard().replace(":"," "));
 		
         ingestData.setState(toCamelCase(ingestData.getState()));
 
 
+        /*What happens:
+        Looks up what fields are allowed for this specific module
+        Think of it like checking a rulebook: "For module X, these are the only fields allowed"
+        If no rules exist for this module, it throws an error*/
         Set<String> configuredFieldsForModule = new HashSet<>();
-
         if(applicationProperties.getModuleFieldsMapping().containsKey(ingestData.getModule()))
             configuredFieldsForModule = applicationProperties.getModuleFieldsMapping().get(ingestData.getModule()).keySet();
         else
             throw new CustomException("EG_DS_VALIDATE_ERR", "Field mapping has not been configured for module code: " + ingestData.getModule());
+
         try {
             Map<String, JsonNodeType> keyVsTypeMap = new HashMap<>();
+            /**
+             * Converts the data to JSON format for easier analysis
+                Extracts the "metrics" section from the data
+                Gets a list of all field names in the metrics
+             */
             String seedData = objectMapper.writeValueAsString(ingestData);
+            //get all the data in the json formats
             JsonNode incomingData = objectMapper.readValue(seedData, JsonNode.class);
             List<String> keyNames = new ArrayList<>();
+            //extarcting the metrics which we send inside teh Payload and data
             JsonNode metricsData = incomingData.get(IngestConstants.METRICS);
             jsonProcessorUtil.enrichKeyNamesInList(metricsData, keyNames);
 
+            /*
+             * For each field in your data, it checks: "Is this field allowed for this module?"
+                If any field is not in the allowed list, it throws an error
+                It also records what type each field is (number, text, array, etc.)
+             */
             for(String inputKeyName : keyNames){
                 keyVsTypeMap.put(inputKeyName, metricsData.get(inputKeyName).getNodeType());
+                // if any of key which is inisde metrics in your payload is not contained then it will thorwi thsi error 
                 if(!configuredFieldsForModule.contains(inputKeyName))
                     throw new CustomException("EG_DS_VALIDATE_ERR", "The metric: " + inputKeyName + " was not configured in field mapping for module: " + ingestData.getModule());
             }
 
-//            if(keyNames.size() < configuredFieldsForModule.size()){
-//                List<String> absentFields = new ArrayList<>();
-//                configuredFieldsForModule.forEach(field -> {
-//                    if(!keyNames.contains(field))
-//                        absentFields.add(field);
-//                });
-//                throw new CustomException("EG_DS_VALIDATE_ERR", "Received less number of fields than the number of fields configured in field mapping for module: " + ingestData.getModule() + ". List of absent fields: " + absentFields.toString());
-//            }
+            /*This is the most complex part. For each field, it checks two scenarios:
+             * 1.  Array Fields (Complex Data)
+             * 2.  Simple Fields
+            */
 
+            /*keyVsTypeMap contains all field names from your metrics and their detected data types or your data, this would include keys like: "todaysApplications", "transactions", "todaysCollection", etc. */
             keyVsTypeMap.keySet().forEach(key ->{
                 JsonNodeType type = keyVsTypeMap.get(key);
+                //extracting all the keys from module fields mapping and checking if there is any array type for modules
+                /*
+                 * The :: acts as a delimiter where:
+                    Left side ("usageCategory"): Describes what the array represents
+                    Right side ("NUMBER"): The expected data type of values in the array
+
+                    Field: "todaysCollection"
+                    Configuration: "usageCategory::NUMBER"
+                    Result: Contains "::" → This is an array field
+                 */
                 if(applicationProperties.getModuleFieldsMapping().get(ingestData.getModule()).get(key).contains("::")){
+                    /*
+                     * Configuration: "usageCategory::NUMBER"
+                        After split("::")[1]: Gets "NUMBER"
+                        valueType: "NUMBER"
+                     */
                     String valueType = applicationProperties.getModuleFieldsMapping().get(ingestData.getModule()).get(key).split("::")[1];
+                    //if any key is added as a array but you send data in other format it throw this error 
                     if(!(metricsData.get(key) instanceof ArrayNode)){
                         throw new CustomException("EG_DS_VALIDATE_ERR", "Key: " + key + " is configured as type array but received value of type: " + type.toString());
                     }else{
                         for(JsonNode childNode : metricsData.get(key)){
                             // Validate groupBy field names for consistency
-                            String inputGroupByField = childNode.get("groupBy").asText();
+                            String inputGroupByField = childNode.get("groupBy").asText(); // get the name of group by from metrics
                             if(!applicationProperties.getModuleAllowedGroupByFieldsMapping().containsKey(ingestData.getModule()))
                                 throw new CustomException("EG_DS_VALIDATE_ERR", "Allowed groupBy fields mapping are mandatory for array type fields. It has not been configured for module: " + ingestData.getModule());
                             else
@@ -356,7 +400,9 @@ public class IngestValidator {
 			.build();
 	
 	
+    // contructing a module detail to send in MDMS - tenant is the module name and nationalInfo is the masterName
 	ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("tenant").masterDetails(Arrays.asList(mstrDetail)).build();
+    //here it is sending module details and tenant id to fetch the data from MDMS
 	MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId("pg").build();
 	MdmsCriteriaReq mdmsConfig = MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	Object response = null;
@@ -413,11 +459,24 @@ public class IngestValidator {
         int validCounts=0;
         
         Boolean isUsageCategoryInvalid = false;
-        if (ingestData.getModule() != null && ingestData.getModule().equals("COMMON") || ingestData.getModule().equals("PGR") || ingestData.getModule() != null && ingestData.getModule().equals("TL") || ingestData.getModule() != null && ingestData.getModule().equals("OBPS") || ingestData.getModule() != null && ingestData.getModule().equals("MCOLLECT") ) {
+    
+        /* Commenting out because we simplified this approach below
+        if (ingestData.getModule() != null && ingestData.getModule().equals("COMMON") || ingestData.getModule().equals("PGR") || ingestData.getModule() != null && ingestData.getModule().equals("TL") || ingestData.getModule() != null && ingestData.getModule().equals("OBPS") ||ingestData.getModule() != null && ingestData.getModule().equals("MCOLLECT") ) {
             keyToFetch = null;
             isUsageCategoryInvalid = true;
         }
-    
+        */
+
+        // Check if module is one of the specific modules that require usage category validation
+        Set<String> validModules = new HashSet<>(Arrays.asList("COMMON", "PGR", "TL", "OBPS", "MCOLLECT", "SV","FINANCE", "PTR", "EWASTE", "ECHALLAN", "ADV", "CHB"));
+        String module = ingestData.getModule();
+        log.info("Processing usage type for module: {}", module);
+        
+        if (module != null && validModules.contains(module)) {
+            keyToFetch = null;
+            isUsageCategoryInvalid = true;
+        }
+            
         if (ingestData.getModule() != null && ingestData.getModule().equals("PT")) {
             keyToFetch = applicationProperties.getNationalDashboardUsageTypePT();
         }
@@ -459,6 +518,85 @@ public class IngestValidator {
 
     	return isUsageCategoryInvalid;
     }
+	 
+	
+	public Boolean verifyPayment(Data ingestData, Set < String > paymentChannelList) {
+
+	        Set < String > PaymentChannel = new HashSet < String > ();
+	        HashMap < String, Object > map = ingestData.getMetrics();
+	        List < String > keyToFetch = null;
+	        Boolean isValid=false;
+	        int validCounts=0;
+	        
+            /* 
+            Commenting out because we simplified this approach below 
+
+	        Boolean isPaymentChannelInvalid = false;
+	        if (ingestData.getModule() != null && (ingestData.getModule().equals("COMMON")||ingestData.getModule().equals("PGR")) ) {
+	            keyToFetch = null;
+	            isPaymentChannelInvalid = true;
+	        }
+	    
+	        if (ingestData.getModule() != null && (ingestData.getModule().equals("PT")|| ingestData.getModule().equals("FIRENOC") || ingestData.getModule().equals("BIRTH") || ingestData.getModule().equals("DEATH") || ingestData.getModule().equals("TL") || ingestData.getModule().equals("FSM") || ingestData.getModule().equals("WS") || ingestData.getModule().equals("OBPS")) ) {
+	            keyToFetch = applicationProperties.getNationalDashboardpaymentChannel();
+	        }
+	        else if (ingestData.getModule() != null && ingestData.getModule().equals("MCOLLECT")) {
+	            keyToFetch = applicationProperties.getNationalDashboardpaymentChannelMISC();
+	        }
+            */
+
+
+            // Define module groups for payment channel handling
+            Set<String> moduleWithoutPayment = new HashSet<>(Arrays.asList("COMMON", "PGR", "EWASTE"));
+            Set<String> moduleWithPayment = new HashSet<>(Arrays.asList("PT", "FIRENOC", "TL", "FSM", "WS", "OBPS", "SV","FINANCE", "PTR", "ECHALLAN", "ADV" ,"CHB"));
+
+            String module = ingestData.getModule();
+            Boolean isPaymentChannelInvalid = false;
+
+            log.info("Processing payment channel for module: {}", module);
+
+            if (module != null) {
+                if (moduleWithoutPayment.contains(module)) {
+                    // COMMON and PGR modules have invalid payment channels
+                    keyToFetch = null;
+                    isPaymentChannelInvalid = true;
+                } else if (moduleWithPayment.contains(module)) {
+                    // Standard modules use national dashboard payment channel
+                    keyToFetch = applicationProperties.getNationalDashboardpaymentChannel();
+                } else if (module.equals("MCOLLECT")) {
+                    // MCOLLECT uses miscellaneous payment channel
+                    keyToFetch = applicationProperties.getNationalDashboardpaymentChannelMISC();
+                }
+            }
+
+	        if (keyToFetch != null) {
+	            for (String key: keyToFetch) {
+	                List < HashMap < String, Object >> values = (List < HashMap < String, Object >> ) map.get(key);
+	                if (values!=null) {
+	                for (HashMap < String, Object > a: values) {
+	                    if (a.get("groupBy").equals("paymentChannelType") || a.get("groupBy").equals("paymentMode")) {
+	                        List < HashMap < String, String >> valuess = (List < HashMap < String, String >> ) a.get("buckets");
+	                        for (HashMap < String, String > b: valuess)
+	                        	PaymentChannel.add(toCamelCase(b.get("name")));
+	                    }
+	                }
+	                }
+	            }
+	    		for (String pc: PaymentChannel) {
+	    			isValid=paymentChannelList.contains(pc); 
+	    			if(!isValid)
+	    				break;
+	    			else
+	    				validCounts++;
+	    				
+	    				
+	            }
+	            if(validCounts==PaymentChannel.size())
+	            	isPaymentChannelInvalid=true;
+	        }
+
+	    	return isPaymentChannelInvalid;
+	    }
     
     public Set < String > verifyPropertyType(RequestInfo requestInfo, List < Data > ingestData) {
 
@@ -466,13 +604,16 @@ public class IngestValidator {
         Boolean isUsageTypeValid = false;
         int validCounts = 0;
 
+        //get the mdms host 
         StringBuilder mdmsURL = new StringBuilder().append(mdmsHost).append(mdmsEndpoint);
 
+        // setting master name - propertyType and get only those who is active true only
         MasterDetail mstrDetail = MasterDetail.builder().name("propertyType")
             .filter("[?(@.active==true)]")
             .build();
 
 
+        // contructing a module detail to send in MDMS - tenant is the module name and propertyType is the masterName
         ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("tenant").masterDetails(Arrays.asList(mstrDetail)).build();
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId("pg").build();
         MdmsCriteriaReq mdmsConfig = MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
@@ -508,14 +649,64 @@ public class IngestValidator {
         return usageList;
     }
     
+    // get the payment channel and verify paymnet channel through the MDMS
+    public Set < String > verifyPaymentChannel(RequestInfo requestInfo, List < Data > ingestData) {
+
+
+        Boolean isPaymentChannelValid = false;
+        int validCounts = 0;
+
+        StringBuilder mdmsURL = new StringBuilder().append(mdmsHost).append(mdmsEndpoint);
+
+        MasterDetail mstrDetail = MasterDetail.builder().name("PaymentChannel")
+            .filter("[?(@.active==true)]")
+            .build();
+
+
+        ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("common-masters").masterDetails(Arrays.asList(mstrDetail)).build();
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId("pg").build();
+        MdmsCriteriaReq mdmsConfig = MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+        Object response = null;
+        List < Map < String, String >> jsonOutput = null;
+
+        log.info("URI: " + mdmsURL.toString());
+        try {
+            log.info(objectMapper.writeValueAsString(mdmsConfig));
+            response = restTemplate.postForObject(mdmsURL.toString(), mdmsConfig, Map.class);
+            jsonOutput = JsonPath.read(response, MDMS_PAYMENTCHANNEL_PATH);
+            //migratedTenant= jsonOutput.get(0);
+
+        } catch (ResourceAccessException e) {
+
+            Map < String, String > map = new HashMap < > ();
+            map.put(null, e.getMessage());
+            throw new CustomException(map);
+        } catch (HttpClientErrorException e) {
+
+            log.info("the error is : " + e.getResponseBodyAsString());
+            throw new ServiceCallException(e.getResponseBodyAsString());
+        } catch (Exception e) {
+
+            log.error("Exception while fetching from searcher: ", e);
+        }
+
+
+        Set < String > paymentChannelList = new HashSet < String > ();
+        for (Map < String, String > paymentType: jsonOutput) {
+        	paymentChannelList.add(paymentType.get("code"));
+        }
+        return paymentChannelList;
+    }
+    
     // The verification logic will always use module name + date to determine the uniqueness of a set of records.
     public IngestAckData verifyIfDataAlreadyIngested(List<Data> ingestData) {
         List<String> keyDataToSearch = new ArrayList<>();
         Set<String> uniquenessHash = new HashSet<>();
         IngestAckData hashedData = new IngestAckData();
         List<AckEntity> ackEntityList = new ArrayList<>();
+        
         ingestData.forEach(data -> {
-	    if(data.getWard().contains(":"))
+            if(data.getWard().contains(":"))
         	 data.setWard(data.getWard().replace(":"," "));
             StringBuilder currKeyData = new StringBuilder();
             currKeyData.append(data.getDate()).append(":").append(data.getModule()).append(":").append(data.getWard()).append(":").append(data.getUlb()).append(":").append(data.getRegion()).append(":").append(data.getState());
@@ -539,7 +730,7 @@ public class IngestValidator {
     public void verifyIfMasterDataAlreadyIngested(MasterData masterData) {
         StringBuilder uri = new StringBuilder(applicationProperties.getElasticSearchHost() + "/");
         uri.append(applicationProperties.getMasterDataIndex());
-        uri.append("/nss").append("/_search");
+        uri.append("/_search");
         uri.append("?q=financialYear").append(":").append(masterData.getFinancialYear()).append(" AND ").append("module").append(":").append(masterData.getModule()).append(" AND ").append("region").append(":").append(masterData.getRegion()).append(" AND ").append("state").append(":").append(masterData.getState());
         log.info(uri.toString());
         Integer numOfRecordsFound = repository.findIfRecordAlreadyExists(uri);
@@ -577,5 +768,95 @@ public class IngestValidator {
         converted.append(ch);
         }
         return converted.toString();
-	}
+    }
+
+    public Map<String, Map<String, Object>> stateListMDMS(RequestInfo requestInfo) {
+
+
+        StringBuilder mdmsURL = new StringBuilder().append(mdmsHost).append(mdmsEndpoint);
+
+        MasterDetail mstrDetail = MasterDetail.builder().name("nationalInfoUser")
+                .filter("[?(@.active==true)]")
+                .build();
+
+        MasterDetail mstrDetail1 = MasterDetail.builder().name("nationalInfo")
+                .filter("[?(@.active==true)]")
+                .build();
+
+
+        ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("tenant").masterDetails(Arrays.asList(mstrDetail)).build();
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId("pg").build();
+        MdmsCriteriaReq mdmsConfig = MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+        Object response = null;
+        List < Map < String, String >> nationalinfouser = null;
+
+        log.info("URI: " + mdmsURL.toString());
+        try {
+            log.info(objectMapper.writeValueAsString(mdmsConfig));
+            response = restTemplate.postForObject(mdmsURL.toString(), mdmsConfig, Map.class);
+            nationalinfouser = JsonPath.read(response, MDMS_NATIONALTENANTUSER_PATH);
+
+
+        } catch (ResourceAccessException e) {
+
+            Map < String, String > map = new HashMap < > ();
+            map.put(null, e.getMessage());
+            throw new CustomException(map);
+        } catch (HttpClientErrorException e) {
+
+            log.info("the error is : " + e.getResponseBodyAsString());
+            throw new ServiceCallException(e.getResponseBodyAsString());
+        } catch (Exception e) {
+
+            log.error("Exception while fetching from searcher: ", e);
+        }
+        ModuleDetail moduleDetail1 = ModuleDetail.builder().moduleName("tenant").masterDetails(Arrays.asList(mstrDetail1)).build();
+        MdmsCriteria mdmsCriteria1 = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail1)).tenantId("pg").build();
+        MdmsCriteriaReq mdmsConfig1 = MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria1).build();
+        List<Map<String,String>> nationalinfo = null;
+        try {
+            log.info(objectMapper.writeValueAsString(mdmsConfig1));
+            response = restTemplate.postForObject(mdmsURL.toString(), mdmsConfig1, Map.class);
+            nationalinfo=  JsonPath.read(response, MDMS_NATIONALTENANTS_PATH);
+            //migratedTenant= jsonOutput.get(0);
+
+        } catch (ResourceAccessException e) {
+
+            Map<String, String> map = new HashMap<>();
+            map.put(null, e.getMessage());
+            throw new CustomException(map);
+        }  catch (HttpClientErrorException e) {
+
+            log.info("the error is : " + e.getResponseBodyAsString());
+            throw new ServiceCallException(e.getResponseBodyAsString());
+        }catch (Exception e) {
+
+            log.error("Exception while fetching from searcher: ", e);
+        }
+
+        Map<String, Map<String, Object>> stateEmailMap = new HashMap<>();
+
+        for (Map<String, String> state : nationalinfouser) {
+            String stateCode = state.get("stateCode");
+            String email = state.get("emailId");
+            String nodalOfficer = state.get("NodalOfficerName");
+            if (stateCode != null && email != null) {
+                Map<String, Object> officerInfo = new HashMap<>();
+                officerInfo.put("email", email);
+                officerInfo.put("nodalOfficer", nodalOfficer);
+                officerInfo.put("ULBs", new ArrayList<String>());
+
+                List<String> ulbs = (List<String>) officerInfo.get("ULBs");
+                for (Map<String, String> stateUlb : nationalinfo) {
+                    String stateWithUlb = stateUlb.get("stateCode");
+                    String ulb = stateUlb.get("code");
+                    if (stateCode.equals(stateWithUlb) && ulb != null) {
+                        ulbs.add(ulb);
+                    }
+                }
+                stateEmailMap.put(stateCode, officerInfo);
+            }
+        }
+        return stateEmailMap;
+    }
 }

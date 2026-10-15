@@ -2,12 +2,13 @@ import { requestInfoToResponseInfo } from "../utils";
 import { searchService } from "../controller/search";
 import { generateDemand } from "./demandService";
 import { getFireNoc } from "./firenocService";
-import isEmpty from "lodash/isEmpty";
+import { get, some, isEmpty } from "lodash";
 import envVariables from "../envVariables";
 import { mdmsData } from "./mdmsService";
 
 export const calculateService = async (req, pool, next) => {
   let calculalteResponse = {};
+  var header = JSON.parse(JSON.stringify(req.headers));
   const requestInfo = req.body.RequestInfo;
   const tenantId = req.body.CalulationCriteria[0].tenantId;
 
@@ -19,7 +20,7 @@ export const calculateService = async (req, pool, next) => {
   let calculations = await getCalculation(req, pool, next);
   calculalteResponse.Calculation = calculations;
 
-  let a = await generateDemand(requestInfo, tenantId, calculations);
+  let a = await generateDemand(requestInfo, tenantId, calculations, header);
 
   return calculalteResponse;
 };
@@ -27,6 +28,8 @@ export const calculateService = async (req, pool, next) => {
 const getCalculation = async (req, pool, next) => {
   let calculations = [];
   const requestInfo = req.body.RequestInfo;
+  var header = JSON.parse(JSON.stringify(req.headers));
+
   for (let i = 0; i < req.body.CalulationCriteria.length; i++) {
     let calculateCriteria = req.body.CalulationCriteria[i];
     if (calculateCriteria.fireNOC) {
@@ -36,10 +39,11 @@ const getCalculation = async (req, pool, next) => {
     if (!calculateCriteria.fireNOC || isEmpty(calculateCriteria.fireNOC)) {
       const applicationNumber = calculateCriteria.applicationNumber;
       const tenantId = calculateCriteria.tenantId;
-      let firefireNocSearchResponseNOC = getFireNoc(
+      let firefireNocSearchResponseNOC = await getFireNoc(
         requestInfo,
         applicationNumber,
-        tenantId
+        tenantId,
+        header
       );
       if (
         !firefireNocSearchResponseNOC.FireNOCs ||
@@ -55,7 +59,8 @@ const getCalculation = async (req, pool, next) => {
       calculateCriteria,
       requestInfo,
       pool,
-      next
+      next,
+      header
     );
 
     calculations.push(calculation);
@@ -68,9 +73,10 @@ const calculateForSingleReq = async (
   calculateCriteria,
   requestInfo,
   pool,
-  next
+  next,
+  header
 ) => {
-  let mdms = await mdmsData(requestInfo, calculateCriteria.tenantId);
+  let mdms = await mdmsData(requestInfo, calculateCriteria.tenantId, header);
   let mdmsConfig = {};
   for (let i = 0; i < mdms.MdmsRes.firenoc.FireNocULBConstats.length; i++) {
     let constEntry = mdms.MdmsRes.firenoc.FireNocULBConstats[i];

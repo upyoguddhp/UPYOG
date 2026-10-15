@@ -10,24 +10,23 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-
-import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.egov.vendor.config.VendorConfiguration;
+import org.egov.vendor.driver.repository.DriverRepository;
 import org.egov.vendor.driver.web.model.Driver;
 import org.egov.vendor.driver.web.model.DriverRequest;
+import org.egov.vendor.driver.web.model.DriverResponse;
 import org.egov.vendor.driver.web.model.DriverSearchCriteria;
 import org.egov.vendor.repository.ServiceRequestRepository;
+import org.egov.vendor.service.ModuleRoleService;
 import org.egov.vendor.util.VendorConstants;
 import org.egov.vendor.util.VendorErrorConstants;
-import org.egov.vendor.web.model.user.User;
-import org.egov.vendor.web.model.user.UserDetailResponse;
-import org.egov.vendor.web.model.user.UserRequest;
-import org.egov.vendor.web.model.user.UserSearchRequest;
+import org.egov.vendor.web.model.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -50,12 +49,19 @@ public class DriverUserService {
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Autowired
+	private DriverRepository driverRepository;
+
+	@Autowired
+	ModuleRoleService moduleRoleService;
+
 	/**
 	 * 
 	 * @param driverRequest
+	 * @param isCreateOrUpdate
 	 */
 	@SuppressWarnings("null")
-	public void manageDrivers(DriverRequest driverRequest) {
+	public void manageDrivers(DriverRequest driverRequest, boolean isCreateOrUpdate) {
 		Driver driver = driverRequest.getDriver();
 		RequestInfo requestInfo = driverRequest.getRequestInfo();
 		User driverInfo = driver.getOwner();
@@ -64,7 +70,8 @@ public class DriverUserService {
 		UserDetailResponse userDetailResponse = null;
 
 		if (driverInfo != null && driverInfo.getMobileNumber() != null) {
-			driverInfoMobileNumber(driverInfo, requestInfo, errorMap, driver, driverRequest);
+			ModuleRoleMapping roleMapping = moduleRoleService.getModuleRoleMapping(driverRequest, ModuleRoleMapping.MappingType.DRIVER);
+			driverInfoMobileNumber(driverInfo, requestInfo, errorMap, driver, driverRequest, isCreateOrUpdate, roleMapping);
 
 		} else {
 			log.debug("MobileNo is not provided in Application.");
@@ -75,35 +82,73 @@ public class DriverUserService {
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
 		}
+		licenseExistCheck(driverRequest);
+	}
 
+	private void licenseExistCheck(DriverRequest driverRequest) {
+		DriverResponse driverResponse = driverRepository.getDriverData(new DriverSearchCriteria());
+		
+		Optional<Driver> driver = Optional.ofNullable(driverResponse)
+		        .map(DriverResponse::getDriver)
+		        .orElse(Collections.emptyList())
+		        .stream()
+		        .filter(driverIdAndLicenseNumCheck ->
+		                driverIdAndLicenseNumCheck.getLicenseNumber().equalsIgnoreCase(driverRequest.getDriver().getLicenseNumber())
+		                && !driverIdAndLicenseNumCheck.getId().equalsIgnoreCase(driverRequest.getDriver().getId()))
+		        .findFirst();
+
+		if (driver.isPresent()) {
+			throw new CustomException("Invalid LicenseNumber", " Driver with the same license number already exist");
+		}
 	}
 
 	private void driverInfoMobileNumber(User driverInfo, RequestInfo requestInfo, HashMap<String, String> errorMap,
-			Driver driver, DriverRequest driverRequest) {
-		UserDetailResponse userDetailResponse = userExists(driverInfo);
+										Driver driver, DriverRequest driverRequest, boolean isCreateOrUpdate, ModuleRoleMapping roleMapping) {
+		UserDetailResponse userDetailResponse = userExists(driverInfo);// 1 user
+
 		User foundDriver = null;
 		if (userDetailResponse != null && !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-
 			for (int i = 0; i < userDetailResponse.getUser().size(); i++) {
 
-				if (isRoleAvailale(userDetailResponse.getUser().get(i), config.getDsoDriver(),
+				if (driver.getOwner().getMobileNumber().equals(userDetailResponse.getUser().get(i).getMobileNumber())
+						&& !userDetailResponse.getUser().get(i).getUuid()
+								.equals(driverRequest.getDriver().getOwner().getUuid())) {
+
+					userDetailResponse.getUser().get(i).getRoles().forEach(getAllRoles -> {
+
+						if (getAllRoles.getCode().equals(VendorConstants.FSM_DRIVER)) {
+							log.debug("Driver with the same mobile number already exist.");
+							errorMap.put(VendorErrorConstants.MOBILE_NUMBER_ALREADY_EXIST,
+									"Driver with the same mobile number already exist ");
+
+						}
+						if (!errorMap.isEmpty()) {
+							throw new CustomException(errorMap);
+						}
+					});
+
+				}
+
+				if (isRoleAvailale(userDetailResponse.getUser().get(i), roleMapping.getRoleCode(),
 						driver.getTenantId()) == Boolean.TRUE) {
 					foundDriver = userDetailResponse.getUser().get(i);
 				}
 			}
 
 			if (foundDriver == null) {
-				foundDriver = findDriver(userDetailResponse, requestInfo, errorMap);
+				foundDriver = findDriver(userDetailResponse, requestInfo, errorMap, roleMapping);
 
 			} else {
 				updateUserDetails(driverInfo, requestInfo, errorMap);
 			}
 
+		} else if (isCreateOrUpdate) {
+			foundDriver = createDriver(driverInfo, requestInfo, roleMapping);
+			driverRequest.getDriver().setOwner(foundDriver);
 		} else {
-			foundDriver = createDriver(driverInfo, requestInfo);
+			updateUserDetails(driverInfo, requestInfo, errorMap);
+			driverRequest.getDriver().setOwner(driverRequest.getDriver().getOwner());
 		}
-
-		driverRequest.getDriver().setOwner(foundDriver);
 	}
 
 	private User updateUserDetails(User driverInfo, RequestInfo requestInfo, HashMap<String, String> errorMap) {
@@ -123,9 +168,9 @@ public class DriverUserService {
 	}
 
 	private User findDriver(UserDetailResponse userDetailResponse, RequestInfo requestInfo,
-			HashMap<String, String> errorMap) {
+							HashMap<String, String> errorMap, ModuleRoleMapping roleMapping) {
 		User foundDriver = userDetailResponse.getUser().get(0);
-		foundDriver.getRoles().add(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName()));
+		foundDriver.getRoles().add(getRolObj(roleMapping.getRoleCode(), roleMapping.getRoleName()));
 		UserRequest userRequest = UserRequest.builder().user(foundDriver).requestInfo(requestInfo).build();
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getUserHost()).append(config.getUserContextPath()).append(config.getUserUpdateEndpoint());
@@ -195,21 +240,22 @@ public class DriverUserService {
 
 	/**
 	 * create Employee in HRMS for Vendor owner
-	 * 
-	 * @param owner
+	 *
+	 * @param driver
 	 * @param requestInfo
+	 * @param roleMapping
 	 * @return
 	 */
-	private User createDriver(User driver, RequestInfo requestInfo) {
+	private User createDriver(User driver, RequestInfo requestInfo, ModuleRoleMapping roleMapping) {
 
 		if (!isUserValid(driver)) {
 			throw new CustomException(VendorErrorConstants.INVALID_DRIVER_ERROR,
 					"Dob, relationShip, relation ship name and gender are mandaotry !");
 		}
 		if (driver.getRoles() != null) {
-			driver.getRoles().add(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName()));
+			driver.getRoles().add(getRolObj(roleMapping.getRoleCode(), roleMapping.getRoleName()));
 		} else {
-			driver.setRoles(Arrays.asList(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName())));
+			driver.setRoles(Arrays.asList(getRolObj(roleMapping.getRoleCode(), roleMapping.getRoleName())));
 		}
 		addUserDefaultFields(driver.getTenantId(), null, driver);
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())

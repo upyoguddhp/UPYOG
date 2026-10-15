@@ -5,8 +5,9 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
@@ -66,5 +67,58 @@ class WorkflowControllerTest {
                         .string(
                                 "{\"ResponseInfo\":{\"apiId\":null,\"ver\":null,\"ts\":null,\"resMsgId\":null,\"msgId\":null,\"status\":null},"
                                         + "\"ProcessInstances\":[],\"totalCount\":null}"));
+    }
+
+    @Test
+    void testGetDashboardApplicationCount() throws Exception {
+        when(this.workflowService.getDashboardApplicationCount((RequestInfo) any(), (org.egov.wf.web.models.ProcessInstanceSearchCriteria) any()))
+                .thenReturn(5);
+        when(this.responseInfoFactory.createResponseInfoFromRequestInfo((RequestInfo) any(), (Boolean) any()))
+                .thenReturn(new ResponseInfo());
+
+        org.egov.wf.web.models.StatusCountRequest request = new org.egov.wf.web.models.StatusCountRequest();
+        request.setRequestInfo(new RequestInfo());
+        request.setProcessInstanceSearchCriteria(new org.egov.wf.web.models.ProcessInstanceSearchCriteria());
+
+        String content = (new ObjectMapper()).writeValueAsString(request);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/egov-wf/process/dashboard/_count")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        MockMvcBuilders.standaloneSetup(this.workflowController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalCount").value(5));
+    }
+
+    @Test
+    void testGetDashboardApplications() throws Exception {
+        org.egov.wf.web.models.DashboardProcessInstanceResponse mockResponse = org.egov.wf.web.models.DashboardProcessInstanceResponse.builder()
+                .processInstances(new ArrayList<>())
+                .totalCount(10)
+                .build();
+
+        when(this.workflowService.getDashboardApplicationsWithCount((RequestInfo) any(), (org.egov.wf.web.models.ProcessInstanceSearchCriteria) any()))
+                .thenReturn(mockResponse);
+        when(this.responseInfoFactory.createResponseInfoFromRequestInfo((RequestInfo) any(), (Boolean) any()))
+                .thenReturn(new ResponseInfo());
+
+        org.egov.wf.web.models.StatusCountRequest request = new org.egov.wf.web.models.StatusCountRequest();
+        request.setRequestInfo(new RequestInfo());
+        request.setProcessInstanceSearchCriteria(new org.egov.wf.web.models.ProcessInstanceSearchCriteria());
+
+        String content = (new ObjectMapper()).writeValueAsString(request);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/egov-wf/process/dashboard/_search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        MockMvcBuilders.standaloneSetup(this.workflowController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalCount").value(10));
     }
 }

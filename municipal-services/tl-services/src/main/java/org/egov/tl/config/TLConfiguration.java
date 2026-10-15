@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import java.util.Map;
 import java.util.TimeZone;
 
 
@@ -217,9 +218,15 @@ public class TLConfiguration {
     //MDMS
     @Value("${egov.mdms.host}")
     private String mdmsHost;
+    
+    @Value("${mdms.v2.host}")
+    private String mdmsV2Host;
 
-    @Value("${egov.mdms.search.endpoint}")
+    @Value("${mdms.v2.search.endpoint}")
     private String mdmsEndPoint;
+    
+    @Value("${egov.mdms.search.endpoint}")
+    private String mdmsV1EndPoint;
 
 
     //Allowed Search Parameters
@@ -262,8 +269,8 @@ public class TLConfiguration {
     private String tlBusinessServices;
 
     //USER EVENTS
-	@Value("${egov.ui.app.host}")
-	private String uiAppHost;
+    @Value("#{${egov.ui.app.host.map}}")
+    private Map<String, String> uiAppHostMap;
     
 	@Value("${egov.usr.events.create.topic}")
 	private String saveUserEventsTopic;
@@ -343,6 +350,14 @@ public class TLConfiguration {
 
     @Value("${id.timezone}")
     private String egovAppTimeZone;
+    
+    // central-instance configs
+    
+    @Value("${state.level.tenantid.length}")
+    private Integer stateLevelTenantIdLength;
+    
+    @Value("${is.environment.central.instance}")
+    private Boolean isEnvironmentCentralInstance;
 
     //receipt
     @Value("${notification.url}")
@@ -360,6 +375,7 @@ public class TLConfiguration {
 
     @Value("${egov.tl.calculator.billingSlab.endpoint}")
     private String billingSlabEndPoint;
+<<<<<<< HEAD
 
     @Value("${egov.report.host}")
     private String reportHost;
@@ -374,4 +390,6 @@ public class TLConfiguration {
     private String alfrescoUploadEndPoint;
 
 
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 }

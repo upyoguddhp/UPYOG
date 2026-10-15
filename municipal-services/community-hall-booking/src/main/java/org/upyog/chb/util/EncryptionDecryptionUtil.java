@@ -19,11 +19,55 @@ import org.upyog.chb.constants.CommunityHallBookingConstants;
 
 import lombok.extern.slf4j.Slf4j;
 
+<<<<<<< HEAD
+=======
+/**
+ * This utility class provides encryption and decryption functionality for sensitive data
+ * in the Community Hall Booking module.
+ * 
+ * Purpose:
+ * - To ensure the security and confidentiality of sensitive data by encrypting and decrypting it.
+ * - To provide reusable methods for performing encryption and decryption operations.
+ * 
+ * Dependencies:
+ * - EncryptionService: Handles the core encryption and decryption logic.
+ * - CommunityHallBookingConstants: Provides constants such as encryption keys.
+ * 
+ * Features:
+ * - Encrypts objects into secure formats using predefined keys and tenant information.
+ * - Decrypts encrypted objects back into their original form for processing or display.
+ * - Handles exceptions gracefully and logs errors for debugging and monitoring purposes.
+ * 
+ * Fields:
+ * - stateLevelTenantId: The tenant ID used for encryption and decryption operations.
+ * - abacEnabled: A flag to enable or disable attribute-based access control for decryption.
+ * 
+ * Methods:
+ * 1. encryptObject:
+ *    - Encrypts the given object using the specified key and tenant ID.
+ *    - Returns the encrypted object in the specified class type.
+ * 
+ * 2. decryptObject:
+ *    - Decrypts the given encrypted object back into its original form.
+ *    - Validates the decryption process and handles errors gracefully.
+ * 
+ * Usage:
+ * - This class is used throughout the module to securely handle sensitive data.
+ * - It ensures consistent and reusable encryption and decryption logic across the application.
+ */
+>>>>>>> niua-upstream/niua-dev-2.0
 @Slf4j
 @Component
 public class EncryptionDecryptionUtil {
 
+<<<<<<< HEAD
     private EncryptionService encryptionService;
+=======
+    private static final String MAP_KEY = "key";
+    private static final String MAP_PURPOSE = "purpose";
+
+    private final EncryptionService encryptionService;
+>>>>>>> niua-upstream/niua-dev-2.0
 
     @Value(("${state.level.tenant.id}"))
     private String stateLevelTenantId;
@@ -66,11 +110,20 @@ public class EncryptionDecryptionUtil {
                 objectToDecrypt = Collections.singletonList(objectToDecrypt);
             }
 
+<<<<<<< HEAD
             Map<String, String> keyPurposeMap = getKeyToDecrypt(objectToDecrypt, key);
             String purpose = keyPurposeMap.get("purpose");
 
             if (key.equalsIgnoreCase(CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY))
                 key = keyPurposeMap.get("key");
+=======
+            Map<String, String> keyPurposeMap = getKeyToDecrypt(key);
+            String purpose = keyPurposeMap.get(MAP_PURPOSE);
+
+            if (key.equalsIgnoreCase(CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY)) {
+                key = keyPurposeMap.get(MAP_KEY);
+            }
+>>>>>>> niua-upstream/niua-dev-2.0
 
             P decryptedObject = (P) encryptionService.decryptJson(requestInfo, objectToDecrypt, key, purpose, classType);
             if (decryptedObject == null) {
@@ -90,6 +143,7 @@ public class EncryptionDecryptionUtil {
         }
     }
 
+<<<<<<< HEAD
     public Map<String, String> getKeyToDecrypt(Object objectToDecrypt, String key) {
         Map<String, String> keyPurposeMap = new HashMap<>();
 
@@ -103,6 +157,19 @@ public class EncryptionDecryptionUtil {
                 keyPurposeMap.put("key", CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY);
                 keyPurposeMap.put("purpose", "CHBBookingSearch");
             }
+=======
+    public Map<String, String> getKeyToDecrypt(String key) {
+        Map<String, String> keyPurposeMap = new HashMap<>();
+
+        if (!abacEnabled) {
+            if (key.equals(CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY)) {
+                keyPurposeMap.put(MAP_KEY, CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_PLAIN_DECRYPTION_KEY);
+                keyPurposeMap.put(MAP_PURPOSE, CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_PLAIN_DECRYPTION_PURPOSE);
+            }
+        } else if (key.equals(CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY)) {
+            keyPurposeMap.put(MAP_KEY, CommunityHallBookingConstants.CHB_APPLICANT_DETAIL_ENCRYPTION_KEY);
+            keyPurposeMap.put(MAP_PURPOSE, "CHBBookingSearch");
+>>>>>>> niua-upstream/niua-dev-2.0
         }
 
         return keyPurposeMap;

@@ -43,7 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+<<<<<<< HEAD
 @RestController	
+=======
+import jakarta.validation.constraints.*;
+import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+>>>>>>> niua-upstream/niua-dev-2.0
 
     @RequestMapping("/v1")
     public class TradeLicenseController {

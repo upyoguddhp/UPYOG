@@ -3,8 +3,13 @@ package org.upyog.chb.web.models.workflow;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+=======
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +39,11 @@ public class BusinessServiceResponse {
 
     public BusinessServiceResponse addBusinessServiceItem(BusinessService businessServiceItem) {
         if (this.businessServices == null) {
+<<<<<<< HEAD
             this.businessServices = new ArrayList<BusinessService>();
+=======
+            this.businessServices = new ArrayList<>();
+>>>>>>> niua-upstream/niua-dev-2.0
         }
         this.businessServices.add(businessServiceItem);
         return this;

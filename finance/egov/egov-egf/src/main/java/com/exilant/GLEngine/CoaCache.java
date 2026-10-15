@@ -47,6 +47,10 @@
  */
 
 package com.exilant.GLEngine;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.egov.commons.CChartOfAccountDetail;
@@ -55,146 +59,196 @@ import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.infra.cache.impl.ApplicationCacheManager;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infstr.services.PersistenceService;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.LongType;
+import org.hibernate.query.NativeQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
- 
-
 @Component
 public class CoaCache implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Autowired
     @Qualifier("persistenceService")
-    PersistenceService persistenceService;
+    private PersistenceService persistenceService;
+
     @Autowired
     @Qualifier("chartOfAccountDetailService")
     private ChartOfAccountDetailService chartOfAccountDetailService;
+
     @Autowired
     private ApplicationCacheManager applicationCacheManager;
-    private static final Logger LOGGER = Logger.getLogger(ChartOfAccounts.class);
+
+    private static final Logger LOGGER =
+            Logger.getLogger(ChartOfAccounts.class);
 
     private static final String ROOTNODE = "/COA";
     private static final String GLACCCODENODE = "GlAccountCodes";
     private static final String GLACCIDNODE = "GlAccountIds";
     private static final String ACCOUNTDETAILTYPENODE = "AccountDetailType";
-    private static final String EXP = "Exp=";
-    private static final String EXILRPERROR = "exilRPError";
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void loadAccountData()   {
-
-        /*
-         * 1.Loads all the account codes and details of that as GLAccount objects in theGLAccountCode,theGLAccountId HashMap's
-         */
+    public void loadAccountData() {
         try {
-            // Temporary place holders
-            final HashMap glAccountCodes = new HashMap();
-            final HashMap glAccountIds = new HashMap();
-            final HashMap accountDetailType = new HashMap();
+            final HashMap<String, GLAccount> glAccountCodes =
+                    new HashMap<>();
+            final HashMap<Object, GLAccount> glAccountIds =
+                    new HashMap<>();
+            final HashMap<String, AccountDetailType> accountDetailType =
+                    new HashMap<>();
 
-            StringBuilder sql = new StringBuilder("select id as \"id\",name as \"name\",tableName as \"tableName\",")
-                    .append("description as \"description\",columnName as \"columnName\",attributeName as \"attributeName\"")
-                    .append(",nbrOfLevels as  \"nbrOfLevels\" from AccountDetailType");
+            final Session session = persistenceService.getSession();
 
-            final Session currentSession = persistenceService.getSession();
-            SQLQuery createSQLQuery = currentSession.createSQLQuery(sql.toString());
-            createSQLQuery.addScalar("id", IntegerType.INSTANCE).addScalar("name").addScalar("tableName")
-                    .addScalar("description").addScalar("columnName").addScalar("attributeName")
-                    .setResultTransformer(Transformers.aliasToBean(AccountDetailType.class));
-            List<AccountDetailType> accountDetailTypeList = new ArrayList<AccountDetailType>();
-            List<GLAccount> glAccountCodesList = new ArrayList<GLAccount>();
-            new ArrayList<GLAccount>();
+            final String detailSql =
+                    "SELECT id AS id, name AS name, tableName AS tableName, " +
+                    "description AS description, columnName AS columnName, " +
+                    "attributeName AS attributeName " +
+                    "FROM AccountDetailType";
 
-            accountDetailTypeList = createSQLQuery.list();
-            for (final AccountDetailType type : accountDetailTypeList)
+            final NativeQuery<Object[]> detailQuery =
+                    session.createNativeQuery(detailSql, Object[].class);
+
+            final List<Object[]> detailRows = detailQuery.getResultList();
+
+            for (final Object[] row : detailRows) {
+                final AccountDetailType type = new AccountDetailType();
+
+                type.setId(((Number) row[0]).intValue());
+                type.setName((String) row[1]);
+                type.setTableName((String) row[2]);
+                type.setDescription((String) row[3]);
+                type.setColumnName((String) row[4]);
+                type.setAttributeName((String) row[5]);
+
                 accountDetailType.put(type.getAttributeName(), type);
-            sql = new StringBuilder("select ID as \"ID\", glCode as \"glCode\" ,name as \"name\" ,")
-                    .append("isActiveForPosting as \"isActiveForPosting\" ,classification as \"classification\",")
-                    .append(" functionReqd as \"functionRequired\" from chartofaccounts ");
-            createSQLQuery = currentSession.createSQLQuery(sql.toString());
-            createSQLQuery.addScalar("ID", IntegerType.INSTANCE).addScalar("glCode").addScalar("name")
-                    .addScalar("isActiveForPosting", BooleanType.INSTANCE).addScalar("classification", LongType.INSTANCE)
-                    .addScalar("functionRequired", BooleanType.INSTANCE)
-                    .setResultTransformer(Transformers.aliasToBean(GLAccount.class));
+            }
 
-            glAccountCodesList = createSQLQuery.list();
-            for (final GLAccount type : glAccountCodesList)
-                glAccountCodes.put(type.getCode(), type);
-            for (final GLAccount type : glAccountCodesList)
-                glAccountIds.put(type.getId(), type);
+            final String coaSql =
+                    "SELECT id, glCode, name, isActiveForPosting, " +
+                    "classification, functionReqd " +
+                    "FROM chartofaccounts";
+
+            final NativeQuery<Object[]> coaQuery =
+                    session.createNativeQuery(coaSql, Object[].class);
+
+            final List<Object[]> coaRows = coaQuery.getResultList();
+
+            for (final Object[] row : coaRows) {
+                final GLAccount account = new GLAccount();
+
+                // GLAccount has no confirmed setId() method.
+                // The account ID is used as the map key instead.
+                final Object accountId = row[0];
+
+                account.setCode((String) row[1]);
+                account.setName((String) row[2]);
+                account.setIsActiveForPosting(
+                        row[3] != null &&
+                        (Boolean.TRUE.equals(row[3]) ||
+                         (row[3] instanceof Number &&
+                          ((Number) row[3]).intValue() != 0)));
+
+                account.setClassification(
+                        row[4] == null ? null :
+                        ((Number) row[4]).longValue());
+
+                account.setFunctionRequired(
+                        row[5] != null &&
+                        (Boolean.TRUE.equals(row[5]) ||
+                         (row[5] instanceof Number &&
+                          ((Number) row[5]).intValue() != 0)));
+
+                glAccountCodes.put(account.getCode(), account);
+                glAccountIds.put(accountId, account);
+            }
+
             loadParameters(glAccountCodes, glAccountIds);
 
-            final HashMap<String, HashMap> hm = new HashMap<String, HashMap>();
-            hm.put(ACCOUNTDETAILTYPENODE, accountDetailType);
-            hm.put(GLACCCODENODE, glAccountCodes);
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Loading size:" + glAccountCodes.size());
-            hm.put(GLACCIDNODE, glAccountIds);
-            applicationCacheManager.put(ROOTNODE, hm);
+            final HashMap<String, HashMap> cacheData = new HashMap<>();
+            cacheData.put(ACCOUNTDETAILTYPENODE, accountDetailType);
+            cacheData.put(GLACCCODENODE, glAccountCodes);
+            cacheData.put(GLACCIDNODE, glAccountIds);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Loading size: " + glAccountCodes.size());
+            }
+
+            applicationCacheManager.put(ROOTNODE, cacheData);
+
         } catch (final Exception e) {
-            LOGGER.error("Error while loading Chart of Accounts cache for tenant "
+            LOGGER.error(
+                    "Error while loading Chart of Accounts cache for tenant "
                     + ApplicationThreadLocals.getTenantID(), e);
             throw e;
         }
     }
 
-    private synchronized void loadParameters(final HashMap glAccountCodes, final HashMap glAccountIds)
-             {
-        final List<CChartOfAccountDetail> chList = chartOfAccountDetailService.findAllBy("from CChartOfAccountDetail");
-        for (final CChartOfAccountDetail chartOfAccountDetail : chList) {
+    private synchronized void loadParameters(
+            final HashMap glAccountCodes,
+            final HashMap glAccountIds) {
+
+        final List<CChartOfAccountDetail> details =
+                chartOfAccountDetailService.findAllBy(
+                        "from CChartOfAccountDetail");
+
+        for (final CChartOfAccountDetail detail : details) {
             final GLParameter parameter = new GLParameter();
-            parameter.setDetailId(chartOfAccountDetail.getDetailTypeId().getId());
-            parameter.setDetailName(chartOfAccountDetail.getDetailTypeId().getAttributename());
-            final GLAccount glAccCode = getGlAccCode(chartOfAccountDetail.getGlCodeId(), glAccountCodes);
-            final GLAccount glAccId = getGlAccId(chartOfAccountDetail.getGlCodeId(), glAccountIds);
-            if (glAccCode != null && glAccCode.getGLParameters() != null)
-                glAccCode.getGLParameters().add(parameter);
-            if (glAccId != null && glAccId.getGLParameters() != null)
-                glAccId.getGLParameters().add(parameter);
+            parameter.setDetailId(detail.getDetailTypeId().getId());
+            parameter.setDetailName(
+                    detail.getDetailTypeId().getAttributename());
+
+            final GLAccount byCode =
+                    getGlAccCode(detail.getGlCodeId(), glAccountCodes);
+            final GLAccount byId =
+                    getGlAccId(detail.getGlCodeId(), glAccountIds);
+
+            if (byCode != null && byCode.getGLParameters() != null) {
+                byCode.getGLParameters().add(parameter);
+            }
+
+            if (byId != null && byId.getGLParameters() != null) {
+                byId.getGLParameters().add(parameter);
+            }
         }
     }
 
-    private static GLAccount getGlAccCode(final CChartOfAccounts glCodeId, final Map glAccountCodes) {
-        for (final Object key : glAccountCodes.keySet())
-            if (((String) key).equalsIgnoreCase(glCodeId.getGlcode()))
+    private static GLAccount getGlAccCode(
+            final CChartOfAccounts coa, final Map glAccountCodes) {
+
+        if (coa == null || coa.getGlcode() == null) {
+            return null;
+        }
+
+        for (final Object key : glAccountCodes.keySet()) {
+            if (key instanceof String &&
+                    ((String) key).equalsIgnoreCase(coa.getGlcode())) {
                 return (GLAccount) glAccountCodes.get(key);
+            }
+        }
+
         return null;
     }
 
-    private static GLAccount getGlAccId(final CChartOfAccounts glCodeId, final Map glAccountIds) {
-        for (final Object key : glAccountIds.keySet())
-            if (key.toString().equalsIgnoreCase(glCodeId.getId().toString()))
-                return (GLAccount) glAccountIds.get(key);
-        return null;
+    private static GLAccount getGlAccId(
+            final CChartOfAccounts coa, final Map glAccountIds) {
+
+        if (coa == null || coa.getId() == null) {
+            return null;
+        }
+
+        return (GLAccount) glAccountIds.get(coa.getId());
     }
-    /**
-     * CLeans the cache
-     */
-    private void clear()
-    {
-    	applicationCacheManager.remove(ROOTNODE);
+
+    private void clear() {
+        applicationCacheManager.remove(ROOTNODE);
     }
-    /**
-     * reloads the cache
-     */
-    public void reLoad()
-    {
-    	applicationCacheManager.remove(ROOTNODE);
+
+    public void reLoad() {
+        applicationCacheManager.remove(ROOTNODE);
         loadAccountData();
     }
 }

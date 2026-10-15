@@ -6,30 +6,32 @@ import lombok.*;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Bind the request meta data(RequestInfo) and Schema defination
  */
 @Schema(description = "Bind the request meta data(RequestInfo) and Schema defination")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]")
+@jakarta.annotation.Generated(
+        value = "org.egov.codegen.SpringBootCodegen",
+        date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]"
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
 public class SchemaDefinitionRequest {
+
     @JsonProperty("RequestInfo")
     @NotNull
     @Valid
-    private RequestInfo requestInfo = null;
+    private RequestInfo requestInfo;
 
     @JsonProperty("SchemaDefinition")
     @NotNull
     @Valid
-    private SchemaDefinition schemaDefinition = null;
-
-
+    private SchemaDefinition schemaDefinition;
 }

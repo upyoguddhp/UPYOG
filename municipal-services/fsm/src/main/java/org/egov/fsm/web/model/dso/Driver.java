@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.user.User;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -22,7 +22,7 @@ import lombok.Setter;
  * Capture the Driver information in the system.
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:34:12.238Z[GMT]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:34:12.238Z[GMT]")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -30,17 +30,17 @@ import lombok.Setter;
 @Setter
 public class Driver {
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("id")
 	private String id;
 
 	@JsonProperty("tenantId")
-	@SafeHtml
+	@CustomSafeHtml
 	@Size(max = 64)
 	private String tenantId;
 
 	@JsonProperty("name")
-	@SafeHtml
+	@CustomSafeHtml
 	@Size(max = 128)
 	private String name;
 
@@ -49,18 +49,18 @@ public class Driver {
 	private User owner;
 
 	@JsonProperty("ownerId")
-	@SafeHtml
+	@CustomSafeHtml
 	@Size(max = 64)
 	private String ownerId;
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("description")
 	private String description;
 
-	@SafeHtml
+	@CustomSafeHtml
 	@JsonProperty("licenseNumber")
 	private String licenseNumber;
 

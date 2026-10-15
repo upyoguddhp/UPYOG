@@ -1,4 +1,4 @@
-import { Card, KeyNote, SubmitBar } from "@egovernments/digit-ui-react-components";
+import { Card, KeyNote, SubmitBar } from "@nudmcdgnpm/digit-ui-react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -7,7 +7,8 @@ import _ from "lodash";
 
 const WSConnection = ({ application }) => {
   const { t } = useTranslation();
-  let encodeApplicationNo = encodeURI(application.applicationNo);
+  // encodeURIComponent encodes slashes too, making the full app number a single path segment
+  let encodeApplicationNo = encodeURIComponent(application.applicationNo);
   return (
     <Card>
       <KeyNote keyValue={t("WS_MYCONNECTIONS_CONSUMER_NO")} note={application?.connectionNo} />
@@ -15,7 +16,7 @@ const WSConnection = ({ application }) => {
       <KeyNote
         keyValue={t("WS_CONSUMER_NAME")}
         note={
-          application?.connectionHolders?.map((owner) => owner.name).join(",") || application?.property?.owners?.map((owner) => owner.name).join(",")
+          application?.connectionHolders?.map((owner) => owner.name).join(",") || application?.property?.owners.sort((a,b)=>a?.additionalDetails?.ownerSequence-b?.additionalDetails?.ownerSequence)?.map((owner) => owner.name).join(",")
         }
       />
       <KeyNote keyValue={t("WS_MYCONNECTION_ADDRESS")} note={getAddress(application?.property?.address, t)}
@@ -36,7 +37,7 @@ const WSConnection = ({ application }) => {
         },
        }}  />
       <KeyNote keyValue={t("WS_MYCONNECTIONS_STATUS")} note={t(application?.status)} />
-      <Link to={{ pathname: `/upyog-ui/citizen/ws/connection/details/${encodeApplicationNo}`, state: { ...application } }}>
+      <Link to={`/upyog-ui/citizen/ws/connection/details/${encodeApplicationNo}`} state={{ ...application }}>
         <SubmitBar label={t("WS_VIEW_DETAILS_LABEL")} />
       </Link>
     </Card>

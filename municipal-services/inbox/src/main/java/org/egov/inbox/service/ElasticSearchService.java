@@ -1,11 +1,11 @@
 package org.egov.inbox.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
@@ -25,17 +25,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.util.Objects.isNull;
-import static javax.servlet.http.HttpServletRequest.BASIC_AUTH;
+import static jakarta.servlet.http.HttpServletRequest.BASIC_AUTH;
 import static org.apache.commons.codec.CharEncoding.US_ASCII;
 import static org.egov.inbox.util.DSSConstants.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -129,6 +130,7 @@ public class ElasticSearchService {
         String url =( config.getIndexServiceHost() ) + indexName + config.getIndexServiceHostSearchEndpoint();
         HttpHeaders headers = getHttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        log.info("Headers: ",headers.toString());
         log.info("Searching ES for Query: " + searchQuery);
         HttpEntity<String> requestEntity = new HttpEntity<>(searchQuery, headers);
         String reqBody = requestEntity.getBody();
@@ -305,6 +307,7 @@ public class ElasticSearchService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", getESEncodedCredentials());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -314,11 +317,18 @@ public class ElasticSearchService {
         return headers;
     }
 
-    private String getBase64Value(String userName, String password) {
-        String authString = String.format("%s:%s", userName, password);
-        byte[] encodedAuthString = Base64.encodeBase64(authString.getBytes(Charset.forName(US_ASCII)));
-        return String.format(BASIC_AUTH, new String(encodedAuthString));
+    public String getESEncodedCredentials() {
+        String credentials = config.getUserName() + ":" + config.getPassword();
+        byte[] credentialsBytes = credentials.getBytes();
+        byte[] base64CredentialsBytes = Base64.getEncoder().encode(credentialsBytes);
+        return "Basic " + new String(base64CredentialsBytes);
     }
+
+//    private String getBase64Value(String userName, String password) {
+//        String authString = String.format("%s:%s", userName, password);
+//        byte[] encodedAuthString = Base64.encodeBase64(authString.getBytes(Charset.forName(US_ASCII)));
+//        return String.format(BASIC_AUTH, new String(encodedAuthString));
+//    }
 
     /**
      * Gets plain data of user details

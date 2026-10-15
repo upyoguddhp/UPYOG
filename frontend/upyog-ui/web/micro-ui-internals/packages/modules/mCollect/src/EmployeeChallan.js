@@ -1,10 +1,11 @@
-import { Card, CardSubHeader, Header, Row, StatusTable, SubmitBar, ActionBar, Menu, Toast,MultiLink,DownloadBtnCommon} from "@egovernments/digit-ui-react-components";
+import { Card, CardSubHeader, Header, Row, StatusTable, SubmitBar, ActionBar, Menu, Toast,MultiLink,DownloadBtnCommon} from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useHistory, useRouteMatch } from "react-router-dom";
+import { useParams,  } from "react-router-dom";
 import { stringReplaceAll, convertEpochToDate } from "./utils";
 import ActionModal from "./components/Modal";
 import { downloadAndPrintChallan, downloadAndPrintReciept } from "./utils";
+import "./EmployeeChallan.css";
 
 const EmployeeChallan = (props) => {
   const { t } = useTranslation();
@@ -16,8 +17,8 @@ const EmployeeChallan = (props) => {
   const [displayMenu, setDisplayMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedAction, setSelectedAction] = useState(null);
-  const history = useHistory();
-  const { url } = useRouteMatch();
+  const navigate = Digit.Hooks.useCustomNavigate();
+  const { url } = Digit.Hooks.useModuleBasePath();
   const [isDisplayDownloadMenu, setIsDisplayDownloadMenu] = useState(false);
   const [showToast, setShowToast] = useState(null);
   useEffect(() => {
@@ -25,10 +26,10 @@ const EmployeeChallan = (props) => {
       case "CANCEL_CHALLAN":
         return setShowModal(true);
       case "UPDATE_CHALLAN":
-        return history.push(`/upyog-ui/employee/mcollect/modify-challan/${challanno}`);
+        return navigate(`/upyog-ui/employee/mcollect/modify-challan/${challanno}`);
       case "BUTTON_PAY":
-        return history.push(
-          `/upyog-ui/employee/payment/collect/${challanDetails?.businessService}/${challanno}/tenantId=${tenantId}?workflow=mcollect`
+        return navigate(
+          `/upyog-ui/employee/payment/collect/${challanDetails?.businessService}/${challanno}/${tenantId}?workflow=mcollect`
         );
       default:
         break;
@@ -51,7 +52,7 @@ const EmployeeChallan = (props) => {
         if (result.challans && result.challans.length > 0) {
           const challan = result.challans[0];
           let LastModifiedTime = Digit.SessionStorage.set("isMcollectAppChanged", challan.challanNo);
-          history.push(
+          navigate(
             `/upyog-ui/employee/mcollect/acknowledgement?purpose=challan&status=success&tenantId=${challan?.tenantId}&serviceCategory=${challan.businessService}&challanNumber=${challan.challanNo}&applicationStatus=${challan.applicationStatus}`,
             { from: url }
           );
@@ -99,13 +100,13 @@ const EmployeeChallan = (props) => {
 
   const challanDownload = {
     order: 1,
-    label: t("PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_LETTER_HEAD"),
+    label: t("UC_CHALLAN"),
     onClick: () => downloadAndPrintChallan(challanno),
   };
 
   const receiptDownload = {
     order: 2,
-    label: t("RECEIPT"),
+    label: t("Receipt"),
     onClick: () => downloadAndPrintReciept(challanDetails?.businessService, challanno),
   };
 
@@ -120,18 +121,24 @@ const EmployeeChallan = (props) => {
 
   return (
     <React.Fragment>
-      <div className={"employee-application-details"} style={{ marginBottom: "15px" }}>
+      <div className="employee-application-details employee-challan-root">
+        <div className="employee-challan-header-row">
+          <div className="employee-challan-title">
         <Header>{`${t("CHALLAN_DETAILS")}`} </Header>
+        </div>
+        <div className="employee-challan-download">
           <MultiLink
-              className="multilinkWrapper employee-mulitlink-main-div"
+              className="multilinkWrapper employee-mulitlink-main-divNew"
               onHeadClick={() => setIsDisplayDownloadMenu(!isDisplayDownloadMenu)}
               displayOptions={isDisplayDownloadMenu}
               options={challanDetails?.applicationStatus === "PAID" ? [challanDownload , receiptDownload] : [challanDownload]}
               downloadBtnClassName={"employee-download-btn-className"}
               optionsClassName={"employee-options-btn-className"}
+              style={{ maxWidth: "100%" }}
             />
+         </div>
       </div>
-
+</div>
       <div>
         <Card>
           <StatusTable style={{ padding: "10px 0px" }}>
@@ -165,6 +172,7 @@ const EmployeeChallan = (props) => {
           <StatusTable>
             <Row label={`${t("UC_CONS_NAME_LABEL")}`} text={challanDetails?.citizen.name || t("CS_NA")} />
             <Row label={`${t("UC_MOBILE_NUMBER")}`} text={challanDetails?.citizen.mobileNumber || t("CS_NA")} />
+            <Row label={`${t("UC_EMAIL_ID")}`} text={challanDetails?.citizen.emailId || t("CS_NA")} />
             <Row label={`${t("UC_DOOR_NO_LABEL")}`} text={challanDetails?.address.doorNo || t("CS_NA")} />
             <Row label={`${t("UC_BUILDING_NAME_LABEL")}`} text={challanDetails?.address.buildingName || t("CS_NA")} />
             <Row label={`${t("UC_STREET_NAME_LABEL")}`} text={challanDetails?.address.street || t("CS_NA")} />

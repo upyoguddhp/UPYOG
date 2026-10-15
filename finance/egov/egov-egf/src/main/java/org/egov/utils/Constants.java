@@ -76,7 +76,6 @@ public class Constants {
     public static final String DEPARTMENT = "department";
     public static final String FUND = "fund";
     public static final String CHARTOFACCOUNTS = "chartofaccounts";
-
     public static final String SCHEME = "scheme";
     public static final String SUBSCHEME = "subscheme";
     public static final String FUNCTION = "function";

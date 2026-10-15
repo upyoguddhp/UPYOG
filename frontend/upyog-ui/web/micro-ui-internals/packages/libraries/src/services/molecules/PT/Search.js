@@ -30,6 +30,7 @@ export const PTSearch = {
       asSectionHeader: true,
       values: [
         { title: "PT_PROPERTY_ADDRESS_PINCODE", value: property?.address?.pincode },
+        { title: "DIGIPIN", value: property?.additionalDetails?.digipin || t("CS_NA"), showDigipin: true, showMapLink: true, digipin: property?.additionalDetails?.digipin },
         { title: "PT_PROPERTY_ADDRESS_CITY", value: property?.address?.city },
         {
           title: "PT_PROPERTY_ADDRESS_MOHALLA",
@@ -80,14 +81,15 @@ export const PTSearch = {
       title: "PT_DETAILS",
       values: [
         { title: "TL_PROPERTY_ID", value: property?.propertyId || "NA" },
-        { title: "PT_OWNER_NAME", value: property?.owners?.map((owner) => owner.name).join(",") || "NA" },
+        { title: "PT_OWNER_NAME", value: property?.owners?.map((owner) => owner.name).reverse().join(",") || "NA" },
         { title: "PT_SEARCHPROPERTY_TABEL_STATUS", value: Digit.Utils.locale.getTransformedLocale(`WF_PT_${property?.status}`) || "NA" },
       ],
     };
+    const ownersSequences=property?.owners?.additionalDetails!==null ? property?.owners?.sort((a,b)=>a?.additionalDetails?.ownerSequence-b?.additionalDetails?.ownerSequence): property?.owners
     const ownerdetails = {
       title: "PT_OWNERSHIP_INFO_SUB_HEADER",
       additionalDetails: {
-        owners: property?.owners
+        owners: ownersSequences
           ?.filter((owner) => owner.status === "ACTIVE")
           .map((owner, index) => {
             return {
@@ -202,6 +204,7 @@ export const PTSearch = {
         asSectionHeader: true,
         values: [
           { title: "PT_PROPERTY_ADDRESS_PINCODE", value: response?.address?.pincode },
+          { title: "DIGIPIN", value: response?.additionalDetails?.digipin || t("CS_NA"), showDigipin: true, showMapLink: true, digipinMapPopup: true, digipinLat: response?.address?.geoLocation?.latitude, digipinLng: response?.address?.geoLocation?.longitude, digipin: response?.additionalDetails?.digipin },
           { title: "PT_PROPERTY_ADDRESS_CITY", value: response?.address?.city },
           {
             title: "PT_PROPERTY_ADDRESS_MOHALLA",

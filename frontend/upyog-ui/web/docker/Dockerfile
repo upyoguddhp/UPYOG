@@ -1,10 +1,12 @@
-FROM upyogio/alpine-node-builder-14:yarn AS build
+# FROM upyogio/alpine-node-builder-14:yarn AS build
 #FROM ghcr.io/egovernments/alpine-node-builder-14:yarn AS build
-RUN apk update && apk upgrade
+FROM node:22.11.0-alpine AS build
 RUN apk add --no-cache git>2.30.0
+
+
 ARG WORK_DIR
 WORKDIR /app
-ENV NODE_OPTIONS "--max-old-space-size=4096"
+ENV NODE_OPTIONS "--max-old-space-size=3584"
 ENV GENERATE_SOURCEMAP "false"
 
 COPY ${WORK_DIR} .
@@ -12,12 +14,10 @@ RUN ls -lah
 
 #RUN node web/envs.js
 RUN cd web/ \
-    && node envs.js \
-    && node -e 'console.log(v8.getHeapStatistics().heap_size_limit/(1024*1024))' \
-    && chmod +x install-deps.sh \
-    &&  ./install-deps.sh \
+    && node -e 'const v8=require("v8"); const s=v8.getHeapStatistics(); console.log("Total Heap Memory Allocated (MB):", (s.total_heap_size/1048576).toFixed(2)); console.log("Total Heap Memory In Use (MB):", (s.used_heap_size/1048576).toFixed(2)); console.log("Total Heap Memory Available Limit (MB):", (s.heap_size_limit/1048576).toFixed(2));' \
     && yarn install \
     && yarn build 
+    
 
 FROM nginx:mainline-alpine
 #FROM ghcr.io/egovernments/nginx:mainline-alpine

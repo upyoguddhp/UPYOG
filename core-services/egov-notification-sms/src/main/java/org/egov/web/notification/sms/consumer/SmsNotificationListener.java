@@ -11,7 +11,11 @@ import org.egov.web.notification.sms.service.SMSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.context.annotation.*;
+import org.springframework.kafka.annotation.*;
+import org.springframework.kafka.config.*;
+import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
@@ -40,6 +44,9 @@ public class SmsNotificationListener {
     @Value("${kafka.topics.error.sms}")
     String errorSmsTopic;
 
+    @Value("${sms.enabled}")
+    Boolean smsEnable;
+
 
     @Autowired
     public SmsNotificationListener(
@@ -58,20 +65,26 @@ public class SmsNotificationListener {
         RequestContext.setId(UUID.randomUUID().toString());
         SMSRequest request = null;
         try {
-            request = objectMapper.convertValue(consumerRecord, SMSRequest.class);
-            if (request.getExpiryTime() != null && request.getCategory() == Category.OTP) {
-                Long expiryTime = request.getExpiryTime();
-                Long currentTime = System.currentTimeMillis();
-                if (expiryTime < currentTime) {
-                    log.info("OTP Expired");
-                    if (!StringUtils.isEmpty(expiredSmsTopic))
-                        kafkaTemplate.send(expiredSmsTopic, request);
+            if(!smsEnable){
+                log.info("Sms service is disable to enable the notification service set the value of sms.enable flag as true");
+            }
+            else{
+                request = objectMapper.convertValue(consumerRecord, SMSRequest.class);
+                if (request.getExpiryTime() != null && request.getCategory() == Category.OTP) {
+                    Long expiryTime = request.getExpiryTime();
+                    Long currentTime = System.currentTimeMillis();
+                    if (expiryTime < currentTime) {
+                        log.info("OTP Expired");
+                        if (!StringUtils.isEmpty(expiredSmsTopic))
+                            kafkaTemplate.send(expiredSmsTopic, request);
+                    } else {
+                        smsService.sendSMS(request.toDomain());
+                    }
                 } else {
                     smsService.sendSMS(request.toDomain());
                 }
-            } else {
-                smsService.sendSMS(request.toDomain());
             }
+
         } catch (RestClientException rx) {
             log.info("Going to backup SMS Service", rx);
             if (!StringUtils.isEmpty(backupSmsTopic))

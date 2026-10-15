@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -47,10 +47,22 @@ public class MDMSControllerV2 {
         return new ResponseEntity<>(ResponseUtil.getMasterDataV2Response(RequestInfo.builder().build(), masterDataList), HttpStatus.OK);
     }
 
+    @RequestMapping(value="_delete/{schemaCode}", method = RequestMethod.POST)
+public ResponseEntity<MdmsResponseV2> delete(      @Valid @RequestBody MdmsRequest mdmsRequest,
+        @PathVariable("schemaCode") String schemaCode) {
+
+    List<Mdms> masterDataList = mdmsServiceV2.delete(mdmsRequest, schemaCode);
+
+    return new ResponseEntity<>(
+            ResponseUtil.getMasterDataV2Response(
+                    mdmsRequest.getRequestInfo(),
+                    masterDataList),
+            HttpStatus.OK);
+}
+
     /**
      * Request handler for serving update requests
      * @param mdmsRequest
-     * @param schemaCode
      * @return
      */
     @RequestMapping(value="_update/{schemaCode}", method = RequestMethod.POST)

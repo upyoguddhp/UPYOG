@@ -11,10 +11,10 @@ import {
   CardLabelError,
   Menu,
   AddIcon,
-} from "@egovernments/digit-ui-react-components";
+} from "@nudmcdgnpm/digit-ui-react-components";
 import DropdownStatus from "./inbox/DropdownStatus";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+
 
 const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperator, searchFields, searchParams, isInboxPage, selectedTab }) => {
   const storedSearchParams = isInboxPage ? Digit.SessionStorage.get("fsm/inbox/searchParams") : Digit.SessionStorage.get("fsm/search/searchParams");
@@ -22,7 +22,7 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
   const { data: applicationStatuses, isFetched: areApplicationStatus } = Digit.Hooks.fsm.useApplicationStatus();
 
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const { register, handleSubmit, reset, watch, control } = useForm({
     defaultValues: storedSearchParams || searchParams,
   });
@@ -73,11 +73,11 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
   function onActionSelect(action) {
     switch (action) {
       case "VENDOR":
-        return history.push("/upyog-ui/employee/fsm/registry/new-vendor");
+        return navigate("/upyog-ui/employee/fsm/registry/new-vendor");
       case "VEHICLE":
-        return history.push("/upyog-ui/employee/fsm/registry/new-vehicle");
+        return navigate("/upyog-ui/employee/fsm/registry/new-vehicle");
       case "DRIVER":
-        return history.push("/upyog-ui/employee/fsm/registry/new-driver");
+        return navigate("/upyog-ui/employee/fsm/registry/new-driver");
       default:
         break;
     }
@@ -88,7 +88,7 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
       case "date":
         return (
           <Controller
-            render={(props) => <DatePicker date={props.value} onChange={props.onChange} />}
+            render={({ field }) => <DatePicker date={field.value} onChange={field.onChange} />}
             name={input.name}
             control={control}
             defaultValue={null}
@@ -97,10 +97,10 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
       case "status":
         return (
           <Controller
-            render={(props) => (
+            render={({ field }) => (
               <DropdownStatus
-                onAssignmentChange={props.onChange}
-                value={props.value}
+                onAssignmentChange={field.onChange}
+                value={field.value}
                 applicationStatuses={applicationStatuses}
                 areApplicationStatus={areApplicationStatus}
               />
@@ -114,7 +114,6 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
         return (
           <TextInput
             {...input}
-            inputRef={register}
             {...register(input.name, {
               validate: searchValidation,
             })}
@@ -182,14 +181,14 @@ const SearchApplication = ({ onSearch, type, onClose, onTabChange, isFstpOperato
                 </div>
               </div>
               {showAddMenu && (
-                <Menu localeKeyPrefix={"ES_FSM_ACTION_CREATE"} options={["VENDOR", "DRIVER", "VEHICLE"]} t={t} onSelect={onActionSelect} />
+                <Menu localeKeyPrefix={"ES_FSM_ACTION_CREATE"} options={["VENDOR", "VEHICLE", "DRIVER"]} t={t} onSelect={onActionSelect} />
               )}
             </div>
           </div>
           <form onSubmit={handleSubmit(onSubmitInput)}>
             <div
               className={FSTP ? "complaint-input-container for-pt for-search" : "complaint-input-container"}
-              style={{ display:"grid",width: "100%", gridTemplateColumns: "33.33% 66.66% 0%" }}
+              style={{ width: "100%", gridTemplateColumns: "33.33% 66.66% 0%" }}
             >
               {searchFields?.map((input, index) => (
                 <span key={index} className={index === 0 ? "complaint-input" : "mobile-input"}>

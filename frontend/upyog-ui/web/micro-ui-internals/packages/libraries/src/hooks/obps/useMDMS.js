@@ -1,26 +1,42 @@
-import { useQuery } from "react-query";
+import { queryTemplate } from "../../common/queryTemplate";
 import { MdmsService } from "../../services/elements/MDMS";
 
 const useMDMS = (tenantId, moduleCode, type, config = {}, payload = []) => {
-  const queryConfig = { staleTime: Infinity, ...config };
-  const useDocumentMapping = () => {
-    return useQuery('DOCUMENT_MAPPING', () => MdmsService.getDocumentTypes(tenantId, moduleCode, type), queryConfig);
-  }
-  const useTradeTypetoRoleMapping = () => {
-    return useQuery('ROLE_DOCUMENT_MAPPING', () => MdmsService.getTradeTypeRoleTypes(tenantId, moduleCode, type), queryConfig);
-  }
-  const _default = () => {
-    return useQuery([tenantId, moduleCode, type], () => MdmsService.getMultipleTypes(tenantId, moduleCode, type), config);
-  };
+  const baseConfig = { staleTime: Infinity, ...config };
 
   switch (type) {
     case "DocumentTypes":
-      return useDocumentMapping();
-    case "TradeTypetoRoleMapping":
-      return useTradeTypetoRoleMapping();
-    default:
-      return _default();
-  }
-}
+      return queryTemplate({
+        queryKey: ["OBPS_DOC_TYPES", tenantId],
+        queryFn: () =>
+          MdmsService.getDocumentTypes(tenantId, moduleCode, type),
+        config: baseConfig,
+      });
 
-export default useMDMS; 
+    case "TradeTypetoRoleMapping":
+      return queryTemplate({
+        queryKey: ["OBPS_ROLE_DOC", tenantId],
+        queryFn: () =>
+          MdmsService.getTradeTypeRoleTypes(tenantId, moduleCode, type),
+        config: baseConfig,
+      });
+
+    case "Disclaimer":
+      return queryTemplate({
+        queryKey: ["OBPS_DISCLAIMER", tenantId],
+        queryFn: () =>
+          MdmsService.getDisclaimer(tenantId, moduleCode, type),
+        config,
+      });
+
+    default:
+      return queryTemplate({
+        queryKey: ["OBPS_MDMS", tenantId, moduleCode, type],
+        queryFn: () =>
+          MdmsService.getMultipleTypes(tenantId, moduleCode, type),
+        config,
+      });
+  }
+};
+
+export default useMDMS;

@@ -14,13 +14,52 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import lombok.extern.slf4j.Slf4j;
 
+<<<<<<< HEAD
+=======
+/**
+ * This class is responsible for making HTTP requests to external services and fetching
+ * responses for the Community Hall Booking module.
+ * 
+ * Purpose:
+ * - To handle communication with external services by sending HTTP requests and processing responses.
+ * - To provide a reusable mechanism for making service calls across the application.
+ * 
+ * Dependencies:
+ * - RestTemplate: Used to send HTTP requests to external services.
+ * - ObjectMapper: Used to serialize and deserialize JSON objects for requests and responses.
+ * 
+ * Features:
+ * - Provides methods to send POST requests with a request body and fetch results.
+ * - Configures the ObjectMapper to handle empty beans gracefully during serialization.
+ * - Logs request and response details for debugging and monitoring purposes.
+ * - Handles exceptions such as HttpClientErrorException and ServiceCallException.
+ * 
+ * Constructor:
+ * - Accepts ObjectMapper and RestTemplate as dependencies and initializes them.
+ * 
+ * Methods:
+ * 1. fetchResult:
+ *    - Sends a POST request to the specified URI with the given request object.
+ *    - Returns the response from the external service as an Object.
+ * 
+ * Usage:
+ * - This class is used by various repository and service classes to interact with external APIs.
+ * - It ensures consistent and reusable logic for making service requests across the application.
+ */
+>>>>>>> niua-upstream/niua-dev-2.0
 @Repository
 @Slf4j
 public class ServiceRequestRepository {
 
+<<<<<<< HEAD
     private ObjectMapper mapper;
 
     private RestTemplate restTemplate;
+=======
+    private final ObjectMapper mapper;
+
+    private final RestTemplate restTemplate;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 
     @Autowired
@@ -34,7 +73,11 @@ public class ServiceRequestRepository {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         Object response = null;
         try {
+<<<<<<< HEAD
         	log.info("request info : "+ request + " uri : " + uri);
+=======
+        	log.info("request info : {} and uri : {}", request, uri);
+>>>>>>> niua-upstream/niua-dev-2.0
             response = restTemplate.postForObject(uri.toString(), request, Map.class);
             log.info("response info : "+ response);
             
@@ -51,6 +94,7 @@ public class ServiceRequestRepository {
     public String getShorteningURL(StringBuilder uri, Object request) {
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		String response = null;
+<<<<<<< HEAD
 		/*
 		 * StringBuilder strq = new
 		 * StringBuilder(this.getClass().getCanonicalName()).append(".fetchResult:")
@@ -59,6 +103,9 @@ public class ServiceRequestRepository {
 		 */
 		try {
 			//log.info("Url shortener url : " +  str.toString());
+=======
+		try {
+>>>>>>> niua-upstream/niua-dev-2.0
 			log.info("request info : "+ request + " uri : " + uri);
 			response = restTemplate.postForObject(uri.toString(), request, String.class);
 			log.info("response info : "+ response);

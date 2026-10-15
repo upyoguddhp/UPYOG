@@ -1,11 +1,11 @@
-import { Banner, Card, CardText, LinkButton, SubmitBar, Toast } from "@egovernments/digit-ui-react-components";
+import { Banner, Card, CardText, LinkButton, SubmitBar, Toast } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useState, useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link,  } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const EDCRAcknowledgement = (props) => {
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => { 
@@ -42,6 +42,8 @@ const EDCRAcknowledgement = (props) => {
   const isMobile = window.Digit.Utils.browser.isMobile();
   const { data:homePageUrlLinks , isLoading: homePageUrlLinksLoading } = Digit.Hooks.obps.useMDMS(state, "BPA", ["homePageUrlLinks"]);
   const { isMdmsLoading, data: mdmsData } = Digit.Hooks.obps.useMDMS(state, "BPA", ["RiskTypeComputation"]);
+  //const { isMdmsLoading, data: mdmsData } = Digit.Hooks.obps.useMDMS(state, "BPA", ["GaushalaFees","MalbaCharges","LabourCess"]);
+
 
   useEffect(() => {
     if (!homePageUrlLinksLoading && homePageUrlLinks?.BPA?.homePageUrlLinks?.length > 0) {
@@ -58,19 +60,33 @@ const EDCRAcknowledgement = (props) => {
 }, [!homePageUrlLinksLoading]);
 
 
-  const printReciept = async () => {
-    var win = window.open(edcrData.planReport, '_blank');
+const printReciept = () => {
+  try {
+    let fileUrl = edcrData?.planReport;
+
+    if (!fileUrl) return;
+
+    // Force HTTPS only if it is HTTP
+    if (fileUrl.startsWith("http://")) {
+      fileUrl = fileUrl.replace(/^http:\/\//i, "https://");
+    }
+
+    const win = window.open(fileUrl, "_blank", "noopener,noreferrer");
+
     if (win) {
       win.focus();
     }
-  };
+  } catch (e) {
+    console.error("EDCR download failed", e);
+    alert("Unable to download scrutiny report. Please try again.");
+  }
+};
 
   const routeToBPAScreen = async () => {
-    history.push(
+    navigate(
       `/upyog-ui/citizen/obps/bpa/${edcrData?.appliactionType?.toLowerCase()}/${edcrData?.applicationSubType?.toLowerCase()}/docs-required`,
-      { edcrNumber: edcrData?.edcrNumber }
+      { state: { edcrNumber: edcrData?.edcrNumber } }
     );
-    // window.location.assign(`${window.location.origin}/upyog-ui/citizen/obps/new-building-permit/docs-required`);
   }
 
   return (
@@ -94,7 +110,7 @@ const EDCRAcknowledgement = (props) => {
             {t("EDCR_DOWNLOAD_SCRUTINY_REPORT_LABEL")}
           </div>
           <div style={{padding: "0px 10px"}}>
-            <Link to={{pathname: `/upyog-ui/citizen/obps/${bpaLinks?.linkData?.flow?.toLowerCase()}/${edcrData?.appliactionType?.toLowerCase()}/${edcrData?.applicationSubType?.toLowerCase()}/docs-required`, state: bpaLinks}} replace>
+            <Link to={`/upyog-ui/citizen/obps/${bpaLinks?.linkData?.flow?.toLowerCase()}/${edcrData?.appliactionType?.toLowerCase()}/${edcrData?.applicationSubType?.toLowerCase()}/docs-required`} state={bpaLinks} replace>
               <SubmitBar label={t("BPA_APPLY_FOR_BPA_LABEL")} onSubmit={() => (sessionStorage.setItem("clickOnBPAApplyAfterEDCR",true))}/>
               <CardText className="button-sub-text"  style={{fontSize: "14px", lineHeight: "16px", textAlign: "center", margin: "0px", marginTop: "4px", fontWeight: "400", color: "#0B0C0C"}}>{t("BPA_FOR_NEW_CONSTRUCTION_LABEL")}</CardText>
             </Link>

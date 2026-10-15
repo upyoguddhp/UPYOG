@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +44,8 @@ public class ServiceDefinitionController {
     @RequestMapping(value="/definition/v1/_search", method = RequestMethod.POST)
     public ResponseEntity<ServiceDefinitionResponse> search(@Valid @RequestBody ServiceDefinitionSearchRequest serviceDefinitionSearchRequest) {
         List<ServiceDefinition> serviceDefinitionList = serviceDefinitionRequestService.searchServiceDefinition(serviceDefinitionSearchRequest);
-        ServiceDefinitionResponse response  = ServiceDefinitionResponse.builder().serviceDefinition(serviceDefinitionList).build();
+        Integer totalCount = serviceDefinitionRequestService.countTotalSurveys(serviceDefinitionSearchRequest);
+        ServiceDefinitionResponse response  = ServiceDefinitionResponse.builder().serviceDefinition(serviceDefinitionList).totalCount(totalCount).build();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 

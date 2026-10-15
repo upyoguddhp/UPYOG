@@ -7,8 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,10 @@ import java.util.List;
  * SchemaDefCriteria
  */
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]")
+@jakarta.annotation.Generated(
+        value = "org.egov.codegen.SpringBootCodegen",
+        date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]"
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,10 +30,10 @@ public class SchemaDefCriteria {
     @JsonProperty("tenantId")
     @Size(min = 1, max = 100)
     @NotNull
-    private String tenantId = null;
+    private String tenantId;
 
     @JsonProperty("codes")
-    private List<String> codes = null;
+    private List<String> codes;
 
     @JsonProperty("offset")
     private Integer offset;
@@ -37,6 +41,11 @@ public class SchemaDefCriteria {
     @JsonProperty("limit")
     private Integer limit;
 
+    @JsonProperty("moduleName")
+    private String moduleName;
+
+    @JsonProperty("isGetAllCodes")
+    private Boolean isGetAllCodes;
 
     public SchemaDefCriteria addCodesItem(String codesItem) {
         if (this.codes == null) {
@@ -45,5 +54,4 @@ public class SchemaDefCriteria {
         this.codes.add(codesItem);
         return this;
     }
-
 }

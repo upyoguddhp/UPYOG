@@ -1,7 +1,6 @@
-import { Loader } from "@egovernments/digit-ui-react-components";
+import { Loader } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { Fragment, useContext, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import FilterContext from "./FilterContext";
 import NoData from "./NoData";
@@ -44,7 +43,7 @@ const CustomHorizontalBarChart = ({
 }) => {
   const { id } = data;
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const { value } = useContext(FilterContext);
   const tenantId = Digit.ULBService.getCurrentTenantId();
   const { isLoading, data: response } = Digit.Hooks.dss.useGetChart({
@@ -73,7 +72,7 @@ const CustomHorizontalBarChart = ({
   };
 
   const goToDrillDownCharts = () => {
-    history.push(`/upyog-ui/employee/dss/drilldown?chart=${response?.responseData?.drillDownChartId}&ulb=${value?.filters?.tenantId}&title=${title}`);
+    navigate(`/upyog-ui/employee/dss/drilldown?chart=${response?.responseData?.drillDownChartId}&ulb=${value?.filters?.tenantId}&title=${title}`);
   };
 
   const tooltipFormatter = (value, name) => {
@@ -164,7 +163,7 @@ const CustomHorizontalBarChart = ({
               }}
               tickCount={10}
               tickFormatter={tickFormatter}
-              unit={id === "fsmCapacityUtilization" ? "%" : ""}
+              unit={id === "fssmCapacityUtilization"  || id === "fsmCapacityUtilization"? "%" : ""}
               width={getVerticalWidth(layout)}
             />
             <XAxis dataKey={xDataKey} type={xAxisType} tick={{ fontSize: "14px", fill: "#505A5F" }} tickCount={10} tickFormatter={tickFormatter} />

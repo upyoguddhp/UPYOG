@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -14,6 +15,7 @@ import org.egov.vendor.config.VendorConfiguration;
 import org.egov.vendor.driver.web.model.Driver;
 import org.egov.vendor.repository.VendorRepository;
 import org.egov.vendor.util.VendorConstants;
+import org.egov.vendor.util.VendorErrorConstants;
 import org.egov.vendor.util.VendorUtil;
 import org.egov.vendor.validator.VendorValidator;
 import org.egov.vendor.web.model.Vendor;
@@ -25,6 +27,7 @@ import org.egov.vendor.web.model.user.UserDetailResponse;
 import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.egov.vendor.web.model.vehicle.VehicleSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -48,6 +51,7 @@ public class VendorService {
 	private VendorRepository repository;
 
 	@Autowired
+	@Lazy
 	private EnrichmentService enrichmentService;
 
 	@Autowired
@@ -66,9 +70,15 @@ public class VendorService {
 			throw new CustomException("Invalid TenantId", " Application cannot be create at StateLevel");
 		}
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
-		vendorValidator.validateCreateOrUpdateRequest(vendorRequest, mdmsData, true);
+		vendorValidator.validateCreateOrUpdateRequest(vendorRequest, mdmsData, true, requestInfo);
 		enrichmentService.enrichCreate(vendorRequest);
 		vendorRepository.save(vendorRequest);
+
+		// Enrich owner details with decrypted data before returning response
+		List<Vendor> vendorList = new ArrayList<>();
+		vendorList.add(vendorRequest.getVendor());
+		enrichmentService.enrichVendorSearch(vendorList, requestInfo, vendorRequest.getVendor().getTenantId());
+
 		return vendorRequest.getVendor();
 
 	}
@@ -127,9 +137,14 @@ public class VendorService {
 		}
 
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
-		vendorValidator.validateCreateOrUpdateRequest(vendorRequest, mdmsData, false);
+		vendorValidator.validateCreateOrUpdateRequest(vendorRequest, mdmsData, false, requestInfo);
 		enrichmentService.enrichUpdate(vendorRequest);
 		updateVendor(vendorRequest, tenantId);
+
+		// Enrich owner details with decrypted data before returning response
+		List<Vendor> vendorList = new ArrayList<>();
+		vendorList.add(vendorRequest.getVendor());
+		enrichmentService.enrichVendorSearch(vendorList, requestInfo, vendorRequest.getVendor().getTenantId());
 
 		return vendorRequest.getVendor();
 

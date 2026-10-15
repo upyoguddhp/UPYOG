@@ -81,7 +81,11 @@ import org.egov.collection.integration.services.BillingIntegrationService;
 import org.egov.collection.utils.CollectionsNumberGenerator;
 import org.egov.collection.utils.CollectionsUtil;
 import org.egov.collection.utils.FinancialsUtil;
-import org.egov.collection.utils.es.CollectionIndexUtils;
+/*
+ * Elasticsearch Integration Refactoring:
+ * Commented out CollectionIndexUtils import as legacy Elasticsearch 2.x indexer was decommissioned during JDK 17 upgrade.
+ */
+//import org.egov.collection.utils.es.CollectionIndexUtils;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CVoucherHeader;
@@ -98,6 +102,7 @@ import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.contract.RequestInfoWrapper;
+import org.egov.infra.microservice.models.AuditDetails;
 import org.egov.infra.microservice.models.Bank;
 import org.egov.infra.microservice.models.Bill;
 import org.egov.infra.microservice.models.BillDetailAdditional;
@@ -136,7 +141,11 @@ import org.egov.model.instrument.InstrumentType;
 import org.egov.pims.commons.Designation;
 import org.egov.pims.commons.Position;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
+/*
+ * Hibernate 6 Query Interface Migration:
+ * Replaced legacy org.hibernate.Query with org.hibernate.query.Query for Hibernate 6 query execution.
+ */
+import org.hibernate.query.Query;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -148,6 +157,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 /**
  * Provides services related to receipt header
@@ -170,11 +182,11 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
     private ChallanService challanService;
 
-    @Autowired
-    private CollectionIndexService collectionIndexService;
+//    @Autowired
+//    private CollectionIndexService collectionIndexService;
 
-    @Autowired
-    private CollectionIndexUtils collectionIndexUtils;
+//    @Autowired
+//    private CollectionIndexUtils collectionIndexUtils;
 
     @Autowired
     private ChartOfAccountsHibernateDAO chartOfAccountsHibernateDAO;
@@ -269,7 +281,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         if (!allUserName)
             query.append(" and receipt.createdBy.username = :userName");
         if (!allDate)
-            query.append(" and (cast(receipt.receiptdate as date)) = :rcptDate");
+            query.append(" a`nd (cast(receipt.receiptdate as date)) = :rcptDate");
         if (receiptType.equals(CollectionConstants.SERVICE_TYPE_BILLING))
             query.append(" and receipt.receipttype = :receiptType");
         else
@@ -282,23 +294,23 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         final Query listQuery = getSession().createQuery(query.toString());
 
         // if (!allPositions)
-        listQuery.setParameterList("positionIds", positionIds);
+        listQuery.setParameter("positionIds", positionIds);
         if (!allCounters)
-            listQuery.setInteger("counterId", counterId);
+            listQuery.setParameter("counterId", counterId);
         if (!allServices && receiptType.equals(CollectionConstants.SERVICE_TYPE_BILLING))
-            listQuery.setString("serviceCode", serviceCode);
+            listQuery.setParameter("serviceCode", serviceCode);
         if (!allWfAction)
-            listQuery.setString("wfAction", wfAction);
+            listQuery.setParameter("wfAction", wfAction);
         if (!allUserName)
-            listQuery.setString("userName", userName);
+            listQuery.setParameter("userName", userName);
         if (!allDate)
-            listQuery.setDate("rcptDate", rcptDate);
+            listQuery.setParameter("rcptDate", rcptDate);
         if (receiptType.equals(CollectionConstants.SERVICE_TYPE_BILLING))
-            listQuery.setCharacter("receiptType", receiptType.charAt(0));
+            listQuery.setParameter("receiptType", receiptType.charAt(0));
         if (paymentMode.equals(CollectionConstants.INSTRUMENTTYPE_CASH))
-            listQuery.setString("paymentMode", paymentMode);
+            listQuery.setParameter("paymentMode", paymentMode);
         else if (paymentMode.equals(CollectionConstants.INSTRUMENTTYPE_CHEQUEORDD))
-            listQuery.setParameterList("paymentMode", new ArrayList<>(Arrays.asList("cheque", "dd")));
+            listQuery.setParameter("paymentMode", new ArrayList<>(Arrays.asList("cheque", "dd")));
         return listQuery.list();
     }
 
@@ -1231,7 +1243,8 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         } catch (JsonProcessingException e) {
             LOGGER.error("json processing ", e);
         }
-        System.out.println(jsonInString);
+        // LTS Migration Fix (WildFly 40): System.out is discarded; use LOGGER.
+        LOGGER.info(jsonInString);
         return restTemplate.postForObject(url, request, DemandResponse.class);
     }
 
@@ -1251,7 +1264,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         } catch (JsonProcessingException e) {
            LOGGER.error("Json processing", e);
         }
-        System.out.println(jsonInString);
+        LOGGER.info(jsonInString);
         Map postForObject = restTemplate.postForObject(url, reqWrapper, Map.class);
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
@@ -1427,15 +1440,15 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                                 && receiptHeader.getStatus().getCode()
                                         .equals(CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED)))
             pushMail(receiptHeader);
-        CollectionIndex collectionIndexObj = collectionIndexUtils.findByReceiptNumber(receiptHeader.getReceiptnumber());
-        if (collectionIndexObj != null) {
-            collectionIndexObj.setStatus(receiptHeader.getStatus().getDescription());
-            collectionIndexService.persistCollectionIndex(collectionIndexObj);
-
-        } else {
-            collectionIndexObj = collectionsUtil.constructCollectionIndex(receiptHeader);
-            collectionIndexService.pushCollectionIndex(collectionIndexObj);
-        }
+//        CollectionIndex collectionIndexObj = collectionIndexUtils.findByReceiptNumber(receiptHeader.getReceiptnumber());
+//        if (collectionIndexObj != null) {
+//            collectionIndexObj.setStatus(receiptHeader.getStatus().getDescription());
+//            collectionIndexService.persistCollectionIndex(collectionIndexObj);
+//
+//        } else {
+//            collectionIndexObj = collectionsUtil.constructCollectionIndex(receiptHeader);
+//            collectionIndexService.pushCollectionIndex(collectionIndexObj);
+//        }
     }
 
     private void pushMail(final ReceiptHeader receiptHeader) {
@@ -1627,7 +1640,8 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
     }
     
     public List<Payment> generatePayments(ReceiptHeader receiptHeader, List<BillV2> billList) {
-        List<PaymentDetail> paymentDetails = new ArrayList<PaymentDetail>();
+        List<PaymentDetail> paymentDetails = new ArrayList<>();
+        ObjectNode emptyJsonNode = new ObjectMapper().createObjectNode();
         billList.stream().forEach(bill -> {
             PaymentDetail pd = PaymentDetail.builder()
                     .billId(bill.getId())
@@ -1637,16 +1651,26 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                     .tenantId(microserviceUtils.getTenentId())
                     .manualReceiptDate(receiptHeader.getManualreceiptdate() != null ? receiptHeader.getManualreceiptdate().getTime() : null)
                     .manualReceiptNumber(receiptHeader.getManualreceiptnumber())
+                    // Explicitly setting empty objects instead of null
+                    .bill(bill)
+                    .auditDetails(bill.getAuditDetails() != null ? bill.getAuditDetails() : new AuditDetails())
+                    .additionalDetails(bill.getAdditionalDetails() != null ? bill.getAdditionalDetails() : emptyJsonNode)
                     .build();
+
             paymentDetails.add(pd);
         });
-        Payment payment = Payment.builder().paymentDetails(paymentDetails)
+        
+        Payment payment = Payment.builder()
+                .paymentDetails(paymentDetails)
                 .tenantId(microserviceUtils.getTenentId())
                 .paymentMode(getPaymentModeEnum(receiptHeader.getModOfPayment()))
                 .totalDue(receiptHeader.getTotalAmount())
                 .totalAmountPaid(receiptHeader.getTotalAmount())
                 .paidBy(receiptHeader.getPaidBy())
                 .paymentStatus(PaymentStatusEnum.NEW)
+                // Explicitly setting empty objects
+                .auditDetails(new AuditDetails())   
+                .additionalDetails(emptyJsonNode)  
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
         PaymentResponse response = microserviceUtils.generatePayments(payment);

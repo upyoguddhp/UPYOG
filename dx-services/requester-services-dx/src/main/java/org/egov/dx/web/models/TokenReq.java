@@ -1,6 +1,6 @@
 package org.egov.dx.web.models;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,8 +19,8 @@ public class TokenReq {
 	 @JsonProperty("code")
      private String code;
 
-     @JsonProperty("code_verifier")
-     private  String codeVerifier;
+     @JsonProperty("dlReqRef")
+     private  String dlReqRef;
 
      @JsonProperty("module")
      private  String module;

@@ -1,19 +1,19 @@
 import producer from "../kafka/producer";
 import { requestInfoToResponseInfo, upadteForAuditDetails } from "../utils";
-import uuid4 from "uuid/v4";
+import { v4 as uuid4 } from "uuid";
 import envVariables from "../envVariables";
 import { validateBillingSlabReq } from "../utils/modelValidation";
 import { mdmsData } from "../services/mdmsService";
-import get from "lodash/get";
-import some from "lodash/some";
+import { get, some, isEmpty } from "lodash";
 import { constants } from "../config/constants";
 
 const create = async (req, res, next) => {
   console.log("create");
+  var header = JSON.parse(JSON.stringify(req.headers));
 
   let errors = [];
   errors = validateBillingSlabReq(req.body);
-  if (errors.length <= 0) errors = await createValidate(req.body, errors);
+  if (errors.length <= 0) errors = await createValidate(req.body, errors, header);
 
   if (errors.length > 0) {
     next({
@@ -55,11 +55,11 @@ const enrichCreateData = reqBody => {
   return reqBody.BillingSlabs;
 };
 
-const createValidate = async (body, errors) => {
+const createValidate = async (body, errors, header) => {
   let BillingSlabs = body.BillingSlabs;
   for (let i = 0; i < BillingSlabs.length; i++) {
     let billingSlab = BillingSlabs[i];
-    let mdms = await mdmsData(body.RequestInfo, billingSlab.tenantId);
+    let mdms = await mdmsData(body.RequestInfo, billingSlab.tenantId, header);
     let Buildingtypes = get(
       mdms,
       `MdmsRes.${constants.MDMS_MODULENAME_FIRENOC}.${

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FormStep, TextInput, LabelFieldPair, CardLabel, WrapUnMaskComponent } from "@egovernments/digit-ui-react-components";
+import { FormStep, TextInput, LabelFieldPair, CardLabel, WrapUnMaskComponent } from "@nudmcdgnpm/digit-ui-react-components";
 import { useForm, Controller } from "react-hook-form";
 import _ from "lodash";
 import Timeline from "../components/TLTimelineInFSM";
@@ -39,6 +39,7 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
         label: "PT_PROPERTY_ADDRESS_STREET_NAME",
         type: "text",
         name: "street",
+        isMandatory: true,
         validation: {
           pattern: "[a-zA-Z0-9 ]{1,255}",
           // maxlength: 256,
@@ -49,6 +50,7 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
         label: "PT_PROPERTY_ADDRESS_HOUSE_NO",
         type: "text",
         name: "doorNo",
+        isMandatory: true,
         validation: {
           pattern: "[A-Za-z0-9#,/ -]{1,63}",
           // maxlength: 256,
@@ -79,8 +81,26 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
   };
 
   useEffect(() => {
+    if(window.location.href.includes("employee/tl/") && formData?.cpt?.details)
+    {
+      setValue("doorNo", formData?.cpt?.details?.address?.doorNo);
+      setValue("street", formData?.cpt?.details?.address?.street);
+    }
+  },[formData])
+  
+  useEffect(() => {
     trigger();
   }, []);
+
+  useEffect(()=>{
+    if(formData?.address?.doorNo) setDoorNo(formData?.address?.doorNo)
+    if(formData?.address?.street) setStreet(formData?.address?.street)
+  },[formData?.address])
+
+  useEffect(() => {
+    if (formData?.address?.doorNo) setDoorNo(formData?.address?.doorNo);
+    if (formData?.address?.street) setStreet(formData?.address?.street);
+  }, [formData?.address]);
 
   useEffect(() => {
     if (formData?.address?.doorNo) setDoorNo(formData?.address?.doorNo);
@@ -134,7 +154,7 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
         <LabelFieldPair key={index}>
           <CardLabel className="card-label-smaller">
             {t(input.label)}
-            {config.isMandatory ? " * " : null}
+            {input.isMandatory ? " * " : null}
           </CardLabel>
           <div className="field">
             <Controller
@@ -142,17 +162,17 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
               defaultValue={formData?.cpt?.details?.address?.[input?.name] || formData?.address?.[input.name]}
               name={input.name}
               rules={{ validate: convertValidationToRules(input) }}
-              render={(_props) => (
+              render={({ field }) => (
                 <div style={{ display: "flex", alignItems: "baseline", marginRight: "unset" }}>
                   <TextInput
                     id={input.name}
                     key={input.name}
-                    value={_props.value}
+                    value={field.value}
                     onChange={(e) => {
                       setFocusIndex({ index });
-                      _props.onChange(e.target.value);
+                      field.onChange(e.target.value);
                     }}
-                    onBlur={_props.onBlur}
+                    onBlur={field.onBlur}
                     // disable={isRenewal}
                     disable={formData?.cpt?.details?.address?.[input.name] ? true : false}
                     autoFocus={focusIndex?.index == index}
@@ -161,10 +181,10 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
                   <div style={{ marginRight: "-50px", marginLeft: "10px" }}>
                     <WrapUnMaskComponent
                       unmaskField={(e) => {
-                        _props.onChange(e);
+                        field.onChange(e);
                       }}
                       iseyevisible={
-                        (_props.value ? _props.value?.includes("*") : formData?.cpt?.details?.address?.[input.name]?.includes("*")) ? true : false
+                        (field.value ? field.value?.includes("*") : formData?.cpt?.details?.address?.[input.name]?.includes("*")) ? true : false
                       }
                       privacy={{
                         uuid: formData?.cpt?.details?.owners?.[0]?.uuid,
@@ -196,6 +216,7 @@ const SelectStreet = ({ t, config, onSelect, userType, formData, formState, setE
       {window.location.href.includes("/tl") ? <Timeline currentStep={2} /> : <Timeline currentStep={1} flow="APPLY" />}
       <FormStep
         config={{ ...config, inputs }}
+        isMandatory={true}
         _defaultValues={{ street: formData?.address.street, doorNo: formData?.address.doorNo }}
         onChange={handleSkip}
         onSelect={(data) => onSelect(config.key, data)}

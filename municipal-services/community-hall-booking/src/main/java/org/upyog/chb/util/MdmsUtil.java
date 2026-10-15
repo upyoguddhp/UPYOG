@@ -12,27 +12,78 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.springframework.stereotype.Component;
 import org.upyog.chb.config.CommunityHallBookingConfiguration;
 import org.upyog.chb.constants.CommunityHallBookingConstants;
 import org.upyog.chb.repository.ServiceRequestRepository;
+<<<<<<< HEAD
 import org.upyog.chb.web.models.ApplicantDetail;
 import org.upyog.chb.web.models.CalculationType;
 import org.upyog.chb.web.models.CommunityHallBookingDetail;
+=======
+import org.upyog.chb.web.models.CalculationType;
+>>>>>>> niua-upstream/niua-dev-2.0
 import org.upyog.chb.web.models.billing.TaxHeadMaster;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+<<<<<<< HEAD
 import com.jayway.jsonpath.JsonPath;
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
+<<<<<<< HEAD
+=======
+/**
+ * This utility class provides methods for interacting with the MDMS (Master Data Management System)
+ * to fetch and process master data required for the Community Hall Booking module.
+ * 
+ * Purpose:
+ * - To retrieve master data such as calculation types, tax head masters, and other configurations.
+ * - To simplify the process of creating MDMS requests and handling responses.
+ * 
+ * Dependencies:
+ * - ServiceRequestRepository: Sends HTTP requests to the MDMS service.
+ * - CommunityHallBookingConfiguration: Provides configuration properties for MDMS operations.
+ * - ObjectMapper: Serializes and deserializes JSON objects for requests and responses.
+ * 
+ * Features:
+ * - Constructs MDMS requests with the required criteria and module details.
+ * - Sends requests to the MDMS service and processes the responses.
+ * - Handles exceptions and logs errors for debugging and monitoring purposes.
+ * 
+ * Fields:
+ * - mdmsHost: The base URL of the MDMS service.
+ * - mdmsPath: The endpoint path for MDMS requests.
+ * 
+ * Methods:
+ * 1. fetchMdmsData:
+ *    - Sends a request to the MDMS service to fetch master data based on the provided criteria.
+ *    - Processes the response and returns the required master data.
+ * 
+ * 2. getCalculationTypes:
+ *    - Retrieves calculation types from the MDMS service for use in demand generation.
+ * 
+ * 3. getTaxHeadMasters:
+ *    - Fetches tax head masters from the MDMS service for financial calculations.
+ * 
+ * Usage:
+ * - This class is used throughout the module to fetch and process master data from MDMS.
+ * - It ensures consistent and reusable logic for MDMS interactions across the application.
+ */
+>>>>>>> niua-upstream/niua-dev-2.0
 @Slf4j
 @Component
 public class MdmsUtil {
 
+<<<<<<< HEAD
 	@Autowired
 	private CommunityHallBookingConfiguration config;
 
@@ -67,12 +118,68 @@ public class MdmsUtil {
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
 		Object result = null;
 		if(mdmsMap == null) {
+=======
+	private final CommunityHallBookingConfiguration config;
+	private final ServiceRequestRepository serviceRequestRepository;
+	private final ObjectMapper mapper;
+
+	private static Object mdmsMap = null;
+
+	public MdmsUtil(CommunityHallBookingConfiguration config, ServiceRequestRepository serviceRequestRepository,
+			ObjectMapper mapper) {
+		this.config = config;
+		this.serviceRequestRepository = serviceRequestRepository;
+		this.mapper = mapper;
+	}
+
+	/**
+	 * Makes an MDMS call using the provided request information and tenant ID.
+	 * Constructs the criteria request specific to general MDMS data and fetches the results.
+	 * * @param requestInfo The authentication and metadata information for the request.
+	 * @param tenantId    The unique identifier of the tenant.
+	 * @return The MDMS data object fetched from the repository or cache.
+	 */
+	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
+		return mDMSCommonCall(mdmsCriteriaReq);
+	}
+	
+	/**
+	 * Makes an MDMS call specifically for Venue Type configurations using the provided 
+	 * request information and tenant ID.
+	 * * @param requestInfo The authentication and metadata information for the request.
+	 * @param tenantId    The unique identifier of the tenant.
+	 * @return The MDMS Venue Type data object fetched from the repository or cache.
+	 */
+	public Object mDMSVenueTypeCall(RequestInfo requestInfo , String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getMDMSVenueTypeRequest(requestInfo, tenantId);
+		return mDMSCommonCall(mdmsCriteriaReq);
+	}
+	
+	/**
+	 * Executes the common MDMS API call logic. It logs the request payload, 
+	 * and serves the data from an in-memory map cache if available; 
+	 * otherwise, it fetches fresh data from the remote MDMS repository.
+	 * * @param mdmsCriteriaReq The prepared MDMS criteria request payload wrapper.
+	 * @return The raw Master Data Management System (MDMS) response object.
+	 */
+	public Object mDMSCommonCall(MdmsCriteriaReq mdmsCriteriaReq) {
+		try {
+			log.debug("MDMS request payload: {}",
+					mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mdmsCriteriaReq));
+		} catch (JsonProcessingException e) {
+			log.warn("Failed to serialize MDMS request for logging", e);
+		}
+		Object result;
+		if (mdmsMap == null) {
+>>>>>>> niua-upstream/niua-dev-2.0
 			result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 			setMDMSDataMap(result);
 		} else {
 			result = getMDMSDataMap();
 		}
 
+<<<<<<< HEAD
 		// Object result = mdmsClient.getMDMSData(mdmsCriteriaReq);
 		// log.info("Master data fetched from MDMSfrom feign client : " + result);
 		
@@ -80,6 +187,10 @@ public class MdmsUtil {
 	}
 
 	
+=======
+		return result;
+	}
+>>>>>>> niua-upstream/niua-dev-2.0
 	/**
 	 * Returns the URL for MDMS search end point
 	 *
@@ -90,6 +201,7 @@ public class MdmsUtil {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * prepares the mdms request object
 	 * 
 	 * @param requestInfo
@@ -99,6 +211,16 @@ public class MdmsUtil {
 	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getCHBModuleRequest();
 
+=======
+	 * Prepares a common MDMS criteria request object by combining the specified 
+	 * module details, tenant ID, and request metadata.
+	 * * @param moduleRequest The list of modules and their specific master data details to fetch.
+	 * @param tenantId      The unique identifier of the tenant.
+	 * @param requestInfo   The authentication and metadata information for the request.
+	 * @return A constructed {@link MdmsCriteriaReq} instance populated with the criteria.
+	 */
+	public MdmsCriteriaReq getCommonMDMSRequest(List<ModuleDetail> moduleRequest,String tenantId,RequestInfo requestInfo) {
+>>>>>>> niua-upstream/niua-dev-2.0
 		log.info("Module details data needs to be fetched from MDMS : " + moduleRequest);
 
 		List<ModuleDetail> moduleDetails = new LinkedList<>();
@@ -106,12 +228,73 @@ public class MdmsUtil {
 
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId).build();
 
+<<<<<<< HEAD
 		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria).requestInfo(requestInfo)
 				.build();
 		return mdmsCriteriaReq;
 	}
 
 	/**
+=======
+		return MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria).requestInfo(requestInfo)
+				.build();
+	}
+
+	/**
+	 * Constructs the standard MDMS request for general CHB (Community Hall Booking) modules.
+	 * It automatically retrieves the default CHB module configurations before building the request.
+	 * * @param requestInfo The authentication and metadata information for the request.
+	 * @param tenantId    The unique identifier of the tenant.
+	 * @return A configured {@link MdmsCriteriaReq} instance for general CHB data.
+	 */
+	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
+		List<ModuleDetail> moduleRequest = getCHBModuleRequest();
+
+		return getCommonMDMSRequest(moduleRequest, tenantId,requestInfo);
+	}
+	
+	/**
+	 * Constructs the MDMS request specifically for CHB Venue Type configurations.
+	 * It retrieves the dedicated Venue Type module requirements before building the request.
+	 * * @param requestInfo The authentication and metadata information for the request.
+	 * @param tenantId    The unique identifier of the tenant.
+	 * @return A configured {@link MdmsCriteriaReq} instance tailored for Venue Type data.
+	 */
+	public MdmsCriteriaReq getMDMSVenueTypeRequest(RequestInfo requestInfo, String tenantId) {
+		List<ModuleDetail> moduleRequest = getCHBVenueTypeModuleRequest();
+
+		return getCommonMDMSRequest(moduleRequest, tenantId,requestInfo);
+	}
+
+	/**
+	 * Generates the specific list of {@link ModuleDetail} objects required to fetch 
+	 * Venue Type data and Common Masters data for the Community Hall Booking system.
+	 * * @return A {@link List} of configured {@link ModuleDetail} objects representing the requested masters.
+	 */
+	public List<ModuleDetail> getCHBVenueTypeModuleRequest() {
+
+		// master details for CHB module
+		List<MasterDetail> chbMasterDtls = new ArrayList<>();
+
+		
+		chbMasterDtls
+				.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_VENUE_TYPE_DATA).build());
+
+
+		ModuleDetail moduleDetail = ModuleDetail.builder().masterDetails(chbMasterDtls)
+				.moduleName(config.getModuleName()).build();
+
+		// master details for common-masters module
+		List<MasterDetail> commonMasterDetails = new ArrayList<>();
+		ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
+				.moduleName(CommunityHallBookingConstants.COMMON_MASTERS_MODULE).build();
+
+		return Arrays.asList(moduleDetail, commonMasterMDtl);
+
+	}
+	
+	/**
+>>>>>>> niua-upstream/niua-dev-2.0
 	 * Creates request to search ApplicationType and etc from MDMS
 	 * 
 	 * @param requestInfo The requestInfo of the request
@@ -133,8 +316,47 @@ public class MdmsUtil {
 				.filter(filterCode).build());
 		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_COMMNUITY_HALLS)
 				.filter(filterCode).build());
+<<<<<<< HEAD
 		chbMasterDtls.add(
 				MasterDetail.builder().name(CommunityHallBookingConstants.CHB_HALL_CODES).filter("$.[?(@.active==true)].HallCode").build());
+=======
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_GUEST_HOUSE_CODES)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_GUEST_HOUSES)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_STADIUM_CODES)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_STADIUMS)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_PARK_CODES)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_PARKS)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_CREMATORIUMS)
+				.filter(filterCode).build());
+		
+
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_CREMATORIUM_CODES)
+				.filter(filterCode).build());
+		
+		
+		chbMasterDtls.add(MasterDetail.builder().name(CommunityHallBookingConstants.CHB_HALL_CODES)
+				.filter(filterCode).build());
+>>>>>>> niua-upstream/niua-dev-2.0
 		chbMasterDtls.add(
 				MasterDetail.builder().name(CommunityHallBookingConstants.CHB_DOCUMENTS).filter(filterCode).build());
 
@@ -157,6 +379,7 @@ public class MdmsUtil {
 	public static Object getMDMSDataMap() {
 		return mdmsMap;
 	}
+<<<<<<< HEAD
 	
 	
 	public List<TaxHeadMaster> getTaxHeadMasterList(RequestInfo requestInfo, String tenantId, String moduleName) {
@@ -174,15 +397,40 @@ public class MdmsUtil {
 			
 			JSONArray jsonArray = mdmsResponse.getMdmsRes().get("BillingService").get("TaxHeadMaster");
 			
+=======
+
+	public List<TaxHeadMaster> getTaxHeadMasterList(RequestInfo requestInfo, String tenantId, String moduleName) {
+		List<TaxHeadMaster> headMasters = null;
+
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getMdmsHost()).append(config.getMdmsPath());
+
+		String filter = "$.[?(@.service=='chb-services')]";
+
+		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestTaxHeadMaster(requestInfo, tenantId, moduleName,
+				"TaxHeadMaster", filter);
+
+		try {
+			MdmsResponse mdmsResponse = mapper.convertValue(serviceRequestRepository.fetchResult(uri, mdmsCriteriaReq),
+					MdmsResponse.class);
+
+			JSONArray jsonArray = mdmsResponse.getMdmsRes().get("BillingService").get("TaxHeadMaster");
+
+>>>>>>> niua-upstream/niua-dev-2.0
 			headMasters = mapper.readValue(jsonArray.toJSONString(),
 					mapper.getTypeFactory().constructCollectionType(List.class, TaxHeadMaster.class));
 		} catch (JsonProcessingException e) {
 			log.info("Exception occured while converting tax haead master list : " + e);
+<<<<<<< HEAD
 		} 
+=======
+		}
+>>>>>>> niua-upstream/niua-dev-2.0
 
 		return headMasters;
 	}
 
+<<<<<<< HEAD
 	public List<CalculationType> getcalculationType(RequestInfo requestInfo, String tenantId, String moduleName, CommunityHallBookingDetail bookingDetail) {
 		
 		List<CalculationType> calculationTypes = new ArrayList<CalculationType>();
@@ -212,6 +460,44 @@ public class MdmsUtil {
 		MasterDetail masterDetail = new MasterDetail();
 		masterDetail.setName("TaxHeadMaster");
 		masterDetail.setFilter("$.[?(@.service=='chb-services')]");
+=======
+	public List<CalculationType> getTaxRatesMasterList(RequestInfo requestInfo, String tenantId, String moduleName) {
+		List<CalculationType> taxRates = null;
+		String taxRatesMasterName = "TaxRates";
+
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getMdmsHost()).append(config.getMdmsPath());
+
+		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestTaxHeadMaster(requestInfo, tenantId, moduleName,
+				taxRatesMasterName, null);
+		MdmsResponse mdmsResponse = mapper.convertValue(serviceRequestRepository.fetchResult(uri, mdmsCriteriaReq),
+				MdmsResponse.class);
+		if (mdmsResponse.getMdmsRes().get(config.getModuleName()) == null) {
+			throw new CustomException("TAX_NOT_AVAILABLE", "Community Hall Tax Rates not available.");
+		}
+		JSONArray jsonArray = mdmsResponse.getMdmsRes().get(config.getModuleName()).get(taxRatesMasterName);
+
+		try {
+			taxRates = mapper.readValue(jsonArray.toJSONString(),
+					mapper.getTypeFactory().constructCollectionType(List.class, CalculationType.class));
+			log.info("tax rates : " + taxRates);
+		} catch (JsonProcessingException e) {
+			log.info("Exception occured while converting tax rates : " + e);
+		}
+
+		return taxRates;
+
+	}
+
+	private MdmsCriteriaReq getMdmsRequestTaxHeadMaster(RequestInfo requestInfo, String tenantId, String moduleName,
+			String masterName, String filter) {
+
+		MasterDetail masterDetail = new MasterDetail();
+		masterDetail.setName(masterName);
+		if (null != filter) {
+			masterDetail.setFilter(filter);
+		}
+>>>>>>> niua-upstream/niua-dev-2.0
 		List<MasterDetail> masterDetailList = new ArrayList<>();
 		masterDetailList.add(masterDetail);
 
@@ -231,6 +517,7 @@ public class MdmsUtil {
 
 		return mdmsCriteriaReq;
 	}
+<<<<<<< HEAD
 	
 	private MdmsCriteriaReq getMdmsRequestCalculationType(RequestInfo requestInfo, String tenantId, String moduleName, String communityHallCode) {
 
@@ -259,4 +546,7 @@ public class MdmsUtil {
 	private String getCalculationTypeMasterName(String communityHallCode) {
 		return CommunityHallBookingConstants.CHB_CALCULATION_TYPE /* + '_' + communityHallCode */;
 	}
+=======
+
+>>>>>>> niua-upstream/niua-dev-2.0
 }

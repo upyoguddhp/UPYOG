@@ -5,6 +5,7 @@ import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.utils.MultiStateInstanceUtil;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -35,6 +36,10 @@ import static org.egov.tl.util.TLConstants.PROPERTY_ID;
 @Service
 public class TLNotificationService {
 
+<<<<<<< HEAD
+=======
+	@Autowired
+>>>>>>> niua-upstream/niua-dev-2.0
 	private TLConfiguration config;
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -45,26 +50,28 @@ public class TLNotificationService {
 
 	private TLRenewalNotificationUtil tlRenewalNotificationUtil;
 
-	private PropertyUtil propertyUtil;
+	private MultiStateInstanceUtil centralInstanceUtil;
 
-	@Value("${egov.mdms.host}")
-	private String mdmsHost;
-
-	@Value("${egov.mdms.search.endpoint}")
-	private String mdmsUrl;
-
+    private PropertyUtil propertyUtil;
+  
 	@Autowired
 	private RestTemplate restTemplate;
 
 	@Autowired
+<<<<<<< HEAD
 	public TLNotificationService(TLConfiguration config, ServiceRequestRepository serviceRequestRepository,
 			NotificationUtil util, BPANotificationUtil bpaNotificationUtil,
 			TLRenewalNotificationUtil tlRenewalNotificationUtil, PropertyUtil propertyUtil) {
+=======
+	public TLNotificationService(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, NotificationUtil util, BPANotificationUtil bpaNotificationUtil, TLRenewalNotificationUtil tlRenewalNotificationUtil
+                               , MultiStateInstanceUtil centralInstanceUtil, PropertyUtil propertyUtil) {
+>>>>>>> niua-upstream/niua-dev-2.0
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.util = util;
 		this.bpaNotificationUtil = bpaNotificationUtil;
 		this.tlRenewalNotificationUtil = tlRenewalNotificationUtil;
+		this.centralInstanceUtil = centralInstanceUtil;
 		this.propertyUtil = propertyUtil;
 	}
 
@@ -110,6 +117,7 @@ public class TLNotificationService {
 			Property property = propertyUtil.getPropertyDetails(request.getLicenses().get(0), propertyId, requestInfo);
 			String source = property.getSource().name();
 
+<<<<<<< HEAD
 			if (config.getIsTLSMSEnabled()) {
 				if (!propertyId.isEmpty() && ACTION_STATUS_INITIATED.equalsIgnoreCase(ACTION_STATUS)) {
 					List<SMSRequest> smsRequestsPT = new ArrayList<>();
@@ -121,6 +129,22 @@ public class TLNotificationService {
 					if (!CollectionUtils.isEmpty(smsRequestsPT))
 						util.sendSMS(smsRequestsPT, true);
 
+=======
+				if (config.getIsTLSMSEnabled()) {
+					if (!propertyId.isEmpty() && ACTION_STATUS_INITIATED.equalsIgnoreCase(ACTION_STATUS)) {
+						List<SMSRequest> smsRequestsPT = new ArrayList<>();
+						String localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+						String message = propertyUtil.getPropertySearchMsg(license, localizationMessages, CHANNEL_NAME_SMS, propertyId, source);
+						log.info("Message to be sent: ", message);
+						smsRequestsPT.addAll(propertyUtil.createPropertySMSRequest(message, property));
+						if (!CollectionUtils.isEmpty(smsRequestsPT))
+							util.sendSMS(smsRequestsPT, true, tenantId);
+
+					}
+					enrichSMSRequest(request, smsRequestsTL, configuredChannelList);
+					if (!CollectionUtils.isEmpty(smsRequestsTL))
+						util.sendSMS(smsRequestsTL, true, request.getLicenses().get(0).getTenantId());
+>>>>>>> niua-upstream/niua-dev-2.0
 				}
 
 				enrichSMSRequest(request, smsRequestsTL, configuredChannelList);
@@ -138,6 +162,7 @@ public class TLNotificationService {
 					if (null != eventRequest)
 						util.sendEventNotification(eventRequest);
 				}
+<<<<<<< HEAD
 				EventRequest eventRequest = getEventsForTL(request);
 				if (null != eventRequest)
 					util.sendEventNotification(eventRequest);
@@ -184,6 +209,43 @@ public class TLNotificationService {
 							mapOfPhnoAndEmail, property));
 					if (!CollectionUtils.isEmpty(emailRequestsPT))
 						util.sendEmail(emailRequestsPT, config.getIsEmailNotificationEnabled());
+=======
+				List<EmailRequest> emailRequests = new LinkedList<>();
+				if (config.getIsEmailNotificationEnabled()) {
+					if (!propertyId.isEmpty() && ACTION_STATUS_INITIATED.equalsIgnoreCase(ACTION_STATUS)) {
+						List<EmailRequest> emailRequestsPT = new LinkedList<>();
+						String localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+						Set<String> propertyMobileNumbers = new HashSet<>();
+						property.getOwners().forEach(owner -> {
+							if (owner.getMobileNumber() != null)
+								propertyMobileNumbers.add(owner.getMobileNumber());
+						});
+						Map<String, String> mapOfPhnoAndEmail = util.fetchUserEmailIds(propertyMobileNumbers, request.getRequestInfo(), tenantId);
+						String message = propertyUtil.getPropertySearchMsg(license, localizationMessages, CHANNEL_NAME_EMAIL, String.valueOf(request.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get(PROPERTY_ID)), source);
+						emailRequestsPT.addAll(propertyUtil.createPropertyEmailRequest(request.getRequestInfo(), message, mapOfPhnoAndEmail, property));
+						if (!CollectionUtils.isEmpty(emailRequestsPT))
+							util.sendEmail(emailRequestsPT, config.getIsEmailNotificationEnabled(), tenantId);
+					}
+
+					Map<String, String> mapOfPhnoAndEmail = util.fetchUserEmailIds(mobileNumbers, requestInfo, tenantId);
+					enrichEmailRequest(request, emailRequests, mapOfPhnoAndEmail, configuredChannelList);
+
+					if (!CollectionUtils.isEmpty(emailRequests))
+						util.sendEmail(emailRequests, config.getIsEmailNotificationEnabled(), tenantId);
+				}
+
+				break;
+
+			case businessService_BPA:
+				configuredChannelList = fetchChannelList(new RequestInfo(), tenantId, "BPAREG", action);
+				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
+				if (null != config.getIsBPASMSEnabled()) {
+					if (config.getIsBPASMSEnabled()) {
+						enrichSMSRequest(request, smsRequestsBPA,configuredChannelList);
+						if (!CollectionUtils.isEmpty(smsRequestsBPA))
+							util.sendSMS(smsRequestsBPA, true, request.getLicenses().get(0).getTenantId());
+					}
+>>>>>>> niua-upstream/niua-dev-2.0
 				}
 				Map<String, String> mapOfPhnoAndEmail = util.fetchUserEmailIds(mobileNumbers, requestInfo, tenantId);
 				enrichEmailRequest(request, emailRequests, mapOfPhnoAndEmail, configuredChannelList);
@@ -218,7 +280,12 @@ public class TLNotificationService {
 							tenantId);
 					enrichEmailRequest(request, emailRequestsForBPA, mapOfPhnoAndEmail, configuredChannelList);
 					if (!CollectionUtils.isEmpty(emailRequestsForBPA))
+<<<<<<< HEAD
 						util.sendEmail(emailRequestsForBPA, config.getIsEmailNotificationEnabledForBPA());
+=======
+						util.sendEmail(emailRequestsForBPA, config.getIsEmailNotificationEnabledForBPA(), tenantId);
+					}
+>>>>>>> niua-upstream/niua-dev-2.0
 				}
 			}
 			break;
@@ -370,6 +437,55 @@ public class TLNotificationService {
 				else
 					message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
 			}
+<<<<<<< HEAD
+=======
+			
+            if(message == null) continue;
+            Map<String,String > mobileNumberToOwner = new HashMap<>();
+            license.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                if(owner.getMobileNumber()!=null)
+                    mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+            });
+            List<SMSRequest> smsRequests = util.createSMSRequest(message,mobileNumberToOwner);
+        	Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
+        	Map<String, String> mapOfPhnoAndUUIDs = util.fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), request.getLicenses().get(0).getTenantId());
+    		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+    			log.info("UUID search failed!");
+    			continue;
+    		}
+            Map<String,String > mobileNumberToMsg = smsRequests.stream().collect(Collectors.toMap(SMSRequest::getMobileNumber, SMSRequest::getMessage));		
+            for(String mobile: mobileNumbers) {
+    			if(null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberToMsg.get(mobile)) {
+    				log.error("No UUID/SMS for mobile {} skipping event", mobile);
+    				continue;
+    			}
+    			List<String> toUsers = new ArrayList<>();
+    			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+    			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
+    			List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
+				List<String> viewTriggerList = Arrays.asList(config.getViewApplicationTriggers().split("[,]"));
+	   			Action action = null;
+    			if(payTriggerList.contains(license.getStatus())) {
+                    List<ActionItem> items = new ArrayList<>();
+        			String actionLink = config.getPayLink().replace("$mobile", mobile)
+        						.replace("$applicationNo", license.getApplicationNumber())
+        						.replace("$tenantId", license.getTenantId())
+        						.replace("$businessService", license.getBusinessService());
+        			actionLink = util.getHost(license.getTenantId()) + actionLink;
+        			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
+        			items.add(item);
+        			action = Action.builder().actionUrls(items).build();
+    			}
+    			if(viewTriggerList.contains(license.getStatus())){
+					List<ActionItem> items = new ArrayList<>();
+					String actionLink = config.getViewApplicationLink().replace("$mobile", mobile)
+							.replace("$applicationNo", license.getApplicationNumber())
+							.replace("$tenantId", license.getTenantId());
+					actionLink = util.getHost(license.getTenantId()) + actionLink;
+					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getViewApplicationCode()).build();
+					items.add(item);
+					action = Action.builder().actionUrls(items).build();
+>>>>>>> niua-upstream/niua-dev-2.0
 
 			if (message == null)
 				continue;
@@ -405,20 +521,30 @@ public class TLNotificationService {
 					String actionLink = config.getPayLink().replace("$mobile", mobile)
 							.replace("$applicationNo", license.getApplicationNumber())
 							.replace("$tenantId", license.getTenantId())
+<<<<<<< HEAD
 							.replace("$businessService", license.getBusinessService());
 					actionLink = config.getUiAppHost() + actionLink;
+=======
+					        .replace("$businessService", license.getBusinessService());;
+					actionLink = util.getHost(license.getTenantId()) + actionLink;
+>>>>>>> niua-upstream/niua-dev-2.0
 					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 					items.add(item);
 					action = Action.builder().actionUrls(items).build();
 				}
 				if (viewTriggerList.contains(license.getStatus())) {
 					List<ActionItem> items = new ArrayList<>();
+<<<<<<< HEAD
 					String actionLink = config.getViewApplicationLink().replace("$mobile", mobile)
 							.replace("$applicationNo", license.getApplicationNumber())
 							.replace("$tenantId", license.getTenantId());
 					actionLink = config.getUiAppHost() + actionLink;
 					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getViewApplicationCode())
 							.build();
+=======
+					String actionLink = util.getHost(tenantId);
+					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPortalUrlCode()).build();
+>>>>>>> niua-upstream/niua-dev-2.0
 					items.add(item);
 					action = Action.builder().actionUrls(items).build();
 
@@ -499,6 +625,7 @@ public class TLNotificationService {
 						action = Action.builder().actionUrls(items).build();
 					}
 
+<<<<<<< HEAD
 					if (license.getStatus().equals(APPROVED_STATUS)) {
 						List<ActionItem> items = new ArrayList<>();
 						String actionLink = config.getUiAppHost();
@@ -524,6 +651,8 @@ public class TLNotificationService {
 
 	}
 
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 	/**
 	 * Fetches Channel List based on the module name and action.
 	 *
@@ -540,11 +669,11 @@ public class TLNotificationService {
 		Map<Object, Object> map = new HashMap<>();
 
 		StringBuilder uri = new StringBuilder();
-		uri.append(mdmsHost).append(mdmsUrl);
+		uri.append(config.getMdmsHost()).append(config.getMdmsV1EndPoint());
 
 		if (StringUtils.isEmpty(tenantId))
 			return map;
-		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestForChannelList(requestInfo, tenantId.split("\\.")[0]);
+		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestForChannelList(requestInfo, centralInstanceUtil.getStateLevelTenant(tenantId));
 
 		Filter masterDataFilter = filter(where(MODULENAME).is(moduleName));
 

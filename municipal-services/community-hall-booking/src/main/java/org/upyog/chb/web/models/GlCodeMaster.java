@@ -1,6 +1,10 @@
 package org.upyog.chb.web.models;
 
+<<<<<<< HEAD
 import javax.validation.constraints.NotNull;
+=======
+import jakarta.validation.constraints.NotNull;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

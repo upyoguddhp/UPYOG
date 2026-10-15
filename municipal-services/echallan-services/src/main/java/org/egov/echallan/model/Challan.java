@@ -26,7 +26,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Capture the challan details 
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-08-10T16:46:24.044+05:30[Asia/Calcutta]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-08-10T16:46:24.044+05:30[Asia/Calcutta]")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -48,31 +48,31 @@ public class Challan {
   private UserInfo citizen = null;
 
   @JsonProperty("id")
-  @SafeHtml
+  @CustomSafeHtml
   private String id = null;
 
   @JsonProperty("tenantId")
-  @SafeHtml
+  @CustomSafeHtml
   private String tenantId = null;
 
   @JsonProperty("businessService")
-  @SafeHtml
+  @CustomSafeHtml
   private String businessService = null;
 
   @JsonProperty("challanNo")
-  @SafeHtml
+  @CustomSafeHtml
   private String challanNo = null;
 
   @JsonProperty("referenceId")
-  @SafeHtml
+  @CustomSafeHtml
   private String referenceId = null;
 
   @JsonProperty("description")
-  @SafeHtml
+  @CustomSafeHtml
   private String description = null;
 
   @JsonProperty("accountId")
-  @SafeHtml
+  @CustomSafeHtml
   private String accountId = null;
 
   @JsonProperty("additionalDetail")
@@ -80,7 +80,7 @@ public class Challan {
   private Object additionalDetail = null;
 
   @JsonProperty("source")
-  @SafeHtml
+  @CustomSafeHtml
   private String source = null;
   
   @JsonProperty("taxPeriodFrom")
@@ -100,7 +100,7 @@ public class Challan {
   private Address address = null;
   
   @JsonProperty("filestoreid")
-  @SafeHtml
+  @CustomSafeHtml
   private String filestoreid = null;
 
   @JsonProperty("auditDetails")

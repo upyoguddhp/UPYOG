@@ -1,0 +1,36 @@
+{
+  "name": "@nudmcdgnpm/workbench-ui-module-workbench",
+  "version": "1.0.0",
+  "description": "Workbench",
+  "main": "src/Module.js",
+  "source": "src/Module.js",
+  
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-router-dom": "6.28.0",
+    "react-dom": "^19.0.0",
+    "@tanstack/react-query": "^5.0.0"
+  },
+  "dependencies": {
+    "@upyog/workbench-ui-react-components": "1.0.0",
+    "@rjsf/core": "5.24.13",
+    "@rjsf/utils": "5.24.13",
+    "@rjsf/validator-ajv8": "5.24.13",
+    "file-saver": "^2.0.5",
+    "react-date-range": "1.4.0",
+    "react-hook-form": "^7.51.0",
+    "react-i18next": "14.0.0",
+    "react-json-view": "^1.21.3",
+    "react-select": "5.7.4",
+    "xlsx": "0.17.5"
+  },
+  "author": "Internal Tech Team, NIUA",
+  "license": "MIT",
+  "keywords": [
+    "upyog",
+    "nudm",
+    "niua",   
+    "workbench-ui",
+    "workbench"
+  ]
+}

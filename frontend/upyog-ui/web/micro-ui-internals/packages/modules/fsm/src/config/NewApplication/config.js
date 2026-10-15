@@ -1,5 +1,76 @@
 export const newConfig = [
   {
+    
+      head: "",
+      body: [
+        
+        {
+          type: "component",
+          route: "search-property",
+          isMandatory: true,
+          component: "CPTSearchProperty", 
+          key: "cptsearchproperty",
+          withoutLabel: true,
+          nextStep: 'search-results',
+          hideInEmployee: true,
+        },
+        {
+          type: "component",
+          route: "search-results",
+          isMandatory: true,
+          component: "CPTSearchResults", 
+          key: "cptsearchresults",
+          withoutLabel: true,
+          nextStep: 'property-type',
+          hideInEmployee: true,
+        },
+        {
+          type: "component",
+          route: "create-property", 
+          isMandatory: true,
+          component: "CPTCreateProperty", 
+          key: "cptcreateproperty",
+          withoutLabel: true,
+          isSkipEnabled : true,
+          nextStep: 'acknowledge-create-property',
+          hideInEmployee: true,
+        },
+        {
+          type: "component",
+          route: "acknowledge-create-property", 
+          isMandatory: true,
+          component: "CPTAcknowledgement", 
+          key: "cptacknowledgement",
+          withoutLabel: true,
+          nextStep: 'property-type',
+          hideInEmployee: true,
+        },
+        {
+          type: "component",
+          route: "property-details",
+          isMandatory: true,
+          component: "CPTPropertyDetails", 
+          key: "propertydetails",
+          withoutLabel: true,
+          nextStep: 'property-type',
+          hideInEmployee: true,
+        },
+        
+      ],
+  },
+  {
+    head: "FSM_NEW_APPLICATION_PROPERTY",
+    body: [
+      {
+        component: "CPTPropertySearchNSummary",
+        withoutLabel: true,
+        key: "cpt",
+        type: "component",
+        hideInCitizen: true
+      }
+    ]
+  },
+    {
     head: "ES_NEW_APPLICATION_PROPERTY_DETAILS",
     body: [
       {
@@ -78,7 +149,6 @@ export const newConfig = [
         type: "component",
         route: "check-slum",
         isMandatory: true,
-        component: "CheckSlum",
         texts: {
           header: "ES_NEW_APPLICATION_SLUM_CHECK",
           submitBarLabel: "CS_COMMON_NEXT",
@@ -140,7 +210,7 @@ export const newConfig = [
     body: [
       {
         label: "ES_NEW_APPLICATION_PIT_TYPE",
-        isMandatory: false,
+        isMandatory: true,
         type: "component",
         route: "pit-type",
         key: "pitType",
@@ -151,7 +221,23 @@ export const newConfig = [
           submitBarLabel: "CS_COMMON_NEXT",
           skipText: "CORE_COMMON_SKIP_CONTINUE",
         },
+        nextStep: "road-details",
+      },
+      {
+        label: "ES_NEW_APPLICATION_ROAD_WIDTH",
+        isMandatory: true,
+        type: "component",
+        route: "road-details",
+        key: "roadWidth",
+        component: "SelectRoadDetails",
+        texts: {
+          header: "CS_FILE_PROPERTY_ROAD_WIDTH",
+          cardText: "CS_FILE_PROPERTY_ROAD_WIDTH_TEXT",
+          submitBarLabel: "CS_COMMON_NEXT",
+          skipText: "CORE_COMMON_SKIP_CONTINUE",
+        },
         nextStep: "tank-size",
+
       },
       {
         route: "tank-size",

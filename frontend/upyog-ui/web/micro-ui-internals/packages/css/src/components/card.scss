@@ -162,7 +162,7 @@
   }
 
   header {
-    @apply font-rc font-medium text-legend text-white leading-10;
+    @apply font-rc text-legend text-white;
   }
 }
 
@@ -175,8 +175,7 @@
   }
 
   header {
-    @apply font-rc font-medium text-legend text-white leading-10;
-    line-height: 2rem !important;
+    @apply font-rc text-legend text-white;
   }
 }
 
@@ -369,6 +368,7 @@
 
 .employee-application-details {
   display: flex !important;
+  flex-direction: column !important;
   justify-content: space-between !important;
   max-height: 70px !important;
   height: 70px !important;
@@ -397,4 +397,16 @@
 
 .language-selector .submit-bar, .submit-bar-disabled{
   background-color: #5a1166 !important;
+}
+
+.owner-details{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between
+}
+
+.owner-details-child{
+  width: 50%;
 }

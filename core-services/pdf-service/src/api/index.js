@@ -1,6 +1,7 @@
-import { version } from '../../package.json';
+// this file is not used any where in the service
+import { version } from '../../package.json' assert { type: 'json' };
 import { Router } from 'express';
-import facets from './facets';
+import facets from './facets.js';
 
 export default ({ config, db }) => {
 	let api = Router();

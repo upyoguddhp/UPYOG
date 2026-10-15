@@ -11,6 +11,8 @@ public class PTConstants {
 
     public static final String PT_TYPE_VACANT = "VACANT";
     
+    public static String SCHEMA_REPLACE_STRING = "{schema}";
+
     public static final String PT_TYPE_SHAREDPROPERTY = "SHAREDPROPERTY";
     
     public static final String PT_TYPE_BUILTUP = "BUILTUP";
@@ -112,9 +114,19 @@ public class PTConstants {
 
     public static final String VARIABLE_OWNER = "ownerInfo";
 
+    public static final String VARIABLE_ID = "id";
+
+    public static final String VARIABLE_NAME = "name";
+
+    public static final String VARIABLE_DESIGNATION = "designation";
+
+    public static final String VARIABLE_AUTHORIZEDPERSON = "nameOfAuthorizedPerson";
+	
+    public static final String VARIABLE_TYPE = "type";
+
 
     public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,
-            VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME));
+            VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME, VARIABLE_AUTHORIZEDPERSON, VARIABLE_ID, VARIABLE_DESIGNATION, VARIABLE_NAME, VARIABLE_TYPE));
 
     public static final List<String> FIELDS_FOR_OWNER_MUTATION = Collections.unmodifiableList(Arrays.asList("name","gender","fatherOrHusbandName"));
 
@@ -402,6 +414,8 @@ public class PTConstants {
     public static final String VIEW_PROPERTY_STRING = "You can view your property on the link given below - {PTURL} Thank you";
 
     public static final String PAY_ONLINE_STRING = "Click on the URL to view the details and pay online {PAYMENT_LINK}";
+
+    public static final String TENANTID_MDC_STRING = "TENANTID";
 
     public static final String PT_ONLINE_STRING = "You can pay your Property Tax online here - {PAYMENT_LINK}";
 

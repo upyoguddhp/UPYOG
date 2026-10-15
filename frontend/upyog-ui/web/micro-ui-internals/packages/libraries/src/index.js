@@ -29,6 +29,7 @@ import { ReportsService } from "./services/elements/Reports";
 import HrmsService from "./services/elements/HRMS";
 import { InboxGeneral } from "./services/elements/InboxService";
 import EventsServices from "./services/elements/Events";
+import { DigiLockerService } from "./services/elements/DigiLocker";
 
 import ShareFiles from "./services/molecules/ShareFiles";
 import { GetServiceDefinitions } from "./services/molecules/ServiceDefinitions";
@@ -49,8 +50,30 @@ import { NOCSearch } from "./services/molecules/NOC/Search";
 import AccessControlService from "./services/elements/Access";
 import BillServices from "./services/elements/Bill";
 import { CFService } from "./services/elements/CF";
+import { PTRService } from "./services/elements/PTR";  
+import { ASSETService } from "./services/elements/ASSET";  
+import { CHBServices } from "./services/elements/CHB"; 
+import { ADSServices } from "./services/elements/ADS";
+import { EwService } from "./services/elements/EW";
+import { EmployeeDashboardService } from "./services/elements/EMPDASHBOARD";
+import { GIS } from "./services/elements/GIS";
+import {CustomService} from "./services/elements/CustomService";    
+import { CMServices } from "./services/elements/CM";
+import { WTService } from "./services/elements/WT";
+import { VendorService } from "./services/elements/EmpVendor";
+import { MTService } from "./services/elements/MT";
+import { TPService } from "./services/elements/TP";
 
-import {CustomService} from "./services/elements/CustomService";
+import { PGRAIService } from "./services/elements/PGRAI";
+import { PGRAIUpdate } from "./services/elements/PGRAIUpdate";
+import { ESTService } from "./services/elements/EST";
+import { NDCService } from "./services/elements/NDC";
+import { ChallanGenerationService } from "./services/elements/ChallanGeneration";
+import {UpyogBotService} from "./services/elements/UpyogBot";
+import { GCServices } from "./services/elements/GC";
+
+   
+
 
 const setupLibraries = (Library, props) => {
   window.Digit = window.Digit || {};
@@ -63,7 +86,6 @@ const initLibraries = () => {
   setupLibraries("PersistantStorage", PersistantStorage);
   setupLibraries("UserService", UserService);
   setupLibraries("ULBService", ULBService);
-
   setupLibraries("Config", { mergeConfig });
   setupLibraries("Services", { useStore });
   setupLibraries("Enums", Enums);
@@ -77,6 +99,7 @@ const initLibraries = () => {
   setupLibraries("CFService", CFService);
   setupLibraries("CustomService", CustomService);
   setupLibraries("TLService", TLService);
+  setupLibraries("DigiLockerService",DigiLockerService)
   setupLibraries("Surveys", Surveys);
   setupLibraries("HRMSService", HrmsService);
   setupLibraries("ReceiptsService", ReceiptsService);
@@ -111,9 +134,30 @@ const initLibraries = () => {
   setupLibraries("AccessControlService", AccessControlService);
   setupLibraries("BillServices", BillServices);
   setupLibraries("AuditService",AuditService);
+  setupLibraries("PTRService", PTRService);
+  setupLibraries("ASSETService", ASSETService);
+  setupLibraries("CHBServices", CHBServices);
+  setupLibraries("ADSServices", ADSServices);
+  setupLibraries("EwService", EwService);
+  setupLibraries("CMServices", CMServices);
+  setupLibraries("EmployeeDashboardService", EmployeeDashboardService);
+  setupLibraries("GIS", GIS);
+  setupLibraries("WTService",WTService);
+  setupLibraries("VendorService", VendorService);
+  setupLibraries("MTService", MTService);
+  setupLibraries("TPService", TPService);
+  setupLibraries("PGRAIService", PGRAIService);
+  setupLibraries("PGRAIUpdate", PGRAIUpdate);
+  setupLibraries("ESTService", ESTService);
+  setupLibraries("NDCService", NDCService);
+  setupLibraries("ChallanGenerationService", ChallanGenerationService);
+  setupLibraries("UpyogBotService", UpyogBotService);
+  setupLibraries("GCServices", GCServices);
+
   return new Promise((resolve) => {
     initI18n(resolve);
   });
 };
 
 export { initLibraries, Enums, Hooks, subFormRegistry };
+export { default as useModuleBasePath } from "./hooks/useModuleBasePath";

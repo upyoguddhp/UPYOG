@@ -1,28 +1,27 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import merge from "lodash.merge";
 import { useDispatch } from "react-redux";
 import { createComplaint } from "../../../redux/actions/index";
 import { PGR_CITIZEN_COMPLAINT_CONFIG, PGR_CITIZEN_CREATE_COMPLAINT } from "../../../constants/Citizen";
 import Response from "./Response";
 
 import { config as defaultConfig } from "./defaultConfig";
-import { Redirect, Route, Switch, useHistory, useRouteMatch, useLocation } from "react-router-dom";
-import { useQueryClient } from "react-query";
+import { Navigate, Route, Routes, useLocation, useMatch } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const CreateComplaint = () => {
   const ComponentProvider = Digit.Contexts.ComponentProvider;
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const match = useRouteMatch();
-  const history = useHistory();
+  const match = useMatch("*");
+  const navigate = Digit.Hooks.useCustomNavigate();
   const registry = useContext(ComponentProvider);
   const dispatch = useDispatch();
   const { data: storeData, isLoading } = Digit.Hooks.useStore.getInitData();
   const { stateInfo } = storeData || {};
   const [params, setParams, clearParams] = Digit.Hooks.useSessionStorage(PGR_CITIZEN_CREATE_COMPLAINT, {});
   // const [customConfig, setConfig] = Digit.Hooks.useSessionStorage(PGR_CITIZEN_COMPLAINT_CONFIG, {});
-  const config = useMemo(() => merge(defaultConfig, Digit.Customizations.PGR.complaintConfig), [Digit.Customizations.PGR.complaintConfig]);
+  const config = useMemo(() => defaultConfig);
   const [paramState, setParamState] = useState(params);
   const [nextStep, setNextStep] = useState("");
   const [canSubmit, setCanSubmit] = useState(false);
@@ -38,7 +37,7 @@ export const CreateComplaint = () => {
     if (nextStep === null) {
       wrapperSubmit();
     } else {
-      history.push(`${match.path}/${nextStep}`);
+      navigate(`${nextStep}`);
     }
   }, [params, nextStep]);
 
@@ -66,9 +65,10 @@ export const CreateComplaint = () => {
   };
   const submitComplaint = async () => {
     if (paramState?.complaintType) {
-      const { city_complaint, locality_complaint, uploadedImages, complaintType, subType, details, ...values } = paramState;
+      const { city_complaint, locality_complaint, uploadedImages, complaintType, subType, prioritylevel, details, ...values } = paramState;
       const { code: cityCode, name: city } = city_complaint;
       const { code: localityCode, name: localityName } = locality_complaint;
+      const storedpropertyid =sessionStorage.getItem("propertyid")
       const _uploadImages = uploadedImages?.map((url) => ({
         documentType: "PHOTO",
         fileStoreId: url,
@@ -81,6 +81,7 @@ export const CreateComplaint = () => {
         complaintType: subType.key,
         cityCode,
         city,
+        prioritylevel: prioritylevel ,
         description: details,
         district: city,
         region: city,
@@ -88,17 +89,36 @@ export const CreateComplaint = () => {
         localityName,
         state: stateInfo.name,
         uploadedImages: _uploadImages,
+        additionalDetails: {
+          propertyid: storedpropertyid,
+        },
       };
 
-      await dispatch(createComplaint(data));
+      const response = await dispatch(createComplaint(data));
+      // Persist the API response to sessionStorage so the Response page
+      // can render the success banner even after a browser refresh.
+      if (response) {
+        sessionStorage.setItem("PGR_COMPLAINT_RESPONSE", JSON.stringify(response));
+      }
       await client.refetchQueries(["complaintsList"]);
-      history.push(`${match.path}/response`);
+      navigate(`response`);
     }
   };
 
   const handleSelect = (data) => {
-    setParams({ ...params, ...data });
-    goNext();
+    let c = JSON.parse(sessionStorage.getItem("complaintType"))
+    if(data?.subType)
+    {
+      
+      let data2 ={"complaintType":c}
+      console.log("handleSelect",data,data2)
+      setParams({ ...params, ...data ,...data2 });
+      goNext();
+    }
+    else {
+      setParams({ ...params, ...data });
+      goNext();
+    }
   };
 
   const handleSkip = () => {
@@ -108,22 +128,20 @@ export const CreateComplaint = () => {
   if (isLoading) return null;
 
   return (
-    <Switch>
+    <Routes>
       {Object.keys(config.routes).map((route, index) => {
         const { component, texts, inputs } = config.routes[route];
         const Component = typeof component === "string" ? Digit.ComponentRegistryService.getComponent(component) : component;
         return (
-          <Route path={`${match.path}/${route}`} key={index}>
-            <Component config={{ texts, inputs }} onSelect={handleSelect} onSkip={handleSkip} value={params} t={t} />
-          </Route>
+          <Route
+            path={`${route}/*`}
+            key={index}
+            element={<Component config={{ texts, inputs }} onSelect={handleSelect} onSkip={handleSkip} value={params} t={t} />}
+          />
         );
       })}
-      <Route path={`${match.path}/response`}>
-        <Response match={match} />
-      </Route>
-      <Route>
-        <Redirect to={`${match.path}/${config.indexRoute}`} />
-      </Route>
-    </Switch>
+      <Route path={`response`} element={<Response match={match} />} />
+      <Route path="*" element={<Navigate to={`${config.indexRoute}`} />} />
+    </Routes>
   );
 };

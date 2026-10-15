@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SubMenu from "./SubMenu";
@@ -25,7 +25,8 @@ import {
   LogoutIcon,
   EditPencilIcon,
   LanguageIcon,
-  LoginIcon
+  LoginIcon,
+  PTRIcon
 } from "./svgindex";
 import { BirthIcon, DeathIcon, FirenocIcon } from "..";
 
@@ -61,7 +62,8 @@ const IconsObject = {
   LogoutIcon: <LogoutIcon className="icon" />,
   Phone: <Phone className="icon" />,
   LanguageIcon: <LanguageIcon className="icon" />,
-  LoginIcon: <LoginIcon className="icon" />
+  LoginIcon: <LoginIcon className="icon" />,
+  PTRIcon: <PTRIcon />
 };
 const NavBar = ({ open, toggleSidebar, profileItem, menuItems, onClose, Footer, isEmployee, search, setSearch,isSideBarScroll }) => {
   const node = useRef();
@@ -70,10 +72,15 @@ const NavBar = ({ open, toggleSidebar, profileItem, menuItems, onClose, Footer, 
   const { t } = useTranslation();
   Digit.Hooks.useClickOutside(node, open ? onClose : null, open);
 
-  if(isSideBarScroll &&  !Digit.clikOusideFired)
-  {
-    document.getElementById("sideBarMenu").scrollTo(0,0);
-  }
+  /**
+   * Safely scroll sideBarMenu to top after render when isSideBarScroll changes
+   * without causing null reference errors.
+   */
+  useEffect(() => {
+    if (isSideBarScroll && !Digit.clikOusideFired) {
+      document.getElementById("sideBarMenu")?.scrollTo?.(0, 0);
+    }
+  }, [isSideBarScroll, open]);
 
   const MenuItem = ({ item }) => {
     let itemComponent;

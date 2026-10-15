@@ -80,8 +80,21 @@ public class TransactionService {
 		RequestInfo requestInfo = transactionRequest.getRequestInfo();
 		Transaction transaction = transactionRequest.getTransaction();
 
-		TransactionDump dump = TransactionDump.builder().txnId(transaction.getTxnId())
-				.auditDetails(transaction.getAuditDetails()).build();
+    /**
+     * Initiates a transaction by generating a gateway redirect URI for the request
+     * <p>
+     * 1. Validates transaction object
+     * 2. Enriches the request by assigning a TxnID and a default status of PENDING
+     * 3. If yes, calls the gateway's implementation to generate a redirect URI
+     * 4. Persists the transaction and a transaction dump with the RAW requests asynchronously
+     * 5. Returns the redirect URI
+     *
+     * @param transactionRequest Valid transaction request for which transaction needs to be initiated
+     * @return Redirect URI to the gateway for the particular transaction
+     */
+    public Transaction initiateTransaction(TransactionRequest transactionRequest) {
+    	log.info("Request received: "+transactionRequest.toString());
+        validator.validateCreateTxn(transactionRequest);
 
 		if (validator.skipGateway(transaction)) {
 			transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);

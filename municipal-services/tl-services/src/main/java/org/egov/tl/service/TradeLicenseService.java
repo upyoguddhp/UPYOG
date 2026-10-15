@@ -167,6 +167,7 @@ public class TradeLicenseService {
 	private Producer producer;
 
 
+<<<<<<< HEAD
 	@Autowired
 	public TradeLicenseService(WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService,
 			UserService userService, TLRepository repository, ActionValidator actionValidator, TLValidator tlValidator,
@@ -188,6 +189,296 @@ public class TradeLicenseService {
 		this.workflowService = workflowService;
 		this.tradeUtil = tradeUtil;
 		this.tlBatchService = tlBatchService;
+=======
+
+
+
+    /**
+     * creates the tradeLicense for the given request
+     * @param tradeLicenseRequest The TradeLicense Create Request
+     * @return The list of created traddeLicense
+     */
+    public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest,String businessServicefromPath){
+       if(businessServicefromPath==null)
+            businessServicefromPath = businessService_TL;
+       tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
+       Object mdmsData = util.mDMSCall(tradeLicenseRequest.getRequestInfo(), tradeLicenseRequest.getLicenses().get(0).getTenantId());
+       Object billingSlabs = util.getBillingSlabs(tradeLicenseRequest.getRequestInfo(), tradeLicenseRequest.getLicenses().get(0).getTenantId());
+       actionValidator.validateCreateRequest(tradeLicenseRequest);
+       switch (businessServicefromPath) {
+            case businessService_BPA:
+                validateMobileNumberUniqueness(tradeLicenseRequest);
+                break;
+        }
+       enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
+       tlValidator.validateCreate(tradeLicenseRequest, mdmsData, billingSlabs);
+       switch(businessServicefromPath)
+       {
+           case businessService_BPA:
+               validateMobileNumberUniqueness(tradeLicenseRequest);
+               break;
+       }
+       userService.createUser(tradeLicenseRequest, false);
+       calculationService.addCalculation(tradeLicenseRequest);
+
+        /*
+         * call workflow service if it's enable else uses internal workflow process
+         */
+       switch(businessServicefromPath)
+       {
+           case businessService_TL:
+               if (config.getIsExternalWorkFlowEnabled())
+                   wfIntegrator.callWorkFlow(tradeLicenseRequest);
+               break;
+       }
+        repository.save(tradeLicenseRequest);
+
+        return tradeLicenseRequest.getLicenses();
+	}
+
+    public void validateMobileNumberUniqueness(TradeLicenseRequest request) {
+        for (TradeLicense license : request.getLicenses()) {
+            for (TradeUnit tradeUnit : license.getTradeLicenseDetail().getTradeUnits()) {
+                String tradetypeOfNewLicense = tradeUnit.getTradeType().split("\\.")[0];
+                List<String> mobileNumbers = license.getTradeLicenseDetail().getOwners().stream().map(OwnerInfo::getMobileNumber).collect(Collectors.toList());
+                for (String mobno : mobileNumbers) {
+                    TradeLicenseSearchCriteria tradeLicenseSearchCriteria = TradeLicenseSearchCriteria.builder().tenantId(license.getTenantId()).businessService(license.getBusinessService()).mobileNumber(mobno).build();
+                    List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
+                    List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
+                    for (TradeLicense result : licensesFromSearch) {
+                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber()) && !StringUtils.equals(result.getStatus(),STATUS_REJECTED)) {
+                            tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType().split("\\.")[0]);
+                        }
+                    }
+                    if (tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense)) {
+                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same license type: "+tradetypeOfNewLicense);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     *  Searches the tradeLicense for the given criteria if search is on owner paramter then first user service
+     *  is called followed by query to db
+     * @param criteria The object containing the paramters on which to search
+     * @param requestInfo The search request's requestInfo
+     * @return List of tradeLicense for the given criteria
+     */
+    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath, HttpHeaders headers){
+        List<TradeLicense> licenses;
+        // allow mobileNumber based search by citizen if interserviceCall
+        boolean isInterServiceCall = isInterServiceCall(headers);
+        tlValidator.validateSearch(requestInfo,criteria,serviceFromPath, isInterServiceCall);
+        criteria.setBusinessService(serviceFromPath);
+        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
+        if(criteria.getRenewalPending()!=null && criteria.getRenewalPending()== true ) {
+        	
+        	String currentFinancialYear = "";
+       	    
+            
+            Object mdmsData = util.mDMSCall(requestInfo, criteria.getTenantId() );
+            String jsonPath = TLConstants.MDMS_CURRENT_FINANCIAL_YEAR.replace("{}",businessService_TL);
+            List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
+            
+            for (int i=0; i<jsonOutput.size();i++) {
+           	 Object startingDate = jsonOutput.get(i).get(TLConstants.MDMS_STARTDATE);
+           	 Object endingDate = jsonOutput.get(i).get(TLConstants.MDMS_ENDDATE);
+           	 Long startTime = (Long)startingDate;
+           	 Long endTime = (Long)endingDate;
+           	 
+           	 if(System.currentTimeMillis()>=startTime && System.currentTimeMillis()<=endTime) {
+           		 currentFinancialYear = jsonOutput.get(i).get(TLConstants.MDMS_FIN_YEAR_RANGE).toString();
+           		 break;
+           	 }
+           	 
+            }
+            
+            
+            criteria.setFinancialYear(currentFinancialYear);
+        	
+        }
+        
+         if(criteria.getMobileNumber()!=null || criteria.getOwnerName() != null){
+             licenses = getLicensesFromMobileNumber(criteria,requestInfo);
+         }
+         else {
+             licenses = getLicensesWithOwnerInfo(criteria,requestInfo);
+         }
+
+         return licenses;       
+    }
+    
+    private void getLatestRejectedApplication(RequestInfo requestInfo, List<TradeLicense> licenses) {
+    	List <TradeLicense> licensesToBeRemoved = new ArrayList<TradeLicense>();
+    	List <TradeLicense> licensesToBeAdded = new ArrayList<TradeLicense>();
+        
+        for (TradeLicense rejectedLicense : licenses) {
+       	 
+       	 if(rejectedLicense.getStatus().toString().equalsIgnoreCase(TLConstants.STATUS_REJECTED)) {
+       		 TradeLicenseSearchCriteria rejectedCriteria = new TradeLicenseSearchCriteria();
+       		 
+       		 rejectedCriteria.setTenantId(rejectedLicense.getTenantId());
+       		 
+       		 List <String> rejectedLicenseNumbers = new ArrayList<String>();
+       		 rejectedLicenseNumbers.add(rejectedLicense.getLicenseNumber());
+       		 
+       		 rejectedCriteria.setLicenseNumbers(rejectedLicenseNumbers);
+       		 licensesToBeRemoved.add(rejectedLicense);
+       		 
+       		 List <TradeLicense> rejectedLicenses = getLicensesWithOwnerInfo(rejectedCriteria,requestInfo);
+       		 
+       		 TradeLicense latestApplication = rejectedLicense;
+       		 
+       		 for(TradeLicense newLicense: rejectedLicenses) {
+       			 if(latestApplication.getStatus().equalsIgnoreCase(TLConstants.STATUS_REJECTED)) {
+       				 latestApplication = newLicense;
+       			 }
+       			 else {
+       				 if(newLicense.getFinancialYear().toString().compareTo(latestApplication.getFinancialYear().toString())>0 && !newLicense.getStatus().equalsIgnoreCase(TLConstants.STATUS_REJECTED)) {
+       					 latestApplication=newLicense;
+       				 }
+       			 }
+       		 }
+       		 
+       		 if(latestApplication.getFinancialYear().toString().compareTo(rejectedLicense.getFinancialYear().toString()) <0) {
+       			 licensesToBeAdded.add(latestApplication);
+       		 }
+
+       	 }
+       	 
+        }
+        licenses.addAll(licensesToBeAdded);
+        licenses.removeAll(licensesToBeRemoved);
+	}
+
+
+	private void filterRejectedApplications(RequestInfo requestInfo, List<TradeLicense> licenses) {
+    	String currentFinancialYear = "";
+   	    TradeLicenseRequest tradeLicenseRequest = new TradeLicenseRequest();
+        tradeLicenseRequest.setRequestInfo(requestInfo);
+        tradeLicenseRequest.setLicenses(licenses);
+        
+        Object mdmsData = util.mDMSCall(tradeLicenseRequest.getRequestInfo(), tradeLicenseRequest.getLicenses().get(0).getTenantId());
+        String jsonPath = TLConstants.MDMS_CURRENT_FINANCIAL_YEAR.replace("{}",businessService_TL);
+        List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
+        
+        for (int i=0; i<jsonOutput.size();i++) {
+       	 Object startingDate = jsonOutput.get(i).get(TLConstants.MDMS_STARTDATE);
+       	 Object endingDate = jsonOutput.get(i).get(TLConstants.MDMS_ENDDATE);
+       	 Long startTime = (Long)startingDate;
+       	 Long endTime = (Long)endingDate;
+       	 
+       	 if(System.currentTimeMillis()>=startTime && System.currentTimeMillis()<=endTime) {
+       		 currentFinancialYear = jsonOutput.get(i).get(TLConstants.MDMS_FIN_YEAR_RANGE).toString();
+       		 break;
+       	 }
+       	 
+        }
+        
+        String checker = currentFinancialYear;
+        licenses.removeIf(t->t.getStatus().toString().equalsIgnoreCase(TLConstants.STATUS_REJECTED) && !t.getFinancialYear().toString().equalsIgnoreCase(checker));
+
+	}
+
+	
+	public int countLicenses(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath, HttpHeaders headers){
+		
+		criteria.setBusinessService(serviceFromPath);
+    	enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
+
+
+    	int licenseCount = repository.getLicenseCount(criteria);
+    	
+    	return licenseCount;
+    }
+
+	public Map<String,Integer> countApplications(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath, HttpHeaders headers){
+
+		criteria.setBusinessService(serviceFromPath);
+
+		Map<String,Integer> licenseCount = repository.getApplicationsCount(criteria);
+
+		return licenseCount;
+	}
+
+
+    public void checkEndStateAndAddBPARoles(TradeLicenseRequest tradeLicenseRequest) {
+        List<String> endstates = tradeUtil.getBPAEndState(tradeLicenseRequest);
+        List<TradeLicense> licensesToAddRoles = new ArrayList<>();
+        for (int i = 0; i < tradeLicenseRequest.getLicenses().size(); i++) {
+            TradeLicense license = tradeLicenseRequest.getLicenses().get(0);
+            if ((license.getStatus() != null) && license.getStatus().equalsIgnoreCase(endstates.get(i))) {
+                licensesToAddRoles.add(license);
+            }
+        }
+        if (!licensesToAddRoles.isEmpty()) {
+            TradeLicenseRequest tradeLicenseRequestForUserUpdate = TradeLicenseRequest.builder().licenses(licensesToAddRoles).requestInfo(tradeLicenseRequest.getRequestInfo()).build();
+            userService.createUser(tradeLicenseRequestForUserUpdate, true);
+        }
+    }
+
+    public List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+
+        String tenantId = criteria.getTenantId();
+        List<TradeLicense> licenses = new LinkedList<>();
+        
+        boolean isEmpty = enrichWithUserDetails(criteria,requestInfo);
+        
+        if(isEmpty) {
+        	return Collections.emptyList();
+        }
+        
+        //Get all tradeLicenses with ownerInfo enriched from user service
+        licenses = getLicensesWithOwnerInfo(tenantId,criteria,requestInfo);
+        return licenses;
+    }
+
+
+    /**
+     * Returns the tradeLicense with enrivhed owners from user servise
+     * @param criteria The object containing the paramters on which to search
+     * @param requestInfo The search request's requestInfo
+     * @return List of tradeLicense for the given criteria
+     */
+    public List<TradeLicense> getLicensesWithOwnerInfo(TradeLicenseSearchCriteria criteria,RequestInfo requestInfo){
+        List<TradeLicense> licenses = repository.getLicenses(criteria, criteria.getTenantId());
+        if(licenses.isEmpty())
+            return Collections.emptyList();
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
+        return licenses;
+    }
+
+    /**
+     * Returns the tradeLicense with enrivhed owners from user servise
+     * @param criteria The object containing the paramters on which to search
+     * @param requestInfo The search request's requestInfo
+     * @return List of tradeLicense for the given criteria
+     */
+    public List<TradeLicense> getLicensesWithOwnerInfo(String stateTenantId,TradeLicenseSearchCriteria criteria,RequestInfo requestInfo){
+        List<TradeLicense> licenses = repository.getLicenses(criteria, stateTenantId);
+        if(licenses.isEmpty())
+            return Collections.emptyList();
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
+        return licenses;
+    }
+
+
+    private void removeDuplicates(List<TradeLicense> licenses) {
+    	List <TradeLicense> duplicateLicenses = new ArrayList<TradeLicense>();
+    	
+    	for(TradeLicense license : licenses) {
+    		for(TradeLicense duplicateLicense : licenses) {
+    			if (!license.getApplicationNumber().equalsIgnoreCase(duplicateLicense.getApplicationNumber()) && license.getLicenseNumber().equalsIgnoreCase(duplicateLicense.getLicenseNumber()) &&  duplicateLicense.getFinancialYear().compareTo(license.getFinancialYear())<0 ) {
+    				duplicateLicenses.add(duplicateLicense);
+    			}
+    		}
+    	}
+    	
+    	for (TradeLicense duplicateLicense : duplicateLicenses) {
+    		licenses.removeIf(t->t.getApplicationNumber().equalsIgnoreCase(duplicateLicense.getApplicationNumber()));
+    	}
+		
+>>>>>>> niua-upstream/niua-dev-2.0
 	}
 
 	/**
@@ -238,8 +529,12 @@ public class TradeLicenseService {
 		}
 		repository.save(tradeLicenseRequest);
 
+<<<<<<< HEAD
 		// trigger wf
 		workflowIntegrator.callWorkFlow(tradeLicenseRequest);
+=======
+        List<TradeLicense> licenses = repository.getLicenses(criteria, request.getLicenses().get(0).getTenantId());
+>>>>>>> niua-upstream/niua-dev-2.0
 
 		return tradeLicenseRequest.getLicenses();
 	}
@@ -306,6 +601,7 @@ public class TradeLicenseService {
 
 			String currentFinancialYear = "";
 
+<<<<<<< HEAD
 			Object mdmsData = util.mDMSCall(requestInfo, criteria.getTenantId());
 			String jsonPath = TLConstants.MDMS_CURRENT_FINANCIAL_YEAR.replace("{}", businessService_TL);
 			List<Map<String, Object>> jsonOutput = JsonPath.read(mdmsData, jsonPath);
@@ -315,6 +611,14 @@ public class TradeLicenseService {
 				Object endingDate = jsonOutput.get(i).get(TLConstants.MDMS_ENDDATE);
 				Long startTime = (Long) startingDate;
 				Long endTime = (Long) endingDate;
+=======
+        criteria.setIds(ids);
+        log.info("Before criteria {}",criteria.getTenantId());
+
+        TradeLicenseSearchCriteria idsCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
+        idsCriteria.setTenantId(criteria.getTenantId());
+        log.info("After criteria {}",idsCriteria.getTenantId());
+>>>>>>> niua-upstream/niua-dev-2.0
 
 				if (System.currentTimeMillis() >= startTime && System.currentTimeMillis() <= endTime) {
 					currentFinancialYear = jsonOutput.get(i).get(TLConstants.MDMS_FIN_YEAR_RANGE).toString();
@@ -351,7 +655,20 @@ public class TradeLicenseService {
 			tempLicenses = filterLicensesBasedOnRolesWithinTenantId(licenses, requestInfo, criteria);
 		}
 
+<<<<<<< HEAD
 		return tempLicenses;
+=======
+        if(userDetailResponse.getUser().size()==0){
+            return true;
+        }
+        enrichmentService.enrichTLCriteriaWithOwnerids(criteria,userDetailResponse);
+        
+        if(criteria.getOnlyMobileNumber()!=null && criteria.getOnlyMobileNumber() ) {
+        	criteria.setTenantId(null);
+        }
+        
+        licenses = repository.getLicenses(criteria, criteria.getTenantId());
+>>>>>>> niua-upstream/niua-dev-2.0
 
 	}
 

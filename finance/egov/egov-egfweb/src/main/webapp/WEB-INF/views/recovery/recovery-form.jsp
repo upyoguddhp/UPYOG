@@ -100,7 +100,8 @@
 								</form:option>
 								<c:forEach var="chartOfAccounts" items="${chartOfAccounts}">
 									<option value="${chartOfAccounts.id}">
-										${chartOfAccounts.glcode}-${chartOfAccounts.name}</option>
+										${chartOfAccounts.glcode}-${chartOfAccounts.name}
+									</option>
 								</c:forEach>
 							</form:select>
 							<form:errors path="chartofaccounts" cssClass="error-msg" />

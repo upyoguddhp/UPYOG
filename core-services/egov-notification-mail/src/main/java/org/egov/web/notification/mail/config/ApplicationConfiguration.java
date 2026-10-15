@@ -50,6 +50,7 @@ import lombok.Getter;
 
 import java.util.Properties;
 
+@Getter
 @Configuration
 public class ApplicationConfiguration {
 
@@ -65,9 +66,9 @@ public class ApplicationConfiguration {
         mailSender.setUsername(emailProperties.getMailSenderUsername());
         mailSender.setPassword(emailProperties.getMailSenderPassword());
         final Properties mailProperties = new Properties();
-        mailProperties.setProperty("mail.smtps.auth", emailProperties.getMailSmtpsAuth());
-        mailProperties.setProperty("mail.smtps.starttls.enable", emailProperties.getMailStartTlsEnabled());
-        mailProperties.setProperty("mail.smtps.debug", emailProperties.getMailSmtpsDebug());
+        mailProperties.setProperty("mail.smtp.auth", emailProperties.getMailSmtpsAuth());
+        mailProperties.setProperty("mail.smtp.starttls.enable", emailProperties.getMailStartTlsEnabled());
+        mailProperties.setProperty("mail.smtp.debug", emailProperties.getMailSmtpsDebug());
         mailSender.setJavaMailProperties(mailProperties);
         return mailSender;
     }

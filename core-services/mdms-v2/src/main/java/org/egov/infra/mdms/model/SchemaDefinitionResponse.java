@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,28 +18,33 @@ import java.util.List;
  */
 @Schema(description = "Response from server")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]")
+@jakarta.annotation.Generated(
+        value = "org.egov.codegen.SpringBootCodegen",
+        date = "2023-05-30T09:26:57.838+05:30[Asia/Kolkata]"
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class SchemaDefinitionResponse {
-    @JsonProperty("ResponseInfo")
 
+    @JsonProperty("ResponseInfo")
     @Valid
-    private ResponseInfo responseInfo = null;
+    private ResponseInfo responseInfo ;
+
+    @JsonProperty("totalMasters")
+    private Integer totalMasters;
 
     @JsonProperty("SchemaDefinitions")
     @Valid
-    private List<SchemaDefinition> schemaDefinitions = null;
+    private List<SchemaDefinition> schemaDefinitions ;
 
-
-    public SchemaDefinitionResponse addSchemaDefinitionsItem(SchemaDefinition schemaDefinitionsItem) {
+    public SchemaDefinitionResponse addSchemaDefinitionsItem(
+            SchemaDefinition schemaDefinitionsItem) {
         if (this.schemaDefinitions == null) {
             this.schemaDefinitions = new ArrayList<>();
         }
         this.schemaDefinitions.add(schemaDefinitionsItem);
         return this;
     }
-
 }

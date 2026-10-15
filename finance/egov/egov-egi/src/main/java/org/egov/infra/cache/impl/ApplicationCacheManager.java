@@ -47,6 +47,7 @@
  */
 
 package org.egov.infra.cache.impl;
+import java.util.Locale;
 
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.slf4j.Logger;
@@ -56,41 +57,66 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class ApplicationCacheManager {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationCacheManager.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ApplicationCacheManager.class);
 
-	@Autowired
-	private CacheManager cacheManager;
+    private CacheManager cacheManager;
 
-	private Cache getCacheOrFail() {
-		String tenantId = ApplicationThreadLocals.getTenantID();
-		if (tenantId != null)
-			tenantId = tenantId.toLowerCase();
-		Cache cache = cacheManager.getCache(tenantId);
-		if (cache == null) {
-			LOGGER.error("No cache registered for tenant '{}'. Known caches: {}", tenantId,
-					cacheManager.getCacheNames());
-			throw new IllegalStateException("No cache registered for tenant '" + tenantId + "'");
-		}
-		return cache;
-	}
+    @Autowired
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
 
-	public void put(Object key, Object value) {
-		getCacheOrFail().put(key, value);
-	}
+        LOGGER.info("CacheManager Class: {}",
+                cacheManager.getClass().getName());
+        LOGGER.info("Available Cache Names: {}",
+                cacheManager.getCacheNames());
+    }
 
-	public Object get(Object key) {
-		Cache.ValueWrapper wrapper = getCacheOrFail().get(key);
-		return wrapper != null ? wrapper.get() : null;
-	}
+    private Cache getCacheOrFail() {
+        String tenantId = ApplicationThreadLocals.getTenantID();
 
-	public <T> T get(Object key, Class<T> returnType) {
-		return getCacheOrFail().get(key, returnType);
-	}
+        if (tenantId != null) {
+            tenantId = tenantId.toLowerCase(Locale.ROOT);
+        }
 
-	public void remove(Object key) {
-		getCacheOrFail().evict(key);
-	}
+        Cache cache = cacheManager.getCache(tenantId);
+
+        if (cache == null) {
+            LOGGER.error(
+                    "No cache registered for tenant '{}'. Known caches: {}",
+                    tenantId,
+                    cacheManager.getCacheNames());
+
+            throw new IllegalStateException(
+                    "No cache registered for tenant '" + tenantId + "'");
+        }
+
+        return cache;
+    }
+
+    public void put(Object key, Object value) {
+        getCacheOrFail().put(key, value);
+    }
+
+    public Object get(Object key) {
+        Cache.ValueWrapper wrapper = getCacheOrFail().get(key);
+        return wrapper != null ? wrapper.get() : null;
+    }
+
+    public <T> T get(Object key, Class<T> returnType) {
+        return getCacheOrFail().get(key, returnType);
+    }
+
+    public void remove(Object key) {
+        getCacheOrFail().evict(key);
+
+        LOGGER.debug(
+                "Removed key '{}' from cache for tenant '{}'",
+                key,
+                ApplicationThreadLocals.getTenantID());
+    }
 }

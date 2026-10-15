@@ -1,40 +1,41 @@
 import { MdmsService } from "../../services/elements/MDMS";
-import { useQuery } from "react-query";
+import { MdmsServiceV2 } from "../../services/elements/MDMSV2";
+import { queryTemplate } from "../../common/queryTemplate";
 
 const usePropertyMDMS = (tenantId, moduleCode, type, config = {}) => {
   const usePropertyOwnerType = () => {
-    return useQuery("PT_OWNERSHIP_CATEGORY", () => MdmsService.getPropertyOwnerType(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: ["PT_OWNERSHIP_CATEGORY"], queryFn: () => MdmsServiceV2.getPropertyOwnerType(tenantId, moduleCode, type), config });
   };
   const usePropertyOwnerShipCategory = () => {
-    return useQuery("PT_OWNER_TYPE", () => MdmsService.getPropertyOwnerShipCategory(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: ["PT_OWNER_TYPE"], queryFn: () => MdmsServiceV2.getPropertyOwnerShipCategory(tenantId, moduleCode, type), config });
   };
   const useSubOwnerShipCategory = () => {
-    return useQuery("PT_SUB_OWNERSHIP_CATEGORY", () => MdmsService.getPropertySubOwnerShipCategory(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: ["PT_SUB_OWNERSHIP_CATEGORY"], queryFn: () => MdmsServiceV2.getPropertySubOwnerShipCategory(tenantId, moduleCode, type), config });
   };
   const useDocumentRequiredScreen = () => {
-    return useQuery("PT_DOCUMENT_REQ_SCREEN", () => MdmsService.getDocumentRequiredScreen(tenantId, moduleCode), config);
+    return queryTemplate({ queryKey: ["PT_DOCUMENT_REQ_SCREEN"], queryFn: () => MdmsServiceV2.getDocumentRequiredScreen(tenantId, moduleCode), config });
   };
   const useUsageCategory = () => {
-    return useQuery("PT_USAGE_CATEGORY", () => MdmsService.getUsageCategory(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: ["PT_USAGE_CATEGORY"], queryFn: () => MdmsServiceV2.getUsageCategory(tenantId, moduleCode, type), config });
   };
   const usePTPropertyType = () => {
-    return useQuery("PT_PROPERTY_TYPE", () => MdmsService.getPTPropertyType(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: ["PT_PROPERTY_TYPE"], queryFn: () => MdmsServiceV2.getPTPropertyType(tenantId, moduleCode, type), config });
   };
   const useRentalDetails = () => {
-    return useQuery("PT_RENTAL_DETAILS", () => MdmsService.getRentalDetails(tenantId, moduleCode), config);
+    return queryTemplate({ queryKey: ["PT_RENTAL_DETAILS"], queryFn: () => MdmsServiceV2.getRentalDetails(tenantId, moduleCode), config });
   };
   const useChargeSlabs = () => {
-    return useQuery("PT_RENTAL_DETAILS", () => MdmsService.getChargeSlabs(tenantId, moduleCode), config);
+    return queryTemplate({ queryKey: ["PT_RENTAL_DETAILS"], queryFn: () => MdmsServiceV2.getChargeSlabs(tenantId, moduleCode), config });
   };
   const useFloorList = () => {
-    return useQuery("PT_FLOOR_LIST", () => MdmsService.getFloorList(tenantId, moduleCode), config);
+    return queryTemplate({ queryKey: ["PT_FLOOR_LIST"], queryFn: () => MdmsServiceV2.getFloorList(tenantId, moduleCode), config });
   };
   const useMapConfig = () => {
-    return useQuery("PT_MAP_CONFIG", () => MdmsService.getMapConfig(tenantId, moduleCode), config);
+    return queryTemplate({ queryKey: ["PT_MAP_CONFIG"], queryFn: () => MdmsServiceV2.getMapConfig(tenantId, moduleCode), config });
   };
 
   const _default = () => {
-    return useQuery([tenantId, moduleCode, type], () => MdmsService.getMultipleTypes(tenantId, moduleCode, type), config);
+    return queryTemplate({ queryKey: [tenantId, moduleCode, type], queryFn: () => MdmsServiceV2.getMultipleTypes(tenantId, moduleCode, type), config });
   };
 
   switch (type) {

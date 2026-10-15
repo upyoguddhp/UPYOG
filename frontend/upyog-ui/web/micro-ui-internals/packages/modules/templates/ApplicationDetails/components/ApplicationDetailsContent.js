@@ -8,11 +8,16 @@ import {
   Loader,
   Row,
   StatusTable,
-} from "@egovernments/digit-ui-react-components";
+  LinkButton,
+  PDFSvg,
+  EditIcon,
+  ViewsIcon,
+  DeleteIcon,
+} from "@nudmcdgnpm/digit-ui-react-components";
 import { values } from "lodash";
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import BPADocuments from "./BPADocuments";
 import InspectionReport from "./InspectionReport";
 import NOCDocuments from "./NOCDocuments";
@@ -31,7 +36,21 @@ import WSFeeEstimation from "./WSFeeEstimation";
 // import WSInfoLabel from "../../../ws/src/pageComponents/WSInfoLabel";
 import DocumentsPreview from "./DocumentsPreview";
 import InfoDetails from "./InfoDetails";
-import ViewBreakup from"./ViewBreakup";
+import ViewBreakup from "./ViewBreakup";
+import ArrearSummary from "../../../common/src/payments/citizen/bills/routes/bill-details/arrear-summary";
+// import ViewAssetOnMap from "./ViewAssetOnMap";
+// import MarkPropertyMap from "../../../asset/src/pageComponents/MarkPropertyMap";
+import { MarkOnMap, ViewOnMap, DiginpinMapPopup } from "@nudmcdgnpm/upyog-ui-module-gis";
+import { GeoLocationWithDigipin } from "@nudmcdgnpm/digit-ui-react-components";
+
+// Helper function to convert "lat,lng" string to {lat:..., lng:...} object
+const coordinateFormatter = (locationString) => {
+  if (locationString && typeof locationString === "string") {
+    const [lat, lng] = locationString.split(", ").map((coord) => parseFloat(coord.trim()));
+    return { lat, lng };
+  }
+  return locationString; // return as-is if already an object
+};
 
 function ApplicationDetailsContent({
   applicationDetails,
@@ -40,18 +59,98 @@ function ApplicationDetailsContent({
   applicationData,
   businessService,
   timelineStatusPrefix,
+  id,
   showTimeLine = true,
   statusAttribute = "status",
   paymentsList,
   oldValue,
-  isInfoLabel = false
+  isInfoLabel = false,
 }) {
   const { t } = useTranslation();
+  const tenantId = Digit.ULBService.getCurrentTenantId();
+  let { id: applicationNo } = useParams(); // Extracts PG-1013-2025-I-001019
+  const isAssetModule = window.location.href.includes("/asset/");
+  const [applicationDetailsofAsset, setApplicationDetailsofAsset] = useState(null);
+
+  useEffect(() => {
+    if (!isAssetModule) return;
+
+    const fetchAssetDetails = async () => {
+      try {
+        const response = await Digit.AssetService.search(tenantId, { applicationNumber: applicationNo });
+        setApplicationDetailsofAsset(response);
+      } catch (err) {
+        console.error("Failed to fetch asset details", err);
+      }
+    };
+
+    fetchAssetDetails();
+  }, [tenantId, applicationNo]);
 
   function OpenImage(imageSource, index, thumbnailsToShow) {
     window.open(thumbnailsToShow?.fullImage?.[0], "_blank");
   }
 
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const [geometry, setGeometry] = useState(null);
+  const [showMap, setShowMap] = useState(false);
+  const [area, setArea] = useState(null);
+
+  // Holds the lat, lng, and digipin to pass into the popup; its presence also controls modal visibility
+  const [digipinMapData, setDigipinMapData] = useState(null);
+
+  const handleOpenMap = (geometry) => {
+    setSelectedLocation(geometry);
+    setShowMapModal(true);
+  };
+
+  const handleCloseMap = () => {
+    setShowMapModal(false);
+    setSelectedLocation(null);
+  };
+
+  // Opens the digipin map modal; parses lat/lng strings to floats for Leaflet
+  const handleOpenDigipinMap = (lat, lng, digipin) => {
+    setDigipinMapData({ digipin, lat: parseFloat(lat), lng: parseFloat(lng) });
+  };
+
+  // Closes the digipin map modal and clears its data
+  const handleCloseDigipinMap = () => {
+    setDigipinMapData(null);
+  };
+
+  const [fetchBillData, updatefetchBillData] = useState({});
+
+  const [billData, updateCanFetchBillData] = useState({
+    loading: false,
+    loaded: false,
+    canLoad: false,
+  });
+
+  useEffect(() => {
+    const propId = applicationData?.propertyId;
+    const resTenant = applicationData?.tenantId || tenantId;
+    if (applicationData?.status === "ACTIVE" && propId && resTenant && !billData.loading && !billData.loaded && !billData.canLoad) {
+      const fetchBill = async () => {
+        updateCanFetchBillData({ loading: true, loaded: false, canLoad: true });
+        try {
+          const assessmentData = await Digit.PTService.assessmentSearch({ tenantId: resTenant, filters: { propertyIds: propId } });
+          let bill = {};
+          if (assessmentData?.Assessments?.length > 0) {
+            bill = await Digit.PaymentService.fetchBill(resTenant, { businessService: "PT", consumerCode: propId });
+          }
+          updatefetchBillData(bill);
+          updateCanFetchBillData({ loading: false, loaded: true, canLoad: true });
+        } catch (err) {
+          console.error(err);
+          updateCanFetchBillData({ loading: false, loaded: true, canLoad: true });
+        }
+      };
+      fetchBill();
+    }
+  }, [applicationData?.status, applicationData?.propertyId, applicationData?.tenantId, tenantId, billData.loading, billData.loaded, billData.canLoad]);
   const convertEpochToDateDMY = (dateEpoch) => {
     if (dateEpoch == null || dateEpoch == undefined || dateEpoch == "") {
       return "NA";
@@ -64,7 +163,7 @@ function ApplicationDetailsContent({
     day = (day > 9 ? "" : "0") + day;
     return `${day}/${month}/${year}`;
   };
-  const getTimelineCaptions = (checkpoint,index=0) => {
+  const getTimelineCaptions = (checkpoint, index = 0, timeline) => {
     if (checkpoint.state === "OPEN" || (checkpoint.status === "INITIATED" && !window.location.href.includes("/obps/"))) {
       const caption = {
         date: convertEpochToDateDMY(applicationData?.auditDetails?.createdTime),
@@ -72,39 +171,49 @@ function ApplicationDetailsContent({
       };
       return <TLCaption data={caption} />;
     } else if (window.location.href.includes("/obps/") || window.location.href.includes("/noc/") || window.location.href.includes("/ws/")) {
-      //From BE side assigneeMobileNumber is masked/unmasked with connectionHoldersMobileNumber and not assigneeMobileNumber
-      const privacy = { uuid: checkpoint?.assignes?.[0]?.uuid, fieldName: "mobileNumber", model: "User",showValue: false,
-      loadData: {
-        serviceName: "/egov-workflow-v2/egov-wf/process/_search",
-        requestBody: {},
-        requestParam: { tenantId : applicationDetails?.tenantId, businessIds : applicationDetails?.applicationNo, history:true },
-        jsonPath: "ProcessInstances[0].assignes[0].mobileNumber",
-        isArray: false,
-        d: (res) => {
-          let resultstring = "";
-          resultstring = `+91 ${_.get(res,`ProcessInstances[${index}].assignes[0].mobileNumber`)}`;
-          return resultstring;
-        }
-      }, }
+      const privacy = {
+        uuid: checkpoint?.assignes?.[0]?.uuid,
+        fieldName: "mobileNumber",
+        model: "User",
+        showValue: false,
+        loadData: {
+          serviceName: "/egov-workflow-v2/egov-wf/process/_search",
+          requestBody: {},
+          requestParam: { tenantId: applicationDetails?.tenantId, businessIds: applicationDetails?.applicationNo, history: true },
+          jsonPath: "ProcessInstances[0].assignes[0].mobileNumber",
+          isArray: false,
+          d: (res) => {
+            let resultstring = "";
+            resultstring = `+91 ${_.get(res, `ProcessInstances[${index}].assignes[0].mobileNumber`)}`;
+            return resultstring;
+          },
+        },
+      };
+      const previousCheckpoint = timeline && timeline[index - 1] && timeline?.[index - 1];
       const caption = {
         date: checkpoint?.auditDetails?.lastModified,
         name: checkpoint?.assignes?.[0]?.name,
-        mobileNumber:applicationData?.processInstance?.assignes?.[0]?.uuid===checkpoint?.assignes?.[0]?.uuid && applicationData?.processInstance?.assignes?.[0]?.mobileNumber ? applicationData?.processInstance?.assignes?.[0]?.mobileNumber: checkpoint?.assignes?.[0]?.mobileNumber,
-        comment: t(checkpoint?.comment),
-        wfComment: checkpoint.wfComment,
+        mobileNumber:
+          applicationData?.processInstance?.assignes?.[0]?.uuid === checkpoint?.assignes?.[0]?.uuid &&
+            applicationData?.processInstance?.assignes?.[0]?.mobileNumber
+            ? applicationData?.processInstance?.assignes?.[0]?.mobileNumber
+            : checkpoint?.assignes?.[0]?.mobileNumber,
+        comment: t(checkpoint && checkpoint?.comment),
+        wfComment: previousCheckpoint ? previousCheckpoint && previousCheckpoint.wfComment : [],
         thumbnailsToShow: checkpoint?.thumbnailsToShow,
       };
+
       return <TLCaption data={caption} OpenImage={OpenImage} privacy={privacy} />;
     } else {
       const caption = {
-        date: convertEpochToDateDMY(applicationData?.auditDetails?.lastModifiedTime),
-        // name: checkpoint?.assigner?.name,
+        date: checkpoint?.auditDetails?.lastModified || convertEpochToDateDMY(applicationData?.auditDetails?.lastModifiedTime),
         name: checkpoint?.assignes?.[0]?.name,
-        // mobileNumber: checkpoint?.assigner?.mobileNumber,
         wfComment: checkpoint?.wfComment,
         mobileNumber: checkpoint?.assignes?.[0]?.mobileNumber,
+        thumbnailsToShow: checkpoint?.thumbnailsToShow,
       };
-      return <TLCaption data={caption} />;
+
+      return <TLCaption data={caption} OpenImage={OpenImage} />;
     }
   };
 
@@ -157,6 +266,21 @@ function ApplicationDetailsContent({
   };
 
   const getTextValue = (value) => {
+    // Handle time values specially
+    if (value?.isTimeValue && value?.value) {
+      // Format time from "HH:MM" to "H:MM AM/PM"
+      const timeString = value.value;
+      const [hours, minutes] = timeString.split(":").map((part) => parseInt(part, 10));
+
+      if (!isNaN(hours) && !isNaN(minutes)) {
+        const period = hours >= 12 ? "PM" : "AM";
+        const hour12 = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+        const paddedMinutes = String(minutes).padStart(2, "0"); // Ensures minutes are always two digits
+        return `${hour12}:${paddedMinutes} ${period}`;
+      }
+      return value.value; // Return original if parsing failed
+    }
+    // Handle other values as before
     if (value?.skip) return value.value;
     else if (value?.isUnit) return value?.value ? `${getTranslatedValues(value?.value, value?.isNotTranslated)} ${t(value?.isUnit)}` : t("N/A");
     else return value?.value ? getTranslatedValues(value?.value, value?.isNotTranslated) : t("N/A");
@@ -164,25 +288,67 @@ function ApplicationDetailsContent({
 
   const getClickInfoDetails = () => {
     if (window.location.href.includes("disconnection") || window.location.href.includes("application")) {
-      return "WS_DISCONNECTION_CLICK_ON_INFO_LABEL"
+      return "WS_DISCONNECTION_CLICK_ON_INFO_LABEL";
     } else {
-      return "WS_CLICK_ON_INFO_LABEL"
+      return "WS_CLICK_ON_INFO_LABEL";
     }
-  }
+  };
 
+  const [showAllTimeline, setShowAllTimeline] = useState(false);
   const getClickInfoDetails1 = () => {
     if (window.location.href.includes("disconnection") || window.location.href.includes("application")) {
-        return "WS_DISCONNECTION_CLICK_ON_INFO1_LABEL"
+      return "WS_DISCONNECTION_CLICK_ON_INFO1_LABEL";
     } else {
-        return ""
+      return "";
     }
-  }
+  };
+  const toggleTimeline = () => {
+    setShowAllTimeline((prev) => !prev);
+  };
+  // this is file open service
+  const openFilePDF = (fileId) => {
+    Digit.UploadServices.Filefetch([fileId], Digit.ULBService.getStateId())
+      .then((res) => {
+        // Extract the concatenated URL string
+        const concatenatedUrls = res?.data?.fileStoreIds?.[0]?.url;
+
+        if (concatenatedUrls) {
+          // Split the string by commas to get individual URLs
+          const urlArray = concatenatedUrls.split(",");
+
+          // Pick the first URL (or any other logic to decide which URL to open)
+          const fileUrl = urlArray[0];
+
+          if (fileUrl) {
+            window.open(fileUrl, "_blank"); // Open the file in a new tab
+          } else {
+            console.error("No valid URL found to open!");
+          }
+        } else {
+          console.error("URL is missing in the response!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching file:", error);
+      });
+  };
+
   return (
     <Card style={{ position: "relative" }} className={"employeeCard-override"}>
       {/* For UM-4418 changes */}
-      { isInfoLabel ? <InfoDetails t={t} userType={false} infoBannerLabel={"CS_FILE_APPLICATION_INFO_LABEL"} infoClickLable={"WS_CLICK_ON_LABEL"} infoClickInfoLabel={getClickInfoDetails()} infoClickInfoLabel1={getClickInfoDetails1()} /> : null }
+      {isInfoLabel ? (
+        <InfoDetails
+          t={t}
+          userType={false}
+          infoBannerLabel={"CS_FILE_APPLICATION_INFO_LABEL"}
+          infoClickLable={"WS_CLICK_ON_LABEL"}
+          infoClickInfoLabel={getClickInfoDetails()}
+          infoClickInfoLabel1={getClickInfoDetails1()}
+        />
+      ) : null}
+
       {applicationDetails?.applicationDetails?.map((detail, index) => (
-        <React.Fragment key={index}>
+        <React.Fragment key={detail.title || index}>
           <div style={getMainDivStyles()}>
             {index === 0 && !detail.asSectionHeader ? (
               <CardSubHeader style={{ marginBottom: "16px", fontSize: "24px" }}>{t(detail.title)}</CardSubHeader>
@@ -202,34 +368,172 @@ function ApplicationDetailsContent({
             )}
             {/* TODO, Later will move to classes */}
             {/* Here Render the table for adjustment amount details detail.isTable is true for that table*/}
+
             {detail?.isTable && (
-              <table style={{ tableLayout: "fixed", width: "100%", borderCollapse: "collapse" }}>
+              <table
+                style={{ tableLayout: "fixed", width: "100%", borderCollapse: "collapse", border: "1px solid black" }}
+              >
                 <tr style={{ textAlign: "left" }}>
                   {detail?.headers.map((header) => (
-                    <th style={{ padding: "10px", paddingLeft:"0px" }}>{t(header)}</th>
+                    <th style={{ padding: "10px", paddingLeft: "5px", border: "1px solid black" }}>{t(header)}</th>
                   ))}
                 </tr>
 
-                {detail?.tableRows.map((row,index)=>{
-                if(index===detail?.tableRows.length - 1){
-                  return <>
-                    <hr style={{ width: "370%",marginTop:"15px" }} className="underline" />
+                {detail?.tableRows.map((row, index) => {
+                  // if (index === detail?.tableRows.length - 1) {
+                  //   return <>
+                  //     <hr style={{ width: "1200px", marginTop: "15px" }} className="underline" />
+                  //     <tr>
+                  //       {row.map(element => <td style={{ textAlign: "left" }}>{t(element)}</td>)}
+                  //     </tr>
+                  //   </>
+                  // }
+                  return (
                     <tr>
-                      {row.map(element => <td style={{ textAlign: "left" }}>{t(element)}</td>)}
+                      {row.map((element, idx) =>
+                        Array.isArray(element) && element.length > 1 && detail.isMaintenance === true ? (
+                          <td style={{ paddingTop: "20px", textAlign: "left", border: "1px solid black", verticalAlign: "middle" }} key={idx}>
+                            <div style={{ display: "flex", flexWrap: "nowrap", gap: "5px" }}>
+                              {element.map((file, fileIndex) => (
+                                <a
+                                  key={fileIndex} // Ensure each <a> tag has a unique key
+                                  onClick={() => openFilePDF(file.fileStoreId)}
+                                  rel="noopener noreferrer"
+                                  style={{ marginRight: "5px", display: "inline-block", cursor: "pointer" }}
+                                >
+                                  <PDFSvg style={{ width: "25px", height: "25px" }} />
+                                </a>
+                              ))}
+                            </div>
+                          </td>
+                        ) : (
+                          <td key={idx} style={{ paddingTop: "20px", textAlign: "left", border: "1px solid black", verticalAlign: "middle" }}>
+                            {element && element.editButton === true ? (
+                              <span style={{ display: "inline-flex", gap: "10px", alignItems: "center" }}>
+                                <Link
+                                  to={{
+                                    pathname: `/upyog-ui/employee/asset/assetservice/maintenance-edit/${applicationNo}`,
+                                    state: { data: element.data },
+                                  }}
+                                >
+                                  <button>
+                                    {" "}
+                                    <EditIcon />{" "}
+                                  </button>
+                                </Link>
+                              </span>
+                            ) : (
+                              t(element)
+                            )}
+                          </td>
+                        )
+                      )}
                     </tr>
-                    </>
-                }
-                return <tr>
-                  {row.map(element => <td style={{ paddingTop:"20px",textAlign:"left" }}>{t(element)}</td>)}
-                </tr>})}
+                  );
+                })}
               </table>
             )}
             <StatusTable style={getTableStyles()}>
               {detail?.title &&
                 !detail?.title.includes("NOC") &&
                 detail?.values?.map((value, index) => {
+                  // New row type: renders a digipin display with an optional map popup button
+                  if (value?.showDigipin) {
+                    // Narrow the input width on employee view to avoid overflow
+                    const isEmployee = Digit.SessionStorage.get("user_type") === "employee";
+                    return (
+                      <Row
+                        key={t(value.title)}
+                        label={t(value.title)}
+                        text={
+                          <div className="application-details-digipin-wrapper">
+                            {/* Read-only digipin display with optional Mappls link */}
+                            <GeoLocationWithDigipin
+                              t={t}
+                              viewOnly
+                              digipin={value.digipin}
+                              showMapLink={value.showMapLink}
+                              inputStyle={{ marginTop: 0, width: isEmployee ? "50%" : "100%" }}
+                            />
+                            {/* Show "View on Map" button only when all required location data is present */}
+                            {value.digipinMapPopup && value.digipinLat && value.digipinLng && value.digipin && (
+                              <button
+                                className="application-details-map-btn"
+                                onClick={() => handleOpenDigipinMap(value.digipinLat, value.digipinLng, value.digipin)}
+                              >
+                                {t("CS_VIEW_ON_MAP")}
+                              </button>
+                            )}
+                          </div>
+                        }
+                        last={index === detail?.values?.length - 1}
+                        className="border-none"
+                        rowContainerStyle={getRowStyles()}
+                      />
+                    );
+                  }
+                  if (value?.isViewOnMap) {
+                    return (
+                      <Row
+                        key={t(value.title)}
+                        label={t(value.title)}
+                        text={
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {/* Show the original value */}
+                            <span>{getTextValue(value)}</span>
+                            {isAssetModule && (
+                              applicationDetailsofAsset?.applicationData?.applicationData?.additionalDetails?.geometry ? (
+                                <button
+                                  style={{
+                                    backgroundColor: "#a82227",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "4px 10px",
+                                    cursor: "pointer",
+                                    fontSize: "0.85rem",
+                                  }}
+                                  onClick={() =>
+                                    handleOpenMap(applicationDetailsofAsset?.applicationData?.applicationData?.additionalDetails?.geometry)
+                                  }
+                                >
+                                  {t("View on Map")}
+                                </button>
+                              ) : (
+                                <button
+                                  style={{
+                                    backgroundColor: "#a82227",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "4px 10px",
+                                    cursor: "pointer",
+                                    fontSize: "0.85rem",
+                                  }}
+                                  onClick={() => setShowMap(true)}
+                                >
+                                  {t("Mark on Map")}
+                                </button>
+                              )
+                            )}
+                          </div>
+                        }
+                        last={index === detail?.values?.length - 1}
+                        className="border-none"
+                        rowContainerStyle={getRowStyles()}
+                      />
+                    );
+                  }
                   if (value.map === true && value.value !== "N/A") {
-                    return <Row labelStyle={{wordBreak: "break-all"}} textStyle={{wordBreak: "break-all"}} key={t(value.title)} label={t(value.title)} text={<img src={t(value.value)} alt="" privacy={value?.privacy} />} />;
+                    return (
+                      <Row
+                        labelStyle={{ wordBreak: "break-all" }}
+                        textStyle={{ wordBreak: "break-all" }}
+                        key={t(value.title)}
+                        label={t(value.title)}
+                        text={<img src={t(value.value)} alt="" privacy={value?.privacy} />}
+                      />
+                    );
                   }
                   if (value?.isLink == true) {
                     return (
@@ -263,39 +567,52 @@ function ApplicationDetailsContent({
                         caption={value.caption}
                         className="border-none"
                         rowContainerStyle={getRowStyles()}
-                        labelStyle={{wordBreak: "break-all"}}
-                        textStyle={{wordBreak: "break-all"}}
+                        labelStyle={{ wordBreak: "break-all" }}
+                        textStyle={{ wordBreak: "break-all" }}
                       />
                     );
                   }
                   return (
-                    <div>
-                      {window.location.href.includes("modify") ?  (
-                      <Row
-                        className="border-none"
-                        key={`${value.title}`}
-                        label={`${t(`${value.title}`)}`}
-                        privacy={value?.privacy}
-                        text={value?.oldValue ? value?.oldValue : value?.value ? value?.value : ""}
-                        labelStyle={{wordBreak: "break-all"}}
-                        textStyle={{wordBreak: "break-all"}}
-                      /> ) : (<Row
-                        key={t(value.title)}
-                        label={t(value.title)}
-                        text={getTextValue(value)}
-                        last={index === detail?.values?.length - 1}
-                        caption={value.caption}
-                        className="border-none"
-                        /* privacy object set to the Row Component */
-                        privacy={value?.privacy}
-                        // TODO, Later will move to classes
-                        rowContainerStyle={getRowStyles()}
-                        labelStyle={{wordBreak: "break-all"}}
-                        textStyle={{wordBreak: "break-all"}}
-                      />
-                    )}
+                    <div key={value.title || index}>
+                      {window.location.href.includes("modify") ? (
+                        <Row
+                          className="border-none"
+                          key={`${value.title}`}
+                          label={`${t(`${value.title}`)}`}
+                          privacy={value?.privacy}
+                          text={value?.oldValue ? value?.oldValue : value?.value ? value?.value : ""}
+                          labelStyle={{ wordBreak: "break-all" }}
+                          textStyle={{ wordBreak: "break-all" }}
+                        />
+                      ) : (
+                        <Row
+                          key={t(value.title)}
+                          label={t(value.title)}
+                          text={getTextValue(value)}
+                          last={index === detail?.values?.length - 1}
+                          caption={value.caption}
+                          className="border-none"
+                          /* privacy object set to the Row Component */
+                          privacy={value?.privacy}
+                          // TODO, Later will move to classes
+                          rowContainerStyle={getRowStyles()}
+                          // labelStyle={{wordBreak: "break-all"}}
+                          // textStyle={{wordBreak: "break-all"}}
+                          labelStyle={{
+                            wordBreak: "break-all",
+                            fontWeight: value.isBold ? "bold" : "normal",
+                            fontStyle: value.isBold ? "italic" : "normal",
+                          }}
+                          textStyle={{
+                            wordBreak: "break-all",
+                            fontWeight: value.isBold ? "bold" : "normal",
+                            fontStyle: value.isBold ? "italic" : "normal",
+                          }}
+                        />
+                      )}
+                      {value.title === "PT_TOTAL_DUES" ? <ArrearSummary bill={fetchBillData.Bill?.[0]} /> : ""}
                     </div>
-                  )
+                  );
                 })}
             </StatusTable>
           </div>
@@ -364,9 +681,8 @@ function ApplicationDetailsContent({
               </Link>
             </div>
           )}
-          {detail?.additionalDetails?.estimationDetails && <WSFeeEstimation wsAdditionalDetails={detail} workflowDetails={workflowDetails}/>}
-          {detail?.additionalDetails?.estimationDetails && <ViewBreakup wsAdditionalDetails={detail} workflowDetails={workflowDetails}/>}
-          
+          {detail?.additionalDetails?.estimationDetails && <WSFeeEstimation wsAdditionalDetails={detail} workflowDetails={workflowDetails} />}
+          {detail?.additionalDetails?.estimationDetails && <ViewBreakup wsAdditionalDetails={detail} workflowDetails={workflowDetails} />}
         </React.Fragment>
       ))}
       {showTimeLine && workflowDetails?.data?.timeline?.length > 0 && (
@@ -375,48 +691,84 @@ function ApplicationDetailsContent({
           {(workflowDetails?.isLoading || isDataLoading) && <Loader />}
           {!workflowDetails?.isLoading && !isDataLoading && (
             <Fragment>
-              <CardSectionHeader style={{ marginBottom: "16px", marginTop: "32px" }}>
-                {t("ES_APPLICATION_DETAILS_APPLICATION_TIMELINE")}
-              </CardSectionHeader>
-              {workflowDetails?.data?.timeline && workflowDetails?.data?.timeline?.length === 1 ? (
-                <CheckPoint
-                  isCompleted={true}
-                  label={t(`${timelineStatusPrefix}${workflowDetails?.data?.timeline[0]?.state}`)}
-                  customChild={getTimelineCaptions(workflowDetails?.data?.timeline[0])}
-                />
-              ) : (
-                <ConnectingCheckPoints>
-                  {workflowDetails?.data?.timeline &&
-                    workflowDetails?.data?.timeline.map((checkpoint, index, arr) => {
-                      let timelineStatusPostfix = "";
-                      if (window.location.href.includes("/obps/")) {
-                        if(workflowDetails?.data?.timeline[index-1]?.state?.includes("BACK_FROM") || workflowDetails?.data?.timeline[index-1]?.state?.includes("SEND_TO_CITIZEN"))
-                        timelineStatusPostfix = `_NOT_DONE`
-                        else if(checkpoint?.performedAction === "SEND_TO_ARCHITECT")
-                        timelineStatusPostfix = `_BY_ARCHITECT_DONE`
-                        else
-                        timelineStatusPostfix = index == 0 ? "" : `_DONE`;
-                      }
-                      
-                      return (
-                        <React.Fragment key={index}>
-                          <CheckPoint
-                            keyValue={index}
-                            isCompleted={index === 0}
-                            info={checkpoint.comment}
-                            label={t(
-                              `${timelineStatusPrefix}${
-                                checkpoint?.performedAction === "REOPEN" ? checkpoint?.performedAction : checkpoint?.[statusAttribute]
-                              }${timelineStatusPostfix}`
-                            )}
-                            customChild={getTimelineCaptions(checkpoint,index)}
-                          />
-                        </React.Fragment>
-                      );
-                    })}
-                </ConnectingCheckPoints>
-              )}
+              <div id="timeline">
+                <CardSectionHeader style={{ marginBottom: "16px", marginTop: "32px" }}>
+                  {t("ES_APPLICATION_DETAILS_APPLICATION_TIMELINE")}
+                </CardSectionHeader>
+                {workflowDetails?.data?.timeline && workflowDetails?.data?.timeline?.length === 1 ? (
+                  <CheckPoint
+                    isCompleted={true}
+                    label={t(`${timelineStatusPrefix}${workflowDetails?.data?.timeline[0]?.state}`)}
+                    customChild={getTimelineCaptions(workflowDetails?.data?.timeline[0], workflowDetails?.data?.timeline)}
+                  />
+                ) : (
+                  <ConnectingCheckPoints>
+                    {workflowDetails?.data?.timeline &&
+                      workflowDetails?.data?.timeline
+                        .slice(0, showAllTimeline ? workflowDetails?.data.timeline.length : 2)
+                        .map((checkpoint, index, arr) => {
+                          let timelineStatusPostfix = "";
+                          if (window.location.href.includes("/obps/")) {
+                            if (
+                              workflowDetails?.data?.timeline[index - 1]?.state?.includes("BACK_FROM") ||
+                              workflowDetails?.data?.timeline[index - 1]?.state?.includes("SEND_TO_CITIZEN")
+                            )
+                              timelineStatusPostfix = `_NOT_DONE`;
+                            else if (checkpoint?.performedAction === "SEND_TO_ARCHITECT") timelineStatusPostfix = `_BY_ARCHITECT_DONE`;
+                            else timelineStatusPostfix = index == 0 ? "" : `_DONE`;
+                          }
+
+                          return (
+                            <React.Fragment key={checkpoint.id || checkpoint.performedAction || index}>
+                              <CheckPoint
+                                keyValue={index}
+                                isCompleted={index === 0}
+                                info={checkpoint.comment}
+                                label={t(
+                                  `${timelineStatusPrefix}${checkpoint?.performedAction === "REOPEN" ? checkpoint?.performedAction : checkpoint?.[statusAttribute]
+                                  }${timelineStatusPostfix}`
+                                )}
+                                customChild={getTimelineCaptions(checkpoint, index, workflowDetails?.data?.timeline)}
+                              />
+                            </React.Fragment>
+                          );
+                        })}
+                  </ConnectingCheckPoints>
+                )}
+                {workflowDetails?.data?.timeline?.length > 2 && (
+                  <LinkButton label={showAllTimeline ? t("COLLAPSE") : t("VIEW_TIMELINE")} onClick={toggleTimeline}></LinkButton>
+                )}
+              </div>
             </Fragment>
+          )}
+
+          {isAssetModule && showMapModal && (
+            <ViewOnMap
+              closeModal={handleCloseMap}
+              location={selectedLocation} // pass lat/lng or ID
+              assetDetails={applicationDetailsofAsset?.applicationData?.applicationData}
+            />
+          )}
+          {isAssetModule && showMap && (
+            <MarkOnMap
+              onGeometrySave={(geoJson) => {
+                setGeometry(geoJson);
+              }}
+              onAreaSave={(polygonArea) => {
+                setArea(polygonArea);
+              }}
+              closeModal={() => setShowMap(false)}
+              location={coordinateFormatter(applicationDetailsofAsset?.applicationData?.applicationData?.location)}
+            />
+          )}
+          {/* Render the Leaflet map modal when a digipin row's "View on Map" button is clicked */}
+          {digipinMapData && (
+            <DiginpinMapPopup
+              lat={digipinMapData.lat}
+              lng={digipinMapData.lng}
+              digipin={digipinMapData.digipin}
+              onClose={handleCloseDigipinMap}
+            />
           )}
         </React.Fragment>
       )}

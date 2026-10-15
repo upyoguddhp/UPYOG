@@ -1,7 +1,19 @@
 package org.upyog.chb.web.models;
 
+<<<<<<< HEAD
 import javax.validation.constraints.NotBlank;
 
+=======
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import org.upyog.chb.util.CommunityHallBookingUtil;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+>>>>>>> niua-upstream/niua-dev-2.0
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -27,12 +39,18 @@ public class BookingSlotDetail {
 	private String bookingId = null;
 	
 	@NotBlank
+<<<<<<< HEAD
 	@JsonProperty("hallCode")
 	private String hallCode;
+=======
+	@JsonProperty("unitCode")
+	private String unitCode;
+>>>>>>> niua-upstream/niua-dev-2.0
 	
 	@NotBlank
 	private String capacity;
 	
+<<<<<<< HEAD
 	@NotBlank
 	private String bookingDate = null;
 	
@@ -41,6 +59,19 @@ public class BookingSlotDetail {
 	
 	@NotBlank
 	private String bookingToTime;
+=======
+	@NotNull
+	@JsonFormat(pattern = CommunityHallBookingUtil.DATE_FORMAT)
+	private LocalDate bookingDate;
+	
+	@NotNull
+	@JsonFormat(pattern = "HH:mm")
+	private LocalTime bookingFromTime;
+	
+	@NotNull
+	@JsonFormat(pattern = "HH:mm")
+	private LocalTime bookingToTime;
+>>>>>>> niua-upstream/niua-dev-2.0
 	
 	@JsonProperty("status")
 	private String status = null;

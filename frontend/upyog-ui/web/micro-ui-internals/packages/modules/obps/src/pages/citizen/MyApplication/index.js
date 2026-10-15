@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, KeyNote, Loader, SubmitBar, Header } from "@egovernments/digit-ui-react-components";
+import { Card, KeyNote, Loader, SubmitBar, Header } from "@nudmcdgnpm/digit-ui-react-components";
 import { Fragment } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link,  } from "react-router-dom";
 import { getBPAFormData } from "../../../utils/index";
 
 const getServiceType = () => {
@@ -11,10 +11,10 @@ const getServiceType = () => {
 
 const MyApplication = () => {
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const [finalData, setFinalData] = useState([]);
   const [labelMessage, setLableMessage] = useState(false);
-  const tenantId = Digit.ULBService.getCurrentTenantId();
+  const tenantId = Digit.ULBService.getCitizenCurrentTenant();
   // const userInfo = Digit.UserService.getUser();
   // const requestor = userInfo?.info?.mobileNumber;
 
@@ -76,7 +76,7 @@ const MyApplication = () => {
     };
 
     sessionStorage.setItem("BPAREGintermediateValue", JSON.stringify(intermediateData));
-    history.push("/upyog-ui/citizen/obps/stakeholder/apply/stakeholder-docs-required");
+    navigate("/upyog-ui/citizen/obps/stakeholder/apply/stakeholder-docs-required");
   };
   useEffect(() => {
     return () => {
@@ -152,6 +152,16 @@ const MyApplication = () => {
                 <SubmitBar label={t("TL_VIEW_DETAILS")} />
               </Link> :
                 <SubmitBar label={t("BPA_COMP_WORKFLOW")} onSubmit={() => getBPAREGFormData(application)} />}
+              {application.status==="PENDINGPAYMENT" ? (
+              <Link
+                to={{
+                  pathname : `/upyog-ui/citizen/payment/collect/${application?.businessService}/${application?.applicationNumber}`,
+                }}>
+              <div style={{marginTop:"10px"}}>
+                <SubmitBar label ={t("COMMON_MAKE_PAYMENT")}/>
+              </div>
+              </Link>
+              ) : null}
             </Card>
           )
         } else {
@@ -159,6 +169,7 @@ const MyApplication = () => {
             <Card key={index}>
               <KeyNote keyValue={t("BPA_APPLICATION_NUMBER_LABEL")} note={application?.applicationNo} />
               <KeyNote keyValue={t("BPA_BASIC_DETAILS_APPLICATION_TYPE_LABEL")} note={application?.businessService !== "BPA_OC" ? t(`WF_BPA_BUILDING_PLAN_SCRUTINY`) : t(`WF_BPA_BUILDING_OC_PLAN_SCRUTINY`)} />
+              <KeyNote keyValue={t("BPA_IS_PREAPPROVED")} note={t(application?.additionalDetails?.isPreApproved ? application?.additionalDetails?.isPreApproved : application?.businessService==="BPA-PAP" ? true : false)} />
               <KeyNote keyValue={t("BPA_COMMON_SERVICE")} note={t(`BPA_SERVICETYPE_NEW_CONSTRUCTION`)} />
               <KeyNote keyValue={t("TL_COMMON_TABLE_COL_STATUS")} note={t(`WF_BPA_${application?.state}`)} noteStyle={application?.status === "APPROVED" ? { color: "#00703C" } : { color: "#D4351C" }} />
               <KeyNote keyValue={t("BPA_COMMON_SLA")} note={typeof(application?.sla) == "string" && application?.sla?.includes("NA") ? t(`${`CS_NA`}`) : application?.sla} />
@@ -169,9 +180,20 @@ const MyApplication = () => {
                   {labelMessage ?
                     <Link to={{ pathname: `/upyog-ui/citizen/obps/bpa/${application?.applicationNo}`, state: { tenantId: '' } }}>
                       <SubmitBar label={t("TL_VIEW_DETAILS")} />
-                    </Link> : <SubmitBar label={t("BPA_COMP_WORKFLOW")} onSubmit={() => getBPAFormData(application, mdmsData, history, t)} />}
+                    </Link> : <SubmitBar label={t("BPA_COMP_WORKFLOW")} onSubmit={() => getBPAFormData(application, mdmsData, navigate, t)} />}
                 </div>
               }
+              {application.status==="PENDINGPAYMENT" ? (
+              <Link
+                to={{
+                  pathname : `/upyog-ui/citizen/payment/collect/${application?.businessService}/${application?.applicationNumber}`,
+
+                }}>
+              <div style={{marginTop:"10px"}}>
+                <SubmitBar label ={t("COMMON_MAKE_PAYMENT")}/>
+              </div>
+              </Link>
+              ) : null}
             </Card>
           )
         }

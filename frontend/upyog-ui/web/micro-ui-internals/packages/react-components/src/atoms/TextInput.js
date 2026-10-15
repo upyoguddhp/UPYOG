@@ -48,6 +48,7 @@ const TextInput = (props) => {
             step={props.step}
             autoFocus={props.autoFocus}
             onBlur={props.onBlur}
+            onKeyDown={props.onKeyDown}
             autoComplete="off"
             disabled={props.disabled}
           />
@@ -82,12 +83,14 @@ const TextInput = (props) => {
             autoFocus={props.autoFocus}
             onBlur={props.onBlur}
             onKeyPress={props.onKeyPress}
+            onKeyDown={props.onKeyDown}
             autoComplete="off"
             disabled={props.disabled}
           />
         )}
-        {props.type === "date" && <DatePicker {...props} date={date} setDate={setDate} data={data} />}
+        {/* {props.type === "date" && <DatePicker {...props} date={date} setDate={setDate} data={data} />} */}
         {props.signature ? props.signatureImg : null}
+
       </div>
     </React.Fragment>
   );

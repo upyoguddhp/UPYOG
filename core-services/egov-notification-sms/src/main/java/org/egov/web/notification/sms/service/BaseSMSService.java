@@ -1,6 +1,36 @@
 package org.egov.web.notification.sms.service;
 
-import java.io.IOException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.jayway.jsonpath.*;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.*;
+import org.apache.http.conn.ssl.*;
+import org.apache.http.impl.client.*;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.egov.web.notification.sms.config.*;
+import org.egov.web.notification.sms.models.*;
+import org.springframework.asm.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.core.*;
+import org.springframework.core.env.*;
+import org.springframework.http.*;
+import org.springframework.http.client.*;
+import org.springframework.http.converter.*;
+import org.springframework.http.converter.json.*;
+import org.springframework.util.*;
+import org.springframework.web.client.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import jakarta.annotation.*;
+import javax.net.ssl.*;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.security.KeyManagementException;
@@ -241,7 +271,17 @@ abstract public class BaseSMSService implements SMSService, SMSBodyBuilder {
                 e.printStackTrace();
             }
             SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(ctx, new NoopHostnameVerifier());
-            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+
+            // Create a connection manager with custom configuration to enable SSL.
+            HttpClientConnectionManager ccm = PoolingHttpClientConnectionManagerBuilder.create()
+                .setSSLSocketFactory(csf)
+                .build();
+
+            // Create HttpClient that uses pool manager.
+            CloseableHttpClient httpClient = HttpClients.custom()
+                .setConnectionManager(ccm)
+                .build();
+
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             restTemplate.setRequestFactory(requestFactory);

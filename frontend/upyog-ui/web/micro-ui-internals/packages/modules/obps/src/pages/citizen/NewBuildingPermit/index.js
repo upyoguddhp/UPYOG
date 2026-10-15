@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useQueryClient } from "react-query";
-import { useRouteMatch, useLocation, useHistory, Switch, Route, Redirect } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams, useLocation, Route, Routes, Navigate,  } from "react-router-dom";
 import { newConfig as newConfigBPA } from "../../../config/buildingPermitConfig";
+import {newConfig1} from "./NewConfig"
 // import CheckPage from "./CheckPage";
 // import OBPSAcknowledgement from "./OBPSAcknowledgement";
 
@@ -17,36 +18,39 @@ const getPath = (path, params) => {
 const NewBuildingPermit = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-  const { path, url } = useRouteMatch();
+  const routeParams = useParams();
   const { pathname, state } = useLocation();
-  const match = useRouteMatch();
-  const history = useHistory();
-  const location = useLocation();
+  const navigate = Digit.Hooks.useCustomNavigate();
+  const { path: modulePath } = Digit.Hooks.useModuleBasePath();
+  const basePath = useMemo(
+    () => getPath(`${modulePath}/bpa/:applicationType/:serviceType`, routeParams),
+    [modulePath, routeParams?.applicationType, routeParams?.serviceType]
+  );
+  Digit.SessionStorage.set("OBPS_PT", "true");
   sessionStorage.removeItem("BPA_SUBMIT_APP");
 
   const tenantId = Digit.ULBService.getCurrentTenantId();
   const [params, setParams, clearParams] = Digit.Hooks.useSessionStorage("BUILDING_PERMIT", state?.edcrNumber ? { data: { scrutinyNumber: { edcrNumber: state?.edcrNumber }}} : {});
- 
   const stateId = Digit.ULBService.getStateId();
   let { data: newConfig } = Digit.Hooks.obps.SearchMdmsTypes.getFormConfig(stateId, []);
 
   const goNext = (skipStep) => {
     const currentPath = pathname.split("/").pop();
-    const { nextStep } = config.find((routeObj) => routeObj.route === currentPath);
-    let redirectWithHistory = history.push;
+    const { nextStep } = newConfig1.find((routeObj) => routeObj.route === currentPath);
+    let redirectWithHistory = navigate;
     if (nextStep === null) {
-      return redirectWithHistory(`${getPath(match.path, match.params)}/check`);
+      return redirectWithHistory(`${basePath}/check`);
     }
-    redirectWithHistory(`${getPath(match.path, match.params)}/${nextStep}`);
+    redirectWithHistory(`${basePath}/${nextStep}`);
 
   }
 
   const onSuccess = () => {
     //clearParams();
-    queryClient.invalidateQueries("PT_CREATE_PROPERTY");
+    queryClient.invalidateQueries({ queryKey: ["PT_CREATE_PROPERTY"] });
   };
   const createApplication = async () => {
-    history.push(`${getPath(match.path, match.params)}/acknowledgement`);
+    navigate(`${basePath}/acknowledgement`);
   };
 
   const handleSelect = (key, data, skipStep, isFromCreateApi) => {
@@ -77,26 +81,22 @@ const NewBuildingPermit = () => {
   const OBPSAcknowledgement = Digit?.ComponentRegistryService?.getComponent('BPAAcknowledgement');
 
   return (
-    <Switch>
-      {config.map((routeObj, index) => {
+    <Routes>
+      {newConfig1.map((routeObj, index) => {
         const { component, texts, inputs, key } = routeObj;
         const Component = typeof component === "string" ? Digit.ComponentRegistryService.getComponent(component) : component;
         return (
-          <Route path={`${getPath(match.path, match.params)}/${routeObj.route}`} key={index}>
-            <Component config={{ texts, inputs, key }} onSelect={handleSelect} onSkip={handleSkip} t={t} formData={params} />
-          </Route>
+          <Route
+            path={routeObj.route}
+            key={index}
+            element={<Component config={{ texts, inputs, key }} onSelect={handleSelect} onSkip={handleSkip} t={t} formData={params} />}
+          />
         );
       })}
-      <Route path={`${getPath(match.path, match.params)}/check`}>
-        <CheckPage onSubmit={createApplication} value={params} />
-      </Route>
-      <Route path={`${getPath(match.path, match.params)}/acknowledgement`}>
-        <OBPSAcknowledgement data={params} onSuccess={onSuccess} />
-      </Route>
-      <Route>
-        <Redirect to={`${getPath(match.path, match.params)}/${config.indexRoute}`} />
-      </Route>
-    </Switch>
+      <Route path="check" element={<CheckPage onSubmit={createApplication} value={params} />} />
+      <Route path="acknowledgement" element={<OBPSAcknowledgement data={params} onSuccess={onSuccess} />} />
+      <Route path="*" element={<Navigate to={`${basePath}/${config.indexRoute}`} replace />} />
+    </Routes>
   );
 };
 

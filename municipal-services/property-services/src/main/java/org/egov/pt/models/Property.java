@@ -9,12 +9,13 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
+import lombok.experimental.SuperBuilder;
 import org.egov.pt.models.enums.Channel;
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Source;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.workflow.ProcessInstance;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,19 +37,19 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Property extends PropertyInfo {
 
 	@JsonProperty("acknowldgementNumber")
-	@SafeHtml
+	@CustomSafeHtml
 	private String acknowldgementNumber;
 
 	@JsonProperty("propertyType")
-	@SafeHtml
+	@CustomSafeHtml
 	private String propertyType;
 
 	@JsonProperty("ownershipCategory")
-	@SafeHtml
+	@CustomSafeHtml
 	private String ownershipCategory;
 
 	@JsonProperty("owners")
@@ -63,7 +64,7 @@ public class Property extends PropertyInfo {
 	private CreationReason creationReason;
 	
 	@JsonProperty("usageCategory")
-	@SafeHtml
+	@CustomSafeHtml
 	private String usageCategory;
 
 	@Max(value = 500)
@@ -117,7 +118,6 @@ public class Property extends PropertyInfo {
 	@JsonProperty("isOldDataEncryptionRequest")
 	private boolean isOldDataEncryptionRequest = false;
 
-	@Builder
 	public Property(String id, String propertyId, String surveyId, List<String> linkedProperties, String tenantId,
 			String accountId, String oldPropertyId, Status status, Address address, String acknowldgementNumber,
 			String propertyType, String ownershipCategory, List<OwnerInfo> owners, Institution institution,

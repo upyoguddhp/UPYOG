@@ -1,5 +1,6 @@
 package org.egov.fsm.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,6 +20,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.fsm.billing.models.BillResponse;
 import org.egov.fsm.config.FSMConfiguration;
+import org.egov.fsm.fsmProducer.FSMProducer;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.service.notification.NotificationService;
 import org.egov.fsm.util.FSMAuditUtil;
@@ -104,15 +106,22 @@ public class FSMService {
 
 	@Autowired
 	FSMRepository fsmRepository;
+	
+	@Autowired
+	private FSMProducer producer;
 
 	@Autowired
 	private FSMRepository repository;
 
 	@Autowired
 	private NotificationService notificationService;
-
+	
 	@Autowired
 	BillingService billingService;
+
+	@Autowired
+	FSMInboxService fSMInboxService;
+
 
 	public FSM create(FSMRequest fsmRequest) {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
@@ -125,8 +134,25 @@ public class FSMService {
 		wfIntegrator.callWorkFlow(fsmRequest);
 		repository.save(fsmRequest);
 
-		if (fsmRequest.getFsm().getAdvanceAmount()!=null && fsmRequest.getFsm().getAdvanceAmount().intValue()>0) {
+		Double tripAmount = wfIntegrator.getAdditionalDetails(fsmRequest.getFsm().getAdditionalDetails());
+
+		if ((fsmRequest.getFsm().getAdvanceAmount() != null && fsmRequest.getFsm().getAdvanceAmount().intValue() > 0)
+				|| tripAmount > 0) {
 			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
+		}
+
+		// Enrich citizen data by fetching from user service to get decrypted user details
+		// This ensures the response contains decrypted citizen data similar to search API
+		if (fsmRequest.getFsm().getAccountId() != null) {
+			List<String> accountIds = new ArrayList<>();
+			accountIds.add(fsmRequest.getFsm().getAccountId());
+			FSMSearchCriteria fsmsearch = new FSMSearchCriteria();
+			fsmsearch.setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmsearch.setOwnerIds(accountIds);
+			UserDetailResponse userDetailResponse = userService.getUser(fsmsearch, requestInfo);
+			if (userDetailResponse != null && !userDetailResponse.getUser().isEmpty()) {
+				fsmRequest.getFsm().setCitizen(userDetailResponse.getUser().get(0));
+			}
 		}
 
 		return fsmRequest.getFsm();
@@ -163,17 +189,20 @@ public class FSMService {
 		List<FSM> fsms = fsmResponse.getFsm();
 
 		String businessServiceName = null;
-		
+
+		Double tripAmount = wfIntegrator.getAdditionalDetails(fsm.getAdditionalDetails());
+
 		if (FSMConstants.FSM_PAYMENT_PREFERENCE_POST_PAY.equalsIgnoreCase(fsmRequest.getFsm().getPaymentPreference()))
 			businessServiceName = FSMConstants.FSM_POST_PAY_BUSINESSSERVICE;
-		else if (fsm.getAdvanceAmount() == null && fsm.getPaymentPreference()==null)
+		else if (FSMConstants.FSM_PAYMENT_PREFERENCE_PRE_PAY
+				.equalsIgnoreCase(fsmRequest.getFsm().getPaymentPreference()))
+			businessServiceName = FSMConstants.FSM_BUSINESSSERVICE;
+		else if (fsm.getAdvanceAmount() == null && fsm.getPaymentPreference() == null && tripAmount <= 0)
 			businessServiceName = FSMConstants.FSM_ZERO_PRICE_SERVICE;
-		else if (fsm.getAdvanceAmount().intValue() == 0)
-			businessServiceName = FSMConstants.FSM_LATER_PAY_SERVICE;
-		else if (fsm.getAdvanceAmount().intValue() > 0)
+		else if (fsm.getAdvanceAmount() != null && fsm.getAdvanceAmount().intValue() > 0)
 			businessServiceName = FSMConstants.FSM_ADVANCE_PAY_BUSINESSSERVICE;
 		else
-			businessServiceName = FSMConstants.FSM_BUSINESSSERVICE;
+			businessServiceName = FSMConstants.FSM_LATER_PAY_SERVICE;
 
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				businessServiceName, null);
@@ -196,10 +225,54 @@ public class FSMService {
 		wfIntegrator.callWorkFlow(fsmRequest);
 		notificationService.process(fsmRequest, oldFSM);
 
+		//createOrUpdateFsmApplicationWorkers(fsmRequest);
 		repository.update(fsmRequest, workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService));
+
+		// Enrich citizen data by fetching from user service to get decrypted user details
+		// This ensures the response contains decrypted citizen data similar to search API
+		if (fsmRequest.getFsm().getAccountId() != null) {
+			List<String> accountIds = new ArrayList<>();
+			accountIds.add(fsmRequest.getFsm().getAccountId());
+			FSMSearchCriteria fsmsearch = new FSMSearchCriteria();
+			fsmsearch.setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmsearch.setOwnerIds(accountIds);
+			UserDetailResponse userDetailResponse = userService.getUser(fsmsearch, requestInfo);
+			if (userDetailResponse != null && !userDetailResponse.getUser().isEmpty()) {
+				fsmRequest.getFsm().setCitizen(userDetailResponse.getUser().get(0));
+			}
+		}
 
 		return fsmRequest.getFsm();
 	}
+
+//	private void createOrUpdateFsmApplicationWorkers(FSMRequest fsmRequest) {
+//		List<Worker> existingWorkers = fsmWorkerRepository.getWorkersData(WorkerSearchCriteria.builder()
+//				.tenantId(fsmRequest.getFsm().getTenantId())
+//				.applicationIds(Collections.singletonList(fsmRequest.getFsm().getId()))
+//				.status(Arrays.asList(WorkerStatus.ACTIVE.toString(), WorkerStatus.INACTIVE.toString()))
+//				.build());
+//
+//		List<Worker> workersToBeInserted = new ArrayList<>();
+//		List<Worker> workersToBeUpdate = new ArrayList<>();
+//		Set<String> existingWorkerIds = existingWorkers.stream().map(Worker::getId)
+//				.collect(Collectors.toSet());
+//		for (Worker worker : fsmRequest.getFsm().getWorkers()) {
+//			if (existingWorkerIds.contains(worker.getId())) {
+//				workersToBeUpdate.add(worker);
+//			} else {
+//				workersToBeInserted.add(worker);
+//			}
+//		}
+//
+//		if(!CollectionUtils.isEmpty(workersToBeInserted)){
+//			fsmWorkerRepository.create(workersToBeInserted);
+//		}
+//
+//		if(!CollectionUtils.isEmpty(workersToBeUpdate)){
+//			fsmWorkerRepository.update(workersToBeUpdate);
+//		}
+//	}
+
 
 	private void callDSORejectCompleteFeedBackPaySend(FSMRequest fsmRequest, Object mdmsData) {
 		if (fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_DSO_REJECT)) {
@@ -218,7 +291,10 @@ public class FSMService {
 
 	private void callApplicationAndAssignDsoAndAccept(FSMRequest fsmRequest, FSM oldFSM) {
 
-		if (fsmRequest.getFsm().getAdvanceAmount()!=null && fsmRequest.getFsm().getAdvanceAmount().intValue()>0
+		Double tripAmount = wfIntegrator.getAdditionalDetails(fsmRequest.getFsm().getAdditionalDetails());
+
+		if (((fsmRequest.getFsm().getAdvanceAmount() != null && fsmRequest.getFsm().getAdvanceAmount().intValue() > 0)
+				|| tripAmount > 0)
 				&& fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT)) {
 			handleApplicationSubmit(fsmRequest);
 		}
@@ -301,6 +377,7 @@ public class FSMService {
 		fsm.setDso(vendor);
 
 		validateDSOVehicle(fsm, vendor, fsmRequest);
+		//validateDSOWorkers(fsm, vendor, fsmRequest);
 		callVehicleTripService(fsmRequest, fsm, oldFSM);
 
 	}
@@ -324,6 +401,33 @@ public class FSMService {
 		}
 	}
 
+//	private void validateDSOWorkers(FSM fsm, Vendor vendor, FSMRequest fsmRequest) {
+//		if(CollectionUtils.isEmpty(fsm.getWorkers()) || fsm.getWorkers().stream()
+//				.filter(worker -> worker.getStatus().equals(WorkerStatus.ACTIVE))
+//				.filter(worker -> worker.getWorkerType().equals(WorkerType.DRIVER)).count() != 1){
+//			log.info("Invalid worker error ::: {}", fsm.getWorkers());
+//			throw new CustomException(FSMErrorConstants.INVALID_DSO_WORKERS,
+//					"Valid workers should be assigned to accept the Request !");
+//		} else {
+//
+//			if(CollectionUtils.isEmpty(vendor.getWorkers())){
+//				throw new CustomException(FSMErrorConstants.INVALID_DSO_WORKERS, " Worker(s) Does not belong to DSO!");
+//			}
+//
+//			List<Worker> filteredList = fsm.getWorkers().stream()
+//					.filter(worker -> worker.getStatus().equals(WorkerStatus.ACTIVE))
+//					.filter(worker -> vendor.getWorkers().stream()
+//							.anyMatch(w -> w.getIndividualId().equals(worker.getIndividualId())))
+//					.collect(Collectors.toList());
+//
+//			if (filteredList.size() != fsm.getWorkers().stream()
+//					.filter(worker -> worker.getStatus().equals(WorkerStatus.ACTIVE)).count()) {
+//				throw new CustomException(FSMErrorConstants.INVALID_DSO_WORKERS,
+//						" Worker(s) Does not belong to DSO!");
+//			}
+//		}
+//	}
+
 	private void callVehicleTripService(FSMRequest fsmRequest, FSM fsm, FSM oldFSM) {
 		if (fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_DSO_ACCEPT)) {
 			ArrayList<String> uuids = new ArrayList<>();
@@ -345,11 +449,17 @@ public class FSMService {
 
 		}
 		if (fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_UPDATE)) {
+			Double tripAmount = wfIntegrator.getAdditionalDetails(fsmRequest.getFsm().getAdditionalDetails());
 			
-			if(fsmRequest.getFsm().getAdvanceAmount()!=null) {
+			if (fsmRequest.getFsm().getNoOfTrips() < oldFSM.getNoOfTrips()) {
+				vehicleTripService.ValidatedecreaseTripWhileUpdate(fsmRequest, oldFSM);
+			}
+				
+
+			if (fsmRequest.getFsm().getAdvanceAmount() != null || tripAmount > 0) {
 				calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
 			}
-			
+
 			vehicleTripService.scheduleVehicleTrip(fsmRequest, oldFSM);
 		}
 	}
@@ -402,19 +512,27 @@ public class FSMService {
 		});
 
 		fsmRequest.getWorkflow().setAssignes(uuidList);
-		if (fsmRequest.getFsm().getPaymentPreference() != null
-				&& !(FSMConstants.FSM_PAYMENT_PREFERENCE_POST_PAY
-						.equalsIgnoreCase(fsmRequest.getFsm().getPaymentPreference()))
-				&& fsmRequest.getFsm().getAdvanceAmount() == null) {
-			vehicleTripService.vehicleTripReadyForDisposal(fsmRequest);
 
-		} else 
-			vehicleTripService.updateVehicleTrip(fsmRequest);
-		
+		/**
+		 * SM-2181
+		 *
+		 *
+		 * if (fsmRequest.getFsm().getPaymentPreference() != null &&
+		 * !(FSMConstants.FSM_PAYMENT_PREFERENCE_POST_PAY
+		 * .equalsIgnoreCase(fsmRequest.getFsm().getPaymentPreference())) &&
+		 * fsmRequest.getFsm().getAdvanceAmount() == null) {
+		 * vehicleTripService.vehicleTripReadyForDisposal(fsmRequest);
+		 *
+		 * } else
+		 */
+
+		vehicleTripService.updateVehicleTrip(fsmRequest);
+
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		BillResponse billResponse = billingService.fetchBill(fsm, requestInfo);
 		log.info("BillResponse from Service", billResponse);
-		if (billResponse != null && !billResponse.getBill().isEmpty()) {
+		if (billResponse != null && (!billResponse.getBill().isEmpty()
+				&& billResponse.getBill().get(0).getTotalAmount().compareTo(new BigDecimal(0)) > 0)) {
 			throw new CustomException(FSMErrorConstants.BILL_IS_PENDING,
 					" Can not close the application since bill amount is pending.");
 		}
@@ -516,6 +634,15 @@ public class FSMService {
 			}
 		}
 
+//		if (!Objects.isNull(criteria.getIndividualIds()) && !criteria.getIndividualIds().isEmpty()) {
+//			List<String> applicationIds = setApplicationIdsWithWorkers(criteria);
+//			if (applicationIds.isEmpty()) {
+//				return FSMResponse.builder().fsm(Collections.emptyList()).totalCount(0).build();
+//			}
+//			criteria.setOwnerIds(Collections.emptyList());
+//			criteria.setIds(applicationIds);
+//		}
+
 		fsmResponse = repository.getFSMData(criteria, dsoId);
 		fsmList = fsmResponse.getFsm();
 		if (!fsmList.isEmpty()) {
@@ -524,6 +651,16 @@ public class FSMService {
 
 		return fsmResponse;
 	}
+
+//	private List<String> setApplicationIdsWithWorkers(FSMSearchCriteria criteria) {
+//		List<Worker> workers = fsmWorkerRepository.getWorkersData(WorkerSearchCriteria.builder()
+//				.workerTypes(Collections.singletonList(WorkerType.DRIVER.toString()))
+//				.individualIds(criteria.getIndividualIds())
+//				.status(Collections.singletonList(WorkerStatus.ACTIVE.toString()))
+//				.tenantId(criteria.getTenantId())
+//				.build());
+//		return workers.stream().map(Worker::getApplicationId).collect(Collectors.toList());
+//	}
 
 	private void checkRoleInValidateSearch(RequestInfo requestInfo, FSMSearchCriteria criteria) {
 		List<Role> roles = requestInfo.getUserInfo().getRoles();
@@ -534,7 +671,9 @@ public class FSMService {
 
 			dsoService.getVendor(vendorSearchCriteria, requestInfo);
 
-		} else if (criteria.tenantIdOnly()) {
+		}
+		// SM-1981 My Application list fixed for DSO number
+		if (criteria.tenantIdOnly()) {
 			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 		}
 	}
@@ -544,7 +683,6 @@ public class FSMService {
 	 * service.
 	 * 
 	 * @param fsmRequest
-	 * @param oldFSM
 	 */
 	public void handleApplicationSubmit(FSMRequest fsmRequest) {
 

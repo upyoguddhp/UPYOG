@@ -26,6 +26,206 @@ const inboxSearchFields = {
       },
     },
   ],
+  PTR: [
+    {
+      label: "PTR_APPLICATION_NUMBER",
+      name: "applicationNumber",
+      roles: [],
+    },
+    {
+      label: "PTR_PET_TYPE",
+      name: "petType",
+      type: "dropdown",
+      roles: [],
+    },
+    {
+      label: "PTR_MOBILE_NUMBER",
+      name: "mobileNumber",
+      type: "mobileNumber",
+      maxLength: 10,
+      minLength: 0,
+      roles: [],
+      pattern: "^$|[6-9][0-9]{9}",
+      errorMessages: {
+        pattern: "",
+        minLength: "",
+        maxLength: "",
+      },
+    },
+  ],
+  ASSET: [
+    {
+      label: "ES_ASSET_RESPONSE_CREATE_LABEL",
+      name: "applicationNo",
+      roles: [],
+    },
+    {
+      label: "AST_ASSET_CATEGORY_LABEL",
+      name: "assetClassification",
+      type: "Dropdown",
+      roles: [],
+    },
+    {
+      label: "AST_PARENT_CATEGORY_LABEL",
+      name: "assetParentCategory",
+      // minLength: "10",
+      roles: [],
+    },
+  ],
+  EW: [
+    {
+      label: "EW_REQUEST_ID",
+      name: "requestId",
+      roles: [],
+    },
+    {
+      label: "EW_MOBILE_NUMBER",
+      name: "mobileNumber",
+      type: "mobileNumber",
+      maxLength: 10,
+      minLength: 0,
+      roles: [],
+      pattern: "^$|[6-9][0-9]{9}",
+      errorMessages: {
+        pattern: "",
+        minLength: "",
+        maxLength: "",
+      },
+    },
+  ],
+  CHB: [
+    {
+      label: "CHB_BOOKING_NO",
+      name: "bookingNo",
+      roles: [],
+    },
+    {
+      label: "CHB_VENUE_TYPE_LABEL",
+      name: "venueType",
+      type: "Dropdown",
+      roles: [],
+    },
+    {
+      label: "CHB_MOBILE_NUMBER",
+      name: "mobileNumber",
+      type: "mobileNumber",
+      maxLength: 10,
+      minLength: 0,
+      roles: [],
+      pattern: "^$|[6-9][0-9]{9}",
+      errorMessages: {
+        pattern: "",
+        minLength: "",
+        maxLength: "",
+      },
+    },
+  ],
+   
+    WT: [
+      {
+        label: "WT_BOOKING_NO",
+        name: "bookingNo",
+        roles: [],
+      },
+      {
+        label: "WT_MOBILE_NUMBER",
+        name: "mobileNumber",
+        type: "mobileNumber",
+        maxLength: 10,
+        minLength: 0,
+        roles: [],
+        pattern: "^$|[6-9][0-9]{9}",
+        errorMessages: {
+          pattern: "",
+          minLength: "",
+          maxLength: "",
+        },
+      },
+    ],
+    MT: [
+      {
+        label: "MT_BOOKING_NO",
+        name: "bookingNo",
+        roles: [],
+      },
+      {
+        label: "MT_MOBILE_NUMBER",
+        name: "mobileNumber",
+        type: "mobileNumber",
+        maxLength: 10,
+        minLength: 0,
+        roles: [],
+        pattern: "^$|[6-9][0-9]{9}",
+        errorMessages: {
+          pattern: "",
+          minLength: "",
+          maxLength: "",
+        },
+      },
+    ],
+    TP: [
+      {
+        label: "TP_BOOKING_NO",
+        name: "bookingNo",
+        roles: [],
+      },
+      {
+        label: "TP_MOBILE_NUMBER",
+        name: "mobileNumber",
+        type: "mobileNumber",
+        maxLength: 10,
+        minLength: 0,
+        roles: [],
+        pattern: "^$|[6-9][0-9]{9}",
+        errorMessages: {
+          pattern: "",
+          minLength: "",
+          maxLength: "",
+        },
+      },
+    ],
+    GC: [
+      {
+        label: "GC_APPLICATION_NUMBER_LABEL",
+        name: "applicationNumber",
+        roles: [],
+      },
+      {
+        label: "GC_MOBILE_NUMBER",
+        name: "mobileNumber",
+        type: "mobileNumber",
+        maxLength: 10,
+        minLength: 0,
+        roles: [],
+        pattern: "^$|[6-9][0-9]{9}",
+        errorMessages: {
+          pattern: "",
+          minLength: "",
+          maxLength: "",
+        },
+      },
+    ],
+    FIRENOC: [
+      {
+        label: "FN_APPLICATION_NUMBER_LABEL",
+        name: "applicationNumber",
+        roles: [],
+      },
+      {
+        label: "FN_MOBILE_NUMBER",
+        name: "mobileNumber",
+        type: "mobileNumber",
+        maxLength: 10,
+        minLength: 0,
+        roles: [],
+        pattern: "^$|[6-9][0-9]{9}",
+        errorMessages: {
+          pattern: "",
+          minLength: "",
+          maxLength: "",
+        },
+      },
+    ]
 };
 
 const searchFieldsForSearch = {

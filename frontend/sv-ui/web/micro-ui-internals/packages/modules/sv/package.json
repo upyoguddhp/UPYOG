@@ -1,0 +1,33 @@
+{
+  "name": "@nudmcdgnpm/upyog-ui-module-sv",
+  "version": "1.3.0",
+  "license": "MIT",
+  "main": "src/Module.js",
+  "source": "src/Module.js",
+  
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19",
+    "react-router-dom": ">=6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "@nudmcdgnpm/digit-ui-libraries": "1.2.1",
+    "@nudmcdgnpm/upyog-ui-react-components-lts": "1.0.0",
+    "@nudmcdgnpm/digit-ui-module-reports" : "1.0.0",
+
+    "exif-js": "^2.3.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "lodash.merge": "^4.6.2",
+    "qrcode": "^1.5.3",
+    "react-hook-form": "^7.51.0",
+    "react-i18next": "^14.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "react-router-dom": "6.28.0",
+    "xlsx": "^0.18.5"
+  }
+}

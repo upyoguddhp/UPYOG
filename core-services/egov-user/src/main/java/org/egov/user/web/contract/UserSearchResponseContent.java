@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.user.domain.model.Address;
 import org.egov.user.domain.model.Role;
 import org.egov.user.domain.model.User;
+import org.egov.user.domain.model.enums.BloodGroup;
+import org.egov.user.domain.model.enums.Gender;
 import org.egov.user.domain.model.enums.GuardianRelation;
 import org.egov.user.domain.model.enums.UserType;
 
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class UserSearchResponseContent {
 
     private Long id;
@@ -39,7 +43,7 @@ public class UserSearchResponseContent {
     private String correspondencePinCode;
     private String alternatemobilenumber;
 
-    @JsonIgnore
+//    @JsonIgnore // This is removed to include address details in user search response V2
     private Set<Address> addresses;
 
     private Boolean active;
@@ -58,6 +62,7 @@ public class UserSearchResponseContent {
     private String tenantId;
     private Set<RoleRequest> roles;
     private String uuid;
+    private String digilockerid;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
@@ -97,9 +102,12 @@ public class UserSearchResponseContent {
         this.lastModifiedDate = user.getLastModifiedDate();
         this.tenantId = user.getTenantId();
         this.roles = convertDomainRolesToContract(user.getRoles());
+        log.info("UserSearchResponseContent - User {} (UUID: {}) converted {} roles to contract",
+                 user.getId(), user.getUuid(), this.roles != null ? this.roles.size() : 0);
         this.fatherOrHusbandName = user.getGuardian();
         this.relationship = user.getGuardianRelation();
         this.uuid = user.getUuid();
+        this.digilockerid = user.getDigilockerid();
         this.addresses = user.getAddresses();
         this.alternatemobilenumber=user.getAlternateMobileNumber();
         mapPermanentAddress(user);
@@ -128,4 +136,95 @@ public class UserSearchResponseContent {
         return roleEntities.stream().map(RoleRequest::new).collect(Collectors.toSet());
     }
 
+    
+    public User toUser() {
+    	 
+        User user = new User();
+ 
+        user.setId(this.id);
+        user.setUuid(this.uuid);
+        user.setDigilockerid(this.digilockerid);
+        user.setTenantId(this.tenantId);
+        user.setUsername(this.userName);
+        user.setSalutation(this.salutation);
+        user.setName(this.name);
+        user.setMobileNumber(this.mobileNumber);
+        user.setEmailId(this.emailId);
+        user.setAltContactNumber(this.altContactNumber);
+        user.setPan(this.pan);
+        user.setAadhaarNumber(this.aadhaarNumber);
+ 
+        // Gender conversion
+        if (this.gender != null) {
+            try {
+                user.setGender(Gender.valueOf(this.gender.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid gender value: " + this.gender);
+            }
+        }
+ 
+        // BloodGroup conversion
+        if (this.bloodGroup != null) {
+            try {
+                user.setBloodGroup(BloodGroup.valueOf(this.bloodGroup.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid blood group value: " + this.bloodGroup);
+            }
+        }
+ 
+        user.setLocale(this.locale);
+        user.setType(this.type);
+        user.setAccountLocked(this.accountLocked);
+        user.setAccountLockedDate(this.accountLockedDate);
+        user.setDob(this.dob);
+        user.setPasswordExpiryDate(this.pwdExpiryDate);
+        user.setSignature(this.signature);
+        user.setPhoto(this.photo);
+        user.setIdentificationMark(this.identificationMark);
+        user.setCreatedBy(this.createdBy);
+        user.setCreatedDate(this.createdDate);
+        user.setLastModifiedBy(this.lastModifiedBy);
+        user.setLastModifiedDate(this.lastModifiedDate);
+        user.setGuardian(this.fatherOrHusbandName);
+        user.setGuardianRelation(this.relationship);
+        user.setActive(this.active);
+        user.setAlternateMobileNumber(this.alternatemobilenumber);
+ 
+        // Address mappings
+        if (this.permanentAddress != null || this.permanentCity != null || this.permanentPinCode != null) {
+            Address permanentAddress = new Address();
+            permanentAddress.setAddress(this.permanentAddress);
+            permanentAddress.setCity(this.permanentCity);
+            permanentAddress.setPinCode(this.permanentPinCode);
+            user.setPermanentAddress(permanentAddress);
+        }
+ 
+        if (this.correspondenceAddress != null || this.correspondenceCity != null || this.correspondencePinCode != null) {
+            Address correspondenceAddress = new Address();
+            correspondenceAddress.setAddress(this.correspondenceAddress);
+            correspondenceAddress.setCity(this.correspondenceCity);
+            correspondenceAddress.setPinCode(this.correspondencePinCode);
+            user.setCorrespondenceAddress(correspondenceAddress);
+        }
+ 
+        user.setAddresses(this.addresses);
+ 
+        // Roles conversion
+        if (this.roles != null) {
+            Set<Role> roleEntities = this.roles.stream()
+                    .map(roleRequest -> {
+                        Role role = new Role();
+                        role.setCode(roleRequest.getCode());
+                        role.setName(roleRequest.getName());
+                        return role;
+                    })
+                    .collect(Collectors.toSet());
+            user.setRoles(roleEntities);
+        } else {
+            // CRITICAL FIX: Ensure roles is never null, always initialize to empty set
+            user.setRoles(new HashSet<>());
+        }
+
+        return user;
+    }
 }

@@ -2,8 +2,8 @@ package org.egov.bpa.calculator.web.controllers;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import org.egov.bpa.calculator.services.CalculationService;
 import org.egov.bpa.calculator.services.DemandService;
@@ -57,5 +57,12 @@ public class BPACalculatorController {
 		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/_estimate", method = RequestMethod.POST)
+	public ResponseEntity<CalculationRes> estimate(@Valid @RequestBody CalculationReq calculationReq) {
+		log.debug("CalculationReaquest:: " + calculationReq);
+		 List<Calculation> calculations = calculationService.estimate(calculationReq);
+		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
+		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
+	}
 
 }

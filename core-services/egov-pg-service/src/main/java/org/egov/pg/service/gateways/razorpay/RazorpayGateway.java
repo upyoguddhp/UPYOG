@@ -1,251 +1,267 @@
 package org.egov.pg.service.gateways.razorpay;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.Base64;
-
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.egov.pg.constants.PgConstants;
+import org.egov.pg.models.Refund;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.service.Gateway;
-import org.egov.pg.service.gateways.razorpay.models.Order;
-import org.egov.pg.service.gateways.razorpay.models.Payment;
-import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
 import org.egov.pg.utils.Utils;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Component
+@Service
 @Slf4j
 public class RazorpayGateway implements Gateway {
-	private static final String GATEWAY_NAME = "RAZORPAY";
 
-	private static final String PAYMENT_AUTO_CAPTURE = "1";
+    private static final String GATEWAY_NAME = "RAZORPAY";
+    private final String KEY_ID;
+    private final String KEY_SECRET;
+    private final String ORDER_URL;
+    private final String PAYMENT_URL;
+    private final String CHECKOUT_URL;
+    private final boolean ACTIVE;
 
-	private static final String ORDER_ID = "ORDER_ID";
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-	private final RestTemplate restTemplate;
+    private final String REDIRECT_URL;
+    private final String ORIGINAL_RETURN_URL_KEY;
 
-	private ObjectMapper objectMapper;
 
-	private final boolean ACTIVE;
+    @Autowired
+    public RazorpayGateway(RestTemplate restTemplate, Environment environment, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
 
-	private final String CURRENCY;
+        ACTIVE = Boolean.parseBoolean(environment.getRequiredProperty("razorpay.active"));
+        KEY_ID = environment.getRequiredProperty("razorpay.key.id");
+        KEY_SECRET = environment.getRequiredProperty("razorpay.key.secret");
+        ORDER_URL = environment.getRequiredProperty("razorpay.url.order");
+        PAYMENT_URL = environment.getRequiredProperty("razorpay.url.payment");
+        CHECKOUT_URL = environment.getRequiredProperty("razorpay.url.checkout");
+        REDIRECT_URL = environment.getRequiredProperty("razorpay.redirect.url");
+        ORIGINAL_RETURN_URL_KEY = environment.getRequiredProperty("razorpay.original.return.url.key");
+        this.objectMapper = objectMapper;
+    }
 
-	private final String MERCHANT_KEY_ID;
+    @Override
+    public URI generateRedirectURI(Transaction transaction) {
+        try {
+            // Step 1: Generate form data
+            String formData = generateRedirectFormData(transaction);
 
-	private final String MERCHANT_KEY_SECRET;
+            // Step 2: Return checkout URL with order details
+            // The actual checkout will be handled by frontend using Razorpay Checkout.js
+            return URI.create(CHECKOUT_URL);
+        } catch (Exception e) {
+            log.error("Razorpay order creation failed", e);
+            throw new CustomException("ORDER_CREATION_FAILED", "Failed to create Razorpay order");
+        }
+    }
 
-	private final String MERCHANT_CREATE_ORDER_URL;
+    @Override
+    public String generateRedirectFormData(Transaction transaction) {
+        try {
+            // Create Razorpay Order
+            String orderId = createRazorpayOrder(transaction);
 
-	private final String MERCHANT_FETCH_PAYMENT_BY_ORDER_ID_URL;
+            // Generate checkout options as JSON
+            Map<String, Object> options = transaction.getAdditionalDetails() == null ? new HashMap<>() : (Map<String, Object>) transaction.getAdditionalDetails();
+            options.put("key", KEY_ID);
+            String amtAsPaise = Utils.formatAmtAsPaise(transaction.getTxnAmount());
+            options.put("amount", amtAsPaise);
+            options.put("currency", "INR");
+            options.put("order_id", orderId);
+            options.put("name", "HDFC Collect Now");
+            options.put("description", transaction.getModule());
 
-	@Autowired
-	public RazorpayGateway(RestTemplate restTemplate, Environment environment, ObjectMapper objectMapper) {
-		this.restTemplate = restTemplate;
-		this.objectMapper = objectMapper;
+            Map<String, String> prefill = new HashMap<>();
+            prefill.put("email", transaction.getUser().getEmailId());
+            prefill.put("contact", transaction.getUser().getMobileNumber());
+            options.put("prefill", prefill);
 
-		ACTIVE = Boolean.valueOf(environment.getRequiredProperty("razorpay.active"));
-		CURRENCY = environment.getRequiredProperty("razorpay.currency");
-		MERCHANT_KEY_ID = environment.getRequiredProperty("razorpay.key.id");
-		MERCHANT_KEY_SECRET = environment.getRequiredProperty("razorpay.merchant.secret.key");
-		MERCHANT_CREATE_ORDER_URL = environment.getRequiredProperty("razorpay.order.create.url");
-		MERCHANT_FETCH_PAYMENT_BY_ORDER_ID_URL = environment
-				.getRequiredProperty("razorpay.merchant.payments.orderid.fetch.url");
-	}
+            Map<String, String> notes = new HashMap<>();
+            notes.put("transaction_id", transaction.getTxnId());
+            options.put("notes", notes);
 
-	@Override
-	public URI generateRedirectURI(Transaction transaction) {
-		// Create Order
-		Order order = createOrder(Utils.formatAmtAsPaise(transaction.getTxnAmount()), transaction.getTxnId());
-		@SuppressWarnings("unchecked") // Suppress the unchecked cast warning
-		LinkedHashMap<Object, Object> additionalDetails = Optional.ofNullable(transaction.getAdditionalDetails())
-				.map(obj -> objectMapper.convertValue(obj, LinkedHashMap.class)).orElseGet(LinkedHashMap::new);
+            /*
+            Build backend callback URL that Razorpay will post to after payment.
+             It wraps the original citizen success URL so RedirectController can
+             process the response and then safely redirect the user to the frontend.
 
-		transaction.setOrderId(order.getOrderId());
-		additionalDetails.put(ORDER_ID, order.getOrderId());
-		transaction.setAdditionalDetails(additionalDetails);
+             Example output:
+             https://niuatt.niua.in/pg-service/transaction/v1/_redirect
+                 ?originalreturnurl=https://niuatt.niua.in/citizen/payment/success/BPA.PLANNING_PERMIT_FEE/PG-BP-2025-11-26-000640/pg.citya
+                 &eg_pg_txnid=PG_PG_2025_11_26_000640_21
+                 */
+            String originalReturnUrl = transaction.getCallbackUrl();
+            String callbackUrl = UriComponentsBuilder.fromHttpUrl(REDIRECT_URL)
+                    .queryParam(ORIGINAL_RETURN_URL_KEY, originalReturnUrl)
+                    .queryParam(PgConstants.PG_TXN_IN_LABEL, transaction.getTxnId())
+                    .build()
+                    .encode()
+                    .toUriString();
 
-		return URI.create(StringUtils.EMPTY); // Return an empty URI
-	}
+            options.put("callback_url", callbackUrl);
+            transaction.setAdditionalDetails(options);
+            String data = Utils.convertObjectToString(objectMapper, options);
+            log.info("Razorpay checkout data: {}", data);
 
-	private Order createOrder(String amount, String transactionId) {
+            return data;
+        } catch (Exception e) {
+            log.error("Failed to generate Razorpay form data", e);
+            throw new CustomException("FORM_DATA_GENERATION_FAILED", "Failed to generate checkout data");
+        }
+    }
 
-		// HttpHeaders
-		HttpHeaders headers = buildHttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    private String createRazorpayOrder(Transaction transaction) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBasicAuth(KEY_ID, KEY_SECRET);
 
-		// Create request body
-		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-		requestBody.add("amount", amount);
-		requestBody.add("currency", CURRENCY);
-		requestBody.add("receipt", transactionId);
-		requestBody.add("payment_capture", PAYMENT_AUTO_CAPTURE);
+            log.info("Key Id and Secrets coming from Env: {} {}", KEY_SECRET, KEY_ID);
+            Map<String, Object> orderRequest = new HashMap<>();
+            String amtAsPaise = Utils.formatAmtAsPaise(transaction.getTxnAmount());
+            orderRequest.put("amount", amtAsPaise);
+            orderRequest.put("currency", "INR");
+            orderRequest.put("receipt", transaction.getTxnId());
+            orderRequest.put("payment_capture", 1); // Auto capture
 
-		try {
-			// Make the POST request with Basic Authentication and get the response as an
-			// object
-			ResponseEntity<Order> responseEntity = restTemplate.exchange(MERCHANT_CREATE_ORDER_URL, HttpMethod.POST,
-					new HttpEntity<>(requestBody, headers), Order.class);
+            log.info("Razorpay order creation request: {}", orderRequest);
+            log.info("Razorpay headers: {}", headers);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(orderRequest, headers);
+            ResponseEntity<RazorpayOrderResponse> response = restTemplate.postForEntity(
+                    ORDER_URL, request, RazorpayOrderResponse.class);
+            log.info("Razorpay order creation response: {}", response);
+            if (response.getBody() != null) {
+                return response.getBody().getId();
+            }
+            throw new CustomException("ORDER_CREATION_FAILED", "Failed to create Razorpay order");
+        } catch (RestClientException e) {
+            log.error("Failed to create Razorpay order", e);
+            throw new CustomException("ORDER_CREATION_FAILED", "Failed to create Razorpay order");
+        }
+    }
 
-			return responseEntity.getBody();
-		} catch (Exception e) {
-			log.error("Unable to create order for the transactionId: " + transactionId, e);
-			throw new CustomException("ERR_HDFC_PG_SERVICE",
-					"Unable to create order for the transactionId: " + transactionId);
-		}
-	}
+    @Override
+    public Transaction fetchStatus(Transaction currentStatus, Map<String, String> params) {
+        try {
+            /// TODO:- Need to explore this verySignature and then unComment it
+            // Verify signature
+           /* if (!verifySignature(orderId, paymentId, signature)) {
+                throw new CustomException("SIGNATURE_VERIFICATION_FAILED", "Payment signature verification failed");
+            }*/
+            Map<String, Object> additionalDetails = objectMapper.convertValue(currentStatus.getAdditionalDetails(), Map.class);;
+            String orderId = additionalDetails.get("order_id").toString();
+            log.info("Fetching Razorpay payment status for Order ID: {}", orderId);
 
-	private HttpHeaders buildHttpHeaders() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            // Fetch payment details
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(KEY_ID, KEY_SECRET);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
 
-		// Create Basic Auth credentials
-		String authCredentials = MERCHANT_KEY_ID + ":" + MERCHANT_KEY_SECRET;
-		String base64Credentials = Base64.getEncoder().encodeToString(authCredentials.getBytes());
+            String orderUrl = ORDER_URL + "/" + orderId;
+            ResponseEntity<RazorpayPaymentResponse> response = restTemplate.exchange(
+                    orderUrl, org.springframework.http.HttpMethod.GET, request, RazorpayPaymentResponse.class);
 
-		headers.set("Authorization", "Basic " + base64Credentials);
+            log.info("Razorpay payment fetch response: {}", response);
 
-		return headers;
-	}
+            return transformRawResponse(response.getBody(), currentStatus);
 
-	@Override
-	public Transaction fetchStatus(Transaction currentStatus, Map<String, String> params) {
+        } catch (RestClientException e) {
+            log.error("Unable to fetch status from Razorpay gateway", e);
+            throw new CustomException("UNABLE_TO_FETCH_STATUS", "Unable to fetch status from Razorpay gateway");
+        }
+    }
 
-		String transactionAmount = currentStatus.getTxnAmount();
+    private boolean verifySignature(String orderId, String paymentId, String signature) {
+        try {
+            String payload = orderId + "|" + paymentId;
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(KEY_SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            mac.init(secretKeySpec);
+            byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            String expectedSignature = bytesToHex(hash);
+            return expectedSignature.equals(signature);
+        } catch (Exception e) {
+            log.error("Signature verification failed", e);
+            return false;
+        }
+    }
 
-		String razorpayPaymentId = params.get("razorpay_payment_id");
-		String razorpayOrderId = params.get("razorpay_order_id");
-		String razorpaySignature = params.get("razorpay_signature");
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
+    }
 
-		if (StringUtils.isNotEmpty(razorpayPaymentId) && StringUtils.isNotEmpty(razorpayOrderId)
-				&& StringUtils.isNotEmpty(razorpaySignature)) {
-			// Requesting from call-back url
+    @Override
+    public boolean isActive() {
+        return ACTIVE;
+    }
 
-			if (RazorPayModelUtils.isSignatureVerified(razorpayOrderId, razorpayPaymentId, razorpaySignature,
-					MERCHANT_KEY_SECRET)) {
+    @Override
+    public String gatewayName() {
+        return GATEWAY_NAME;
+    }
 
-				Transaction transaction = validateAndEnrichPaymentStatus(currentStatus, transactionAmount,
-						razorpayOrderId);
+    @Override
+    public String transactionIdKeyInResponse() {
+        return "razorpay_payment_id";
+    }
 
-				if (null != transaction) {
-					return transaction;
-				}
+    private Transaction transformRawResponse(RazorpayPaymentResponse resp, Transaction currentStatus) {
+        Transaction.TxnStatusEnum status = Transaction.TxnStatusEnum.PENDING;
 
-			}
+        if ("captured".equalsIgnoreCase(resp.getStatus())) {
+            status = Transaction.TxnStatusEnum.SUCCESS;
+        } else if ("failed".equalsIgnoreCase(resp.getStatus())) {
+            status = Transaction.TxnStatusEnum.FAILURE;
+        } else if ("paid".equalsIgnoreCase(resp.getStatus())) {
+            status = Transaction.TxnStatusEnum.SUCCESS;
+        }
 
-		} else {
-			Map<String, Object> additionDetailsMap = objectMapper.convertValue(currentStatus.getAdditionalDetails(),
-					Map.class);
-			razorpayOrderId = additionDetailsMap.get(ORDER_ID).toString();
+        return Transaction.builder()
+                .txnId(currentStatus.getTxnId())
+                .txnAmount(Utils.formatAmtAsRupee(String.valueOf(resp.getAmount() / 100))) // Convert from paise
+                .txnStatus(status)
+                .gatewayTxnId(resp.getId())
+                .gatewayPaymentMode(resp.getMethod())
+                .gatewayStatusCode(resp.getStatus())
+                .gatewayStatusMsg(resp.getDescription())
+                .responseJson(resp)
+                .build();
+    }
 
-			// Call from CRON JOB
-			Transaction transaction = validateAndEnrichPaymentStatus(currentStatus, transactionAmount, razorpayOrderId);
 
-			if (null != transaction) {
-				return transaction;
-			}
+    @Override
+    public Refund initiateRefund(Refund refundTxn) {
+        return null;
+    }
 
-		}
-
-		return Transaction.builder().txnId(currentStatus.getTxnId()).txnAmount(currentStatus.getTxnAmount())
-				.txnStatus(Transaction.TxnStatusEnum.FAILURE).build();
-
-	}
-
-	private Transaction validateAndEnrichPaymentStatus(Transaction currentStatus, String transactionAmount,
-			String razorpayOrderId) {
-		PaymentResponse paymentResponse = fetchPaymentsByOrderId(razorpayOrderId);
-
-		if (null != paymentResponse) {
-
-			List<Payment> successPayments = Optional.ofNullable(paymentResponse.getPayments())
-					.orElse(Collections.emptyList()).stream()
-					.filter(payment -> StringUtils.equals(Utils.formatAmtAsPaise(transactionAmount),
-							String.valueOf(payment.getPaymentAmount())) && StringUtils.isEmpty(payment.getErrorCode())
-							&& payment.isCaptured())
-					.collect(Collectors.toList());
-
-			if (!CollectionUtils.isEmpty(successPayments)) {
-				Payment successPayment = successPayments.get(0);
-				return Transaction.builder().txnId(currentStatus.getTxnId()).txnAmount(currentStatus.getTxnAmount())
-						.txnStatus(Transaction.TxnStatusEnum.SUCCESS).gatewayTxnId(successPayment.getPaymentId())
-						.gatewayStatusCode(successPayment.getPaymentStatus())
-						.gatewayStatusMsg(successPayment.getPaymentStatus()).responseJson(successPayment).build();
-			}
-
-			Set<String> successPaymentIds = successPayments.stream().map(Payment::getPaymentId)
-					.collect(Collectors.toSet());
-
-			List<Payment> failedPayments = Optional.ofNullable(paymentResponse.getPayments())
-					.orElse(Collections.emptyList()).stream()
-					.filter(payment -> !successPaymentIds.contains(payment.getPaymentId()))
-					.collect(Collectors.toList());
-
-			if (!CollectionUtils.isEmpty(failedPayments)) {
-				Payment failedPayment = failedPayments.get(0);
-				return Transaction.builder().txnId(currentStatus.getTxnId()).txnAmount(currentStatus.getTxnAmount())
-						.txnStatus(Transaction.TxnStatusEnum.FAILURE).gatewayTxnId(failedPayment.getPaymentId())
-						.gatewayStatusCode(failedPayment.getErrorCode())
-						.gatewayStatusMsg(failedPayment.getErrorReason()).responseJson(failedPayment).build();
-			}
-
-		}
-		return null;
-	}
-
-	private PaymentResponse fetchPaymentsByOrderId(String orderId) {
-
-		String url = String.format(MERCHANT_FETCH_PAYMENT_BY_ORDER_ID_URL, orderId);
-
-		try {
-			// Make a GET request to fetch payments using Basic Authentication
-			ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
-					new HttpEntity<>(buildHttpHeaders()), PaymentResponse.class);
-
-			return responseEntity.getBody();
-		} catch (Exception e) {
-			log.error("Unable to fetch payments for the orderId: " + orderId, e);
-			throw new CustomException("ERR_PNB_PG_SERVICE", "Unable to fetch payments for the orderId: " + orderId);
-		}
-	}
-
-	@Override
-	public boolean isActive() {
-		return ACTIVE;
-	}
-
-	@Override
-	public String gatewayName() {
-		return GATEWAY_NAME;
-	}
-
-	@Override
-	public String transactionIdKeyInResponse() {
-		return "hdfc_TxnRef";
-	}
-	 public String generateRedirectFormData(Transaction transaction ) {
-		 return null;
-	 }
+    @Override
+    public Refund fetchRefundStatus(Refund refundRequest) {
+        return null;
+    }
 }

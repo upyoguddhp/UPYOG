@@ -11,6 +11,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
+=======
+/**
+ * Represents the response structure for Tax Head Master data.
+ * 
+ * Purpose:
+ * - To encapsulate ResponseInfo and a list of TaxHeadMaster objects.
+ */
+>>>>>>> niua-upstream/niua-dev-2.0
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

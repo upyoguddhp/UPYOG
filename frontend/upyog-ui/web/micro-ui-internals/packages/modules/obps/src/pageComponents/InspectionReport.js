@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { CardLabel, LabelFieldPair, Dropdown, TextInput, LinkButton, DatePicker, CardSectionHeader, DeleteIcon } from "@egovernments/digit-ui-react-components";
+import { CardLabel, LabelFieldPair, Dropdown, TextInput, LinkButton, DatePicker, CardSectionHeader, DeleteIcon } from "@nudmcdgnpm/digit-ui-react-components";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import _ from "lodash";
@@ -225,35 +225,35 @@ const InspectionReportForm = (_props) => {
                     ) : null}
                     <CardSectionHeader>{allFieldReport?.length > 1 ? `${t("BPA_FI_REPORT")}-${index + 1}` : `${t("BPA_FI_REPORT")}`}</CardSectionHeader>
                     <LabelFieldPair style={{ width: "100%" }}>
-                        <CardLabel style={{ marginTop: "0px", width: "100%" }} className="card-label-smaller">{`${t("BPA_FI_DATE_LABEL")} * `}</CardLabel>
+                        <CardLabel style={{ marginTop: "0px", width: "100%" }} className="card-label-smaller">{`${t("BPA_FI_DATE_LABEL")}`}<span className="check-page-link-button"> *</span></CardLabel>
                         <div className="field" style={{ width: "100%" }}>
                             <Controller
                                 name="InspectionDate"
                                 rules={{ required: t("REQUIRED_FIELD") }}
                                 control={control}
-                                render={(props) => (
+                                render={({ field }) => (
                                     <DatePicker
-                                        date={props.value}
+                                        date={field.value}
                                         name="InspectionDate"
-                                        onChange={props.onChange}
+                                        onChange={field.onChange}
                                     />
                                 )}
                             />
                         </div>
                     </LabelFieldPair>
                     <LabelFieldPair style={{ width: "100%" }}>
-                        <CardLabel style={{ marginTop: "0px", width: "100%" }} className="card-label-smaller">{`${t("ES_COMMON_TIME")} * `}</CardLabel>
+                        <CardLabel style={{ marginTop: "0px", width: "100%" }} className="card-label-smaller">{`${t("ES_COMMON_TIME")}`}<span className="check-page-link-button"> *</span></CardLabel>
                         <div className="field" style={{ width: "100%" }}>
                             <Controller
                                 name="InspectionTime"
                                 rules={{ required: t("REQUIRED_FIELD") }}
                                 control={control}
-                                render={(props) => (
+                                render={({ field }) => (
                                     <TextInput
                                         name="InspectionTime"
                                         type="time"
-                                        value={props.value}
-                                        onChange={props.onChange}
+                                        value={field.value}
+                                        onChange={field.onChange}
                                     />
                                 )}
                             />
@@ -263,13 +263,13 @@ const InspectionReportForm = (_props) => {
                     {questionList && questionList.map((ob, ind) => (
                         <div key={ind} className="fieldInsepctionInsideWrapper" style={{ maxWidth: "100%" }}>
                             <LabelFieldPair style={{width :"100%"}}>
-                                <CardLabel style={{ marginRight: "30px", width :"100%" }} className="card-label-smaller">{`${t(ob.question)}*`}</CardLabel>
+                                <CardLabel style={{ marginRight: "30px", width :"100%" }} className="card-label-smaller">{`${t(ob.question)}`}<span className="check-page-link-button"> *</span></CardLabel>
                                 <div className="field" style={{ width: "100%" }}>
                                     <Controller
                                         control={control}
                                         name={`question_${ind}`}
                                         rules={{ required: t("REQUIRED_FIELD") }}
-                                        render={(props) => (
+                                        render={({ field }) => (
                                             <Dropdown
                                                 className="form-field"
                                                 style={{ width: "100%", maxWidth: "100%" }}
@@ -277,11 +277,11 @@ const InspectionReportForm = (_props) => {
                                                 disable={false}
                                                 option={getOptions(ob.fieldType)}
                                                 select={(e) => {
-                                                    if (props?.value?.code == e?.code) return true;
-                                                    props.onChange(e);
+                                                    if (field?.value?.code == e?.code) return true;
+                                                    field.onChange(e);
                                                 }}
                                                 optionKey="i18nKey"
-                                                onBlur={props.onBlur}
+                                                onBlur={field.onBlur}
                                                 t={t}
                                             />
                                         )}
@@ -295,13 +295,13 @@ const InspectionReportForm = (_props) => {
                                         control={control}
                                         name={`Remarks_${ind}`}
                                         defaultValue={unit?.uomValue}
-                                        render={(props) => (
+                                        render={({ field }) => (
                                             <TextInput
                                                 value={getValues(`Remarks${ind}`)}
                                                 onChange={(e) => {
-                                                    props.onChange(e);
+                                                    field.onChange(e);
                                                 }}
-                                                onBlur={props.onBlur}
+                                                onBlur={field.onBlur}
                                             />
                                         )}
                                     />

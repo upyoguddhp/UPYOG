@@ -1,5 +1,6 @@
 package org.egov.pg.web.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.pg.constants.PgConstants;
@@ -14,9 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,47 +24,63 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedirectController {
 
-    @Value("${egov.default.citizen.url}")
-    private String defaultURL;
+	@Value("${egov.default.citizen.url}")
+	private String defaultURL;
 
-    @Value("${paygov.original.return.url.key}")
-    private String returnUrlKey;
+	@Value("${paygov.original.return.url.key}")
+	private String returnUrlKey;
 
-    @Value("${paygov.citizen.redirect.domain.name}")
-    private String citizenRedirectDomain;
+	@Value("${paygov.citizen.redirect.domain.name}")
+	private String citizenRedirectDomain;
 
+	private final TransactionService transactionService;
 
-    private final TransactionService transactionService;
+	@Autowired
+	public RedirectController(TransactionService transactionService) {
+		this.transactionService = transactionService;
+	}
 
+	@PostMapping(value = "/transaction/v1/_redirect", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Object> method(
+            @RequestBody MultiValueMap<String, String> formData,
+            @RequestParam(value = "originalreturnurl", required = false) String originalReturnUrlParam,
+            @RequestParam(value = "eg_pg_txnid", required = false) String txnIdParam,
+    @RequestParam(value = "amp;eg_pg_txnid", required = false) String txnIdParamNTT) 
+{
 
-    @Autowired
-    public RedirectController(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
+    	String returnURL = originalReturnUrlParam;
+    	String txnId=txnIdParam;
+    	if(txnId==null)
+    		txnId=txnIdParamNTT;
+    		
+    	if(returnURL == null && formData.get(returnUrlKey) != null) {
+    		returnURL = formData.get(returnUrlKey).get(0);
+    	}
 
-    @PostMapping(value = "/transaction/v1/_redirect", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<Object> method(@RequestBody MultiValueMap<String, String> formData) {
-        
-        log.info("formData in redirect::::"+formData);
-
-    	String returnURL = formData.get(returnUrlKey).get(0); 
-    	String txnId=null;
-    	if(formData.get(PgConstants.PG_TXN_IN_LABEL)!=null)
+    	if(formData.get(PgConstants.PG_TXN_IN_LABEL)!=null && txnId==null)
     	{
     		txnId = formData.get(PgConstants.PG_TXN_IN_LABEL).get(0);
-    		if(txnId==null)
+    		if(txnId==null && returnURL != null && returnURL.contains(PgConstants.PG_TXN_IN_LABEL+"="))
     			txnId=returnURL.split(PgConstants.PG_TXN_IN_LABEL+"=")[1];
     	}
-    	else if(formData.get(PgConstants.PG_TXN_IN_LABEL_NTTDATA)!=null)
-    		txnId = formData.get(PgConstants.PG_TXN_IN_LABEL_NTTDATA).get(0); 
-    	else
+    	else if(formData.get(PgConstants.PG_TXN_IN_LABEL_NTTDATA)!=null && txnId==null)
+    		txnId = formData.get(PgConstants.PG_TXN_IN_LABEL_NTTDATA).get(0);
+
+    	else if(returnURL != null && returnURL.contains(PgConstants.PG_TXN_IN_LABEL) && txnId==null)
     	{
     		txnId=returnURL.split(PgConstants.PG_TXN_IN_LABEL+"=")[1];
     	}
 
-        //MultiValueMap<String, String> params = UriComponentsBuilder.fromUriString(returnURL).build().getQueryParams();
+
+
+        // additional looger for ICICI posts txnId as 'merchantTxnNo' in formData, not as eg_pg_txnid
+        if (txnId == null && formData.get("merchantTxnNo") != null) {
+            txnId = formData.get("merchantTxnNo").get(0);
+            log.info("txnId resolved from ICICI merchantTxnNo: " + txnId);
+        }
         log.info("returnUrl in redirect::::"+returnURL);
         log.info("txn Id"+txnId);
+        log.info("originalreturnurl::::"+originalReturnUrlParam);
         /*
          * From redirect URL get transaction id.
          * And using transaction id fetch transaction details.
@@ -89,38 +104,75 @@ public class RedirectController {
          * https://test.org/pg-service/transaction/v1/_redirect?originalreturnurl=/digit-ui/citizen/payment/success/PT/PG-PT-2022-03-10-006063/pg.citya?eg_pg_txnid=PB_PG_2022_07_12_002082_48
          * Here we are reading originalreturnurl value and then forming redirect URL with domain name.
          */
+        StringBuilder redirectURL = new StringBuilder();
+
         if(gateway != null && gateway.equalsIgnoreCase("PAYGOV")) {
-            StringBuilder redirectURL = new StringBuilder();
             redirectURL.append(returnURL);
+            if(returnURL != null) 
+                returnURL=returnURL + "&eg_pg_txnid="+txnId;
             formData.remove(returnUrlKey);
+            formData.add("eg_pg_txnid", txnId);
+            log.info("returnUrl in PAYGOV redirect::::"+redirectURL);
+            log.info("returnUrl in PAYGOV redirect::::"+redirectURL.toString());
             httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(redirectURL.toString())
                     .queryParams(formData).build().encode().toUri());
-        } 
+        }
         else if(gateway != null && gateway.equalsIgnoreCase("NTTDATA")) {
-            StringBuilder redirectURL = new StringBuilder();
-            returnURL=returnURL + "&eg_pg_txnid="+txnId;
-            redirectURL.append(returnURL);
+            if(returnURL != null) {
+                returnURL=returnURL + "&eg_pg_txnid="+txnId;
+                log.info("Modified returnURL with txnId in NTTDATA redirect: {}", returnURL);
+                log.info("returnUrl in NTTDATA redirect::::"+redirectURL);
+                redirectURL.append(returnURL);
+            } else {
+                // Fallback to default URL if returnURL is null
+                log.info("returnUrl in NTTDATA redirect::::"+defaultURL);
+                redirectURL.append(defaultURL);
+            }
             formData.remove(returnUrlKey);
             formData.remove("encData");
             formData.remove("merchId");
             formData.remove(PgConstants.PG_TXN_IN_LABEL_NTTDATA);
-
+            log.info("NTTDATA redirect before making Call::::"+redirectURL);
             httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(redirectURL.toString())
                     .queryParams(formData).build().encode().toUri());
+        }
+        else if (gateway != null && gateway.equalsIgnoreCase("ICICI")) {
+            if (returnURL != null) {
+                // Append eg_pg_txnid so frontend SuccessfulPayment component can call _update API to verify transaction status
+                if (txnId != null && !returnURL.contains("eg_pg_txnid")) {
+                    returnURL = returnURL + (returnURL.contains("?") ? "&" : "?") + "eg_pg_txnid=" + txnId;
+                }
+                log.info("returnUrl in ICICI redirect::::" + returnURL);
+                redirectURL.append(returnURL);
+            } else {
+                log.info("returnUrl is null in ICICI redirect, using default::::" + defaultURL);
+                redirectURL.append(defaultURL);
+            }
+            formData.remove(returnUrlKey);
+            formData.remove("secureHash");
+            formData.remove("merchantId");
+            formData.remove("merchantTxnNo");
+
+            httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(redirectURL.toString())
+                    .build().encode().toUri());
         }else {
-            httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(formData.get(returnUrlKey).get(0))
+            // Use returnURL if available, otherwise fall back to formData, then defaultURL
+            String fallbackUrl = returnURL != null ? returnURL :
+                                (formData.get(returnUrlKey) != null ? formData.get(returnUrlKey).get(0) : defaultURL);
+            log.info("Fallback URL in redirect::::"+fallbackUrl);
+            httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(fallbackUrl)
                     .queryParams(formData).build().encode().toUri());
         }
 
         return new ResponseEntity<>(httpHeaders, HttpStatus.FOUND);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleError(Exception e) {
-        log.error("EXCEPTION_WHILE_REDIRECTING", e);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(defaultURL).build().encode().toUri());
-        return new ResponseEntity<>(httpHeaders, HttpStatus.FOUND);
-    }
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Object> handleError(Exception e) {
+		log.error("EXCEPTION_WHILE_REDIRECTING", e);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setLocation(UriComponentsBuilder.fromHttpUrl(defaultURL).build().encode().toUri());
+		return new ResponseEntity<>(httpHeaders, HttpStatus.FOUND);
+	}
 
 }

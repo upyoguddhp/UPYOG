@@ -1,27 +1,125 @@
-import { Card, CardHeader, CardSubHeader, CardText, Loader, SubmitBar } from "@egovernments/digit-ui-react-components";
+import { Card, CardHeader, CardSubHeader, CardText, Loader, SubmitBar } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect } from "react";
 import { cardBodyStyle, stringReplaceAll } from "../utils";
 //import { map } from "lodash-es";
 
-const PropertyTax = ({ t, config, onSelect, userType, formData }) => {
+const PropertyTax = ({
+  t,
+  config,
+  onSelect,
+  userType,
+  formData
+}) => {
   const tenantId = Digit.ULBService.getCurrentTenantId();
   const stateId = Digit.ULBService.getStateId();
   sessionStorage.removeItem("docReqScreenByBack");
-
   const docType = config?.isMutation ? ["MutationDocuments"] : "Documents";
-
-  const { isLoading, data: Documentsob = {} } = Digit.Hooks.pt.usePropertyMDMS(stateId, "PropertyTax", docType);
-
+  const {
+    isLoading,
+    data: Documentsob = {}
+  } = Digit.Hooks.pt.usePropertyMDMS(stateId, "PropertyTax", docType);
   let docs = Documentsob?.PropertyTax?.[config?.isMutation ? docType[0] : docType];
-  if (!config?.isMutation) docs = docs?.filter((doc) => doc["digit-citizen"]);
+  if (!config?.isMutation) docs = docs?.filter(doc => doc["digit-citizen"]);
   function onSave() {}
-
   function goNext() {
     onSelect();
   }
+  function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+  function generateCodeVerifier(length) {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    let codeVerifier = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      codeVerifier += characters.charAt(randomIndex);
+    }
+    return codeVerifier;
+  }
+  function sha256(plain) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    return window.crypto.subtle.digest("SHA-256", data);
+  }
+  function base64UrlEncode(buffer) {
+    const padding = "=".repeat((4 - buffer.length % 4) % 4);
+    const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") + padding;
+  }
+  async function generateCodeChallenge(codeVerifier) {
+    const hashedBuffer = await sha256(codeVerifier);
+    const codeChallenge = base64UrlEncode(hashedBuffer);
+    return codeChallenge;
+  }
+  useEffect(()=>{
+window.process={...window.process}
+// console.log("enviorement Variable",process.env.NODE_ENV,process.env.REACT_APP_PROXY_API,
+// process.env)
 
-  return (
-    <React.Fragment>
+  },[])
+
+  const {  isSuccess,error,count, mutate: assessmentMutate } = Digit.Hooks.createTokenAPI();
+const onConcent=async (e)=>{
+  const data = await Digit.DigiLockerService.authorization({module:"PT"});
+  e.preventDefault()
+  console.log("data",data)
+  sessionStorage.setItem("code_verfier",data?.dlReqRef)
+  //let redirectURL=data?.redirectURL.replace("https://upyog-test.niua.org","http://localhost:3000")
+  window.location.href=data?.redirectURL    
+ 
+}
+useEffect(() => {
+  async function run() {
+    if (window.location.href.includes("code")) {
+      let code = window.location.href.split("=")[1].split("&")[0];
+
+      let TokenReq = {
+        dlReqRef: sessionStorage.getItem("code_verfier"),
+        code: code,
+        module: "PT",
+      };
+
+      console.log("token", code, TokenReq, sessionStorage.getItem("code_verfier"));
+
+      const data = await Digit.DigiLockerService.token({ TokenReq });
+
+      sessionStorage.setItem(
+        "DigiLocker.token1",
+        data?.TokenRes?.access_token
+      );
+    }
+  }
+
+  run();
+}, []);
+// Function to set data with an expiration time in sessionStorage
+function setItemWithExpiry(key, value, expiryMinutes) {
+  const now = new Date();
+  const expiryTime = now.getTime() + (expiryMinutes * 60 * 1000); // Convert minutes to milliseconds
+
+    const item = {
+      value: value,
+      expiry: expiryTime
+    };
+    sessionStorage.setItem(key, JSON.stringify(item));
+  }
+
+  // Function to get data from sessionStorage, checking for expiration
+  function getItemWithExpiry(key) {
+    const itemString = sessionStorage.getItem(key);
+    if (!itemString) {
+      return null;
+    }
+    const item = JSON.parse(itemString);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      // Item has expired, remove it
+      sessionStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  }
+  return <React.Fragment>
       <Card>
         <CardHeader>{!config.isMutation ? t("PT_DOC_REQ_SCREEN_HEADER") : t("PT_REQIURED_DOC_TRANSFER_OWNERSHIP")}</CardHeader>
         <div>
@@ -32,40 +130,37 @@ const PropertyTax = ({ t, config, onSelect, userType, formData }) => {
           <CardText className={"primaryColor"}>{t("PT_DOC_REQ_SCREEN_LABEL_TEXT")}</CardText>
           <div>
             {isLoading && <Loader />}
-            {Array.isArray(docs)
-              ? config?.isMutation ?
-                  docs.map(({ code, dropdownData }, index) => (
-                    <div key={index}>
+            {Array.isArray(docs) ? config?.isMutation ? docs.map(({
+            code,
+            dropdownData
+          }, index) => <div key={index}>
                       <CardSubHeader>
                         {index + 1}. {t(code)}
                       </CardSubHeader>
                       <CardText className={"primaryColor"}>
-                        {dropdownData.map((dropdownData) => (
-                          t(dropdownData?.code)
-                        )).join(', ')}
+                        {dropdownData.map(dropdownData => t(dropdownData?.code)).join(', ')}
                       </CardText>
                       {/* <CardText>{t(`${code.split('.')[0]}.${code.split('.')[1]}.${code.split('.')[1]}_DESCRIPTION`)}</CardText> */}
-                    </div>
-                  )) :
-                  docs.map(({ code, dropdownData }, index) => (
-                    <div key={index}>
+                    </div>) : docs.map(({
+            code,
+            dropdownData
+          }, index) => <div key={index}>
                       <CardSubHeader>
                         {index + 1}. {t("PROPERTYTAX_" + stringReplaceAll(code, ".", "_") + "_HEADING")}
                       </CardSubHeader>
-                      {dropdownData.map((dropdownData) => (
-                        <CardText className={"primaryColor"}>{t("PROPERTYTAX_" + stringReplaceAll(dropdownData?.code, ".", "_") + "_LABEL")}</CardText>
-                      ))}
-                    </div>
-                  ))
-              : null}
+                      {dropdownData.map(dropdownData => <CardText className={"primaryColor"}>{t("PROPERTYTAX_" + stringReplaceAll(dropdownData?.code, ".", "_") + "_LABEL")}</CardText>)}
+                    </div>) : null}
           </div>
         </div>
         <span>
           <SubmitBar label={t("PT_COMMON_NEXT")} onSubmit={onSelect} />
         </span>
+        <span className="pt-auto-74">
+          <SubmitBar label={t("PT_DIGILOCKER_CONSENT")} onSubmit={e => {
+          onConcent(e);
+        }} />
+        </span>
       </Card>
-    </React.Fragment>
-  );
+    </React.Fragment>;
 };
-
 export default PropertyTax;

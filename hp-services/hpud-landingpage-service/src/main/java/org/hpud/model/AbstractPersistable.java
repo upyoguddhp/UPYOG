@@ -46,11 +46,41 @@
  *
  */
 
+<<<<<<< HEAD:hp-services/hpud-landingpage-service/src/main/java/org/hpud/model/AbstractPersistable.java
 package org.hpud.model;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 import java.io.Serializable;
+=======
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+//import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author Vaibhav.K
+ *
+ */
+@Ignore
+@RunWith(SpringJUnit4ClassRunner.class)
+@Transactional
+@Rollback
+@ActiveProfiles("test")
+@ContextConfiguration(
+        //loader = SpringockitoContextLoader.class,
+        locations = {
+                "classpath*:config/spring/applicationContext-properties.xml",
+                "classpath*:config/spring/test-applicationContext-hibernate.xml",
+                "classpath*:config/spring/applicationContext-egi.xml",
+                "classpath*:config/spring/applicationContext-eis.xml"
+        })
+public abstract class EISAbstractSpringIntegrationTest {
+>>>>>>> niua-upstream/niua-dev-2.0:finance/egov/egov-eis/src/test/java/org/egov/eis/EISAbstractSpringIntegrationTest.java
 
 @MappedSuperclass
 public abstract class AbstractPersistable<PK extends Serializable> implements Serializable {

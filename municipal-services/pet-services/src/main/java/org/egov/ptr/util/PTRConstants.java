@@ -1,5 +1,6 @@
 package org.egov.ptr.util;
 
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Component
+=======
+>>>>>>> niua-upstream/niua-dev-2.0
 public class PTRConstants {
 
 //	private PTRConstants() {
@@ -46,7 +49,6 @@ public class PTRConstants {
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
 //    
-	public static final String ACTION_PAY = "PAY";
 
 	public static final String ACTION_PAID = "PAID";
 
@@ -142,7 +144,7 @@ public class PTRConstants {
 
 	public static final String WF_STATUS_PAID_LOCALE = "PT_NOTIF_WF_STATE_LOCALE_PAID";
 
-	public static final String NOTIFICATION_MODULENAME = "rainmaker-ptr";
+	public static final String NOTIFICATION_MODULENAME = "rainmaker-ptr-notification";
 
 	public static final String WORKFLOW_SENDBACK_CITIZEN = "SENDBACKTOCITIZEN";
 
@@ -264,6 +266,10 @@ public class PTRConstants {
 	public static final String NOTIFICATION_APPROVE = "ptr.en.counter.approve";
 
 	public static final String NOTIFICATION_REJECT = "ptr.en.counter.reject";
+	
+	public static final String NOTIFICATION_EXPIRE = "ptr.en.counter.expire";
+	
+	public static final String NOTIFICATION_ABOUT_TO_EXPIRE = "ptr.en.counter.aboutto.expire";
 
 	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 
@@ -271,6 +277,7 @@ public class PTRConstants {
 
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-PTR";
 
+<<<<<<< HEAD
 	// APPLICATION STATUS
 	public static final String APPLICATION_STATUS_INITIATED = "INITIATED";
 	public static final String APPLICATION_STATUS_PENDINGFORMODIFICATION = "PENDINGFORMODIFICATION";
@@ -305,4 +312,56 @@ public class PTRConstants {
     public static final String ALFRESCO_COMMON_CERTIFICATE_TYPE = "PDF";
     public static final String ALFRESCO_DOCUMENT_TYPE = "CERT";
     public static final String ALFRESCO_TL_CERTIFICATE_COMMENT = "Signed Certificate";
+=======
+	public static final String PET_BUSINESS_SERVICE = "ptr";
+	
+	public static final String PET_MODULE_NAME = "pet-services";
+
+	public static final String STATUS_APPLIED = "Applied";
+
+	public static final String STATUS_DOCVERIFIED = "Documents Verified";
+
+	public static final String STATUS_APPROVED = "Approved";
+
+	public static final String STATUS_REGISTRATIONCOMPLETED = "Registration Completed";
+
+	public static final String STATUS_EXPIRED = "Expired";
+
+	public static final String STATUS_REJECTED = "Rejected";
+
+	public static final String ACTION_APPROVE = "APPROVE";
+
+	public static final String ACTION_APPLY = "APPLY";
+
+	public static final String ACTION_VERIFY = "VERIFY";
+
+	public static final String ACTION_REJECT = "REJECT";
+
+	public static final String ACTION_PAY = "PAY";
+	
+	public static final String ACTION_EXPIRE = "EXPIRE";
+	
+	public static final String ACTION_ABOUT_TO_EXPIRE = "ABOUTTOEXPIRE";
+
+	public static final String NEW_PET_APPLICATION = "NEWAPPLICATION";
+
+	public static final String RENEW_PET_APPLICATION = "RENEWAPPLICATION";
+
+	public static final String PET_REGISTRATION_FEE = "PET_REGISTRATION_FEE";
+
+	public static final String PET_MASTER_MODULE_NAME = "PetService";
+	
+	public static final String PET_MASTER_PET_TYPE = "PetType";
+	
+	public static final String PET_MASTER_BREED_TYPE = "BreedType";
+
+	public static final String BILLING_SERVICE = "BillingService";
+
+	public static final String CALCULATION_TYPE = "CalculationType";
+	
+	public static final String JSONPATH_PETSERVICE_RESPONSE = "$.MdmsRes.PetService";
+	
+	public static final String PET_TAX_MASTER_CODE= "PET_REGISTRATION_FEE";
+	
+>>>>>>> niua-upstream/niua-dev-2.0
 }

@@ -129,7 +129,7 @@ const Address = {
         "Unique Identifier of the tenant to which user primarily belongs"
     },
     doorNo: {
-      type: "string",
+      type: ["string", "null"],
       description: "House number or door number."
     },
     latitude: {
@@ -169,7 +169,7 @@ const Address = {
     },
     landmark: {
       description: "additional landmark to help locate the address",
-      type: ["string", "null"],
+      type: ["string", "null"]
     },
     city: {
       description:
@@ -541,6 +541,11 @@ const RequestInfo = {
       description: "unique API ID",
       maxLength: 128
     },
+    /*
+    * Below fields are not used / Mandatory for Micro-Ui
+    * If Anyone running this service in Mono-Ui Steup, please uncomment this
+
+
     ver: {
       type: "string",
       description:
@@ -568,7 +573,7 @@ const RequestInfo = {
       description:
         "API key (API key provided to the caller in case of server to server communication)",
       maxLength: 256
-    },
+    }, */
     msgId: {
       type: "string",
       description: "Unique request message id from the caller",
@@ -590,7 +595,7 @@ const RequestInfo = {
       readOnly: true
     }
   },
-  required: ["apiId", "ver", "msgId", "action"]
+  required: ["apiId", "msgId"]
 };
 
 const FireNOCRequest = {

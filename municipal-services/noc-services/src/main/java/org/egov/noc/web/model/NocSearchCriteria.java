@@ -2,7 +2,7 @@ package org.egov.noc.web.model;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 
 @Getter
 @Setter
@@ -22,34 +22,34 @@ import org.hibernate.validator.constraints.SafeHtml;
 public class NocSearchCriteria {
 
     @NotNull
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("tenantId")
     private String tenantId;
 
     @JsonProperty("ids")
     private List<String> ids;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("applicationNo")
     private String applicationNo;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("mobileNumber")
     private String mobileNumber;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("nocNo")
     private String nocNo;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("source")
     private String source;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("nocType")
     private String nocType;
 
-    @SafeHtml
+    @CustomSafeHtml
     @JsonProperty("sourceRefId")
     private String sourceRefId;
 
@@ -67,6 +67,9 @@ public class NocSearchCriteria {
     
     @JsonProperty("status")
     private List<String> status;
+
+    @JsonProperty("applicationStatus")
+    private String applicationStatus;
 
     public boolean isEmpty() {
         return (this.tenantId == null && this.ids == null && this.applicationNo == null

@@ -30,11 +30,16 @@ public class EventDetails {
 	private String address;
 
 	public boolean isEmpty(EventDetails details) {
+<<<<<<< HEAD
 		if (null == details.getFromDate() || null == details.getToDate() || null == details.getLatitude()
 				|| null == details.getLongitude()) {
 			return true;
 		}
 		return false;
+=======
+		return null == details.getFromDate() || null == details.getToDate() || null == details.getLatitude()
+				|| null == details.getLongitude();
+>>>>>>> niua-upstream/niua-dev-2.0
 	}
 
 }

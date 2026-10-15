@@ -4,7 +4,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-   //mode: 'development',
+  //  mode: 'development',
   mode: 'production',
   entry: "./src/index.js",
   devtool: "source-map",
@@ -30,6 +30,10 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({ inject: true, template: "public/index.html" }),
-  ],
+    new HtmlWebpackPlugin({ 
+      inject: true, 
+      template: "public/index.html",
+      scriptLoading: "defer" // Ensures scripts are loaded externally, not inline
+     })
+  ]
 };

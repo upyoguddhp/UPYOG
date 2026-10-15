@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.ingestpipeline.model.SourceReferences;
 import com.ingestpipeline.model.TargetReferences;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,9 @@ import com.ingestpipeline.repository.TargetDataDao;
 import com.ingestpipeline.util.Constants;
 import com.ingestpipeline.util.JSONUtil;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 /**
  * This is a Service Implementation for all the actions which are with respect
  * to Elastic Search
@@ -122,7 +124,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 					break;
 				}
 			}
-
+			LOGGER.info("businessTypeVal :: " + businessTypeVal);
 			DomainIndexConfig indexConfig = domainConfig.getIndexConfig(businessTypeVal.toString());
 			LOGGER.info("indexConfig ## "+indexConfig);
 			if(indexConfig != null){
@@ -160,9 +162,12 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 						JSONUtil.replaceFieldValue(queryNode, ref.getArgument(), ref.getValue());
 
 					}
-					LOGGER.info("Query node "+ queryNode);
+					LOGGER.info("Query node "+ queryNode+ " -- INDEX NAME:   "+ indexName);					
 					Map domainNode = elasticService.search(indexName, queryNode.toString());
+					LOGGER.info("domainNode outside if",  domainNode);
 					if(domainNode != null){
+						LOGGER.info("domainNode ",  domainNode);
+						LOGGER.info("businessTypeVal ",  businessTypeVal);
 						Object transDomainResponse = enrichTransform.transform(domainNode, businessTypeVal.toString());
 						incomingData.put("domainObject", transDomainResponse);
 						enhanceData(incomingData);
@@ -237,8 +242,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	 */
 	private String getBase64Value(String userName, String password) {
 		String authString = String.format("%s:%s", userName, password);
-		byte[] encodedAuthString = Base64.encodeBase64(authString.getBytes(Charset.forName(US_ASCII)));
-		return String.format(BASIC_AUTH, new String(encodedAuthString));
+		byte[] encodedAuthString = Base64.getEncoder().encode(authString.getBytes(StandardCharsets.US_ASCII));
+		return String.format(BASIC_AUTH, new String(encodedAuthString, StandardCharsets.US_ASCII));
 	}
 	
 	/**
@@ -297,9 +302,17 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 					}
 					LOGGER.info("Enhance Query node "+ queryNode);
 					List domainNode = elasticService.searchMultiple(indexName, queryNode.toString());
-					if(domainNode != null){
-						Object transDomainResponse = enrichTransform.transformEnhanceData(domainNode, businessTypeVal.toString());
+					LOGGER.info("domainNode"+domainNode);
+//					if(domainNode != null){
+//						Object transDomainResponse = enrichTransform.transformEnhanceData(domainNode, businessTypeVal.toString());
+					if(domainNode != null && !domainNode.isEmpty()){
+						List cleanList = new ArrayList();
+						Map firstHit = (Map) domainNode.get(0);
+						cleanList.add(firstHit.get("_source"));
+						Object transDomainResponse = enrichTransform.transformEnhanceData(cleanList, businessTypeVal.toString());
+						LOGGER.info("transDomainResponse"+transDomainResponse);
 						Object domainObject = incomingData.get("domainObject");
+						LOGGER.info("domainObject"+domainObject);
 						Map domainMap = (Map) domainObject;
 						domainMap.put("assessmentsDetails", transDomainResponse);
 

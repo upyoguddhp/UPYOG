@@ -1,4 +1,5 @@
-import { CardLabel, CitizenInfoLabel, Dropdown, FormStep, LabelFieldPair, RadioButtons } from "@egovernments/digit-ui-react-components";
+import { CardLabel, CitizenInfoLabel, Dropdown, LabelFieldPair, RadioButtons } from "@nudmcdgnpm/digit-ui-react-components";
+import  {FormStep}  from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect, useState } from "react";
 import Timeline from "../components/TLTimeline";
 

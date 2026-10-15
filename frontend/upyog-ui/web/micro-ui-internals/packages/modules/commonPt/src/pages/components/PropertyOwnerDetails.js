@@ -12,7 +12,7 @@ import {
   LinkButton,
   DeleteIcon,
   CardSectionHeader
-} from "@egovernments/digit-ui-react-components";
+} from "@nudmcdgnpm/digit-ui-react-components";
 import _ from "lodash";
 import React, { useState, useMemo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -113,6 +113,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
   const formValue = watch();
 
   useEffect(() => {
+    if (ownershipCategory?.code === "INDIVIDUAL.MULTIPLEOWNERS") {
+      if (ownerDetails.length > 1) {
+        clearErrors("mulipleOwnerError");
+      } else if (ownerDetails.length === 1) {
+        setError("mulipleOwnerError", { type: "owner_missing", message: `TL_ERROR_MULTIPLE_OWNER` });
+      }
+    } else {
+      clearErrors("mulipleOwnerError");
+    }
+
+    const data = ownerDetails?.map((e) => {
+      return e;
+    });
+    onSelect(config?.key, data);
+  }, [ownerDetails, ownershipCategory, clearErrors, setError, onSelect]);
+
+  useEffect(() => {
     let hasErrors = false;
     const part = {};
     ownerDetails.map((own) => {
@@ -178,7 +195,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
   return (
     <div>
       <LabelFieldPair>
-        <CardLabel className="">{`${t("TL_NEW_OWNER_DETAILS_OWNERSHIP_TYPE_LABEL")}*`}</CardLabel>
+        <CardLabel className="">{`${t("TL_NEW_OWNER_DETAILS_OWNERSHIP_TYPE_LABEL")}`}<span className="check-page-link-button"> *</span></CardLabel>
         <Controller
           name="ownershipCategory"
           defaultValue={ownershipCategory}
@@ -186,20 +203,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
           rules={{
             required: t("REQUIRED_FIELD"),
           }}
-          render={({ value, onChange, onBlur }) => (
+          render={({ field }) => (
             <Dropdown
               className="form-field"
-              selected={value}
+              selected={field.value}
               option={dropdownData}
               select={(value) => {
+                if (value?.value.includes("INSTITUTIONAL")) {
+                  value.value = value.value.split('.')[0]; 
+                }
                 if (!value?.code?.includes("MULTIPLEOWNERS") && ownerDetails?.length > 1) {
                   setOwnerDetails([...ownerDetails.filter((own, ind) => ind == 0)]);
                 }
-                onChange(value);
+                field.onChange(value);
                 setOwnerCategory(value);
               }}
               optionKey="i18nKey"
-              onBlur={onBlur}
+              onBlur={field.onBlur}
               t={t}
             />
           )}
@@ -233,7 +253,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                 <React.Fragment>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_INSTITUTION_NAME")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_INSTITUTION_NAME")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"institutionName" + index}
@@ -243,23 +263,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => {
-                            return /^[a-zA-Z-.`' ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
+                            return /^[a-zA-Z ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
                           },
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <TextInput
                             t={t}
                             type={"text"}
                             isMandatory={false}
                             optionKey="i18nKey"
                             name={"institutionName" + index}
-                            value={value}
+                            value={field.value}
                             onChange={(ev) => {
-                              onChange(ev.target.value);
+                              field.onChange(ev.target.value);
                               updateState("institutionName", index, ev.target.value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -268,7 +288,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["institutionName" + index] ? errors?.["institutionName" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel className="">{`${t("PT_INSTITUTION_TYPE")}*`}</CardLabel>
+                    <CardLabel className="">{`${t("PT_INSTITUTION_TYPE")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"institutionType" + index}
@@ -278,18 +298,18 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <Dropdown
-                            selected={institutionTypeMenu?.length === 1 ? Menu1[0] : value}
+                            selected={institutionTypeMenu?.length === 1 ? Menu1[0] : field.value}
                             disable={institutionTypeMenu?.length === 1 || editScreen}
                             option={institutionTypeMenu ? institutionTypeMenu.sort((a, b) => a.name.localeCompare(b.name)) : []}
                             select={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("institutionType", index, value);
                             }}
                             optionKey="i18nKey"
                             t={t}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -298,7 +318,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["institutionType" + index] ? errors?.["institutionType" + index]?.message : ""}</CardLabelError>
                   <CardSectionHeader>{t("TL_AUTHORIZED_PERSON_DETAILS")}</CardSectionHeader>
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_OWNER_NAME")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_OWNER_NAME")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"name" + index}
@@ -308,23 +328,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => {
-                            return /^[a-zA-Z-.`' ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
+                            return /^[a-zA-Z ]+$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
                           },
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <TextInput
                             t={t}
                             type={"text"}
                             isMandatory={false}
                             optionKey="i18nKey"
                             name={"name" + index}
-                            value={value}
+                            value={field.value}
                             onChange={(ev) => {
-                              onChange(ev.target.value);
+                              field.onChange(ev.target.value);
                               updateState("name", index, ev.target.value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -333,7 +353,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["name" + index] ? errors?.["name" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_LANDLINE_NUMBER_FLOATING_LABEL")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_LANDLINE_NUMBER_FLOATING_LABEL")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"altContactNumber" + index}
@@ -344,20 +364,20 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => (/^[0-9]{11}$/i.test(value) ? true : t("ERR_DEFAULT_INPUT_FIELD_MSG")),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <MobileNumber
                             type={"text"}
                             t={t}
                             maxLength={11}
-                            value={value}
+                            value={field.value}
                             name={"altContactNumber" + index}
                             onChange={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("altContactNumber", index, value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
                             labelStyle={{ border: "1px solid #000", borderRight: "none" }}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -366,7 +386,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["altContactNumber" + index] ? errors?.["altContactNumber" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_FORM3_MOBILE_NUMBER")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_FORM3_MOBILE_NUMBER")}`}<span className="check-page-link-button"> *</span></CardLabel>
 
                     <div className="form-field">
                       <Controller
@@ -378,17 +398,17 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => (/[6-9]{1}[0-9]{9}/i.test(value) ? true : t("CORE_COMMON_APPLICANT_MOBILE_NUMBER_INVALID")),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <MobileNumber
-                            value={value}
+                            value={field.value}
                             name={"mobileNumber" + index}
                             onChange={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("mobileNumber", index, value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
                             labelStyle={{ border: "1px solid #000", borderRight: "none" }}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -410,7 +430,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["mobileNumber" + index] ? errors?.["mobileNumber" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("TL_NEW_DESIG_OWNER_LABEL")}*`}</CardLabel>
+                    <CardLabel>{`${t("TL_NEW_DESIG_OWNER_LABEL")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"designation" + index}
@@ -420,23 +440,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => {
-                            return /^[a-zA-Z-.`' ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
+                            return /^[a-zA-Z ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
                           },
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <TextInput
                             t={t}
                             type={"text"}
                             isMandatory={false}
                             optionKey="i18nKey"
                             name={"designation" + index}
-                            value={value}
+                            value={field.value}
                             onChange={(ev) => {
-                              onChange(ev.target.value);
+                              field.onChange(ev.target.value);
                               updateState("designation", index, ev.target.value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -475,7 +495,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                 </ React.Fragment> :
                 <React.Fragment>
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_FORM3_MOBILE_NUMBER")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_FORM3_MOBILE_NUMBER")}`}<span className="check-page-link-button"> *</span></CardLabel>
 
                     <div className="form-field">
                       <Controller
@@ -487,17 +507,17 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => (/[6-9]{1}[0-9]{9}/i.test(value) ? true : t("CORE_COMMON_APPLICANT_MOBILE_NUMBER_INVALID")),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <MobileNumber
-                            value={value}
+                            value={field.value}
                             name={"mobileNumber" + index}
                             onChange={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("mobileNumber", index, value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
                             labelStyle={{ border: "1px solid #000", borderRight: "none" }}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -519,7 +539,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["mobileNumber" + index] ? errors?.["mobileNumber" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_OWNER_NAME")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_OWNER_NAME")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"name" + index}
@@ -529,23 +549,23 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                           validate: (value) => {
-                            return /^[a-zA-Z-.`' ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
+                            return /^[a-zA-Z ]+$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE");
                           },
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <TextInput
                             t={t}
                             type={"text"}
                             isMandatory={false}
                             optionKey="i18nKey"
                             name={"name" + index}
-                            value={value}
+                            value={field.value}
                             onChange={(ev) => {
-                              onChange(ev.target.value);
+                              field.onChange(ev.target.value);
                               updateState("name", index, ev.target.value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -554,7 +574,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["name" + index] ? errors?.["name" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_FORM3_GENDER")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_FORM3_GENDER")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"gender" + index}
@@ -564,20 +584,20 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <RadioOrSelect
                             name={"gender" + index}
                             options={menu}
-                            selectedOption={value}
+                            selectedOption={field.value}
                             optionKey="code"
                             onSelect={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("gender", index, value);
                             }}
                             t={t}
                             disabled={isUpdateProperty || isEditProperty}
                             isDropDown={window.location.href.includes("/employee") ? true : false}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -586,7 +606,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["gender" + index] ? errors?.["gender" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_FORM3_GUARDIAN_NAME")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_FORM3_GUARDIAN_NAME")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"fatherOrHusbandName" + index}
@@ -595,22 +615,22 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         control={control}
                         rules={{
                           required: t("REQUIRED_FIELD"),
-                          validate: (value) => (/^[a-zA-Z-.`' ]*$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE")),
+                          validate: (value) => (/^[a-zA-Z ]+$/i.test(value) ? true : t("PT_NAME_ERROR_MESSAGE")),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <TextInput
                             t={t}
                             type={"text"}
                             isMandatory={false}
                             optionKey="i18nKey"
                             name={"fatherOrHusbandName" + index}
-                            value={value}
+                            value={field.value}
                             onChange={(ev) => {
-                              onChange(ev.target.value);
+                              field.onChange(ev.target.value);
                               updateState("fatherOrHusbandName", index, ev.target.value);
                             }}
                             disable={isUpdateProperty || isEditProperty}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -621,7 +641,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   </CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel>{`${t("PT_FORM3_RELATIONSHIP")}*`}</CardLabel>
+                    <CardLabel>{`${t("PT_FORM3_RELATIONSHIP")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"relationship" + index}
@@ -631,20 +651,20 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <RadioOrSelect
                             name={"relationship" + index}
                             options={GuardianOptions}
-                            selectedOption={value}
+                            selectedOption={field.value}
                             optionKey="i18nKey"
                             onSelect={(value) => {
-                              onChange(value);
+                              field.onChange(value);
                               updateState("relationship", index, value);
                             }}
                             t={t}
                             disabled={isUpdateProperty || isEditProperty}
                             isDropDown={window.location.href.includes("/employee") ? true : false}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />
@@ -653,7 +673,7 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                   <CardLabelError style={errorStyle}>{touched?.["relationship" + index] ? errors?.["relationship" + index]?.message : ""}</CardLabelError>
 
                   <LabelFieldPair>
-                    <CardLabel className="">{`${t("PT_SPECIAL_APPLICANT_CATEGORY")}*`}</CardLabel>
+                    <CardLabel className="">{`${t("PT_SPECIAL_APPLICANT_CATEGORY")}`}<span className="check-page-link-button"> *</span></CardLabel>
                     <div className="form-field">
                       <Controller
                         key={"ownerType" + index}
@@ -663,19 +683,19 @@ const PropertyOwnerDetails = ({ t, config, onSelect, userType, formData, formSta
                         rules={{
                           required: t("REQUIRED_FIELD"),
                         }}
-                        render={({ value, onChange, onBlur }) => (
+                        render={({ field }) => (
                           <Dropdown
-                            selected={Menu1?.length === 1 ? Menu1[0] : value}
+                            selected={Menu1?.length === 1 ? Menu1[0] : field.value}
                             disable={Menu1?.length === 1 || editScreen}
                             option={Menu1 ? Menu1.sort((a, b) => a.name.localeCompare(b.name)) : []}
                             select={(value) => {
-                              onChange(value);
+                              field.onChange(value);
 
                               updateState("ownerType", index, value);
                             }}
                             optionKey="i18nKey"
                             t={t}
-                            onBlur={onBlur}
+                            onBlur={field.onBlur}
                           />
                         )}
                       />

@@ -79,12 +79,28 @@ public class FSMValidator {
 				mdmsValidator.validateApplicationChannel(fsm.getSource());
 
 			}
+			if (!StringUtils.isEmpty(fsm.getPaymentPreference())) {
+				validatePaymentPreference(fsm.getPaymentPreference());
+
+			}
 			if (!StringUtils.isEmpty(fsm.getSanitationtype())) {
 				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 			}
 		}
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 		validateNoOfTrips(fsmRequest, mdmsData);
+	}
+
+	private void validatePaymentPreference(String paymentPreference) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		if (!paymentPreference.isEmpty()) {
+			errorMap.put(FSMErrorConstants.INVALID_PAYMENT_PREFERENCE, "Payment Preference is invalid");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
 	}
 
 	private void validateEmployeeData(FSM fsm, FSMRequest fsmRequest, Object mdmsData) {
@@ -293,10 +309,7 @@ public class FSMValidator {
 		checkUpdateOrActionError(searchResult, fsmRequest, mdmsData, fsm);
 
 		// SAN-889: Added validation for recevied payment
-		
-		// #SM-2099 removed validation for received payment type
-
-		
+        // SM-2099 :Removed validation for received payment		
 		/*
 		 * if (null != fsmRequest.getWorkflow() && null !=
 		 * fsmRequest.getWorkflow().getAction() &&
@@ -314,9 +327,7 @@ public class FSMValidator {
 		 * log.info("additionalDetails.get(\"receivedPayment\"):: " +
 		 * additionalDetails.get(FSMConstants.RECEIVED_PAYMENT));
 		 * mdmsValidator.validateReceivedPaymentType(additionalDetails.get(FSMConstants.
-		 * RECEIVED_PAYMENT));
-		 * 
-		 * }
+		 * RECEIVED_PAYMENT)); }
 		 */
 		validations(fsmRequest, searchResult, mdmsData, fsm);
 

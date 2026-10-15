@@ -2,10 +2,11 @@ import {
     CardLabel, FormStep,
     UploadFile,
     Toast,
-    Loader
-} from "@egovernments/digit-ui-react-components";
+    Loader,
+    CardText
+} from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useEffect, useState } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation,  } from "react-router-dom";
 
 const OCUploadPlanDiagram = ({ t, config, onSelect, userType, formData, ownerIndex = 0, addNewOwner, isShowToast, isSubmitBtnDisable, setIsShowToast }) => {
     const tenantId = Digit.ULBService.getCurrentTenantId();
@@ -13,7 +14,7 @@ const OCUploadPlanDiagram = ({ t, config, onSelect, userType, formData, ownerInd
     const [uploadedFile, setUploadedFile] = useState(() => formData?.uploadData?.file || null);
     const [file, setFile] = useState(formData?.uploadData?.file);
     const [uploadMessage, setUploadMessage] = useState("");
-    const history = useHistory();
+    const navigate = Digit.Hooks.useCustomNavigate();
 
     function selectfile(e) {
         setUploadedFile(e.target.files[0]);
@@ -29,7 +30,7 @@ const OCUploadPlanDiagram = ({ t, config, onSelect, userType, formData, ownerInd
             setUploadMessage("");
         }
         if (isShowToast) {
-            history.push(
+            navigate(
                 `/upyog-ui/citizen/obps/edcrscrutiny/oc-apply/acknowledgement`,
                 { data: isShowToast?.label ? isShowToast?.label : "BPA_INTERNAL_SERVER_ERROR", type: "ERROR"}
               );
@@ -56,7 +57,8 @@ const OCUploadPlanDiagram = ({ t, config, onSelect, userType, formData, ownerInd
             onAdd={onAdd}
             isMultipleAllow={true}
         >
-            <CardLabel>{`${t("BPA_OC_PLAN_DIAGRAM_DXF")} *`}</CardLabel>
+            <CardLabel>{`${t("BPA_OC_PLAN_DIAGRAM_DXF")}`}<span className="check-page-link-button"> *</span></CardLabel>
+            <CardText>{t("please upload same/updated dxf file")}</CardText>
             <UploadFile
                 id={"oc-doc"}
                 extraStyleName={"propertyCreate"}

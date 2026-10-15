@@ -41,6 +41,19 @@ public class ServiceRequestValidator {
      */
     public void validateCreate(ServiceRequest request, Object mdmsData){
         Map<String,String> errorMap = new HashMap<>();
+        if (request.getService() == null) {
+            errorMap.put("SERVICE_MISSING", "Service object is mandatory");
+        } else {
+            if (request.getService().getServiceCode() == null || request.getService().getServiceCode().trim().isEmpty()) {
+                errorMap.put("SERVICE_CODE_MISSING", "serviceCode is mandatory");
+            }
+            if (request.getService().getPriority() == null) {
+                errorMap.put("PRIORITY_MISSING", "priority is mandatory");
+            }
+            if (request.getService().getAddress() == null) {
+                errorMap.put("ADDRESS_MISSING", "address is mandatory");
+            }
+        }
         validateUserData(request,errorMap);
         validateSource(request.getService().getSource());
         validateMDMS(request, mdmsData);
@@ -58,11 +71,12 @@ public class ServiceRequestValidator {
     public void validateUpdate(ServiceRequest request, Object mdmsData){
 
         String id = request.getService().getId();
+        String tenantId = request.getService().getTenantId();
         validateSource(request.getService().getSource());
         validateMDMS(request, mdmsData);
         validateDepartment(request, mdmsData);
         validateReOpen(request);
-        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
+        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).tenantId(tenantId).build();
         criteria.setIsPlainSearch(false);
         List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
 
@@ -228,7 +242,7 @@ public class ServiceRequestValidator {
         if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE" ) && criteria.isEmpty())
             throw new CustomException("INVALID_SEARCH","Search without params is not allowed");
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE") && criteria.getTenantId().split("\\.").length == 1){
+        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE") && criteria.getTenantId().split("\\.").length == config.getStateLevelTenantIdLength()){
             throw new CustomException("INVALID_SEARCH", "Employees cannot perform state level searches.");
         }
 

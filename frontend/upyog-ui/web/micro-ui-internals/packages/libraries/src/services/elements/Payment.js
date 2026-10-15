@@ -8,14 +8,27 @@ export const PaymentService = {
       useCache: false,
       method: "POST",
       auth: false,
-      userService: false,
+      userService: true,
       params: { tenantId, ...filters },
     })
       .then((d) => {
         return d;
       })
       .catch((err) => {
-        if (err?.response?.data?.Errors?.[0]?.code === "EG_BS_BILL_NO_DEMANDS_FOUND") return { Bill: [] };
+        const errorCode =
+          err?.response?.data?.Errors?.[0]?.code ||
+          err?.Errors?.[0]?.code ||
+          "";
+        const status = err?.response?.status;
+        // No active demand / client bill errors → treat as no amount due.
+        if (
+          status === 400 ||
+          errorCode === "EG_BS_BILL_NO_DEMANDS_FOUND" ||
+          errorCode === "EMPTY_DEMANDS" ||
+          String(errorCode).includes("NO_DEMAND")
+        ) {
+          return { Bill: [] };
+        }
         else throw err;
       }),
   searchBill: (tenantId, filters = {}) =>
@@ -52,7 +65,7 @@ export const PaymentService = {
   getReciept: (tenantId, businessservice, filters = {}) =>
     Request({
       url:
-        businessservice && businessservice !== "BPAREG"
+        businessservice && businessservice !== "BPAREG" || businessservice && businessservice !== "TL"
           ? `${Urls.payment.print_reciept}/${businessservice}/_search`
           : `${Urls.payment.print_reciept}/_search`,
       useCache: false,
@@ -90,7 +103,7 @@ export const PaymentService = {
       useCache: false,
       method: "POST",
       auth: false,
-      userService: false,
+      userService: true,
       params: { tenantId },
       data: { ...details },
     }),
@@ -130,7 +143,22 @@ export const PaymentService = {
       auth: true,
       params: { tenantId, ...params },
     }),
-
+    recieptSearchNew: (tenantId, params) =>
+    Request({
+      url:Urls.payment.obps_Reciept_Search,
+      method: "POST",
+      // do not change this directly add a param if needed
+      auth: true,
+      params: { tenantId, ...params },
+    }),
+    useAssetQrCodeService: (tenantId, params) =>
+      Request({
+        url:Urls.asset.assets_Reciept_Search,
+        method: "POST",
+        // do not change this directly add a param if needed
+        auth: true,
+        params: { tenantId, ...params },
+      }),
   getBulkPdfRecordsDetails: (filters) =>
     Request({
       url: Urls.payment.getBulkPdfRecordsDetails,

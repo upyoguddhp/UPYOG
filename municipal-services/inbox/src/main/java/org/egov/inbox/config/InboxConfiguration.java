@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -91,6 +91,12 @@ public class InboxConfiguration {
 	@Value("${egov.services.esindexer.host.search}")
 	private String indexServiceHostSearchEndpoint;
 
+	@Value("${services.esindexer.username}")
+	private String userName;
+
+	@Value("${services.esindexer.password}")
+	private String password;
+
 	@Value("${egov.user.host}")
 	private String userHost;
 
@@ -133,5 +139,41 @@ public class InboxConfiguration {
 
 	@Value("${es.search.default.sort.order}")
 	private String defaultSortOrder;
-}
+	
+	@Value("${egov.searcher.cnd.search.path}")
+	private String cndInboxSearcherEndpoint;
 
+	@Value("${egov.searcher.cnd.search.desc.path}")
+	private String cndInboxSearcherDescEndpoint;
+
+	@Value("${egov.searcher.mt.search.path}")
+	private String mtInboxSearcherEndpoint;
+
+	@Value("${egov.searcher.mt.search.desc.path}")
+	private String mtInboxSearcherDescEndpoint;
+
+	@Value("${egov.searcher.tp.search.path}")
+	private String tpInboxSearcherEndpoint;
+
+	@Value("${egov.searcher.tp.search.desc.path}")
+	private String tpInboxSearcherDescEndpoint;
+
+	@Value("${egov.searcher.gc.search.path}")
+	private String gcInboxSearcherEndpoint;
+
+	@Value("${egov.searcher.gc.search.desc.path}")
+	private String gcInboxSearcherDescEndpoint;
+
+	@Value("${egov.searcher.gc.count.path}")
+	private String gcInboxSearcherCountEndpoint;
+
+
+	@Value("${egov.searcher.fn.search.path}")
+	private String firenocInboxSearcherEndpoint;
+
+	@Value("${egov.searcher.fn.search.desc.path}")
+	private String firenocInboxSearcherDescEndpoint;
+
+	@Value("${egov.searcher.fn.count.path}")
+	private String firenocInboxSearcherCountEndpoint;
+}

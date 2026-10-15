@@ -1,7 +1,7 @@
-import { CloseSvg, FormComposer, Header, Toast } from "@egovernments/digit-ui-react-components";
+import { CloseSvg, FormComposer, Header, Toast, Loader } from "@nudmcdgnpm/digit-ui-react-components";
 import React, { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import CreateNewSurvey from "../../../components/Surveys/SurveyForms";
 
 export const answerTypeEnum = {
@@ -49,8 +49,10 @@ export const mapQuestions = (questions =[],initialData) =>{
 
 const NewSurveys = () => {
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const [showToast, setShowToast] = useState(null);
+  const mutation = Digit.Hooks.survey.useServeyCreateDef();
+  const queryClient = useQueryClient();
 
   const closeToast = () => {
     setShowToast(null);
@@ -62,27 +64,80 @@ const NewSurveys = () => {
   const onSubmit = (data) => {
     const { collectCitizenInfo, title, description, tenantIds, fromDate, toDate, fromTime, toTime, questions } = data;
     const mappedQuestions = mapQuestions(questions);
+    let serveyMappedQuestions = [];
+    let userToken = window.localStorage.getItem("token");
+    let userInfo = JSON.parse(window.localStorage.getItem("user-info"));
+    questions && questions.length && questions.map((element,index)=>{
+      serveyMappedQuestions.push({
+        "tenantId": tenantIds?.[0]?.code,
+        "code": element.formConfig.questionStatement,
+        "dataType": "String",
+        "values": null,
+        "required": element.formConfig.required,
+        "isActive": true,
+        "reGex": null,
+        "order": index++,
+        "additionalDetails": {
+          type: element.formConfig.type.i18Key,
+          options: element.formConfig.options || ["NA"]
+        }
+      })
+    })
     const details = {
-      SurveyEntity: {
-        tenantIds: tenantIds.map(({code})=>(code)),
-        title,
-        description,
-        startDate: new Date(`${fromDate} ${fromTime}`).getTime(),
-        endDate: new Date(`${toDate} ${toTime}`).getTime(),
-        questions:mappedQuestions
+      // SurveyEntity: {
+      //   tenantIds: tenantIds.map(({code})=>(code)),
+      //   title,
+      //   description,
+      //   startDate: new Date(`${fromDate} ${fromTime}`).getTime(),
+      //   endDate: new Date(`${toDate} ${toTime}`).getTime(),
+      //   questions:mappedQuestions
+      // },
+
+      ServiceDefinition: {
+        tenantId:tenantIds?.[0]?.code,
+        module:"engagement",
+        code: title,
+        isActive: true,
+        additionalDetails:{
+          title: title,
+          description: description,
+          startDate:  new Date(`${fromDate} ${fromTime}`).getTime(),
+          endDate: new Date(`${toDate} ${toTime}`).getTime(),
+          postedBy: userInfo.name,
+        },
+        clientId:userInfo.uuid,
+        attributes:serveyMappedQuestions
       },
+
     };
-    
+
     try{
-      let filters = {tenantIds : tenantIds?.[0]?.code, title : title}
-      Digit.Surveys.search(filters).then((ob) => {
-        if(ob?.Surveys?.length>0)
+      // let filters = {tenantIds : tenantIds?.[0]?.code, title : title}
+      let searchDetails = {
+        ServiceDefinitionCriteria:{
+          "tenantId": tenantId,
+          "code": [title],
+          "module": ["engagement"]
+        }
+        
+      }
+
+      Digit.Surveys.cfdefinitionsearch(searchDetails).then((ob) => {
+        if(ob?.ServiceDefinition?.length>0)
         {
           setShowToast({ key: true, label: "SURVEY_SAME_NAME_SURVEY_ALREADY_PRESENT" });
         }
         else
         {
-          history.push("/upyog-ui/employee/engagement/surveys/create-response", details)
+          mutation.mutate(details, {
+            onSuccess: (responseData) => {
+              queryClient.clear();
+              navigate("/upyog-ui/employee/engagement/surveys/create-response", { state: { isSuccess: true, data: responseData } });
+            },
+            onError: (error) => {
+              navigate("/upyog-ui/employee/engagement/surveys/create-response", { state: { isSuccess: false, error } });
+            }
+          });
         }
       })
     }
@@ -111,6 +166,10 @@ const NewSurveys = () => {
     marginLeft:'-20px',
   }
   
+  if (mutation.isPending) {
+    return <Loader />;
+  }
+
   return (
     <Fragment>
       {/* <Header>{t("CS_COMMON_SURVEYS")}</Header> */}

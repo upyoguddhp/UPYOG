@@ -15,34 +15,34 @@ import java.util.List;
 
 import org.egov.noc.web.model.enums.ApplicationType;
 import org.egov.noc.web.model.enums.Status;
-import org.hibernate.validator.constraints.SafeHtml;
+import org.egov.tracer.annotations.CustomSafeHtml;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 
 /**
  * NOC application object to capture the details of noc related information, landid and related documents.
  */
 @ApiModel(description = "NOC application object to capture the details of noc related information, landid and related documents.")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-07-30T05:26:25.138Z[GMT]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-07-30T05:26:25.138Z[GMT]")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Noc   {
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("id")
   private String id = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("tenantId")
   private String tenantId = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("applicationNo")
   private String applicationNo = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("nocNo")
   private String nocNo = null;
 
@@ -50,23 +50,23 @@ public class Noc   {
   @JsonProperty("applicationType")
   private ApplicationType applicationType = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("nocType")
   private String nocType = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("accountId")
   private String accountId = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("source")
   private String source = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("sourceRefId")
   private String sourceRefId = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("landId")
   private String landId = null;
 
@@ -74,7 +74,7 @@ public class Noc   {
   @JsonProperty("status")
   private Status status = null;
 
-  @SafeHtml
+  @CustomSafeHtml
   @JsonProperty("applicationStatus")
   private String applicationStatus = null;
 

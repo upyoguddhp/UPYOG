@@ -1,5 +1,6 @@
 package org.egov.asset.web.models.workflow;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +22,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+=======
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import org.egov.asset.web.models.AuditDetails;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+>>>>>>> niua-upstream/niua-dev-2.0
 
 /**
  * A Object holds the
  */
+<<<<<<< HEAD
 @ApiModel(description = "A Object holds the")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
 
+=======
+@Schema(description = "A Object holds the")
+@Validated
+@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
+>>>>>>> niua-upstream/niua-dev-2.0
 @Getter
 @Setter
 @AllArgsConstructor
@@ -38,6 +59,7 @@ import lombok.ToString;
 //@EqualsAndHashCode(of = {"tenantId","businessService"})
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
+<<<<<<< HEAD
 public class BusinessService   {
 
         @Size(max=256)
@@ -103,6 +125,73 @@ public class BusinessService   {
                return state;
         }
 
+=======
+public class BusinessService {
+
+    @Size(max = 256)
+    @JsonProperty("tenantId")
+    private String tenantId;
+
+    @Size(max = 256)
+    @JsonProperty("uuid")
+    private String uuid;
+
+    @Size(max = 256)
+    @JsonProperty("businessService")
+    private String businessService;
+
+    @Size(max = 256)
+    @JsonProperty("business")
+    private String business;
+
+    @Size(max = 1024)
+    @JsonProperty("getUri")
+    private String getUri;
+
+    @Size(max = 1024)
+    @JsonProperty("postUri")
+    private String postUri;
+
+    @JsonProperty("businessServiceSla")
+    private Long businessServiceSla;
+
+    @NotNull
+    @Valid
+    @JsonProperty("states")
+    private List<State> states;
+
+    @JsonProperty("auditDetails")
+    private AuditDetails auditDetails;
+
+
+    public BusinessService addStatesItem(State statesItem) {
+        if (this.states == null) {
+            this.states = new ArrayList<>();
+        }
+        this.states.add(statesItem);
+        return this;
+    }
+
+
+    /**
+     * Returns the currentState with the given uuid if not present returns null
+     *
+     * @param uuid the uuid of the currentState to be returned
+     * @return
+     */
+    public State getStateFromUuid(String uuid) {
+        State state = null;
+        if (this.states != null) {
+            for (State s : this.states) {
+                if (s.getUuid().equalsIgnoreCase(uuid)) {
+                    state = s;
+                    break;
+                }
+            }
+        }
+        return state;
+    }
+>>>>>>> niua-upstream/niua-dev-2.0
 
 
 }

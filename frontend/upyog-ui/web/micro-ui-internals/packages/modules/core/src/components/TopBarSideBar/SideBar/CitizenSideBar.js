@@ -1,12 +1,13 @@
 import {
   Loader, NavBar
-} from "@egovernments/digit-ui-react-components";
+} from "@nudmcdgnpm/digit-ui-react-components";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
+
 import SideBarMenu from "../../../config/sidebar-menu";
 import ChangeCity from "../../ChangeCity";
 import StaticCitizenSideBar from "./StaticCitizenSideBar";
+import { APPLICATION_PATH } from "../../../pages/citizen/Home/EDCR/utils";
 
 const defaultImage =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAO4AAADUCAMAAACs0e/bAAAAM1BMVEXK0eL" +
@@ -32,18 +33,20 @@ const defaultImage =
   "L+RGKCddCGmatiPyPB/+ekO/M/q/7uvbt22kTt3zEnXPzCV13T3Gel4/6NduDu66xRvlPNkM1RjjxUdv+4WhGx6TftD19Q/dfzpwcHO+rE3fAAAAAElFTkSuQmCC";
 const Profile = ({ info, stateName, t }) => {
   const [profilePic, setProfilePic] = React.useState(null);
-  React.useEffect(async () => {
-    const tenant = Digit.ULBService.getCurrentTenantId();
-    const uuid = info?.uuid;
-    if (uuid) {
-      const usersResponse = await Digit.UserService.userSearch(tenant, { uuid: [uuid] }, {});
-
-      if (usersResponse && usersResponse.user && usersResponse.user.length) {
-        const userDetails = usersResponse.user[0];
-        const thumbs = userDetails?.photo?.split(",");
-        setProfilePic(thumbs?.at(0));
+  React.useEffect(() => {
+    const fetchProfilePic = async () => {
+      const tenant = Digit.ULBService.getCurrentTenantId();
+      const uuid = info?.uuid;
+      if (uuid) {
+        const usersResponse = await Digit.UserService.userSearch(tenant, { uuid: [uuid] }, {});
+        if (usersResponse && usersResponse.user && usersResponse.user.length) {
+          const userDetails = usersResponse.user[0];
+          const thumbs = userDetails?.photo?.split(",");
+          setProfilePic(thumbs?.at(0));
+        }
       }
-    }
+    };
+    fetchProfilePic();
   }, [profilePic !== null]);
   return (
     <div className="profile-section">
@@ -87,7 +90,7 @@ export const CitizenSideBar = ({ isOpen, isMobile = false, toggleSidebar, onLogo
   const [search, setSearch] = useState("");
 
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = Digit.Hooks.useCustomNavigate();
   const closeSidebar = () => {
     Digit.clikOusideFired = true;
     toggleSidebar(false);
@@ -96,22 +99,36 @@ export const CitizenSideBar = ({ isOpen, isMobile = false, toggleSidebar, onLogo
   const { isLoading, data } = Digit.Hooks.useAccessControl();
   const tenantId = Digit.ULBService.getCitizenCurrentTenant();
   const showProfilePage = () => {
-    const redirectUrl = isEmployee ? "/upyog-ui/employee/user/profile" : "/upyog-ui/citizen/user/profile";
-    history.push(redirectUrl);
+    const redirectUrl = isEmployee ? `${APPLICATION_PATH}/employee/user/profile` : `${APPLICATION_PATH}/citizen/user/profile`;
+    navigate(redirectUrl);
     closeSidebar();
   };
   const redirectToLoginPage = () => {
     // localStorage.clear();
     // sessionStorage.clear();
-    history.push("/upyog-ui/citizen/login");
+    navigate(`${APPLICATION_PATH}/citizen/login`);
     closeSidebar();
   };
+  // Function to redirect the user to the EDCR scrutiny page
+  const redirectToScrutinyPage = () => {
+    // localStorage.clear();
+    // sessionStorage.clear();
+    navigate(`${APPLICATION_PATH}/citizen/core/edcr/scrutiny`);
+};
+  /**
+   * If the mobile/citizen drawer is closed, do not mount or render anything to the DOM.
+   * This prevents the <Loader /> from rendering in the background behind the fixed TopBar on page reload.
+   */
+  if (!isOpen && isMobile) {
+    return null;
+  }
+
   if (islinkDataLoading || isLoading || !isFetched) {
     return <Loader />;
   }
   const filteredTenantContact = storeData?.tenants.filter((e) => e.code === tenantId)[0]?.contactNumber || storeData?.tenants[0]?.contactNumber;
 
-  let menuItems = [...SideBarMenu(t, closeSidebar, redirectToLoginPage, isEmployee, storeData, tenantId)];
+  let menuItems = [...SideBarMenu(t, closeSidebar, redirectToLoginPage, redirectToScrutinyPage, isEmployee, storeData, tenantId)];
   let profileItem;
   if (isFetched && user && user.access_token) {
     profileItem = <Profile info={user?.info} stateName={stateInfo?.name} t={t} />;
@@ -161,12 +178,12 @@ export const CitizenSideBar = ({ isOpen, isMobile = false, toggleSidebar, onLogo
       })
       linkData.FSM = FSM;
     }
-    Object.keys(linkData)
+    Object.keys(linkData || {})
       ?.sort((x, y) => y.localeCompare(x))
       ?.map((key) => {
         if (linkData[key][0]?.sidebar === "digit-ui-links")
           menuItems.splice(1, 0, {
-            type: linkData[key][0]?.sidebarURL?.includes("digit-ui") ? "link" : "external-link",
+            type: linkData[key][0]?.sidebarURL?.includes("upyog-ui") ? "link" : "external-link",
             text: t(`ACTION_TEST_${Digit.Utils.locale.getTransformedLocale(key)}`),
             links: linkData[key],
             icon: linkData[key][0]?.leftIcon,
@@ -208,7 +225,7 @@ export const CitizenSideBar = ({ isOpen, isMobile = false, toggleSidebar, onLogo
           icon: configEmployeeSideBar[keys[i]][0]?.leftIcon?.split?.(":")[1],
           populators: {
             onClick: () => {
-              history.push(configEmployeeSideBar[keys[i]][0]?.navigationURL);
+              navigate(configEmployeeSideBar[keys[i]][0]?.navigationURL);
               closeSidebar();
             },
           },
@@ -236,7 +253,7 @@ export const CitizenSideBar = ({ isOpen, isMobile = false, toggleSidebar, onLogo
   }
 
   /*  URL with openlink wont have sidebar and actions    */
-  if (history.location.pathname.includes("/openlink")) {
+  if (location.pathname.includes("/openlink")) {
     profileItem = <span></span>;
     menuItems = menuItems.filter((ele) => ele.element === "LANGUAGE");
   }
