@@ -9,8 +9,8 @@
 export const ALL_SERVICES_URL = "/digit-ui/citizen/all-services";
 export const LOGIN_URL = "/digit-ui/citizen/login";
 
-// Auto-play interval for the "How it works" stepper (ms)
-export const STEP_INTERVAL = 6000;
+// Auto-play interval for the "How it works" stepper (ms): 2.5s per step, about 15s for the full loop
+export const STEP_INTERVAL = 2500;
 
 export const popularSearches = [
   { key: "LANDING_POPULAR_PT", text: "Pay property tax", match: "pt" },
@@ -107,4 +107,30 @@ export const defaultNews = [
   { key: "LANDING_NEWS_TL", title: "Apply for or renew a trade licence from home", navigationUrl: "/digit-ui/citizen/tl-home" },
   { key: "LANDING_NEWS_PGR", title: "How to lodge a grievance and track it with an ID", navigationUrl: "/digit-ui/citizen/pgr-home" },
   { key: "LANDING_NEWS_CERT", title: "Download your certificates and receipts any time", navigationUrl: "/digit-ui/citizen/all-services" },
+];
+
+/**
+ * At-a-glance facts for each service card (processing time, fee) and the "Before you apply"
+ * document checklist shown on hover/tap. Matched against the service label + URL, first hit wins.
+ * time/fee come from the approved service-page design. Document names follow the DIGIT/UPYOG
+ * masters in MDMS (e.g. PropertyTax/Documents.json) where one exists; the rest are working lists
+ * to be confirmed by the department. Fees differ per ULB, so edit this list as they are confirmed.
+ */
+export const serviceMeta = [
+  { re: /property|\/pt(-|\/|$)/i, time: "3 min", fee: "₹ as per ULB",
+    docs: ["Address proof", "Identity proof", "Registration proof (sale / gift deed)", "Special category proof, if applicable"] },
+  { re: /water|sewer|\/ws(-|\/|$)/i, time: "7 days", fee: "₹ 0 to apply",
+    docs: ["Identity proof", "Address proof", "Property tax receipt", "Ownership document", "Plumber estimate / site sketch"] },
+  { re: /birth|death/i, time: "2 days", fee: "₹ 0",
+    docs: ["Hospital / medical certificate", "Parent / applicant identity proof", "Address proof"] },
+  { re: /building|bpa|permit/i, time: "15 days", fee: "Slab fee",
+    docs: ["Ownership deed", "Approved site plan", "Architect drawings", "Structural stability certificate", "Identity proof", "Property tax receipt", "Land-use certificate", "Fire safety NOC, if applicable", "Latest photograph"] },
+  { re: /trade|licen|\/tl(-|\/|$)/i, time: "5 days", fee: "₹ 250+",
+    docs: ["Owner identity proof", "Address proof", "Premises ownership / rent agreement", "Property tax receipt", "Photograph", "Trade-specific certificate, if applicable"] },
+  { re: /garbage|waste|swm|sanitation/i, time: "Monthly", fee: "₹ 60",
+    docs: ["Identity proof", "Property ID / address proof"] },
+  { re: /street.?light/i, time: "48 hrs", fee: "Free",
+    docs: ["Photograph of the location"] },
+  { re: /noc|layout/i, time: "10 days", fee: "Slab fee",
+    docs: ["Ownership proof", "Layout / site plan", "Identity proof", "Approved building plan", "Fire safety certificate", "Water availability proof", "Photograph of the site"] },
 ];

@@ -236,6 +236,18 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
           onServices={() => document.getElementById("landing-services")?.scrollIntoView({ behavior: "smooth" })}
         />
 
+        <div className="LandingHelpBand">
+          <div className="LandingWrap">
+            <HelpCenter actions={{ grievance: openGrievance, ticket: openTicket, chat: openChat }} />
+          </div>
+        </div>
+
+        <div className="LandingBand LandingBand--how">
+          <div className="LandingWrap">
+            <HowItWorks />
+          </div>
+        </div>
+
         {groups.length > 0 && (
           <div className="LandingBand LandingBand--sky">
           <div className="LandingWrap">
@@ -246,24 +258,13 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
               activeGroup={activeGroup || "__all"}
               onGroupChange={setActiveGroup}
               onOpen={(it) => go(it.url)}
+              onViewAll={() => history.push(ALL_SERVICES_URL)}
             />
           </div>
           </div>
         )}
 
         <StatsBand stats={uiHomePage?.statistics} />
-
-        <div className="LandingBand LandingBand--how">
-          <div className="LandingWrap">
-            <HowItWorks />
-          </div>
-        </div>
-
-        <div className="LandingHelpBand">
-          <div className="LandingWrap">
-            <HelpCenter actions={{ grievance: openGrievance, ticket: openTicket, chat: openChat }} />
-          </div>
-        </div>
 
         <div className="LandingBand LandingBand--mint">
         <div className="LandingWrap">
