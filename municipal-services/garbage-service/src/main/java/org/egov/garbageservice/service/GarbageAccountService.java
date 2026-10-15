@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -1512,6 +1514,12 @@ public class GarbageAccountService {
 
 	public GarbageAccountResponse searchGarbageAccounts(
 			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex) {
+		return searchGarbageAccounts(searchCriteriaGarbageAccountRequest, isIndex, true);
+	}
+
+	public GarbageAccountResponse searchGarbageAccounts(
+			SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, Boolean isIndex,
+			boolean includeCounts) {
 
 		searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().setUserType(searchCriteriaGarbageAccountRequest.getRequestInfo().getUserInfo().getType());
 		
@@ -1590,7 +1598,7 @@ public class GarbageAccountService {
 			grbgAccs = garbageAccountRepository.searchGarbageAccount(
 					searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount(), garbageCriteriaMap);
 
-		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest);
+		GarbageAccountResponse garbageAccountResponse = getSearchResponseFromAccounts(grbgAccs, searchCriteriaGarbageAccountRequest, includeCounts);
 
 		if (CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			garbageAccountResponse.setResponseInfo(responseInfoFactory
@@ -1622,10 +1630,15 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 
 
 
-	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
+	private GarbageAccountResponse getSearchResponseFromAccounts(List<GarbageAccount> grbgAccs,SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest, boolean includeCounts) {
 
 		GarbageAccountResponse garbageAccountResponse = GarbageAccountResponse.builder().garbageAccounts(grbgAccs)
 				.build();
+
+		if (!includeCounts) {
+			processResponse(garbageAccountResponse);
+			return garbageAccountResponse;
+		}
 
 		DdpVerificationCount ddpCount = garbageAccountRepository.getDdpVerificationCount(
 				searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getTenantId());
@@ -1846,22 +1859,48 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 		return garbageAccountActionResponse;
 	}
 
+	/**
+	 * Fetches the bills of all given accounts with a single billing-service search per tenant
+	 * and groups them by consumer code.
+	 */
+	private Map<String, List<Bill>> fetchBillsByConsumerCode(List<GarbageAccount> accounts, RequestInfo requestInfo) {
+		Map<String, Set<String>> consumerCodesByTenant = new LinkedHashMap<>();
+		for (GarbageAccount account : accounts) {
+			consumerCodesByTenant.computeIfAbsent(account.getTenantId(), k -> new LinkedHashSet<>())
+					.add(account.getGrbgApplication().getApplicationNo());
+		}
+
+		Map<String, List<Bill>> result = new HashMap<>();
+		consumerCodesByTenant.forEach((tenantId, consumerCodes) -> {
+			BillSearchCriteria criteria = BillSearchCriteria.builder().tenantId(tenantId)
+					.consumerCode(consumerCodes).service("GB").build();
+			List<Bill> bills = billService.searchBill(criteria, requestInfo).getBill();
+			if (!CollectionUtils.isEmpty(bills)) {
+				for (Bill bill : bills) {
+					result.computeIfAbsent(bill.getConsumerCode(), k -> new ArrayList<>()).add(bill);
+				}
+			}
+		});
+		return result;
+	}
+
 	private List<GarbageAccountDetail> getApplicationBillUserDetail(List<GarbageAccount> accounts,
 			RequestInfo requestInfo, GarbageAccountActionRequest garbageAccountActionRequest) {
 
 		List<GarbageAccountDetail> garbageAccountDetails = new ArrayList<>();
 
+		// one billing-service call per tenant instead of one per account
+		Map<String, List<Bill>> billsByConsumerCode = fetchBillsByConsumerCode(accounts, requestInfo);
+
 		accounts.stream().forEach(account -> {
 			GarbageAccountDetail garbageAccountDetail = GarbageAccountDetail.builder()
 					.applicationNumber(account.getGrbgApplication().getApplicationNo()).build();
 
-			// search bill Details
-			BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(account.getTenantId())
-					.consumerCode(Collections.singleton(account.getGrbgApplication().getApplicationNo()))
-					.service(null != account.getBusinessService() ? account.getBusinessService() : "GB")// business//
-																										// service
+			// bill details (pre-fetched above)
+			BillResponse billResponse = BillResponse.builder()
+					.bill(new ArrayList<>(billsByConsumerCode.getOrDefault(
+							account.getGrbgApplication().getApplicationNo(), Collections.emptyList())))
 					.build();
-			BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfo);
 			Map<Object, Object> billDetailsMap = new HashMap<>();
 			if (!CollectionUtils.isEmpty(billResponse.getBill())) {
 				// enrich all bills
@@ -2099,8 +2138,9 @@ public GarbageAccountActionResponse openSearchPayPreview(
         SearchCriteriaGarbageAccountRequest request,
         Boolean isIndex) {
 
+    // dashboard counts are not needed for the public search
     GarbageAccountResponse searchResponse =
-            searchGarbageAccounts(request, isIndex);
+            searchGarbageAccounts(request, isIndex, false);
 
     if (CollectionUtils.isEmpty(searchResponse.getGarbageAccounts())) {
         return GarbageAccountActionResponse.builder()
@@ -2111,21 +2151,18 @@ public GarbageAccountActionResponse openSearchPayPreview(
                 .build();
     }
 
-  
-    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
-            .stream()
-            .map(acc -> acc.getGrbgApplication().getApplicationNo())
-            .collect(Collectors.toList());
-
-    
+    // reuse the accounts already loaded by the search instead of searching them again
     GarbageAccountActionRequest actionRequest =
             GarbageAccountActionRequest.builder()
-                    .applicationNumbers(applicationNumbers)
                     .requestInfo(request.getRequestInfo())
-                    .skipValidation(true) 
+                    .skipValidation(true)
                     .build();
 
-    return getApplicationDetails(actionRequest);
+    return GarbageAccountActionResponse.builder()
+            .applicationDetails(getApplicationBillUserDetail(searchResponse.getGarbageAccounts(),
+                    request.getRequestInfo(), actionRequest))
+            .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+            .build();
 }
 
 	public GrbgBillTrackerRequest enrichGrbgBillTrackerCreateRequest(GarbageAccount garbageAccount,
