@@ -47,6 +47,7 @@ import org.egov.garbageservice.repository.GarbageAccountRepository;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.garbageservice.contract.bill.BillSearchCriteria;
+import org.egov.garbageservice.contract.bill.UpdateBillCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -164,7 +165,10 @@ public class GarbageAccountSchedulerService {
 
 			// Demand existence for this exact period is checked once per batch (in
 			// chunks, to stay within URL length limits) instead of once per account.
-			Set<String> applicationsWithExistingDemand = fetchApplicationsWithExistingDemandForPeriod(
+			// Keyed by application number -> the matching ACTIVE demand, so that if it
+			// turns out to be an orphan (see handleExistingDemandForPeriod) we have what
+			// we need to cancel it without a second lookup.
+			Map<String, Demand> applicationsWithExistingDemand = fetchApplicationsWithExistingDemandForPeriod(
 					generateBillRequest, garbageAccounts);
 
 			garbageAccounts.stream().forEach(garbageAccount -> {
@@ -184,7 +188,7 @@ public class GarbageAccountSchedulerService {
 							skippedCount.incrementAndGet();
 							errorList.add("Bill already exists for application "
 									+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
+							if (applicationsWithExistingDemand.containsKey(garbageAccount.getGrbgApplicationNumber())) {
 								errorList.clear();
 								errorList.add("Demand already exists for the selected period");
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
@@ -250,9 +254,11 @@ public class GarbageAccountSchedulerService {
 
 							String billType = Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
 									|| generateBillRequest.getMonths().size() > 1 ? "MULTI_MONTH" : "MONTHLY";
-							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
-								errorList.add("Demand already exists for the selected period");
-								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+							Demand existingDemand = applicationsWithExistingDemand
+									.get(garbageAccount.getGrbgApplicationNumber());
+							if (existingDemand != null) {
+								handleExistingDemandForPeriod(garbageAccount, generateBillRequest, existingDemand,
+										skippedCount, errorList);
 								return;
 							}
 
@@ -265,23 +271,61 @@ public class GarbageAccountSchedulerService {
 								log.error("Failed to generate garbage bill for application {}",
 										garbageAccount.getGrbgApplicationNumber(), e);
 								errorList.add("Bill generation failed: " + e.getMessage());
+								// demandService.generateDemand() already succeeded and set demandId
+								// before the failure (e.g. the bill fetch/create call to billing-service
+								// timed out waiting for a response that may well have been committed
+								// server-side). Rather than leave that demand as an orphan with no
+								// tracker row - which would block every future retry once the
+								// existing-demand check sees it - cancel it (and its bill, if one was
+								// actually created) right now.
+								if (demandId.get() != null) {
+									String businessService = "ON-DEMAND".equals(billType) ? "GB_BULK" : "GB";
+									Demand demandToCancel = Demand.builder().id(demandId.get())
+											.tenantId(garbageAccount.getTenantId())
+											.consumerCode(garbageAccount.getGrbgApplicationNumber())
+											.businessService(businessService).build();
+									cancelOrphanDemandAndBill(garbageAccount, generateBillRequest, demandToCancel);
+								}
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 								return;
 							}
 
 							if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
-								GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
-										.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,
-												billResponse.getBill().get(0), calculationBreakdown);
-								grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
-								// add to garbage bill tracker
-								GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
-								tracker.setGarbageBillWithoutRebate(billAmount);
-								tracker.setRebateAmount(rebateAmount);
-								tracker.setGrbgBillAmount(finalBillAmount);
 
-								GrbgBillTracker grbgBillTracker = garbageAccountService
-										.saveToGarbageBillTracker(grbgBillTrackerRequest);
+								GrbgBillTracker grbgBillTracker;
+								try {
+									GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
+											.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,
+													billResponse.getBill().get(0), calculationBreakdown);
+									grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
+									// add to garbage bill tracker
+									GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
+									tracker.setGarbageBillWithoutRebate(billAmount);
+									tracker.setRebateAmount(rebateAmount);
+									tracker.setGrbgBillAmount(finalBillAmount);
+
+									grbgBillTracker = garbageAccountService.saveToGarbageBillTracker(grbgBillTrackerRequest);
+								} catch (Exception e) {
+									// The demand and bill were already created in billing-service at this
+									// point (generateDemandAndBill above succeeded), but we failed to write
+									// the tracker row that is supposed to back them. Rather than leaving
+									// that demand/bill as an orphan that the next run's existing-demand
+									// check would otherwise skip forever, cancel both now so the next run
+									// starts clean for this application/period.
+									log.error(
+											"Tracker creation failed for application {} after demand {} and bill {} were already created; cancelling demand and bill",
+											garbageAccount.getGrbgApplicationNumber(), demandId.get(),
+											billResponse.getBill().get(0).getId(), e);
+									errorList.add("Tracker creation failed after bill generation: " + e.getMessage());
+									Demand demandToCancel = Demand.builder().id(demandId.get())
+											.tenantId(garbageAccount.getTenantId())
+											.consumerCode(garbageAccount.getGrbgApplicationNumber())
+											.businessService(billResponse.getBill().get(0).getBusinessService()).build();
+									cancelOrphanDemandAndBill(garbageAccount, generateBillRequest, demandToCancel);
+									createFailureLog(garbageAccount, generateBillRequest, billResponse, errorList);
+									return;
+								}
+
 								grbgBillTrackers.add(grbgBillTracker);
 								// Status comes from the bill we just fetched above - no need to search
 								// billing-service again just to re-read it (that extra search also
@@ -366,6 +410,18 @@ public class GarbageAccountSchedulerService {
 								}
 							} else {
 								errorList.add("Issues In Bill Generation Probably Demand Already Exists");
+								// generateDemandAndBill() swallows ServiceCallException internally for
+								// scheduler/bulk calls and just returns null - so a demand created just
+								// before billing-service rejected/failed the bill call lands here with
+								// no exception for the outer catch to react to. Same orphan risk, same fix.
+								if (demandId.get() != null) {
+									String orphanBusinessService = "ON-DEMAND".equals(billType) ? "GB_BULK" : "GB";
+									Demand demandToCancel = Demand.builder().id(demandId.get())
+											.tenantId(garbageAccount.getTenantId())
+											.consumerCode(garbageAccount.getGrbgApplicationNumber())
+											.businessService(orphanBusinessService).build();
+									cancelOrphanDemandAndBill(garbageAccount, generateBillRequest, demandToCancel);
+								}
 								createFailureLog(garbageAccount, generateBillRequest, billResponse, errorList);
 							}
 						} else {
@@ -448,7 +504,7 @@ public class GarbageAccountSchedulerService {
 	 * the whole batch in chunks (grouped by tenantId, since the search is
 	 * tenant-scoped) instead of issuing one search per account.
 	 */
-	private Set<String> fetchApplicationsWithExistingDemandForPeriod(GenerateBillRequest generateBillRequest,
+	private Map<String, Demand> fetchApplicationsWithExistingDemandForPeriod(GenerateBillRequest generateBillRequest,
 			List<GarbageAccount> garbageAccounts) {
 
 		Map<String, List<String>> applicationNumbersByTenant = garbageAccounts.stream()
@@ -458,7 +514,7 @@ public class GarbageAccountSchedulerService {
 		long fromDate = generateBillRequest.getFromDate().getTime();
 		long toDate = generateBillRequest.getToDate().getTime();
 		int chunkSize = 150;
-		Set<String> applicationsWithExistingDemand = new HashSet<>();
+		Map<String, Demand> applicationsWithExistingDemand = new HashMap<>();
 
 		applicationNumbersByTenant.forEach((tenantId, applicationNumbers) -> {
 			for (int i = 0; i < applicationNumbers.size(); i += chunkSize) {
@@ -475,11 +531,86 @@ public class GarbageAccountSchedulerService {
 						.filter(demand -> Demand.StatusEnum.ACTIVE.equals(demand.getStatus())
 								&& demand.getTaxPeriodFrom() != null && demand.getTaxPeriodTo() != null
 								&& demand.getTaxPeriodFrom() == fromDate && demand.getTaxPeriodTo() == toDate)
-						.forEach(demand -> applicationsWithExistingDemand.add(demand.getConsumerCode()));
+						.forEach(demand -> applicationsWithExistingDemand.put(demand.getConsumerCode(), demand));
 			}
 		});
 
 		return applicationsWithExistingDemand;
+	}
+
+	/**
+	 * An ACTIVE demand already exists in billing-service for this exact
+	 * application + period. That is only a legitimate duplicate if a tracker
+	 * row backed by that demand was actually created - otherwise it is an
+	 * orphan left behind by a previous run that created the demand/bill but
+	 * never got as far as writing the eg_grbg_bill_tracker row (e.g. the
+	 * process died, or an exception hit after the bill call succeeded). We
+	 * never retry on top of an orphan demand - instead we cancel the demand
+	 * and its bill so the application is clean again and gets a fresh
+	 * demand/bill/tracker the next time bill-generator runs for this period.
+	 */
+	private void handleExistingDemandForPeriod(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
+			Demand demand, AtomicInteger skippedCount, List<String> errorList) {
+
+		skippedCount.incrementAndGet();
+
+		GrbgBillTrackerSearchCriteria criteria = GrbgBillTrackerSearchCriteria.builder()
+				.demandIds(Collections.singleton(demand.getId())).build();
+		List<GrbgBillTracker> trackers = garbageBillTrackerRepository.getBillTracker(criteria);
+
+		if (!CollectionUtils.isEmpty(trackers)) {
+			errorList.add("Demand already exists for the selected period");
+			createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+			return;
+		}
+
+		log.warn(
+				"Orphan demand {} found for application {} for the requested period with no backing tracker entry; cancelling demand and bill so it can be regenerated on the next run",
+				demand.getId(), garbageAccount.getGrbgApplicationNumber());
+		cancelOrphanDemandAndBill(garbageAccount, generateBillRequest, demand);
+
+		errorList.add("Orphan demand found for the selected period with no tracker entry; "
+				+ "demand and bill have been cancelled and will be regenerated on the next run");
+		createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+	}
+
+	/**
+	 * Best-effort cancellation of a demand (and its bill, if one was created)
+	 * that has no backing eg_grbg_bill_tracker row. Each step is isolated so a
+	 * failure cancelling the bill does not stop us from still cancelling the
+	 * demand, and vice versa; either way we never throw out of here - at worst
+	 * the orphan survives to be cancelled on a later attempt.
+	 */
+	private void cancelOrphanDemandAndBill(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
+			Demand demand) {
+
+		try {
+			BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(demand.getTenantId())
+					.consumerCode(Collections.singleton(demand.getConsumerCode())).build();
+			BillResponse billResponse = billService.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo());
+
+			if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
+				Bill bill = billResponse.getBill().get(0);
+				UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
+						.consumerCodes(Collections.singleton(bill.getConsumerCode()))
+						.billIds(Collections.singleton(bill.getId())).businessService(bill.getBusinessService())
+						.statusToBeUpdated(Demand.StatusEnum.CANCELLED)
+						.additionalDetails(objectMapper.createObjectNode().put("reason", "ORPHAN_BILL_AUTO_CANCELLED"))
+						.build();
+				billService.cancelBill(updateBillCriteria, generateBillRequest.getRequestInfo());
+			}
+		} catch (Exception e) {
+			log.error("Failed to cancel orphan bill for demand {} / application {}", demand.getId(),
+					garbageAccount.getGrbgApplicationNumber(), e);
+		}
+
+		try {
+			demandService.cancelDemand(demand.getTenantId(), Collections.singleton(demand.getId()),
+					generateBillRequest.getRequestInfo(), demand.getBusinessService());
+		} catch (Exception e) {
+			log.error("Failed to cancel orphan demand {} for application {}", demand.getId(),
+					garbageAccount.getGrbgApplicationNumber(), e);
+		}
 	}
 	
 	public List<GenerateBillPreviewResponse> generateBillPreview(GenerateBillRequest generateBillRequest) {
