@@ -1,18 +1,49 @@
 package org.egov.echallan.service;
 
 
-import java.util.*;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_ACTION;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_CODE;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.CREATE_ACTION;
+import static org.egov.echallan.util.ChallanConstants.CREATE_CODE;
+import static org.egov.echallan.util.ChallanConstants.CREATE_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.DOWNLOAD_RECEIPT_CODE;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_ACTION;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_CODE;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.SMS_BODY_CREATE_CHALLAN;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_ACTION;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_CODE;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_CODE_INAPP;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
-import org.egov.echallan.model.*;
+import org.egov.echallan.model.Amount;
+import org.egov.echallan.model.Bill;
+import org.egov.echallan.model.BillSearchCriteria;
+import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.Challan.StatusEnum;
+import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.Email;
+import org.egov.echallan.model.EmailRequest;
+import org.egov.echallan.model.SMSRequest;
 import org.egov.echallan.producer.Producer;
 import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.util.NotificationUtil;
-import org.egov.echallan.web.models.collection.PaymentDetail;
-import org.egov.echallan.web.models.collection.PaymentRequest;
 import org.egov.echallan.web.models.collection.PaymentResponse;
 import org.egov.echallan.web.models.user.User;
 import org.egov.echallan.web.models.uservevents.Action;
@@ -30,13 +61,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
-import org.egov.echallan.service.BillingService;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-import java.math.BigDecimal;
-
-import static org.egov.echallan.util.ChallanConstants.*;
 
 
 @Service
@@ -397,6 +427,40 @@ public class NotificationService {
 				log.error("No message configured! Notification will not be sent.");
 			}
 	}
-	
+		
+		public void sendChallanSms(ChallanRequest challanRequest, Bill bill) {
+			SMSRequest smsRequest = buildCreateChallanSmsRequest(challanRequest);
+			
+			StringBuilder smsTrackerUri = new StringBuilder();
+			smsTrackerUri.append(config.smsHost).append(config.smsTrackerCreateEndpoint);
 
+			Map<String, Object> smsTrackerRequest = new HashMap<>();
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			String fromDateStr = formatter.format(bill.getBillDetails().get(0).getFromPeriod());
+			String toDateStr = formatter.format(bill.getBillDetails().get(0).getToPeriod());
+			smsTrackerRequest.put("uuid", java.util.UUID.randomUUID().toString());
+			smsTrackerRequest.put("amount", bill.getTotalAmount());
+			smsTrackerRequest.put("applicationNo", bill.getConsumerCode());
+			smsTrackerRequest.put("tenantId", bill.getTenantId());
+			smsTrackerRequest.put("service", "CHLDW");
+			smsTrackerRequest.put("fromDate", fromDateStr);
+			smsTrackerRequest.put("toDate", toDateStr);
+			smsTrackerRequest.put("createdBy", "system");
+			smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+			smsTrackerRequest.put("ward", bill.getPayerAddress());
+			smsTrackerRequest.put("billId", bill.getId());
+			smsTrackerRequest.put("smsStatus", false);
+			smsTrackerRequest.put("ownerMobileNo", bill.getMobileNumber());
+			smsTrackerRequest.put("smsRequest", smsRequest);
+			smsTrackerRequest.put("smsResponse", null);
+			smsTrackerRequest.put("ward", "bharari");
+			try {
+				serviceRequestRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+				log.info("SMS tracker entry created for billId {}", bill.getId());
+			} catch (Exception e) {
+				log.error("Failed to create SMS tracker entry for billId {}",bill.getId(), e);
+			}
+			
+		}	
 }

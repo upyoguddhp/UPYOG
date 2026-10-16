@@ -225,5 +225,11 @@ public class ChallanConfiguration {
 
 	@Value("${workflow.processinstance.search.path}")
 	private String wfProcessSearchPath;
+	
+	@Value("${egov.sms.host}")
+	public String smsHost;
+	
+	@Value("${egov.sms.tracker.create.endpoint}")
+	public String smsTrackerCreateEndpoint;
 
 }

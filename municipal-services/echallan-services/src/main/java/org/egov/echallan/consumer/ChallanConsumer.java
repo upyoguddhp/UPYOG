@@ -29,22 +29,22 @@ public class ChallanConsumer {
         this.config = config;
     }
 
-    @KafkaListener(topics = {"${persister.save.challan.topic}","${persister.update.challan.topic}"})
-    public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        try {
-        ObjectMapper mapper = new ObjectMapper();
-        ChallanRequest challanRequest = new ChallanRequest();
-  
-            challanRequest = mapper.convertValue(record, ChallanRequest.class);
-
-			if (topic.equalsIgnoreCase(config.getSaveChallanTopic()))
-				notificationService.sendChallanNotification(challanRequest, true);
+//    @KafkaListener(topics = {"${persister.save.challan.topic}","${persister.update.challan.topic}"})
+//    public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+//        try {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ChallanRequest challanRequest = new ChallanRequest();
+//  
+//            challanRequest = mapper.convertValue(record, ChallanRequest.class);
+//
+//			if (topic.equalsIgnoreCase(config.getSaveChallanTopic()))
+//				notificationService.sendChallanNotification(challanRequest, true);
 //			else if (topic.equalsIgnoreCase(config.getUpdateChallanTopic()))
 //				notificationService.sendChallanNotification(challanRequest, false);
-			
-		} catch (final Exception e) {
-			e.printStackTrace();
-			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
-		}
-    }
+//			
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
+//		}
+//    }
 }
