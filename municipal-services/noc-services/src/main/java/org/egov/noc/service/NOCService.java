@@ -151,9 +151,9 @@ public class NOCService {
 		    	 nocBillingService.generateBill(nocRequest);
 		    }
 		    
-//		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
-//		        createCertificate(nocRequest);
-//		    }
+		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+		        createCertificate(nocRequest);
+		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
@@ -262,6 +262,8 @@ public class NOCService {
         }
         
 		private void createCertificate(NocRequest nocRequest) {
+			String template = getMdmsCertificateTemplate(nocRequest);
+			Object certificateTemplate = nocUtil.mDMSCall(nocRequest.getRequestInfo(), nocRequest.getNoc().getTenantId());
 			Resource resource = createResource(nocRequest);
 			DmsRequest dmsRequest = generateDmsRequest(resource, nocRequest);
 			try {
@@ -327,5 +329,54 @@ public class NOCService {
 					.documentId(config.ALFRESCO_COMMON_DOCUMENT_ID)
 					.build();
 			return dmsRequest;
+		}
+		
+		
+		private String getMdmsCertificateTemplate(NocRequest noc) {
+			
+		    Map<String, Object> mdmsCriteria = new HashMap<>();
+			String[] tenantParts = noc.getNoc().getTenantId().split("\\.");
+			String ulbName = tenantParts[tenantParts.length - 1];
+//			String nocType = noc.getNocType();
+//			String uniqueIdentifier = ulbName + "." +noc.getNocType().replace("NOC", "_NOC");
+			String uniqueIdentifier = null;
+			
+			mdmsCriteria.put("tenantId", tenantParts[0]);
+			mdmsCriteria.put("schemaCode", "ULBS.NocFee");
+			mdmsCriteria.put("uniqueIdentifiers",Collections.singletonList(uniqueIdentifier));
+		
+		    Map<String, Object> mdmsRequest = new HashMap<>();
+		    mdmsRequest.put("RequestInfo", noc.getRequestInfo());
+		    mdmsRequest.put("MdmsCriteria", mdmsCriteria);
+		
+		    log.info("Fetching NOC fee from MDMS for tenant {}", noc.getNoc().getTenantId());
+		
+		    Object response = serviceRequestRepository.fetchResult(
+		            new StringBuilder(config.getMdmsV2Host())
+		                    .append(config.getMdmsV2SearchEndpoint()),
+		            mdmsRequest
+		    );
+		
+		    if (!(response instanceof Map)) {
+		        throw new IllegalStateException("Invalid MDMS response");
+		    }
+		
+		    Map<?, ?> responseMap = (Map<?, ?>) response;
+		    List<?> mdmsList = (List<?>) responseMap.get("mdms");
+		
+		    if (CollectionUtils.isEmpty(mdmsList)) {
+		        throw new IllegalStateException("NOC fee not configured in MDMS");
+		    }
+		
+		    Map<?, ?> mdmsEntry = (Map<?, ?>) mdmsList.get(0);
+		    Map<?, ?> data = (Map<?, ?>) mdmsEntry.get("data");
+		
+		    Object rate = data.get("rate");
+		    if (rate == null) {
+		        throw new IllegalStateException("Rate missing in MDMS NocFee");
+		    }
+		
+		    log.info("NOC fee fetched from MDMS: {}", rate);
+		    return "";
 		}
 }
