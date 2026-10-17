@@ -454,7 +454,7 @@ public class NotificationService {
 			smsTrackerRequest.put("ownerMobileNo", bill.getMobileNumber());
 			smsTrackerRequest.put("smsRequest", smsRequest);
 			smsTrackerRequest.put("smsResponse", null);
-			smsTrackerRequest.put("ward", "bharari");
+			smsTrackerRequest.put("ward", "N/A");
 			try {
 				serviceRequestRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
 				log.info("SMS tracker entry created for billId {}", bill.getId());
