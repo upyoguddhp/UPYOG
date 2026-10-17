@@ -350,7 +350,11 @@ public class GarbageAccountSchedulerService {
 									return;
 								}
 
-								grbgBillTrackers.add(grbgBillTracker);
+								// Everything from here until the tracker is added to the result must succeed
+								// together with the demand, bill and tracker written above; if any step
+								// fails, all of it is rolled back so no service keeps a partial entry.
+								Map<String, String> expiredPreviousTrackers = new HashMap<>();
+								try {
 								// Status comes from the bill we just fetched above - no need to search
 								// billing-service again just to re-read it (that extra search also
 								// triggers billing-service's per-bill callback into this service's
@@ -373,10 +377,21 @@ public class GarbageAccountSchedulerService {
 											continue;
 										}
 
+										expiredPreviousTrackers.put(prev.getUuid(), prev.getStatus());
 										prev.setStatus("EXPIRED");
 										garbageBillTrackerRepository.updateStatusBillTracker(prev);
 									}
 								}
+								} catch (Exception e) {
+									log.error("Post-tracker steps failed for application {}; rolling back demand, bill and tracker",
+											garbageAccount.getGrbgApplicationNumber(), e);
+									errorList.add("Bill generation rolled back: " + e.getMessage());
+									rollbackGeneratedBill(garbageAccount, generateBillRequest, grbgBillTracker,
+											expiredPreviousTrackers, billResponse.getBill().get(0), demandId.get());
+									createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+									return;
+								}
+								grbgBillTrackers.add(grbgBillTracker);
 								// remove bill if failure exists
 //							GrbgBillFailure grbgBillFailure	= garbageAccountService.enrichGrbgBillFailure(garbageAccount, generateBillRequest,billResponse,errorList);
 //							garbageAccountService.removeGarbageBillFailure(grbgBillFailure);
@@ -679,12 +694,45 @@ public class GarbageAccountSchedulerService {
 	 * demand, and vice versa; either way we never throw out of here - at worst
 	 * the orphan survives to be cancelled on a later attempt.
 	 */
+	/**
+	 * Undoes everything written for one account in this run: previous trackers go
+	 * back to their old status, the new tracker row is deleted, and the bill and
+	 * demand are cancelled in billing-service. Each step is attempted
+	 * independently so one failing compensation does not block the others.
+	 */
+	private void rollbackGeneratedBill(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
+			GrbgBillTracker tracker, Map<String, String> expiredPreviousTrackers, Bill bill, String demandId) {
+
+		expiredPreviousTrackers.forEach((uuid, status) -> {
+			try {
+				garbageBillTrackerRepository.restoreTrackerStatusByUuid(uuid, status);
+			} catch (Exception e) {
+				log.error("Rollback: failed to restore tracker {} to {}", uuid, status, e);
+			}
+		});
+
+		try {
+			garbageBillTrackerRepository.deleteTrackerByUuid(tracker.getUuid());
+		} catch (Exception e) {
+			log.error("Rollback: failed to delete tracker {}", tracker.getUuid(), e);
+		}
+
+		if (demandId != null) {
+			Demand demandToCancel = Demand.builder().id(demandId).tenantId(garbageAccount.getTenantId())
+					.consumerCode(garbageAccount.getGrbgApplicationNumber()).businessService(bill.getBusinessService())
+					.build();
+			cancelOrphanDemandAndBill(garbageAccount, generateBillRequest, demandToCancel);
+		}
+	}
+
 	private void cancelOrphanDemandAndBill(GarbageAccount garbageAccount, GenerateBillRequest generateBillRequest,
 			Demand demand) {
 
 		try {
 			BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(demand.getTenantId())
-					.consumerCode(Collections.singleton(demand.getConsumerCode())).build();
+					.consumerCode(Collections.singleton(demand.getConsumerCode()))
+					// only the bill created for this demand, never an older valid bill of the consumer
+					.demandId(Collections.singleton(demand.getId())).build();
 			BillResponse billResponse = billService.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo());
 
 			if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {

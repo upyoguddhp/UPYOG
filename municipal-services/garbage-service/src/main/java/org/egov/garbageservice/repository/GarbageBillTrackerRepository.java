@@ -233,7 +233,33 @@ public class GarbageBillTrackerRepository {
 		return GrbgBillFailureReq;
 	}
 
-	public List<GrbgBillTracker> getBillTracker(GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria) {
+	// PostgreSQL allows at most 32767 bind parameters per statement, and very long
+	// IN lists are slow, so a bulk search over a big ULB's accounts is split.
+	private static final int APPLICATION_ID_CHUNK_SIZE = 1000;
+
+	public List<GrbgBillTracker> getBillTracker(GrbgBillTrackerSearchCriteria criteria) {
+		Set<String> applicationIds = criteria.getGrbgApplicationIds();
+		if (null != criteria.getLimit() || CollectionUtils.isEmpty(applicationIds)
+				|| applicationIds.size() <= APPLICATION_ID_CHUNK_SIZE) {
+			return getBillTrackerChunk(criteria);
+		}
+
+		List<GrbgBillTracker> trackers = new ArrayList<>();
+		List<String> ids = new ArrayList<>(applicationIds);
+		for (int i = 0; i < ids.size(); i += APPLICATION_ID_CHUNK_SIZE) {
+			GrbgBillTrackerSearchCriteria chunkCriteria = GrbgBillTrackerSearchCriteria.builder()
+					.tenantId(criteria.getTenantId()).type(criteria.getType()).month(criteria.getMonth())
+					.year(criteria.getYear()).status(criteria.getStatus()).tenantIds(criteria.getTenantIds())
+					.uuids(criteria.getUuids()).billIds(criteria.getBillIds()).demandIds(criteria.getDemandIds())
+					.grbgApplicationIds(new java.util.LinkedHashSet<>(
+							ids.subList(i, Math.min(i + APPLICATION_ID_CHUNK_SIZE, ids.size()))))
+					.build();
+			trackers.addAll(getBillTrackerChunk(chunkCriteria));
+		}
+		return trackers;
+	}
+
+	private List<GrbgBillTracker> getBillTrackerChunk(GrbgBillTrackerSearchCriteria grbgBillTrackerSearchCriteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = getBillTrackerSearchQuery(grbgBillTrackerSearchCriteria, preparedStmtList);
 		List<GrbgBillTracker> grbgBillTrackers = jdbcTemplate.query(query, preparedStmtList.toArray(),
@@ -251,6 +277,30 @@ public class GarbageBillTrackerRepository {
 		}
 
 		return queryBuilder.toString();
+	}
+
+	/**
+	 * Compensation for a bill-generation run that failed after its tracker row was
+	 * written: removes that row so no trace of the failed bill remains.
+	 */
+	public int deleteTrackerByUuid(String uuid) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", uuid);
+		return namedParameterJdbcTemplate.update("DELETE FROM eg_grbg_bill_tracker WHERE uuid = :uuid", params);
+	}
+
+	/**
+	 * Compensation counterpart of the "expire previous trackers" step: puts a
+	 * tracker back to the status it had before the failed run changed it.
+	 */
+	public int restoreTrackerStatusByUuid(String uuid, String status) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", uuid);
+		params.put("status", status);
+		params.put("lastModifiedTime", System.currentTimeMillis());
+		return namedParameterJdbcTemplate.update(
+				"UPDATE eg_grbg_bill_tracker SET status = :status, last_modified_time = :lastModifiedTime WHERE uuid = :uuid",
+				params);
 	}
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
