@@ -591,12 +591,26 @@ public class GarbageAccountSchedulerService {
 
 			if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
 				Bill bill = billResponse.getBill().get(0);
+
+				// Preserve whatever additionalDetails the bill already carries (billing-service
+				// relies on some of those keys elsewhere) and just add the mandatory cancel
+				// reason fields on top, same as the proven cancelGarbageBill flow does.
+				Map<String, Object> additionalDetails;
+				if (bill.getAdditionalDetails() != null && !bill.getAdditionalDetails().isNull()
+						&& !bill.getAdditionalDetails().isEmpty()) {
+					additionalDetails = objectMapper.convertValue(bill.getAdditionalDetails(), Map.class);
+				} else {
+					additionalDetails = new HashMap<>();
+				}
+				additionalDetails.put("reasonMessage",
+						"Orphan bill with no backing tracker entry; auto-cancelled so it can be regenerated");
+				additionalDetails.put("reason", "ORPHAN_BILL_AUTO_CANCELLED");
+
 				UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
 						.consumerCodes(Collections.singleton(bill.getConsumerCode()))
 						.billIds(Collections.singleton(bill.getId())).businessService(bill.getBusinessService())
 						.statusToBeUpdated(Demand.StatusEnum.CANCELLED)
-						.additionalDetails(objectMapper.createObjectNode().put("reason", "ORPHAN_BILL_AUTO_CANCELLED"))
-						.build();
+						.additionalDetails(objectMapper.valueToTree(additionalDetails)).build();
 				billService.cancelBill(updateBillCriteria, generateBillRequest.getRequestInfo());
 			}
 		} catch (Exception e) {
