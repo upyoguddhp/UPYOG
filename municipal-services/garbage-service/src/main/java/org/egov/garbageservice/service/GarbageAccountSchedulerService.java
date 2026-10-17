@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -145,6 +146,8 @@ public class GarbageAccountSchedulerService {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
 		AtomicInteger skippedCount = new AtomicInteger(0);
+		AtomicInteger outOfSequenceCount = new AtomicInteger(0);
+		AtomicReference<String> firstSequenceError = new AtomicReference<>(null);
 		setFromDateToDate(generateBillRequest);
 		String message = null;
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
@@ -173,7 +176,7 @@ public class GarbageAccountSchedulerService {
 
 			// Demand existence for this exact period is checked once per batch (in
 			// chunks, to stay within URL length limits) instead of once per account.
-			Set<String> applicationsWithExistingDemand = fetchApplicationsWithExistingDemandForPeriod(
+			Map<String, Demand> applicationsWithExistingDemand = fetchApplicationsWithExistingDemandForPeriod(
 					generateBillRequest, garbageAccounts);
 
 			garbageAccounts.stream().forEach(garbageAccount -> {
@@ -193,11 +196,20 @@ public class GarbageAccountSchedulerService {
 							skippedCount.incrementAndGet();
 							errorList.add("Bill already exists for application "
 									+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
-							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
+							if (applicationsWithExistingDemand.containsKey(garbageAccount.getGrbgApplicationNumber())) {
 								errorList.clear();
 								errorList.add("Demand already exists for the selected period");
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 							}
+							return;
+						}
+
+						String sequenceError = validateBillSequence(generateBillRequest, garbageAccount, trackerMap);
+						if (sequenceError != null) {
+							firstSequenceError.compareAndSet(null, sequenceError);
+							outOfSequenceCount.incrementAndGet();
+							errorList.add(sequenceError);
+							createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 							return;
 						}
 
@@ -259,8 +271,16 @@ public class GarbageAccountSchedulerService {
 
 							String billType = Boolean.TRUE.equals(generateBillRequest.getIsMultiMonth())
 									|| generateBillRequest.getMonths().size() > 1 ? "MULTI_MONTH" : "MONTHLY";
-							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
-								errorList.add("Demand already exists for the selected period");
+							// No tracker overlaps this period (checked above), so a demand that already
+							// exists for it is an orphan from an earlier run that created the demand but
+							// failed before the bill/tracker. Reuse it instead of skipping the account
+							// forever.
+							Demand orphanDemand = applicationsWithExistingDemand
+									.get(garbageAccount.getGrbgApplicationNumber());
+							if (orphanDemand != null && orphanDemand.getMinimumAmountPayable() != null
+									&& orphanDemand.getMinimumAmountPayable().compareTo(finalBillAmount) != 0) {
+								errorList.add("Demand already exists for the selected period with a different amount ("
+										+ orphanDemand.getMinimumAmountPayable() + " vs " + finalBillAmount + ")");
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 								return;
 							}
@@ -269,7 +289,7 @@ public class GarbageAccountSchedulerService {
 							BillResponse billResponse;
 							try {
 								billResponse = generateDemandAndBill(generateBillRequest, garbageAccount,
-										finalBillAmount, billType, demandId, numberOfMonths);
+										finalBillAmount, billType, demandId, numberOfMonths, orphanDemand);
 							} catch (Exception e) {
 								log.error("Failed to generate garbage bill for application {}",
 										garbageAccount.getGrbgApplicationNumber(), e);
@@ -322,14 +342,20 @@ public class GarbageAccountSchedulerService {
 //							GrbgBillFailure grbgBillFailure	= garbageAccountService.enrichGrbgBillFailure(garbageAccount, generateBillRequest,billResponse,errorList);
 //							garbageAccountService.removeGarbageBillFailure(grbgBillFailure);
 //							triggerNotifications
-								notificationService.triggerNotificationsGenerateBill(garbageAccount,
-										billResponse.getBill().get(0), generateBillRequest.getRequestInfo(),
-										grbgBillTracker);
+								try {
+									notificationService.triggerNotificationsGenerateBill(garbageAccount,
+											billResponse.getBill().get(0), generateBillRequest.getRequestInfo(),
+											grbgBillTracker);
+								} catch (Exception e) {
+									log.error("Failed to trigger bill notification for application {}",
+											garbageAccount.getGrbgApplicationNumber(), e);
+								}
 								// getting
 								// calling sms_TRACKER call to make a push to sms_tracker
 								StringBuilder smsTrackerUri = new StringBuilder();
 								smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
 
+								try {
 								ObjectNode smsRequestJson = notificationService.buildGenerateBillSmsRequest(garbageAccount,
 										billResponse.getBill().get(0), grbgBillTracker);
 
@@ -365,10 +391,9 @@ public class GarbageAccountSchedulerService {
 								smsTrackerRequest.put("smsRequest", smsRequestJson);
 								smsTrackerRequest.put("smsResponse", null);
 
-								try {
-									restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
-									log.info("SMS tracker entry created for billId {}",
-											billResponse.getBill().get(0).getId());
+								restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+								log.info("SMS tracker entry created for billId {}",
+										billResponse.getBill().get(0).getId());
 								} catch (Exception e) {
 									log.error("Failed to create SMS tracker entry for billId {}",
 											billResponse.getBill().get(0).getId(), e);
@@ -398,8 +423,22 @@ public class GarbageAccountSchedulerService {
 		}
 		int generatedCount = grbgBillTrackers.size();
 		int skipped = skippedCount.get();
+		int outOfSequence = outOfSequenceCount.get();
 
-		if (generatedCount > 0 && skipped > 0) {
+		// A request aimed at specific accounts is rejected outright so the user sees why.
+		if (outOfSequence > 0 && generatedCount == 0 && (null != generateBillRequest.getGrbgApplicationNumbers()
+				|| null != generateBillRequest.getMobileNumbers())) {
+			sanatizeFailureLog(generateBillRequest);
+			throw new CustomException("BILL_OUT_OF_SEQUENCE", firstSequenceError.get());
+		}
+
+		if (outOfSequence > 0) {
+			String sequenceMessage = outOfSequence
+					+ " Application Id(s) skipped because bills must be generated in month order (use arrear for earlier/missing months).";
+			message = generatedCount > 0
+					? "Bills generated successfully for " + generatedCount + " Application Id(s). " + sequenceMessage
+					: "No bills generated. " + sequenceMessage;
+		} else if (generatedCount > 0 && skipped > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + skipped
 					+ " Application Id(s) due to overlapping bill periods.";
 		} else if (generatedCount > 0) {
@@ -450,6 +489,60 @@ public class GarbageAccountSchedulerService {
 	}
 
 	/**
+	 * Bills must follow on from the latest bill already raised for the account:
+	 * a period earlier than (or leaving a gap after) the latest billed month is
+	 * rejected, and the missing months have to be raised as arrears. Accounts
+	 * with no earlier bill may start from any month.
+	 *
+	 * @return the rejection reason, or null when the period is the next in line
+	 */
+	private String validateBillSequence(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
+			Map<String, List<GrbgBillTracker>> trackerMap) {
+
+		List<GrbgBillTracker> trackers = trackerMap.get(garbageAccount.getGrbgApplicationNumber());
+		if (CollectionUtils.isEmpty(trackers)) {
+			return null;
+		}
+
+		YearMonth latestBilled = null;
+		for (GrbgBillTracker tracker : trackers) {
+			if ("CANCELLED".equalsIgnoreCase(tracker.getStatus()) || "ON-DEMAND".equalsIgnoreCase(tracker.getType())) {
+				continue;
+			}
+			Date existingTo = purseToDate(tracker.getToDate());
+			if (existingTo == null) {
+				continue;
+			}
+			YearMonth existingToMonth = YearMonth
+					.from(existingTo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+			if (latestBilled == null || existingToMonth.isAfter(latestBilled)) {
+				latestBilled = existingToMonth;
+			}
+		}
+		if (latestBilled == null) {
+			return null;
+		}
+
+		YearMonth requestedFrom = YearMonth
+				.from(generateBillRequest.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		YearMonth expected = latestBilled.plusMonths(1);
+
+		if (requestedFrom.equals(expected)) {
+			return null;
+		}
+		if (requestedFrom.isAfter(expected)) {
+			return "Bill for " + application(garbageAccount) + " cannot skip months. Last bill is up to " + latestBilled
+					+ "; generate " + expected + " first (or raise the missing months as arrear).";
+		}
+		return "A bill up to " + latestBilled + " already exists for " + application(garbageAccount)
+				+ ". Earlier months cannot be generated as a regular bill; generate an arrear instead.";
+	}
+
+	private String application(GarbageAccount garbageAccount) {
+		return "application " + garbageAccount.getGrbgApplicationNumber();
+	}
+
+	/**
 	 * Returns the application numbers in {@code garbageAccounts} that already
 	 * have an ACTIVE demand for the exact billing period in
 	 * {@code generateBillRequest}. Billing-service's demand search already
@@ -457,7 +550,7 @@ public class GarbageAccountSchedulerService {
 	 * the whole batch in chunks (grouped by tenantId, since the search is
 	 * tenant-scoped) instead of issuing one search per account.
 	 */
-	private Set<String> fetchApplicationsWithExistingDemandForPeriod(GenerateBillRequest generateBillRequest,
+	private Map<String, Demand> fetchApplicationsWithExistingDemandForPeriod(GenerateBillRequest generateBillRequest,
 			List<GarbageAccount> garbageAccounts) {
 
 		Map<String, List<String>> applicationNumbersByTenant = garbageAccounts.stream()
@@ -467,7 +560,7 @@ public class GarbageAccountSchedulerService {
 		long fromDate = generateBillRequest.getFromDate().getTime();
 		long toDate = generateBillRequest.getToDate().getTime();
 		int chunkSize = 150;
-		Set<String> applicationsWithExistingDemand = new HashSet<>();
+		Map<String, Demand> applicationsWithExistingDemand = new HashMap<>();
 
 		applicationNumbersByTenant.forEach((tenantId, applicationNumbers) -> {
 			for (int i = 0; i < applicationNumbers.size(); i += chunkSize) {
@@ -483,8 +576,9 @@ public class GarbageAccountSchedulerService {
 				demands.stream()
 						.filter(demand -> Demand.StatusEnum.ACTIVE.equals(demand.getStatus())
 								&& demand.getTaxPeriodFrom() != null && demand.getTaxPeriodTo() != null
-								&& demand.getTaxPeriodFrom() == fromDate && demand.getTaxPeriodTo() == toDate)
-						.forEach(demand -> applicationsWithExistingDemand.add(demand.getConsumerCode()));
+								&& demand.getTaxPeriodFrom().longValue() == fromDate
+										&& demand.getTaxPeriodTo().longValue() == toDate)
+						.forEach(demand -> applicationsWithExistingDemand.put(demand.getConsumerCode(), demand));
 			}
 		});
 
@@ -679,6 +773,13 @@ public class GarbageAccountSchedulerService {
 	            .sorted()
 	            .collect(Collectors.toList());
 	
+	    for (int i = 1; i < months.size(); i++) {
+	        if (months.get(i).getValue() != months.get(i - 1).getValue() + 1) {
+	            throw new CustomException("INVALID_BILL_PERIOD",
+	                    "Selected months must be consecutive; generate non-adjacent months as separate bills in order");
+	        }
+	    }
+
 	    LocalDate start = LocalDate.of(year, months.get(0), 1)
 	            .with(TemporalAdjusters.firstDayOfMonth());
 	
@@ -750,9 +851,17 @@ public class GarbageAccountSchedulerService {
 
 	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
 			BigDecimal billAmount,String Type,AtomicReference<String> demandId, int numberOfMonths) {
+		return generateDemandAndBill(generateBillRequest, garbageAccount, billAmount, Type, demandId, numberOfMonths,
+				null);
+	}
+
+	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
+			BigDecimal billAmount,String Type,AtomicReference<String> demandId, int numberOfMonths,
+			Demand existingDemand) {
 		try {
 			if(!checkUuidNumber(garbageAccount))
-				return null;
+				throw new CustomException("USER_MISMATCH",
+						"Mobile number user does not match the user mapped to the garbage account");
 			List<Demand> savedDemands = new ArrayList<>();
 			
 			// generate demand
@@ -787,7 +896,13 @@ public class GarbageAccountSchedulerService {
 		    }
 			generateBillRequest.setAdditionalDetail(additionalDetails);
 			String service = Type.equals("ON-DEMAND")?"GB_BULK":"GB";
-			savedDemands = demandService.generateDemand(generateBillRequest.getRequestInfo(), garbageAccount,service, billAmount, generateBillRequest);
+			if (existingDemand != null) {
+				log.info("Reusing existing demand {} for application {}", existingDemand.getId(),
+						garbageAccount.getGrbgApplicationNumber());
+				savedDemands = Collections.singletonList(existingDemand);
+			} else {
+				savedDemands = demandService.generateDemand(generateBillRequest.getRequestInfo(), garbageAccount,service, billAmount, generateBillRequest);
+			}
 
 			if (CollectionUtils.isEmpty(savedDemands)) {
 				throw new CustomException("INVALID_CONSUMERCODE",
@@ -818,13 +933,10 @@ public class GarbageAccountSchedulerService {
 				        log.error("Failed to parse backend error JSON: {}", parseEx.getMessage());
 				    }
 			}
-			if(null != generateBillRequest.getGrbgApplicationNumbers() || null != generateBillRequest.getMobileNumbers()) {
-				throw new CustomException("INVALID_CONSUMERCODE",actualMessage);
-			}else {
-		        log.error("Failed to parse backend error JSON: {}", e.getError());
-			}
+			log.error("Bill generation failed for application {}: {}", garbageAccount.getGrbgApplicationNumber(),
+					actualMessage);
+			throw new CustomException("INVALID_CONSUMERCODE", actualMessage);
 		}
-		return null;
 	}
 
 	private Date purseToDate(String dateString) {
