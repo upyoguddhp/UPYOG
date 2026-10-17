@@ -109,7 +109,9 @@ public class ChallanConfiguration {
 
     @Value("${egov.bill.gen.endpoint}")
     private String fetchBillEndpoint;
-
+    
+    @Value("${egov.bill.search.endpoint}")
+    private String searchBillEndpoint;
 
     //Localization
     @Value("${egov.localization.host}")
@@ -223,5 +225,11 @@ public class ChallanConfiguration {
 
 	@Value("${workflow.processinstance.search.path}")
 	private String wfProcessSearchPath;
+	
+	@Value("${egov.sms.host}")
+	public String smsHost;
+	
+	@Value("${egov.sms.tracker.create.endpoint}")
+	public String smsTrackerCreateEndpoint;
 
 }

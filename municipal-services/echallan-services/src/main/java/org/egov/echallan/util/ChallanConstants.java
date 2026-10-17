@@ -94,7 +94,7 @@ public class ChallanConstants {
     
     public static final String SMS_BODY_CREATE_CHALLAN =
             "Dear {NAME}, your Challan of Rs.{AMOUNT} for {SERVICE} "
-          + "is issued with Challan No:{CHALLANNO}, Dt: {DATE}. "
+          + "is issued with Challan No:{CHALLANNO}, Dt: {DATE}."
           + "Please pay using {URL}. Citizen Seva";
 
     public ChallanConstants() {}

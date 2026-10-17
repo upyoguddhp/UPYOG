@@ -1,18 +1,49 @@
 package org.egov.echallan.service;
 
 
-import java.util.*;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_ACTION;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_CODE;
+import static org.egov.echallan.util.ChallanConstants.CANCEL_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.CREATE_ACTION;
+import static org.egov.echallan.util.ChallanConstants.CREATE_CODE;
+import static org.egov.echallan.util.ChallanConstants.CREATE_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.DOWNLOAD_RECEIPT_CODE;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_ACTION;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_CODE;
+import static org.egov.echallan.util.ChallanConstants.PAYMENT_CODE_INAPP;
+import static org.egov.echallan.util.ChallanConstants.SMS_BODY_CREATE_CHALLAN;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_ACTION;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_CODE;
+import static org.egov.echallan.util.ChallanConstants.UPDATE_CODE_INAPP;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
-import org.egov.echallan.model.*;
+import org.egov.echallan.model.Amount;
+import org.egov.echallan.model.Bill;
+import org.egov.echallan.model.BillSearchCriteria;
+import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.Challan.StatusEnum;
+import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.Email;
+import org.egov.echallan.model.EmailRequest;
+import org.egov.echallan.model.SMSRequest;
 import org.egov.echallan.producer.Producer;
 import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.util.NotificationUtil;
-import org.egov.echallan.web.models.collection.PaymentDetail;
-import org.egov.echallan.web.models.collection.PaymentRequest;
 import org.egov.echallan.web.models.collection.PaymentResponse;
 import org.egov.echallan.web.models.user.User;
 import org.egov.echallan.web.models.uservevents.Action;
@@ -31,11 +62,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static org.egov.echallan.util.ChallanConstants.*;
 
 
 @Service
@@ -55,7 +86,10 @@ public class NotificationService {
 	
 	private Producer producer;
 	
-	 private ServiceRequestRepository serviceRequestRepository;
+	@Autowired
+	private BillingService billingService;
+	
+	private ServiceRequestRepository serviceRequestRepository;
 	
 	private static final String BUSINESSSERVICE_MDMS_MODULE = "BillingService";
 	public static final String BUSINESSSERVICE_MDMS_MASTER = "BusinessService";
@@ -144,15 +178,28 @@ public class NotificationService {
 			return null;
 		}
 
-		String message = populateCreateChallanTemplate(challan);
-		return SMSRequest.builder().mobileNumber(mobileNumber).message(message).build();
+		String message = populateCreateChallanTemplate(challan, challanRequest);
+		return SMSRequest.builder()
+				.mobileNumber(mobileNumber)
+				.message(message)
+				.templateName("CitizenSeva 22")
+				.build();
 	}
 	
-	private String populateCreateChallanTemplate(Challan challan) {
+	private String populateCreateChallanTemplate(Challan challan, ChallanRequest challanRequest) {
 
 		String body = SMS_BODY_CREATE_CHALLAN;
 		String citizenName = challan.getCitizen() != null ? challan.getCitizen().getName() : "";
-		String amount = challan.getAmount() != null ? challan.getAmount().toString() : "0";
+		String amount = "0";
+
+		if (challan.getAmount() != null) {
+		    BigDecimal totalAmount = challan.getAmount().stream()
+		            .map(Amount::getAmount)
+		            .filter(Objects::nonNull)
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		    amount = totalAmount.toPlainString();
+		}
 		String service = challan.getBusinessService();
 		String challanNo = challan.getChallanNo();
 		String date = "";
@@ -161,15 +208,41 @@ public class NotificationService {
 			Date challanDate = new Date(challan.getAuditDetails().getCreatedTime());
 			date = new java.text.SimpleDateFormat("dd-MM-yyyy").format(challanDate);
 		}
+		
+		BillSearchCriteria criteria = BillSearchCriteria.builder()
+		        .tenantId(challan.getTenantId())
+		        .consumerCode(Collections.singleton(challan.getChallanNo()))
+		        .build();
 
-		String paymentUrl = config.getUiAppHost() + "/citizen/payment/my-bills/" + challan.getTenantId();
+		Object response = billingService.searchBill(criteria, challanRequest.getRequestInfo());
 
+		String billId = "";
+
+		if (response instanceof Map) {
+			Map<String, Object> responseMap = (Map<String, Object>) response;
+			List<Map<String, Object>> bills = (List<Map<String, Object>>) responseMap.get("Bill");
+			if (bills != null && !bills.isEmpty()) {
+				billId = (String) bills.get(0).get("id");
+			}
+		}
+		
+		String payNowUrl =
+		        "https://citizenseva.hp.gov.in/hp-udd/"
+		        + "citizen-payment"
+		        + "/"
+		        + challan.getId() 
+		        + "/"
+		        + billId
+				+"/CHL/";
+		
+		String shortUrl = util.getShortenedUrl(payNowUrl);
+		
 		body = body.replace("{NAME}", citizenName);
 		body = body.replace("{AMOUNT}", amount);
 		body = body.replace("{SERVICE}", service);
 		body = body.replace("{CHALLANNO}", challanNo);
 		body = body.replace("{DATE}", date);
-		body = body.replace("{URL}", paymentUrl);
+		body = body.replace("{URL}", shortUrl);
 
 		return body;
 	}
@@ -358,6 +431,40 @@ public class NotificationService {
 				log.error("No message configured! Notification will not be sent.");
 			}
 	}
-	
+		
+		public void sendChallanSms(ChallanRequest challanRequest, Bill bill) {
+			SMSRequest smsRequest = buildCreateChallanSmsRequest(challanRequest);
+			
+			StringBuilder smsTrackerUri = new StringBuilder();
+			smsTrackerUri.append(config.smsHost).append(config.smsTrackerCreateEndpoint);
 
+			Map<String, Object> smsTrackerRequest = new HashMap<>();
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			String fromDateStr = formatter.format(bill.getBillDetails().get(0).getFromPeriod());
+			String toDateStr = formatter.format(bill.getBillDetails().get(0).getToPeriod());
+			smsTrackerRequest.put("uuid", java.util.UUID.randomUUID().toString());
+			smsTrackerRequest.put("amount", bill.getTotalAmount());
+			smsTrackerRequest.put("applicationNo", bill.getConsumerCode());
+			smsTrackerRequest.put("tenantId", bill.getTenantId());
+			smsTrackerRequest.put("service", "CHLDW");
+			smsTrackerRequest.put("fromDate", fromDateStr);
+			smsTrackerRequest.put("toDate", toDateStr);
+			smsTrackerRequest.put("createdBy", "system");
+			smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+			smsTrackerRequest.put("ward", bill.getPayerAddress());
+			smsTrackerRequest.put("billId", bill.getId());
+			smsTrackerRequest.put("smsStatus", false);
+			smsTrackerRequest.put("ownerMobileNo", bill.getMobileNumber());
+			smsTrackerRequest.put("smsRequest", smsRequest);
+			smsTrackerRequest.put("smsResponse", null);
+			smsTrackerRequest.put("ward", "N/A");
+			try {
+				serviceRequestRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+				log.info("SMS tracker entry created for billId {}", bill.getId());
+			} catch (Exception e) {
+				log.error("Failed to create SMS tracker entry for billId {}",bill.getId(), e);
+			}
+			
+		}	
 }

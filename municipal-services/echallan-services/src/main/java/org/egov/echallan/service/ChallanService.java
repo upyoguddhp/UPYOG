@@ -1,12 +1,15 @@
 package org.egov.echallan.service;
 
-import java.util.*;
-
-import javax.validation.Valid;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.echallan.config.ChallanConfiguration;
+import org.egov.echallan.model.BillSearchCriteria;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.SearchCriteria;
@@ -19,6 +22,10 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.echallan.model.Bill;
 
 
 @Service
@@ -33,6 +40,9 @@ public class ChallanService {
 	@Autowired
 	private WorkflowService workflowService;
 	
+	@Autowired
+	private BillingService billService;
+	
     private UserService userService;
     
     private ChallanRepository repository;
@@ -44,6 +54,9 @@ public class ChallanService {
     private CommonUtils utils;
     
     private ChallanConfiguration config;
+    
+    @Autowired
+    private NotificationService notificationService;
     
     @Autowired
     public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService,
@@ -66,22 +79,40 @@ public class ChallanService {
 	 */
 	public Challan create(ChallanRequest request) {
 		Object mdmsData = utils.mDMSCall(request);
-		validator.validateFields(request, mdmsData,"create");
-		
+		validator.validateFields(request, mdmsData, "create");
+
 		enrichmentService.enrichCreateRequest(request);
-		
+
 		userService.createUser(request);
-		
+
 		calculationService.addCalculation(request);
-		
-		if(request.getChallan().getBusinessService().equalsIgnoreCase("REQSERV"))
-		workflowService.updateWorkflow(request);
+
+		if (request.getChallan().getBusinessService().equalsIgnoreCase("REQSERV"))
+			workflowService.updateWorkflow(request);
 
 		repository.save(request);
+
+		BillSearchCriteria criteria = BillSearchCriteria.builder().tenantId(request.getChallan().getTenantId())
+				.consumerCode(Collections.singleton(request.getChallan().getChallanNo())).build();
+
+		Object billResponse = billService.searchBill(criteria, request.getRequestInfo());
 		
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ChallanRequest challanRequest = new ChallanRequest();
+			challanRequest = mapper.convertValue(request, ChallanRequest.class);
+
+			JsonNode root = mapper.valueToTree(billResponse);
+			JsonNode billNode = root.path("Bill");
+			Bill bill = mapper.treeToValue(billNode.get(0), Bill.class);
+
+			notificationService.sendChallanSms(challanRequest, bill);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
 		return request.getChallan();
 	}
-	
 	
 	 public List<Challan> search(SearchCriteria criteria, RequestInfo requestInfo){
 	        List<Challan> challans;
