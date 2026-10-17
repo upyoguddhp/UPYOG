@@ -218,7 +218,8 @@ public class PropertyQueryBuilder {
 	
 	private static final String PROPERTY_APPROVER_QUERY = "SELECT e.code " + "FROM eg_userrole_v1 r "
 			+ "INNER JOIN eg_hrms_employee e ON r.user_id = e.id " + "WHERE r.role_tenantid = ? "
-			+ "AND r.role_code = 'PROPERTY_APPROVER'";
+			+ "AND r.role_code = 'PROPERTY_APPROVER'"
+			+ "LIMIT 1";
 
 	public String getUniqueWardsSearchQuery(String stringDate, List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(UNIQUE_WARDS_SEARCH_QUERY);
@@ -583,6 +584,26 @@ public class PropertyQueryBuilder {
 	        "    ELSE additionaldetails " +
 	        "END " +
 	        "WHERE bill_id = ?";
+
+			private static final String UPDATE_CUSTOM_TRACKER_AMOUNT =
+		    "UPDATE eg_pt_tax_calculator_tracker "
+		  + "SET propertytax = :amount, "
+		  + "lastmodifiedby = :modifiedBy, "
+		  + "lastmodifiedtime = :modifiedTime, "
+		  + "additionaldetails = jsonb_set( "
+		  + "   CASE "
+		  + "       WHEN jsonb_typeof(additionaldetails) = 'object' "
+		  + "       THEN additionaldetails "
+		  + "       WHEN jsonb_typeof(additionaldetails) = 'array' "
+		  + "       THEN jsonb_build_object('data', additionaldetails) "
+		  + "       ELSE '{}'::jsonb "
+		  + "   END, "
+		  + "   '{reason}', "
+		  + "   to_jsonb(:reason), "
+		  + "   true "
+		  + ") "
+		  + "WHERE bill_id = :billId "
+		  + "AND tenantid = :tenantId";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1397,6 +1418,8 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 	
 	public String getExpireActiveTrackersByPropertyIdQuery() {
 	    return PT_TRACKER_UPDATE_BY_PROPERTY_ID;
+	}	public String getCustomTrackerUpdateQuery() {
+		return UPDATE_CUSTOM_TRACKER_AMOUNT;
 	}
 	
 
