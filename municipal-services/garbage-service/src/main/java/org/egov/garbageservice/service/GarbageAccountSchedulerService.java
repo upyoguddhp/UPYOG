@@ -589,9 +589,15 @@ public class GarbageAccountSchedulerService {
 					.consumerCode(Collections.singleton(demand.getConsumerCode())).build();
 			BillResponse billResponse = billService.searchBill(billSearchCriteria, generateBillRequest.getRequestInfo());
 
-			if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
-				Bill bill = billResponse.getBill().get(0);
+			// searchBill always asks billing-service for retrieveAll=true with no status
+			// filter, so it can return CANCELLED/PAID/etc. bills for this consumer too -
+			// billing-service only allows cancelling an ACTIVE bill (anything else 400s
+			// with "No Active bills found for cancellation"), so only act if one exists.
+			Bill bill = CollectionUtils.isEmpty(billResponse == null ? null : billResponse.getBill()) ? null
+					: billResponse.getBill().stream().filter(b -> Bill.StatusEnum.ACTIVE.equals(b.getStatus()))
+							.findFirst().orElse(null);
 
+			if (bill != null) {
 				// Preserve whatever additionalDetails the bill already carries (billing-service
 				// relies on some of those keys elsewhere) and just add the mandatory cancel
 				// reason fields on top, same as the proven cancelGarbageBill flow does.
