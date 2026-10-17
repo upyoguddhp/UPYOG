@@ -179,7 +179,11 @@ public class NotificationService {
 		}
 
 		String message = populateCreateChallanTemplate(challan, challanRequest);
-		return SMSRequest.builder().mobileNumber(mobileNumber).message(message).build();
+		return SMSRequest.builder()
+				.mobileNumber(mobileNumber)
+				.message(message)
+				.templateName("CitizenSeva 22")
+				.build();
 	}
 	
 	private String populateCreateChallanTemplate(Challan challan, ChallanRequest challanRequest) {
