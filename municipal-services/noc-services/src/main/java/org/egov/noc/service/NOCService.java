@@ -152,7 +152,7 @@ public class NOCService {
 		    }
 		    
 		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
-		        createCertificate(nocRequest);
+		        saveCertificateTemplate(nocRequest);
 		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
@@ -261,95 +261,25 @@ public class NOCService {
                 return nocRepository.getNocCount(criteria);
         }
         
-		private void createCertificate(NocRequest nocRequest) {
+		private void saveCertificateTemplate(NocRequest nocRequest) {
 			String template = getMdmsCertificateTemplate(nocRequest);
-			Object certificateTemplate = nocUtil.mDMSCall(nocRequest.getRequestInfo(), nocRequest.getNoc().getTenantId());
-			Resource resource = createResource(nocRequest);
-			DmsRequest dmsRequest = generateDmsRequest(resource, nocRequest);
-			try {
-				String documentReferenceId = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
-			} catch (IOException e) {
-				throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
-			}
 		}
-        
-		private Resource createResource(NocRequest nocRequest) {
-
-		    Map<String, Object> map = new HashMap<>();
-		    Map<String, Object> nocObject = new HashMap<>();
-
-		    // Demo values for NOC certificate
-		    nocObject.put("fromDate", "05-10-2026");
-		    nocObject.put("toDate", "05-10-2026");
-		    nocObject.put("siteName", "Demo Property");
-		    nocObject.put("siteAddress", "Shimla, Himachal Pradesh");
-		    nocObject.put("bookedBy", "Jatin Sharma");
-		    nocObject.put("mobileNumber", "9876543210");
-		    nocObject.put("bookingDate", "05-10-2026");
-		    nocObject.put("address", "Demo Address, Shimla, Himachal Pradesh");
-		    nocObject.put("contactNumber", "9876543210");
-		    nocObject.put("pinLocation", "Shimla");
-		    nocObject.put("contactLocation", "Shimla");
-		    nocObject.put("bookingStatus", "APPROVED");
-		    nocObject.put("bookingReference", "NOC/0126/00001");
-		    nocObject.put("perDayCost", "0");
-		    nocObject.put("numberOfDays", "1");
-		    nocObject.put("ulbName", "Shimla Municipal Corporation");
-		    nocObject.put("ulbType", "Municipal Corporation");
-		    nocObject.put("TotalAmount", "0");
-		    nocObject.put("securityAmount", "0");
-		    nocObject.put("approverName", "EMP-0-000112");
-
-		    // Root key expected by DataConfigs baseKeyPath: $.noc
-		    map.put("noc", nocObject);
-
-		    PDFRequest pdfRequest = PDFRequest.builder()
-		            .RequestInfo(nocRequest.getRequestInfo())
-		            .key("nocCertificate")
-		            .tenantId(nocRequest.getNoc().getTenantId())
-		            .data(map)
-		            .build();
-
-		    return reportService.createNoSavePDF(pdfRequest);
-		}
-		
-		private DmsRequest generateDmsRequest(Resource resource, NocRequest nocRequest) {
-			Noc noc = nocRequest.getNoc();
-			RequestInfo requestInfo = nocRequest.getRequestInfo();
-			DmsRequest dmsRequest = DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
-					.objectId(noc.getId()).description(config.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
-					.id(config.ALFRESCO_COMMON_CERTIFICATE_ID)
-					.type(config.ALFRESCO_COMMON_CERTIFICATE_TYPE)
-					.objectName(config.ALFRESCO_BUSINESS_SERVICE)
-					.comments(config.ALFRESCO_NOC_CERTIFICATE_COMMENT)
-					.status(config.STATUS_APPROVED)
-					.file(resource)
-					.servicetype(config.ALFRESCO_BUSINESS_SERVICE)
-					.documentType(config.ALFRESCO_DOCUMENT_TYPE)
-					.documentId(config.ALFRESCO_COMMON_DOCUMENT_ID)
-					.build();
-			return dmsRequest;
-		}
-		
-		
+	
 		private String getMdmsCertificateTemplate(NocRequest noc) {
 			
 		    Map<String, Object> mdmsCriteria = new HashMap<>();
 			String[] tenantParts = noc.getNoc().getTenantId().split("\\.");
-			String ulbName = tenantParts[tenantParts.length - 1];
-//			String nocType = noc.getNocType();
-//			String uniqueIdentifier = ulbName + "." +noc.getNocType().replace("NOC", "_NOC");
-			String uniqueIdentifier = null;
+			String uniqueIdentifier = noc.getNoc().getNocType().replace("NOC", "_NOC");
 			
 			mdmsCriteria.put("tenantId", tenantParts[0]);
-			mdmsCriteria.put("schemaCode", "ULBS.NocFee");
+			mdmsCriteria.put("schemaCode", "NOC.CERTIFICATE");
 			mdmsCriteria.put("uniqueIdentifiers",Collections.singletonList(uniqueIdentifier));
 		
 		    Map<String, Object> mdmsRequest = new HashMap<>();
 		    mdmsRequest.put("RequestInfo", noc.getRequestInfo());
 		    mdmsRequest.put("MdmsCriteria", mdmsCriteria);
 		
-		    log.info("Fetching NOC fee from MDMS for tenant {}", noc.getNoc().getTenantId());
+		    log.info("Fetching NOC certificate from MDMS for tenant {}", noc.getNoc().getTenantId());
 		
 		    Object response = serviceRequestRepository.fetchResult(
 		            new StringBuilder(config.getMdmsV2Host())
@@ -357,26 +287,11 @@ public class NOCService {
 		            mdmsRequest
 		    );
 		
-		    if (!(response instanceof Map)) {
-		        throw new IllegalStateException("Invalid MDMS response");
-		    }
-		
-		    Map<?, ?> responseMap = (Map<?, ?>) response;
-		    List<?> mdmsList = (List<?>) responseMap.get("mdms");
-		
-		    if (CollectionUtils.isEmpty(mdmsList)) {
-		        throw new IllegalStateException("NOC fee not configured in MDMS");
-		    }
-		
-		    Map<?, ?> mdmsEntry = (Map<?, ?>) mdmsList.get(0);
-		    Map<?, ?> data = (Map<?, ?>) mdmsEntry.get("data");
-		
-		    Object rate = data.get("rate");
-		    if (rate == null) {
-		        throw new IllegalStateException("Rate missing in MDMS NocFee");
-		    }
-		
-		    log.info("NOC fee fetched from MDMS: {}", rate);
-		    return "";
+			Map<String, Object> responseMap = (Map<String, Object>) response;
+			List<Map<String, Object>> mdmsList = (List<Map<String, Object>>) responseMap.get("mdms");
+			Map<String, Object> mdmsData = (Map<String, Object>) mdmsList.get(0).get("data");
+			String template = (String) mdmsData.get("data");
+			
+			return template;
 		}
 }
