@@ -151,9 +151,10 @@ public class NOCService {
 		    	 nocBillingService.generateBill(nocRequest);
 		    }
 		    
-		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+		    //TODO: uncomment the approve check
+//		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
 		        saveCertificateTemplate(nocRequest);
-		    }
+//		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
@@ -263,6 +264,9 @@ public class NOCService {
         
 		private void saveCertificateTemplate(NocRequest nocRequest) {
 			String template = getMdmsCertificateTemplate(nocRequest);
+			String applicationNo = nocRequest.getNoc().getApplicationNo();
+			//TODO: need to fill in values to the template
+			nocRepository.saveCertificateTemplate(template, applicationNo);
 		}
 	
 		private String getMdmsCertificateTemplate(NocRequest noc) {

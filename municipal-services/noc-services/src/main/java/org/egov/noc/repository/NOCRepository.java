@@ -3,7 +3,6 @@ package org.egov.noc.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
 import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.producer.Producer;
 import org.egov.noc.repository.builder.NocQueryBuilder;
@@ -14,6 +13,10 @@ import org.egov.noc.web.model.NocSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
@@ -33,6 +36,9 @@ public class NOCRepository {
 
 	@Autowired
 	private NocRowMapper rowMapper;
+	
+	@Autowired
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	/**
 	 * push the nocRequest object to the producer on the save topic
@@ -80,5 +86,13 @@ public class NOCRepository {
                 int count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
                 return count;
         }
+        
+		public void saveCertificateTemplate(String template, String applicationNo) {
+			List<Object> preparedStmtList = new ArrayList<>();
+			preparedStmtList.add(template);
+			preparedStmtList.add(applicationNo);
+			String query = queryBuilder.getNocTemplateInsertQuery(template, applicationNo);
+			namedParameterJdbcTemplate.getJdbcTemplate().update(query, preparedStmtList.toArray());
+		}
 
 }

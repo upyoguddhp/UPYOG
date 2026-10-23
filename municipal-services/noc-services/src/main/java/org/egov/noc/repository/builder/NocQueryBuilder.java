@@ -34,6 +34,8 @@ public class NocQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 	
 	private final String countWrapper = "SELECT COUNT(DISTINCT(noc_id)) FROM ({INTERNAL_QUERY}) as noc_count";
+	
+	private final String TEMPLATE_INSERTION_QUERY = "UPDATE eg_noc SET certificatetemplate = ? WHERE applicationno = ?";
 
 	/**
 	 * To give the Search query based on the requirements.
@@ -152,6 +154,10 @@ public class NocQueryBuilder {
 		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
+	}
+	
+	public String getNocTemplateInsertQuery(String template, String applicationNo) {
+	    return TEMPLATE_INSERTION_QUERY;
 	}
 
 	/**
