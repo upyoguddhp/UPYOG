@@ -24,7 +24,7 @@ public class NocQueryBuilder {
 
 	private static final String QUERY = "SELECT noc.*,nocdoc.*,noc.id as noc_id,noc.tenantid as noc_tenantId,noc.lastModifiedTime as "
 			+ "noc_lastModifiedTime,noc.createdBy as noc_createdBy,noc.lastModifiedBy as noc_lastModifiedBy,noc.createdTime as "
-			+ "noc_createdTime,noc.additionalDetails,noc.landId as noc_landId, nocdoc.id as noc_doc_id, nocdoc.additionalDetails as doc_details, "
+			+ "noc_createdTime,noc.certificatetemplate,noc.additionalDetails,noc.landId as noc_landId, nocdoc.id as noc_doc_id, nocdoc.additionalDetails as doc_details, "
 			+ "nocdoc.documenttype as noc_doc_documenttype,nocdoc.filestoreid as noc_doc_filestore"
 			+ " FROM eg_noc noc  LEFT OUTER JOIN "
 			+ "eg_noc_document nocdoc ON nocdoc.nocid = noc.id WHERE 1=1 ";

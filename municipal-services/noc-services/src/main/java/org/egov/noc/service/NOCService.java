@@ -19,6 +19,7 @@ import org.egov.noc.validator.NOCValidator;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
+import org.egov.noc.web.model.PDFRequest;
 import org.egov.noc.web.model.RequestInfoWrapper;
 import org.egov.noc.web.model.workflow.BusinessService;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.egov.noc.web.model.NocSearchCriteria;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +78,9 @@ public class NOCService {
 	
 	@Autowired
 	private AlfrescoService alfrescoService;
+	
+	@Autowired
+	private NOCService nocService;
 
 	/**
 	 * entry point from controller, takes care of next level logic from controller to create NOC application
@@ -281,12 +286,15 @@ public class NOCService {
 		}
 		
 		public ResponseEntity<Resource> generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
-				String applicationNo) {
-
-			 return null;
-//			PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequestForBill(requestInfoWrapper, grbAccount, bill,
-//					grbgTaxCalculatorTracker);
-//
-//			return reportService.createNoSavePDF(pdfRequest);
+				String applicationNo, String tenantid ) {
+			NocSearchCriteria criteria = NocSearchCriteria.builder()
+					.tenantId(tenantid)
+					.applicationNo(applicationNo).build();
+			
+			List<Noc> nocList = nocService.search(criteria, requestInfoWrapper.getRequestInfo());
+			String template = nocList.get(0).getCertificateTemplate(); 
+			
+			PDFRequest pdfRequest = reportService.generatePdfRequestForNoc(template, requestInfoWrapper);
+			return reportService.createNoSavePDF(pdfRequest);
 		}
 }

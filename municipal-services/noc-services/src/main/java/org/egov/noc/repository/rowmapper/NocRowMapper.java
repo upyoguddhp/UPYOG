@@ -48,6 +48,7 @@ public class NocRowMapper implements ResultSetExtractor<List<Noc>> {
                 
                 
                 noc.setNocReason(rs.getString("nocreason"));
+                noc.setCertificateTemplate(rs.getString("certificatetemplate"));
                 noc.setBusinessService(rs.getString("businessservice"));
                 noc.setConnectionType(rs.getString("connectiontype"));
 
