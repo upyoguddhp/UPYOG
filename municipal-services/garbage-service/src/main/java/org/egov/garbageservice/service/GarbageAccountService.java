@@ -1681,6 +1681,8 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getGarbageId())
 						&& CollectionUtils.isEmpty(
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getPropertyId())
+						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccountRequest
+								.getSearchCriteriaGarbageAccount().getSystemPropertyId())
 						&& CollectionUtils.isEmpty(
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getType())
 						&& CollectionUtils.isEmpty(
@@ -1726,6 +1728,7 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 	public Boolean isCriteriaEmpty(SearchCriteriaGarbageAccount criteria) {
 		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getId())
 				&& CollectionUtils.isEmpty(criteria.getGarbageId()) && CollectionUtils.isEmpty(criteria.getPropertyId())
+				&& CollectionUtils.isEmpty(criteria.getSystemPropertyId())
 				&& CollectionUtils.isEmpty(criteria.getUuid()) && CollectionUtils.isEmpty(criteria.getType())
 				&& CollectionUtils.isEmpty(criteria.getName()) && CollectionUtils.isEmpty(criteria.getMobileNumber())
 				&& CollectionUtils.isEmpty(criteria.getApplicationNumber())
