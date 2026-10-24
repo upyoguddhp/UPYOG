@@ -118,6 +118,9 @@ public class GarbageAccountRepository {
     		+ ":status, :additionalDetail :: JSONB, :createdBy, :createdDate, "
     		+ ":lastModifiedBy, :lastModifiedDate, :tenantId, :parentAccount, :businessService, :approvalDate, :isActive, :channel)";
     
+	private static final String INSERT_ACCOUNT_DDP = "INSERT INTO eg_grbg_account_ddp "
+			+ "(garbage_account_uuid, garbage_id) " + "VALUES (:uuid, :garbageId)";
+    
     private static final String UPDATE_ACCOUNT_BY_ID = "UPDATE eg_grbg_account SET garbage_id = :garbageId, uuid =:uuid"
     		+ ", property_id = :propertyId, type = :type, name = :name, mobile_number = :mobileNumber, is_owner = :isOwner"
     		+ ", user_uuid = :userUuid, declaration_uuid = :declarationUuid, status = :status"
@@ -285,6 +288,7 @@ public class GarbageAccountRepository {
         accountInputs.put("isActive", account.getIsActive());
 
         namedParameterJdbcTemplate.update(INSERT_ACCOUNT, accountInputs);
+        namedParameterJdbcTemplate.update(INSERT_ACCOUNT_DDP, accountInputs);
         
         createGarbageAccountAudit(account);
         

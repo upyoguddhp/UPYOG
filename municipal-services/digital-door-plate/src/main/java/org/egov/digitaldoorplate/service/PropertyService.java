@@ -97,6 +97,15 @@ public class PropertyService {
 		if (StringUtils.isEmpty(mobileNo) && null != owner) {
 			mobileNo = owner.getMobileNumber();
 		}
+		
+		String wardNo = readText(addressDetails, "wardNo");
+		String wardNumber = readText(addressDetails, "wardNumber");
+
+		wardNo = wardNo == null ? "" : wardNo.trim();
+		wardNumber = wardNumber == null ? "" : wardNumber.trim();
+
+		String wardAddress = "Ward No. " + (wardNo.isEmpty() ? wardNumber
+				: wardNumber.isEmpty() || wardNo.equalsIgnoreCase(wardNumber) ? wardNo : wardNo + ", " + wardNumber);
 
 		return DoorPlateQrSnapshot.builder()
 				.ownerName(null == owner ? null : owner.getPropertyOwnerName())
@@ -105,7 +114,7 @@ public class PropertyService {
 				.id(id)
 				.ulbName(readText(addressDetails, "ulbName"))
 				.ward(readText(addressDetails, "wardNumber"))
-				.address("Ward No. " + readText(addressDetails, "wardNo") + ", " + readText(addressDetails, "wardNumber"))
+				.address(wardAddress)
 				.build();
 	}
 
