@@ -1,27 +1,15 @@
 package org.egov.noc.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Set;
-import java.util.HashSet;
-
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.NOCRepository;
 import org.egov.noc.repository.ServiceRequestRepository;
@@ -32,26 +20,19 @@ import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
 import org.egov.noc.web.model.RequestInfoWrapper;
-import org.egov.noc.web.model.bpa.BPA;
-import org.egov.noc.web.model.bpa.BPAResponse;
-import org.egov.noc.web.model.bpa.BPASearchCriteria;
 import org.egov.noc.web.model.workflow.BusinessService;
-import org.egov.noc.web.model.workflow.ProcessInstance;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
-import org.egov.noc.web.model.DmsRequest;
 import org.egov.noc.workflow.WorkflowIntegrator;
 import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.egov.noc.web.model.PDFRequest;
-import org.egov.noc.service.ReportService;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -297,5 +278,15 @@ public class NOCService {
 			String template = (String) mdmsData.get("data");
 			
 			return template;
+		}
+		
+		public ResponseEntity<Resource> generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
+				String applicationNo) {
+
+			 return null;
+//			PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequestForBill(requestInfoWrapper, grbAccount, bill,
+//					grbgTaxCalculatorTracker);
+//
+//			return reportService.createNoSavePDF(pdfRequest);
 		}
 }
