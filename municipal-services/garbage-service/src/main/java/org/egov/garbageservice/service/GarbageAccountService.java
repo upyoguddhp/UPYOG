@@ -665,6 +665,25 @@ public class GarbageAccountService {
 //					}));
 //		}
 	}
+	
+	/**
+	 * One property can be mapped to only one garbage id. Rejects a DDP mapping whose
+	 * property is already mapped to a different main garbage account.
+	 */
+	private void validatePropertyNotMappedToOtherGarbageId(List<GarbageAccount> accounts) {
+		for (GarbageAccount account : accounts) {
+			if (StringUtils.isBlank(account.getSystemPropertyId()) || null == account.getGarbageId()) {
+				continue;
+			}
+			List<Long> otherGarbageIds = garbageAccountRepository.findOtherMappedGarbageIds(
+					account.getSystemPropertyId(), account.getTenantId(), account.getGarbageId());
+			if (!CollectionUtils.isEmpty(otherGarbageIds)) {
+				throw new CustomException("PROPERTY_ALREADY_MAPPED", "Property " + account.getSystemPropertyId()
+						+ " is already mapped to Garbage ID " + otherGarbageIds.get(0)
+						+ ". One property can be mapped to only one Garbage ID.");
+			}
+		}
+	}
 
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
 		
@@ -700,6 +719,7 @@ public class GarbageAccountService {
 		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
 		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
 		    }
+		    validatePropertyNotMappedToOtherGarbageId(updateGarbageRequest.getGarbageAccounts());
 		}
 
 		// load garbage account from backend if workflow = true

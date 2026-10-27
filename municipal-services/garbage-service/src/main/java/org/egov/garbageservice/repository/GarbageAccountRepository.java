@@ -1007,6 +1007,18 @@ public class GarbageAccountRepository {
 		namedParameterJdbcTemplate.update(UPSERT_DDP_WORKFLOW_BY_UUID, params);
 		return updatedAccounts;
 	}
+	
+	/**
+	 * Returns the garbage ids of other active main accounts (child accounts are
+	 * excluded, they share their parent's property) already mapped to the given
+	 * property-services propertyId.
+	 */
+	public List<Long> findOtherMappedGarbageIds(String systemPropertyId, String tenantId, Long garbageId) {
+		return jdbcTemplate.queryForList(
+				"SELECT garbage_id FROM eg_grbg_account WHERE system_property_id = ? AND tenant_id = ?"
+						+ " AND is_active = true AND parent_account IS NULL AND garbage_id <> ?",
+				Long.class, systemPropertyId, tenantId, garbageId);
+	}
 
 	/**
 	 * Looks up the raw eg_pt_owner.mobile_number for each of the given
