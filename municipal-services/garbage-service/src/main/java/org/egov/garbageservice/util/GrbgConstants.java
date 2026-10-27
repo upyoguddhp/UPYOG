@@ -24,6 +24,10 @@ public class GrbgConstants {
 
 	public static final String STATUS_INITIATED = "INITIATED";
 
+	public static final String DDP_DISPATCH_STATUS_INITIATED = "INITIATED";
+
+	public static final String DDP_DISPATCH_STATUS_SUBMITTED = "SUBMITTED";
+
 	public static final String STATUS_PENDINGFORMODIFICATION = "PENDINGFORMODIFICATION";
 
 	public static final String STATUS_PENDINGFORVERIFICATION = "PENDINGFORVERIFICATION";
