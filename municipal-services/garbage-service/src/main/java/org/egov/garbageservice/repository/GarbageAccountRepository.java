@@ -121,6 +121,9 @@ public class GarbageAccountRepository {
     		+ ":status, :additionalDetail :: JSONB, :createdBy, :createdDate, "
     		+ ":lastModifiedBy, :lastModifiedDate, :tenantId, :parentAccount, :businessService, :approvalDate, :isActive, :channel)";
     
+	private static final String INSERT_ACCOUNT_DDP = "INSERT INTO eg_grbg_account_ddp "
+			+ "(garbage_account_uuid, garbage_id) " + "VALUES (:uuid, :garbageId)";
+    
     private static final String UPDATE_ACCOUNT_BY_ID = "UPDATE eg_grbg_account SET garbage_id = :garbageId, uuid =:uuid"
     		+ ", property_id = :propertyId, type = :type, name = :name, mobile_number = :mobileNumber, is_owner = :isOwner"
     		+ ", user_uuid = :userUuid, declaration_uuid = :declarationUuid, status = :status"
@@ -293,6 +296,7 @@ public class GarbageAccountRepository {
         accountInputs.put("isActive", account.getIsActive());
 
         namedParameterJdbcTemplate.update(INSERT_ACCOUNT, accountInputs);
+        namedParameterJdbcTemplate.update(INSERT_ACCOUNT_DDP, accountInputs);
         
         createGarbageAccountAudit(account);
         
@@ -1016,6 +1020,18 @@ public class GarbageAccountRepository {
 
 		namedParameterJdbcTemplate.update(UPSERT_DDP_WORKFLOW_BY_UUID, params);
 		return updatedAccounts;
+	}
+	
+	/**
+	 * Returns the garbage ids of other active main accounts (child accounts are
+	 * excluded, they share their parent's property) already mapped to the given
+	 * property-services propertyId.
+	 */
+	public List<Long> findOtherMappedGarbageIds(String systemPropertyId, String tenantId, Long garbageId) {
+		return jdbcTemplate.queryForList(
+				"SELECT garbage_id FROM eg_grbg_account WHERE system_property_id = ? AND tenant_id = ?"
+						+ " AND is_active = true AND parent_account IS NULL AND garbage_id <> ?",
+				Long.class, systemPropertyId, tenantId, garbageId);
 	}
 
 	/**

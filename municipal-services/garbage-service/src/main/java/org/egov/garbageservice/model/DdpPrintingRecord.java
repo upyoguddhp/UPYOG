@@ -44,4 +44,10 @@ public class DdpPrintingRecord {
 
 	@JsonProperty("Category")
 	private String category;
+	
+	@JsonProperty("WardNo")
+	private String wardNo; 
+	
+	@JsonProperty("propertyWard")
+	private String propertyWard;
 }

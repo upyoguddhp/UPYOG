@@ -665,6 +665,25 @@ public class GarbageAccountService {
 //					}));
 //		}
 	}
+	
+	/**
+	 * One property can be mapped to only one garbage id. Rejects a DDP mapping whose
+	 * property is already mapped to a different main garbage account.
+	 */
+	private void validatePropertyNotMappedToOtherGarbageId(List<GarbageAccount> accounts) {
+		for (GarbageAccount account : accounts) {
+			if (StringUtils.isBlank(account.getSystemPropertyId()) || null == account.getGarbageId()) {
+				continue;
+			}
+			List<Long> otherGarbageIds = garbageAccountRepository.findOtherMappedGarbageIds(
+					account.getSystemPropertyId(), account.getTenantId(), account.getGarbageId());
+			if (!CollectionUtils.isEmpty(otherGarbageIds)) {
+				throw new CustomException("PROPERTY_ALREADY_MAPPED", "Property " + account.getSystemPropertyId()
+						+ " is already mapped to Garbage ID " + otherGarbageIds.get(0)
+						+ ". One property can be mapped to only one Garbage ID.");
+			}
+		}
+	}
 
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
 		
@@ -700,6 +719,7 @@ public class GarbageAccountService {
 		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
 		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
 		    }
+		    validatePropertyNotMappedToOtherGarbageId(updateGarbageRequest.getGarbageAccounts());
 		}
 
 		// load garbage account from backend if workflow = true
@@ -3058,6 +3078,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		}
 
 		searchRequest.getSearchCriteriaGarbageAccount().setIsReadyForPrinting(Boolean.TRUE);
+		searchRequest.getSearchCriteriaGarbageAccount().setDdpPrintVerified(Boolean.FALSE);
+		searchRequest.getSearchCriteriaGarbageAccount().setIsDdpVerified(Boolean.TRUE);
 		String tenantId = searchRequest.getSearchCriteriaGarbageAccount().getTenantId();
 
 		GarbageAccountResponse garbageAccountResponse = searchGarbageAccounts(searchRequest, false);
@@ -3156,6 +3178,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		String ownerName = null;
 		String address = null;
+		String wardNo = null;
+		String wardNumber = null;
 		String propertyId = systemPropertyId;
 
 		if (null != property) {
@@ -3163,6 +3187,20 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				propertyId = property.getPropertyId();
 			}
 			address = toPropertyAddress(property.getAddress());
+			
+			if (null != property.getAddress()
+		            && null != property.getAddress().getAdditionalDetails()) {
+		        wardNo = property.getAddress()
+		                .getAdditionalDetails()
+		                .path("wardNo")
+		                .asText(null);
+		        
+		        wardNumber = property.getAddress()
+		                .getAdditionalDetails()
+		                .path("wardNumber")
+		                .asText(null);
+		    }
+			
 			PtOwnerInfo owner = findPrimaryOwner(property.getOwners());
 			if (null != owner) {
 				ownerName = owner.getPropertyOwnerName();
@@ -3177,7 +3215,17 @@ public GarbageAccountActionResponse openSearchPayPreview(
 
 		return DdpPrintingRecord.builder().ownerName(ownerName).mobileNo(mobileNo).propertyId(propertyId)
 				.id(account.getUuid()).ulbName(null == accountAddress ? null : accountAddress.getUlbName())
-				.ward(null == accountAddress ? null : accountAddress.getWardName()).address(address)
+				.ward(null == accountAddress ? null : accountAddress.getWardName())
+				.wardNo(wardNo)
+				.propertyWard(wardNumber)
+				.address(("Ward No. " + (StringUtils.isBlank(wardNo) ? "" : wardNo.trim())
+						+ (StringUtils.isNotBlank(wardNo) && StringUtils.isNotBlank(wardNumber)
+								&& !wardNo.trim().equals(wardNumber.trim())
+										? ", " + wardNumber.trim()
+										: StringUtils.isBlank(wardNo) && StringUtils.isNotBlank(wardNumber)
+												? wardNumber.trim()
+												: ""))
+						.trim())
 				.category(category).build();
 	}
 
