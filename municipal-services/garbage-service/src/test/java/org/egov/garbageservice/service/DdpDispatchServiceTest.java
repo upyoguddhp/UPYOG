@@ -18,7 +18,14 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.egov.garbageservice.model.DdpDispatch;
+import org.egov.garbageservice.model.DdpDispatchGenerateQrRequest;
+import org.egov.garbageservice.model.DdpDispatchGenerateQrResponse;
+import org.egov.garbageservice.model.DdpDispatchReceiveRequest;
+import org.egov.garbageservice.model.DdpDispatchReceiveResponse;
 import org.egov.garbageservice.model.DdpDispatchScanRequest;
 import org.egov.garbageservice.model.DdpDispatchScanResponse;
 import org.egov.garbageservice.model.DdpDispatchSearchResponse;
@@ -30,6 +37,7 @@ import org.egov.garbageservice.model.SearchCriteriaDdpDispatchRequest;
 import org.egov.garbageservice.repository.DdpDispatchRepository;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.ResponseInfoFactory;
+import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +54,12 @@ class DdpDispatchServiceTest {
 
 	@Mock
 	private ResponseInfoFactory responseInfoFactory;
+
+	@Mock
+	private RestCallRepository restCallRepository;
+
+	@Mock
+	private GrbgConstants grbgConstants;
 
 	@InjectMocks
 	private DdpDispatchService service;
@@ -271,5 +285,128 @@ class DdpDispatchServiceTest {
 
 		assertThrows(CustomException.class, () -> service.scanPlate(request));
 		verify(ddpDispatchRepository, times(0)).findPlateForDispatch(any());
+	}
+
+	@Test
+	void generateQrReturnsImageForDispatchedBatch() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").status(GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+		when(grbgConstants.getDigitalDoorPlateHostUrl()).thenReturn("http://localhost:1239/digital-door-plate");
+		when(grbgConstants.getDigitalDoorPlateQrGenerateEndpoint()).thenReturn("/qr/_generate");
+
+		Map<String, Object> qrServiceResponse = new HashMap<>();
+		qrServiceResponse.put("qrCodeImage", "data:image/png;base64,abc123");
+		qrServiceResponse.put("encryptedData", "encrypted-payload");
+		when(restCallRepository.fetchResult(any(), any())).thenReturn(qrServiceResponse);
+
+		DdpDispatchGenerateQrRequest request = DdpDispatchGenerateQrRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").build();
+
+		DdpDispatchGenerateQrResponse response = service.generateQrForBatch(request);
+
+		assertEquals("DDP-SHIMLA-271026-001", response.getBatchNo());
+		assertEquals("data:image/png;base64,abc123", response.getQrCodeImage());
+		assertEquals("encrypted-payload", response.getEncryptedData());
+	}
+
+	@Test
+	void generateQrRejectsBatchThatHasNotBeenDispatchedYet() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").status(GrbgConstants.DDP_DISPATCH_STATUS_INITIATED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+
+		DdpDispatchGenerateQrRequest request = DdpDispatchGenerateQrRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.generateQrForBatch(request));
+		assertEquals("BATCH_NOT_DISPATCHED", ex.getCode());
+		verify(restCallRepository, never()).fetchResult(any(), any());
+	}
+
+	@Test
+	void generateQrRejectsUnknownBatch() {
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-UNKNOWN")).thenReturn(null);
+
+		DdpDispatchGenerateQrRequest request = DdpDispatchGenerateQrRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-UNKNOWN").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.generateQrForBatch(request));
+		assertEquals("BATCH_NOT_FOUND", ex.getCode());
+	}
+
+	@Test
+	void receiveFlipsSubmittedBatchToReceived() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").dispatchDate(1793103225696L).status(GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+		when(ddpDispatchRepository.receiveBatch(eq("DDP-SHIMLA-271026-001"), eq(GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED),
+				eq(GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED), eq("Store Keeper"), any(Long.class), eq("user-uuid-1"),
+				any(Long.class))).thenReturn(1);
+		when(ddpDispatchRepository.findScannedPlatesByBatchNo("DDP-SHIMLA-271026-001"))
+				.thenReturn(Arrays.asList(ScannedPlateInfo.builder().build(), ScannedPlateInfo.builder().build()));
+
+		DdpDispatchReceiveRequest request = DdpDispatchReceiveRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").receivedBy("Store Keeper").build();
+
+		DdpDispatchReceiveResponse response = service.receiveBatch(request);
+
+		assertEquals(GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED, response.getStatus());
+		assertEquals("Store Keeper", response.getReceivedBy());
+		assertEquals(2, response.getTotalScanCount());
+		assertEquals("SHIMLA", response.getUlb());
+	}
+
+	@Test
+	void receiveRejectsBatchThatHasNotBeenDispatchedYet() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").status(GrbgConstants.DDP_DISPATCH_STATUS_INITIATED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+
+		DdpDispatchReceiveRequest request = DdpDispatchReceiveRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").receivedBy("Store Keeper").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.receiveBatch(request));
+		assertEquals("BATCH_NOT_DISPATCHED", ex.getCode());
+	}
+
+	@Test
+	void receiveRejectsAlreadyReceivedBatch() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").status(GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+
+		DdpDispatchReceiveRequest request = DdpDispatchReceiveRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").receivedBy("Store Keeper").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.receiveBatch(request));
+		assertEquals("BATCH_ALREADY_RECEIVED", ex.getCode());
+		verify(ddpDispatchRepository, never()).receiveBatch(any(), any(), any(), any(), any(Long.class), any(),
+				any(Long.class));
+	}
+
+	@Test
+	void receiveRejectsRaceLostToAnotherReceiptConfirmation() {
+		DdpDispatch batch = DdpDispatch.builder().uuid("batch-uuid").batchNo("DDP-SHIMLA-271026-001").ulb("SHIMLA")
+				.ward("Ward 1").status(GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED).build();
+		when(ddpDispatchRepository.findBatchByBatchNo("DDP-SHIMLA-271026-001")).thenReturn(batch);
+		when(ddpDispatchRepository.receiveBatch(anyString(), anyString(), anyString(), anyString(), any(Long.class),
+				anyString(), any(Long.class))).thenReturn(0);
+
+		DdpDispatchReceiveRequest request = DdpDispatchReceiveRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").receivedBy("Store Keeper").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.receiveBatch(request));
+		assertEquals("BATCH_ALREADY_RECEIVED", ex.getCode());
+	}
+
+	@Test
+	void receiveRequiresReceivedBy() {
+		DdpDispatchReceiveRequest request = DdpDispatchReceiveRequest.builder().requestInfo(requestInfo)
+				.tenantId("hp.shimla").batchNo("DDP-SHIMLA-271026-001").build();
+
+		CustomException ex = assertThrows(CustomException.class, () -> service.receiveBatch(request));
+		assertEquals("INVALID_REQUEST", ex.getCode());
+		verify(ddpDispatchRepository, never()).findBatchByBatchNo(any());
 	}
 }

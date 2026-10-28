@@ -2,7 +2,9 @@ package org.egov.garbageservice.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpDispatch;
 import org.egov.garbageservice.model.DdpDispatchDetail;
+import org.egov.garbageservice.model.DdpDispatchGenerateQrRequest;
+import org.egov.garbageservice.model.DdpDispatchGenerateQrResponse;
+import org.egov.garbageservice.model.DdpDispatchReceiveRequest;
+import org.egov.garbageservice.model.DdpDispatchReceiveResponse;
 import org.egov.garbageservice.model.DdpDispatchScanRequest;
 import org.egov.garbageservice.model.DdpDispatchScanResponse;
 import org.egov.garbageservice.model.DdpDispatchSearchResponse;
@@ -22,6 +28,7 @@ import org.egov.garbageservice.model.SearchCriteriaDdpDispatchRequest;
 import org.egov.garbageservice.repository.DdpDispatchRepository;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.ResponseInfoFactory;
+import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +49,12 @@ public class DdpDispatchService {
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
+
+	@Autowired
+	private RestCallRepository restCallRepository;
+
+	@Autowired
+	private GrbgConstants grbgConstants;
 
 	public DdpDispatchScanResponse scanPlate(DdpDispatchScanRequest request) {
 
@@ -155,6 +168,98 @@ public class DdpDispatchService {
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.batchNo(batch.getBatchNo()).status(GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED).dispatchDate(now)
 				.ulb(batch.getUlb()).totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates).build();
+	}
+
+	/**
+	 * Generates a QR code for a dispatched batch (encoding just the batch_no,
+	 * via digital-door-plate's generic /qr/_generate), for the ULB side to
+	 * scan on receipt. Allowed once the batch has actually been dispatched
+	 * (SUBMITTED or already RECEIVED, e.g. to reprint); not before.
+	 */
+	public DdpDispatchGenerateQrResponse generateQrForBatch(DdpDispatchGenerateQrRequest request) {
+
+		validateRequestInfo(request.getRequestInfo());
+		if (StringUtils.isEmpty(request.getBatchNo())) {
+			throw new CustomException("INVALID_REQUEST", "batch_no is mandatory to generate a dispatch QR code.");
+		}
+
+		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(request.getBatchNo());
+		if (null == batch) {
+			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + request.getBatchNo());
+		}
+		if (GrbgConstants.DDP_DISPATCH_STATUS_INITIATED.equals(batch.getStatus())) {
+			throw new CustomException("BATCH_NOT_DISPATCHED",
+					"Batch " + batch.getBatchNo() + " has not been submitted/dispatched yet.");
+		}
+
+		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
+				.append(grbgConstants.getDigitalDoorPlateQrGenerateEndpoint());
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("RequestInfo", request.getRequestInfo());
+		requestBody.put("tenantId", request.getTenantId());
+		requestBody.put("data", batch.getBatchNo());
+
+		Object response = restCallRepository.fetchResult(uri, requestBody);
+		if (null == response || !(response instanceof Map)) {
+			throw new CustomException("QR_GENERATION_FAILED", "Failed to generate QR code for batch " + batch.getBatchNo() + ".");
+		}
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> qrResponse = (Map<String, Object>) response;
+
+		return DdpDispatchGenerateQrResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.batchNo(batch.getBatchNo()).ulb(batch.getUlb()).status(batch.getStatus())
+				.qrCodeImage((String) qrResponse.get("qrCodeImage")).encryptedData((String) qrResponse.get("encryptedData"))
+				.build();
+	}
+
+	/**
+	 * Confirms receipt of a dispatched batch at the ULB side (after scanning
+	 * and decrypting its QR code to get the batch_no back): flips the batch
+	 * from SUBMITTED to RECEIVED and records who received it and when.
+	 */
+	public DdpDispatchReceiveResponse receiveBatch(DdpDispatchReceiveRequest request) {
+
+		validateRequestInfo(request.getRequestInfo());
+		if (StringUtils.isEmpty(request.getBatchNo())) {
+			throw new CustomException("INVALID_REQUEST", "batch_no is mandatory to receive a dispatch batch.");
+		}
+		if (StringUtils.isEmpty(request.getReceivedBy())) {
+			throw new CustomException("INVALID_REQUEST", "receivedBy is mandatory to receive a dispatch batch.");
+		}
+
+		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(request.getBatchNo());
+		if (null == batch) {
+			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + request.getBatchNo());
+		}
+		if (GrbgConstants.DDP_DISPATCH_STATUS_INITIATED.equals(batch.getStatus())) {
+			throw new CustomException("BATCH_NOT_DISPATCHED",
+					"Batch " + batch.getBatchNo() + " has not been submitted/dispatched yet and cannot be received.");
+		}
+		if (GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED.equals(batch.getStatus())) {
+			throw new CustomException("BATCH_ALREADY_RECEIVED",
+					"Batch " + batch.getBatchNo() + " has already been received.");
+		}
+
+		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
+		long now = System.currentTimeMillis();
+
+		int updated = ddpDispatchRepository.receiveBatch(batch.getBatchNo(), GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED,
+				GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED, request.getReceivedBy(), now, userUuid, now);
+		if (updated == 0) {
+			throw new CustomException("BATCH_ALREADY_RECEIVED",
+					"Batch " + batch.getBatchNo() + " was already received by another request.");
+		}
+
+		List<ScannedPlateInfo> scannedPlates = ddpDispatchRepository.findScannedPlatesByBatchNo(batch.getBatchNo());
+
+		return DdpDispatchReceiveResponse.builder()
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
+				.batchNo(batch.getBatchNo()).status(GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED).ulb(batch.getUlb())
+				.dispatchDate(batch.getDispatchDate()).receivedBy(request.getReceivedBy()).ulbReceivingDate(now)
+				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates).build();
 	}
 
 	public DdpDispatchSearchResponse searchBatches(SearchCriteriaDdpDispatchRequest request) {

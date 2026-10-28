@@ -1,5 +1,9 @@
 package org.egov.garbageservice.controller;
 
+import org.egov.garbageservice.model.DdpDispatchGenerateQrRequest;
+import org.egov.garbageservice.model.DdpDispatchGenerateQrResponse;
+import org.egov.garbageservice.model.DdpDispatchReceiveRequest;
+import org.egov.garbageservice.model.DdpDispatchReceiveResponse;
 import org.egov.garbageservice.model.DdpDispatchScanRequest;
 import org.egov.garbageservice.model.DdpDispatchScanResponse;
 import org.egov.garbageservice.model.DdpDispatchSearchResponse;
@@ -48,5 +52,24 @@ public class DdpDispatchController {
 	@PostMapping("/_search")
 	public ResponseEntity<DdpDispatchSearchResponse> search(@RequestBody SearchCriteriaDdpDispatchRequest request) {
 		return ResponseEntity.ok(service.searchBatches(request));
+	}
+
+	/**
+	 * Generates a QR code (encoding the batch_no) for a dispatched batch, for
+	 * the ULB side to print/scan on receipt.
+	 */
+	@PostMapping("/_generateQr")
+	public ResponseEntity<DdpDispatchGenerateQrResponse> generateQr(@RequestBody DdpDispatchGenerateQrRequest request) {
+		return ResponseEntity.ok(service.generateQrForBatch(request));
+	}
+
+	/**
+	 * Confirms receipt of a dispatched batch at the ULB side, after scanning
+	 * and decrypting its QR code (via digital-door-plate's /qr/_decrypt) to
+	 * recover the batch_no.
+	 */
+	@PostMapping("/_receive")
+	public ResponseEntity<DdpDispatchReceiveResponse> receive(@RequestBody DdpDispatchReceiveRequest request) {
+		return ResponseEntity.ok(service.receiveBatch(request));
 	}
 }
