@@ -54,7 +54,7 @@ public class DdpDispatchRepository {
 			+ "WHERE garbage_account_uuid = ?";
 
 	private static final String SELECT_SCANNED_PLATES_BY_BATCH_NO = "SELECT acc.name as owner_name, "
-			+ "addr.ward_name as ward, COALESCE(acc.property_id, acc.system_property_id) as property_id "
+			+ "addr.ward_name as ward, acc.system_property_id as property_id "
 			+ "FROM eg_grbg_account_ddp ddp "
 			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
 			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
