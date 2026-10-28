@@ -1023,15 +1023,17 @@ public class GarbageAccountRepository {
 	}
 	
 	/**
-	 * Returns the garbage ids of other active main accounts (child accounts are
-	 * excluded, they share their parent's property) already mapped to the given
-	 * property-services propertyId.
+	 * Returns the application numbers of other active main accounts (child
+	 * accounts are excluded, they share their parent's property) already mapped
+	 * to the given property-services propertyId.
 	 */
-	public List<Long> findOtherMappedGarbageIds(String systemPropertyId, String tenantId, Long garbageId) {
+	public List<String> findOtherMappedApplicationNumbers(String systemPropertyId, String tenantId, Long garbageId) {
 		return jdbcTemplate.queryForList(
-				"SELECT garbage_id FROM eg_grbg_account WHERE system_property_id = ? AND tenant_id = ?"
-						+ " AND is_active = true AND parent_account IS NULL AND garbage_id <> ?",
-				Long.class, systemPropertyId, tenantId, garbageId);
+				"SELECT app.application_no FROM eg_grbg_account acc"
+						+ " LEFT OUTER JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id"
+						+ " WHERE acc.system_property_id = ? AND acc.tenant_id = ?"
+						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?",
+				String.class, systemPropertyId, tenantId, garbageId);
 	}
 
 	/**
