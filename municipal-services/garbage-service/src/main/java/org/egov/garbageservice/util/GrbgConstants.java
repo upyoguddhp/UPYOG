@@ -28,6 +28,8 @@ public class GrbgConstants {
 
 	public static final String DDP_DISPATCH_STATUS_SUBMITTED = "SUBMITTED";
 
+	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
+
 	public static final String STATUS_PENDINGFORMODIFICATION = "PENDINGFORMODIFICATION";
 
 	public static final String STATUS_PENDINGFORVERIFICATION = "PENDINGFORVERIFICATION";
@@ -227,6 +229,12 @@ public class GrbgConstants {
 	
 	@Value("${egov.update.bill.endpoint}")
 	private String updateBillEndpoint;
+
+	@Value("${egov.digital.door.plate.host}")
+	private String digitalDoorPlateHostUrl;
+
+	@Value("${egov.digital.door.plate.qr.generate.endpoint}")
+	private String digitalDoorPlateQrGenerateEndpoint;
 
 	public static String generateApplicationNumberFormat(String id, String ulbName, String district) {
 		String appNo = null;
