@@ -2404,19 +2404,23 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		        .type(Collections.singleton(grbgTaxCalculatorMonthTracker.getType()))
 		        .grbgApplicationIds(garbapplicationNos);
 
-		if (!StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getMonth())
-		        && !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getYear())) {
+		boolean hasMonthAndYear = !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getMonth())
+		        && !StringUtils.isEmpty(grbgTaxCalculatorMonthTracker.getYear());
+
+		if (hasMonthAndYear) {
 			trackerBuilder.month(grbgTaxCalculatorMonthTracker.getMonth())
 		           .year(grbgTaxCalculatorMonthTracker.getYear());
-		} else {
-			trackerBuilder.billIds(Collections.singleton(grbgTaxCalculatorMonthTracker.getBillId()));
 		}
 
 		GrbgBillTrackerSearchCriteria grbgTrackerSearchCriteria = trackerBuilder.build();
 
 		List<GrbgBillTracker> grbgTaxCalculatorTracker = getBillCalculatedGarbageAccounts(grbgTrackerSearchCriteria);
-		
-		if ("ARREAR".equalsIgnoreCase(grbgTaxCalculatorMonthTracker.getType())) {
+
+		// Period-based bills (ARREAR and other non-monthly types) have no month/year, so the
+		// tracker rows for all child accounts in the same billing period are matched by date range
+		// instead, rather than being narrowed down to a single billId (which would drop the other
+		// child accounts' tracker/tenant records from the receipt).
+		if (!hasMonthAndYear) {
 			String referenceFromDate = grbgTaxCalculatorMonthTracker.getFromDate();
 			String referenceToDate = grbgTaxCalculatorMonthTracker.getToDate();
 
