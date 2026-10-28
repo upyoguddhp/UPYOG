@@ -169,8 +169,11 @@ public class PDFRequestGenerator {
 				    }
 				}
 				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
-				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
+				int comparison = totalPaidAmount.compareTo(billObj.getTotalAmount());
+				if (comparison < 0) {
 					paymentStatus = "PARTIALLY_PAID";
+				} else if (comparison > 0) {
+					paymentStatus = "ADVANCE_PAID";
 				} else {
 					paymentStatus = "PAID";
 				}
@@ -255,6 +258,22 @@ public class PDFRequestGenerator {
 		        
 		        totalPaid = totalPaid.add(billPaid);
 		        totalDue = totalDue.add(amount.subtract(billPaid));
+		        totalAmount = amount;
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ADVANCE_PAID) {
+		        BigDecimal billPaid = BigDecimal.ZERO;
+		        for (BillDetail billDetail : billObj.getBillDetails()) {
+		            if (billDetail.getBillAccountDetails() != null) {
+		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
+
+		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
+		                            ? accDetail.getAdjustedAmount()
+		                            : BigDecimal.ZERO;
+		                    billPaid = billPaid.add(adjusted);
+		                }
+		            }
+		        }
+
+		        totalPaid = totalPaid.add(billPaid);
 		        totalAmount = amount;
 		    }
 		}

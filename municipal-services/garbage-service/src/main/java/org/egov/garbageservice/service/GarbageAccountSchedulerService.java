@@ -1174,6 +1174,10 @@ public class GarbageAccountSchedulerService {
 	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
 	    }
+
+	    if (Bill.StatusEnum.ADVANCE_PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update advance paid bill");
+	    }
 	    
 	    if (request.getBillId() == null || request.getBillId().trim().isEmpty()) {
 	        throw new CustomException("INVALID_REQUEST", "billId is required");

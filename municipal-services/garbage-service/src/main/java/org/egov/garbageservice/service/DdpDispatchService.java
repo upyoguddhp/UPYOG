@@ -193,6 +193,7 @@ public class DdpDispatchService {
 		}
 
 		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
+				.append(grbgConstants.getDigitalDoorPlateContextPath())
 				.append(grbgConstants.getDigitalDoorPlateQrGenerateEndpoint());
 
 		Map<String, Object> requestBody = new HashMap<>();
