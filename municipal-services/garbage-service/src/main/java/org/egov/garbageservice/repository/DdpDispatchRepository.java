@@ -29,7 +29,7 @@ public class DdpDispatchRepository {
 
 	private static final String SELECT_PLATE_LOOKUP_BY_UUID = "SELECT acc.uuid as garbage_account_uuid, "
 			+ "acc.garbage_id as garbage_id, acc.tenant_id as tenant_id, acc.name as owner_name, "
-			+ "acc.property_id as property_id, addr.ulb_name as ulb, addr.ward_name as ward, "
+			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id, addr.ulb_name as ulb, addr.ward_name as ward, "
 			+ "ddp.batch_no as existing_batch_no, COALESCE(ddp.ddp_dispatched, false) as ddp_dispatched "
 			+ "FROM eg_grbg_account acc "
 			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
@@ -54,7 +54,7 @@ public class DdpDispatchRepository {
 			+ "WHERE garbage_account_uuid = ?";
 
 	private static final String SELECT_SCANNED_PLATES_BY_BATCH_NO = "SELECT acc.name as owner_name, "
-			+ "addr.ward_name as ward, acc.property_id as property_id "
+			+ "addr.ward_name as ward, acc.system_property_id as property_id "
 			+ "FROM eg_grbg_account_ddp ddp "
 			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
 			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
@@ -68,6 +68,11 @@ public class DdpDispatchRepository {
 			+ "SET ddp_dispatched = true, ddp_dispatch_date = :dispatchDate WHERE batch_no = :batchNo";
 
 	private static final String COUNT_PLATES_BY_BATCH_NO = "SELECT COUNT(*) FROM eg_grbg_account_ddp WHERE batch_no = ?";
+
+	private static final String RECEIVE_BATCH = "UPDATE eg_grbg_ddp_dispatch SET status = :status, "
+			+ "received_by = :receivedBy, ulb_receiving_date = :ulbReceivingDate, "
+			+ "modifiedby = :modifiedBy, modifiedtime = :modifiedTime "
+			+ "WHERE batch_no = :batchNo AND status = :currentStatus";
 
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -163,6 +168,26 @@ public class DdpDispatchRepository {
 		namedParameterJdbcTemplate.update(MARK_PLATES_DISPATCHED_BY_BATCH_NO, plateParams);
 
 		return updatedBatches;
+	}
+
+	/**
+	 * Flips the batch from SUBMITTED to RECEIVED and records who received it
+	 * and when. Returns the number of rows updated (0 if the batch wasn't
+	 * found or wasn't still SUBMITTED, i.e. a duplicate/racing receipt
+	 * confirmation).
+	 */
+	public int receiveBatch(String batchNo, String currentStatus, String newStatus, String receivedBy,
+			long ulbReceivingDate, String modifiedBy, long modifiedTime) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("batchNo", batchNo);
+		params.put("currentStatus", currentStatus);
+		params.put("status", newStatus);
+		params.put("receivedBy", receivedBy);
+		params.put("ulbReceivingDate", ulbReceivingDate);
+		params.put("modifiedBy", modifiedBy);
+		params.put("modifiedTime", modifiedTime);
+
+		return namedParameterJdbcTemplate.update(RECEIVE_BATCH, params);
 	}
 
 	public List<DdpDispatch> searchBatches(SearchCriteriaDdpDispatch criteria) {
