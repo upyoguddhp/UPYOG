@@ -675,11 +675,11 @@ public class GarbageAccountService {
 			if (StringUtils.isBlank(account.getSystemPropertyId()) || null == account.getGarbageId()) {
 				continue;
 			}
-			List<Long> otherGarbageIds = garbageAccountRepository.findOtherMappedGarbageIds(
+			List<String> otherApplicationNumbers = garbageAccountRepository.findOtherMappedApplicationNumbers(
 					account.getSystemPropertyId(), account.getTenantId(), account.getGarbageId());
-			if (!CollectionUtils.isEmpty(otherGarbageIds)) {
+			if (!CollectionUtils.isEmpty(otherApplicationNumbers)) {
 				throw new CustomException("PROPERTY_ALREADY_MAPPED", "Property " + account.getSystemPropertyId()
-						+ " is already mapped to Garbage ID " + otherGarbageIds.get(0)
+						+ " is already mapped to Garbage Application No " + otherApplicationNumbers.get(0)
 						+ ". One property can be mapped to only one Garbage ID.");
 			}
 		}
