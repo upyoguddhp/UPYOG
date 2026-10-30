@@ -228,53 +228,62 @@ public class PDFRequestGenerator {
 
 		for (Bill billObj : bill) {
 
-		    BigDecimal amount = billObj.getTotalAmount() != null 
-		            ? billObj.getTotalAmount() 
+		    BigDecimal amount = billObj.getTotalAmount() != null
+		            ? billObj.getTotalAmount()
 		            : BigDecimal.ZERO;
+		    totalAmount = amount;
 
-		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
-		        totalPaid = totalPaid.add(amount);
-		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
-		        totalDue = totalDue.add(amount);
-		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
-		        BigDecimal billPaid = BigDecimal.ZERO;
+		    GrbgBillTracker tracker = grbgBillTracker.stream()
+		            .filter(t -> billObj.getConsumerCode() != null && billObj.getConsumerCode().equals(t.getGrbgApplicationId()))
+		            .findFirst().orElse(null);
+
+		    BigDecimal adjustedAmount = BigDecimal.ZERO;
+		    if (billObj.getBillDetails() != null) {
 		        for (BillDetail billDetail : billObj.getBillDetails()) {
 		            if (billDetail.getBillAccountDetails() != null) {
 		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
-		                	
+
 		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
 		                            ? accDetail.getAdjustedAmount()
 		                            : BigDecimal.ZERO;
-		                    billPaid = billPaid.add(adjusted);
+		                    adjustedAmount = adjustedAmount.add(adjusted);
 		                }
 		            }
 		        }
-		        
+		    }
+
+		    if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+		        // Payment is still PROCESSING (e.g. a cheque pending clearance, reflected as
+		        // PROCESSING in eg_pg_transaction): the amount actually tendered so far is the
+		        // tracker's txn amount plus whatever has already been adjusted against the bill,
+		        // not the full bill amount regardless of what status the bill came back with.
+		        BigDecimal chequeTxnAmount = BigDecimal.ZERO;
+		        JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
+		        if (trackerAdditionalDetail != null && trackerAdditionalDetail.has("chequeTxnAmount")
+		                && !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
+		            chequeTxnAmount = trackerAdditionalDetail.get("chequeTxnAmount").decimalValue();
+		        }
+
+		        BigDecimal billPaid = chequeTxnAmount.add(adjustedAmount);
+		        BigDecimal billDue = amount.subtract(billPaid);
+		        if (billDue.compareTo(BigDecimal.ZERO) < 0) {
+		            billDue = BigDecimal.ZERO;
+		        }
+		        totalPaid = totalPaid.add(billPaid);
+		        totalDue = totalDue.add(billDue);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.PAID) {
+		        totalPaid = totalPaid.add(amount);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
+		        totalDue = totalDue.add(amount);
+		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
+		        BigDecimal billPaid = adjustedAmount;
+
 				if (totalArrear.compareTo(BigDecimal.ZERO) < 0) {
 					billPaid = billPaid.add(totalArrear);
 				}
-		        
+
 		        totalPaid = totalPaid.add(billPaid);
 		        totalDue = totalDue.add(amount.subtract(billPaid));
-		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.ADVANCE_PAID) {
-		        BigDecimal billPaid = BigDecimal.ZERO;
-		        for (BillDetail billDetail : billObj.getBillDetails()) {
-		            if (billDetail.getBillAccountDetails() != null) {
-		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
-
-		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
-		                            ? accDetail.getAdjustedAmount()
-		                            : BigDecimal.ZERO;
-		                    billPaid = billPaid.add(adjusted);
-		                }
-		            }
-		        }
-
-		        totalPaid = totalPaid.add(billPaid);
-		        totalAmount = amount;
 		    }
 		}
 
