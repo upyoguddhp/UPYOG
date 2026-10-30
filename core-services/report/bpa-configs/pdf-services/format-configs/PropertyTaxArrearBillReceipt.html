@@ -259,7 +259,7 @@
                </tr>
                <tr>
                   <td>
-                     <strong>Bill No:</strong>
+                     <strong>Bill No / Receipt No:</strong>
                      <span th:text="${billNo}">NA</span>
                   </td>
                   <td>
@@ -307,7 +307,7 @@
                            <td><span th:text="${rebate}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Penalty</th>
+                           <th>Penalty / Interest</th>
                            <td><span th:text="${penalty}">NA</span></td>
                         </tr>
                         <tr>
@@ -363,13 +363,21 @@
                            <td><span th:text="${mobileNumber}">NA</span></td>
                         </tr>
                         <tr>
-                           <th>Ward Number</th>
+                           <th>Ward</th>
                            <td><span th:text="${wardNumber}">NA</span></td>
                         </tr>
+						<tr>
+						   <th>Ward Number</th>
+						   <td><span th:text="${wardNo}">NA</span></td>
+						</tr>
                         <tr>
-                           <th>Address</th>
+                           <th>Property Address</th>
                            <td><span th:text="${address}">NA</span></td>
                         </tr>
+						<tr>
+						   <th>Correspondence Address</th>
+						   <td><span th:text="${correspondenceAddress}">NA</span></td>
+						</tr>
                      </table>
                   </div>
                </td>
@@ -424,7 +432,7 @@
 			   			   	The existing bill will expire once a new bill is generated.
 			   			   </li>
 			   			   <li>
-			   			   	<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+			   			   	<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty/interest, and other conditions. </span>
 			   			   	<ul>
 			   			   		<li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
 			   			   		<li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>

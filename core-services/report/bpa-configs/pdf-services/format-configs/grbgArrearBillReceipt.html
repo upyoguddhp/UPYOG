@@ -263,7 +263,7 @@
 			   <br></br>
 		       <tr>
 		          <td>
-		             <strong>Bill No:</strong>
+		             <strong>Bill No / Receipt No:</strong>
 		             <span th:text="${billNo}">NA</span>
 		          </td>
 				  <td align="right">
@@ -281,7 +281,7 @@
                      <h3>Bill Details</h3>
                      <table class="card-table">
                         <tr>
-                           <th>Bill No</th>
+                           <th>Bill No / Receipt No</th>
                            <td><span th:text="${billNo}">NA</span></td>
                         </tr>
                         <tr>
@@ -357,6 +357,10 @@
                            <th>Ward </th>
                            <td><span th:text="${wardNumber}">NA</span></td>
                         </tr>
+						<tr>
+						   <th>Ward Number</th>
+						   <td><span th:text="${wardNo}">NA</span></td>
+						</tr>
                         <tr>
                            <th>Address</th>
                            <td><span th:text="${address}">NA</span></td>
@@ -431,7 +435,7 @@
 			      The existing bill will expire once a new bill is generated.
 			   </li>
 			   <li>
-				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty/interest, and other conditions. </span>
 				<ul>
 				        <li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
 				        <li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>

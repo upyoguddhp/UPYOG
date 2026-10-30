@@ -60,6 +60,12 @@
               "path": "$.wardNumber"
             }
           },
+		  {
+		  	"variable": "wardNo",
+		  	"value": {
+		  		"path": "$.wardNo"
+		  	}
+		  },
           {
             "variable": "mobileNumber",
             "value": {
@@ -72,6 +78,12 @@
               "path": "$.address"
             }
           },
+		  {
+		  	"variable": "correspondenceAddress",
+		  	"value": {
+		  		"path": "$.correspondenceAddress"
+		  	}
+		  },
           {
             "variable": "customerId",
             "value": {

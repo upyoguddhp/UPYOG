@@ -73,6 +73,12 @@
 						}
 					},
 					{
+						"variable": "wardNo",
+						"value": {
+							"path": "$.wardNo"
+						}
+					},
+					{
 						"variable": "address",
 						"value": {
 							"path": "$.address"

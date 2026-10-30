@@ -360,6 +360,11 @@ public class PDFRequestGenerator {
 		grbg.put("finYear", startYear + "-" + (startYear + 1));
 		grbg.put("district", "district");
 		grbg.put("wardNumber", grbgAccount.getAddresses().get(0).getWardName());
+		JsonNode addressAdditionalDetail = grbgAccount.getAddresses().get(0).getAdditionalDetail();
+		grbg.put("wardNo", addressAdditionalDetail != null && addressAdditionalDetail.has("wardNo")
+						&& !addressAdditionalDetail.get("wardNo").isNull()
+								? addressAdditionalDetail.get("wardNo").asInt()
+								: null);
 		grbg.put("unitCategory", escapeHtml(grbgAccount.getGrbgCollectionUnits().get(0).getCategory()));
 		grbg.put("address",
 				grbgAccount.getAddresses().get(0).getAddress1().concat(", ")

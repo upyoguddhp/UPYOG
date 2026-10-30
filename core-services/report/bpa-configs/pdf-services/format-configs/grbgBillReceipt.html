@@ -77,7 +77,7 @@
          }
          .invoice-header h1 {
          font-size: 26px;
-         margin: 0;
+         margin: 0 0 15px 0;
          text-align: center;
          }
          .card-box {
@@ -260,17 +260,24 @@
          <!-- Invoice Header -->
          <div class="invoice-header">
             <table>
-               <tr>
-                  <td><strong>Bill No:</strong><span th:text="${billNo}">NA</span></td>
-                  <td align="center">
-					<h1 th:text="${amountPaid > 0} 
-					    ? 'Garbage Collection Bill Receipt' 
-					    : 'Garbage Collection Bill'">
-					    Garbage Collection Bill
-					</h1>
-                  </td>
-                  <td align="right"><strong>Financial Year:</strong> <br /><span th:text="${finYear}">NA</span></td>
-               </tr>
+				<tr>
+				    <td colspan="2" align="center">
+				        <h1 th:text="${amountPaid > 0} 
+				            ? 'Garbage Collection Bill Receipt' 
+				            : 'Garbage Collection Bill'">
+				            Garbage Collection Bill
+				        </h1>
+				    </td>
+				</tr>
+				<tr>
+				    <td><strong>Bill No / Receipt No:</strong>
+				        <span th:text="${billNo}">NA</span>
+				    </td>
+				    <td align="right">
+				        <strong>Financial Year:</strong>
+				        <span th:text="${finYear}">NA</span>
+				    </td>
+				</tr>
             </table>
          </div>
          <!-- Bill Details / Customer Details -->
@@ -281,7 +288,7 @@
                      <h3>Bill Details</h3>
                      <table class="card-table">
                         <tr>
-                           <th>Bill No</th>
+                           <th>Bill No / Receipt No</th>
                            <td><span th:text="${billNo}">NA</span></td>
                         </tr>
                         <tr>
@@ -361,6 +368,10 @@
                            <th>Ward </th>
                            <td><span th:text="${wardNumber}">NA</span></td>
                         </tr>
+						<tr>
+						   <th>Ward Number</th>
+						   <td><span th:text="${wardNo}">NA</span></td>
+						</tr>
                         <tr>
                            <th>Address</th>
                            <td><span th:text="${address}">NA</span></td>
@@ -435,7 +446,7 @@
 			      The existing bill will expire once a new bill is generated.
 			   </li>
 			   <li>
-				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty, and other conditions. </span>
+				<span class="bold-dark-text">The payable bill amount may change depending on the applicable rebate, penalty/interest, and other conditions. </span>
 				<ul>
 				        <li>The rebate can be availed if the bill is paid within <strong>15 days</strong> from the bill generation date.</li>
 				        <li>If the bill is not paid within the rebate period, <strong>penalty/interest will be applicable after 30 days.</strong></li>

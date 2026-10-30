@@ -89,7 +89,10 @@ public class PDFRequestGenerator {
 
 		ptbr.put("district", property.getAddress().getDistrict());
 		ptbr.put("wardNumber", addressAdditionalDetails.get("wardNumber").asText());
-
+		ptbr.put("wardNo",
+				addressAdditionalDetails.has("wardNo") && !addressAdditionalDetails.get("wardNo").isNull()
+						? addressAdditionalDetails.get("wardNo").asText()
+						: null);
 		ptbr.put("address",
 				Stream.of(addressAdditionalDetails.get("propertyAddress"), addressAdditionalDetails.get("wardNumber"),
 						addressAdditionalDetails.get("ulbType"), addressAdditionalDetails.get("ulbName"),
@@ -107,7 +110,15 @@ public class PDFRequestGenerator {
 		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", ")));
 
 		ptbr.put("propertyId", property.getPropertyId());
+		JsonNode correspondenceAddress = property.getOwners() != null && !property.getOwners().isEmpty()
+		        && property.getOwners().get(0).getAdditionalDetails() != null
+		        ? property.getOwners().get(0).getAdditionalDetails().get("correspondenceAddress")
+		        : null;
 
+		ptbr.put("correspondenceAddress",
+		        correspondenceAddress != null && !correspondenceAddress.isNull()
+		                ? correspondenceAddress.asText()
+		                : "");
 		ptbr.put("ownerOrOccupier",
 			    property.getOwners().stream()
 			        .flatMap(owner -> {
