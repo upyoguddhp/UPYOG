@@ -232,29 +232,51 @@ public class PDFRequestGenerator {
 		    if (billObj.getStatus() == Bill.StatusEnum.PAID) {
 		        totalPaid = totalPaid.add(amount);
 		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
-		        totalDue = totalDue.add(amount);
-		        totalAmount = amount;
-		    } else if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID) {
-		        BigDecimal billPaid = BigDecimal.ZERO;
+		        continue;
+		    }
+
+		    BigDecimal billPaid = BigDecimal.ZERO;
+		    if (billObj.getBillDetails() != null) {
 		        for (BillDetail billDetail : billObj.getBillDetails()) {
 		            if (billDetail.getBillAccountDetails() != null) {
 		                for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
-		                	
-		                    BigDecimal adjusted = accDetail.getAdjustedAmount() != null
-		                            ? accDetail.getAdjustedAmount()
-		                            : BigDecimal.ZERO;
-		                    billPaid = billPaid.add(adjusted);
+		                    if (accDetail.getAdjustedAmount() != null) {
+		                        billPaid = billPaid.add(accDetail.getAdjustedAmount());
+		                    }
 		                }
 		            }
 		        }
-		        
-				if (totalArrear.compareTo(BigDecimal.ZERO) < 0) {
-					billPaid = billPaid.add(totalArrear);
-				}
-		        
+		    }
+
+		    GrbgBillTracker tracker = grbgBillTracker.stream()
+		            .filter(t -> billObj.getConsumerCode() != null
+		                    && billObj.getConsumerCode().equals(t.getGrbgApplicationId()))
+		            .findFirst()
+		            .orElse(null);
+		    boolean paymentProcessing = tracker != null
+		            && Boolean.TRUE.equals(tracker.getIsPaymentProcessing());
+
+		    if (paymentProcessing) {
+		        JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
+		        if (trackerAdditionalDetail != null
+		                && trackerAdditionalDetail.has("chequeTxnAmount")
+		                && !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
+		            billPaid = billPaid.add(trackerAdditionalDetail.get("chequeTxnAmount").decimalValue());
+		        }
+		    }
+
+		    if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID || paymentProcessing) {
+		        if (billObj.getStatus() == Bill.StatusEnum.PARTIALLY_PAID
+		                && totalArrear.compareTo(BigDecimal.ZERO) < 0) {
+		            billPaid = billPaid.add(totalArrear);
+		        }
+
 		        totalPaid = totalPaid.add(billPaid);
 		        totalDue = totalDue.add(amount.subtract(billPaid));
+		        totalAmount = amount;
+		    } else if (billObj.getStatus() == Bill.StatusEnum.ACTIVE
+		            || billObj.getStatus() == Bill.StatusEnum.ADVANCE_ADJUSTED) {
+		        totalDue = totalDue.add(amount);
 		        totalAmount = amount;
 		    }
 		}
