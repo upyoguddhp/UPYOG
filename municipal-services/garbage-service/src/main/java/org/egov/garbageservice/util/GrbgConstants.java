@@ -233,6 +233,9 @@ public class GrbgConstants {
 	@Value("${egov.digital.door.plate.host}")
 	private String digitalDoorPlateHostUrl;
 
+	@Value("${egov.digital.door.plate.context.path}")
+	private String digitalDoorPlateContextPath;
+
 	@Value("${egov.digital.door.plate.qr.generate.endpoint}")
 	private String digitalDoorPlateQrGenerateEndpoint;
 
