@@ -171,6 +171,8 @@ public class PDFRequestGenerator {
 				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
 				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
 					paymentStatus = "PARTIALLY_PAID";
+				} else if (totalPaidAmount.compareTo(billObj.getTotalAmount()) > 0) {
+					paymentStatus = "ADVANCE_ADJUSTED";
 				} else {
 					paymentStatus = "PAID";
 				}
