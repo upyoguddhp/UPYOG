@@ -172,7 +172,7 @@ public class PDFRequestGenerator {
 				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
 					paymentStatus = "PARTIALLY_PAID";
 				} else if (totalPaidAmount.compareTo(billObj.getTotalAmount()) > 0) {
-					paymentStatus = "ADVANCE_ADJUSTED";
+					paymentStatus = "ADVANCE_PAID";
 				} else {
 					paymentStatus = "PAID";
 				}
