@@ -344,6 +344,8 @@ public class PDFRequestGenerator {
 				}
 			}
 			BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
+			amountPaid = totalPaidAmount;
+			amountDue = totalAmount.subtract(amountPaid);
 			if (totalPaidAmount.compareTo(bill.getTotalAmount()) < 0) {
 				paymentStatus = "Partially Paid";
 			} else {
