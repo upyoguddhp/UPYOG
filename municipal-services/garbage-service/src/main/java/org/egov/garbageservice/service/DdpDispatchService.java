@@ -5,10 +5,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpDispatch;
 import org.egov.garbageservice.model.DdpDispatchDetail;
@@ -32,6 +35,7 @@ import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Backs the "Create Dispatch" flow: scanning plates into a dispatch batch
@@ -43,6 +47,14 @@ public class DdpDispatchService {
 
 	private static final String BATCH_NO_FORMAT = "DDP-%s-%s-%03d";
 	private static final String BATCH_DATE_FORMAT = "ddMMyy";
+
+	/**
+	 * Matches a plain, already-decrypted batch_no (e.g.
+	 * "DDP-SHIMLA-271026-001"). Anything else passed in as a "batchNo" is
+	 * treated as the raw encrypted payload scanned straight off a dispatch
+	 * QR code (see {@link #generateQrForBatch}) and decrypted first.
+	 */
+	private static final Pattern BATCH_NO_PATTERN = Pattern.compile("^DDP-[A-Za-z0-9]+-\\d{6}-\\d{3,}$");
 
 	@Autowired
 	private DdpDispatchRepository ddpDispatchRepository;
@@ -231,9 +243,11 @@ public class DdpDispatchService {
 			throw new CustomException("INVALID_REQUEST", "receivedBy is mandatory to receive a dispatch batch.");
 		}
 
-		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(request.getBatchNo());
+		String batchNo = decryptBatchNoIfNeeded(request.getBatchNo(), request.getRequestInfo());
+
+		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(batchNo);
 		if (null == batch) {
-			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + request.getBatchNo());
+			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + batchNo);
 		}
 		if (GrbgConstants.DDP_DISPATCH_STATUS_INITIATED.equals(batch.getStatus())) {
 			throw new CustomException("BATCH_NOT_DISPATCHED",
@@ -271,6 +285,13 @@ public class DdpDispatchService {
 				? request.getSearchCriteriaDdpDispatch()
 				: SearchCriteriaDdpDispatch.builder().build();
 
+		if (!CollectionUtils.isEmpty(criteria.getBatchNo())) {
+			Set<String> decryptedBatchNos = criteria.getBatchNo().stream()
+					.map(batchNo -> decryptBatchNoIfNeeded(batchNo, request.getRequestInfo()))
+					.collect(Collectors.toSet());
+			criteria = criteria.toBuilder().batchNo(decryptedBatchNos).build();
+		}
+
 		List<DdpDispatch> batches = ddpDispatchRepository.searchBatches(criteria);
 		long totalCount = ddpDispatchRepository.countBatches(criteria);
 
@@ -291,7 +312,43 @@ public class DdpDispatchService {
 				.auditDetails(batch.getAuditDetails()).build();
 	}
 
-	private void validateRequestInfo(org.egov.common.contract.request.RequestInfo requestInfo) {
+	/**
+	 * Scanning a dispatch QR code (see {@link #generateQrForBatch}) yields
+	 * the raw encrypted payload, not the plain batch_no - callers that take
+	 * that raw scan straight off a scanner (receive, search) run it through
+	 * this first. A value already shaped like a plain batch_no is returned
+	 * unchanged (so typing/pasting a real batch_no still works); anything
+	 * else is decrypted via digital-door-plate's generic /qr/_decrypt.
+	 */
+	private String decryptBatchNoIfNeeded(String rawValue, RequestInfo requestInfo) {
+		if (StringUtils.isEmpty(rawValue) || BATCH_NO_PATTERN.matcher(rawValue).matches()) {
+			return rawValue;
+		}
+
+		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
+				.append(grbgConstants.getDigitalDoorPlateContextPath())
+				.append(grbgConstants.getDigitalDoorPlateQrDecryptEndpoint());
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("RequestInfo", requestInfo);
+		requestBody.put("encryptedData", rawValue);
+
+		Object response = restCallRepository.fetchResult(uri, requestBody);
+		if (null == response || !(response instanceof Map)) {
+			throw new CustomException("QR_DECRYPT_FAILED", "Failed to decrypt the scanned dispatch QR code.");
+		}
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> decryptResponse = (Map<String, Object>) response;
+		Object data = decryptResponse.get("data");
+		if (null == data || StringUtils.isEmpty(data.toString())) {
+			throw new CustomException("QR_DECRYPT_FAILED", "Failed to decrypt the scanned dispatch QR code.");
+		}
+
+		return data.toString();
+	}
+
+	private void validateRequestInfo(RequestInfo requestInfo) {
 		if (null == requestInfo || null == requestInfo.getUserInfo() || StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
 			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
 		}

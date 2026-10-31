@@ -239,6 +239,9 @@ public class GrbgConstants {
 	@Value("${egov.digital.door.plate.qr.generate.endpoint}")
 	private String digitalDoorPlateQrGenerateEndpoint;
 
+	@Value("${egov.digital.door.plate.qr.decrypt.endpoint}")
+	private String digitalDoorPlateQrDecryptEndpoint;
+
 	public static String generateApplicationNumberFormat(String id, String ulbName, String district) {
 		String appNo = null;
 		appNo = GrbgConstants.APPLICATION_PREFIX;
