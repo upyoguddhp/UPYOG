@@ -382,11 +382,10 @@ public class DdpDispatchService {
 			if (null != owner) {
 				ownerName = owner.getPropertyOwnerName();
 			}
-			if (null != property.getAddress() && null != property.getAddress().getAdditionalDetails()) {
-				String wardNo = property.getAddress().getAdditionalDetails().path("wardNo").asText(null);
-				String wardNumber = property.getAddress().getAdditionalDetails().path("wardNumber").asText(null);
-				ward = StringUtils.isNotEmpty(wardNo) ? wardNo : wardNumber;
-			}
+			ward = (property != null && property.getAddress() != null
+					&& property.getAddress().getAdditionalDetails() != null)
+							? property.getAddress().getAdditionalDetails().path("wardNumber").asText(null)
+							: null;
 		}
 
 		return ScannedPlateInfo.builder().ownerName(ownerName).ward(ward).propertyId(raw.getPropertyId()).build();

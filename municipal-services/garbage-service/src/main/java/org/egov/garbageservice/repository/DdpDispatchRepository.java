@@ -61,7 +61,7 @@ public class DdpDispatchRepository {
 	 */
 	private static final String SELECT_SCANNED_PLATES_BY_BATCH_NO = "SELECT acc.tenant_id as tenant_id, "
 			+ "acc.system_property_id as system_property_id, "
-			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id "
+			+ "COALESCE(acc.system_property_id, acc.system_property_id) as property_id "
 			+ "FROM eg_grbg_account_ddp ddp "
 			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
 			+ "WHERE ddp.batch_no = ?";
