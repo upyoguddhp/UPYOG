@@ -60,6 +60,9 @@ public class BillV2 {
 
 	@JsonProperty("totalAmount")
 	private BigDecimal totalAmount;
+	
+	@JsonProperty("processingAmount")
+	private BigDecimal processingAmount;
 
 	@JsonProperty("businessService")
 	@Size(max = 256)

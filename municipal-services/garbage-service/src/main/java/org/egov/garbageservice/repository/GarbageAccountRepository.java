@@ -1032,7 +1032,8 @@ public class GarbageAccountRepository {
 				"SELECT app.application_no FROM eg_grbg_account acc"
 						+ " LEFT OUTER JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id"
 						+ " WHERE acc.system_property_id = ? AND acc.tenant_id = ?"
-						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?",
+						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?"
+						+ " AND acc.status != 'REJECTED'",
 				String.class, systemPropertyId, tenantId, garbageId);
 	}
 
