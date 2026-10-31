@@ -423,7 +423,7 @@ public class BillServicev2 {
 						BigDecimal chequeTxnAmount = chequeTxnAmountObj != null
 								? new BigDecimal(chequeTxnAmountObj.toString())
 								: BigDecimal.ZERO;
-						bill.getBillDetails().get(0).getBillAccountDetails().get(0).setAdjustedAmount(chequeTxnAmount);
+						bill.setProcessingAmount(chequeTxnAmount);	
 					} else if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
 						bill.setStatus(resolveProcessingPaymentStatus(bill, tracker.getAdditionaldetail()));
 					}
@@ -442,7 +442,7 @@ public class BillServicev2 {
 						BigDecimal chequeTxnAmount = chequeTxnAmountNode != null && !chequeTxnAmountNode.isNull()
 								? chequeTxnAmountNode.decimalValue()
 								: BigDecimal.ZERO;
-						bill.getBillDetails().get(0).getBillAccountDetails().get(0).setAdjustedAmount(chequeTxnAmount);
+						bill.setProcessingAmount(chequeTxnAmount);	
 					} else if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
 						bill.setStatus(resolveProcessingPaymentStatus(bill, tracker.getAdditionalDetails()));
 					}
