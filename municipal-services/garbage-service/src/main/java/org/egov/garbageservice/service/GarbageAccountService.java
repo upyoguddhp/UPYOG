@@ -714,11 +714,11 @@ public class GarbageAccountService {
 		}
 		
 		if (Boolean.TRUE.equals(isDdpUpdateCall)) {
-		    Set<Long> validGarbageIds = validateDdpUpdateWindow(existingGarbageIdAccountsMap);
-		    updateGarbageRequest.getGarbageAccounts().removeIf(account -> !validGarbageIds.contains(account.getGarbageId()));
-		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
-		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
-		    }
+//		    Set<Long> validGarbageIds = validateDdpUpdateWindow(existingGarbageIdAccountsMap);
+//		    updateGarbageRequest.getGarbageAccounts().removeIf(account -> !validGarbageIds.contains(account.getGarbageId()));
+//		    if (updateGarbageRequest.getGarbageAccounts().isEmpty()) {
+//		        throw new CustomException("DDP_UPDATE_WINDOW_EXPIRED","DDP update not allowed after 7 days of verification.");
+//		    }
 		    validatePropertyNotMappedToOtherGarbageId(updateGarbageRequest.getGarbageAccounts());
 		}
 
@@ -2995,23 +2995,23 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		    garbageBillTrackerRepository.updatePenalty(tracker);
 		}
 		
-		private Set<Long> validateDdpUpdateWindow(Map<Long, GarbageAccount> existingGarbageAccountsMap) {
-
-			Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
-			Set<Long> validGarbageIds = new HashSet<>();
-
-			for (GarbageAccount garbageAccount : existingGarbageAccountsMap.values()) {
-				Long ddpModifiedDate = garbageAccount.getDdpModifiedDate();
-				if (ddpModifiedDate == null || ddpModifiedDate <= 0) {
-					validGarbageIds.add(garbageAccount.getGarbageId());
-					continue;
-				}
-				if (!Instant.ofEpochMilli(ddpModifiedDate).isBefore(sevenDaysAgo)) {
-					validGarbageIds.add(garbageAccount.getGarbageId());
-				}
-			}
-			return validGarbageIds;
-		}
+//		private Set<Long> validateDdpUpdateWindow(Map<Long, GarbageAccount> existingGarbageAccountsMap) {
+//
+//			Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+//			Set<Long> validGarbageIds = new HashSet<>();
+//
+//			for (GarbageAccount garbageAccount : existingGarbageAccountsMap.values()) {
+//				Long ddpModifiedDate = garbageAccount.getDdpModifiedDate();
+//				if (ddpModifiedDate == null || ddpModifiedDate <= 0) {
+//					validGarbageIds.add(garbageAccount.getGarbageId());
+//					continue;
+//				}
+//				if (!Instant.ofEpochMilli(ddpModifiedDate).isBefore(sevenDaysAgo)) {
+//					validGarbageIds.add(garbageAccount.getGarbageId());
+//				}
+//			}
+//			return validGarbageIds;
+//		}
 
 	/**
 	 * Partially updates the DDP (door plate) workflow fields on one account
