@@ -9,7 +9,7 @@ import java.util.HashMap;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpDispatch;
 import org.egov.garbageservice.model.DispatchPlateLookup;
-import org.egov.garbageservice.model.ScannedPlateInfo;
+import org.egov.garbageservice.model.ScannedPlateRaw;
 import org.egov.garbageservice.model.SearchCriteriaDdpDispatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -53,11 +53,17 @@ public class DdpDispatchRepository {
 	private static final String ASSIGN_PLATE_TO_BATCH = "UPDATE eg_grbg_account_ddp SET batch_no = ? "
 			+ "WHERE garbage_account_uuid = ?";
 
-	private static final String SELECT_SCANNED_PLATES_BY_BATCH_NO = "SELECT acc.name as owner_name, "
-			+ "addr.ward_name as ward, acc.system_property_id as property_id "
+	/**
+	 * ownerName and ward are not sourced from eg_grbg_account/eg_grbg_address
+	 * here - only the raw ids needed to enrich via property-services are
+	 * selected (same lookup GarbageAccountService's DDP printing search
+	 * uses); see DdpDispatchService#buildScannedPlateInfos.
+	 */
+	private static final String SELECT_SCANNED_PLATES_BY_BATCH_NO = "SELECT acc.tenant_id as tenant_id, "
+			+ "acc.system_property_id as system_property_id, "
+			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id "
 			+ "FROM eg_grbg_account_ddp ddp "
 			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
-			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
 			+ "WHERE ddp.batch_no = ?";
 
 	private static final String SUBMIT_BATCH = "UPDATE eg_grbg_ddp_dispatch SET status = :status, "
@@ -128,10 +134,11 @@ public class DdpDispatchRepository {
 		jdbcTemplate.update(ASSIGN_PLATE_TO_BATCH, batchNo, garbageAccountUuid);
 	}
 
-	public List<ScannedPlateInfo> findScannedPlatesByBatchNo(String batchNo) {
+	public List<ScannedPlateRaw> findScannedPlateRawByBatchNo(String batchNo) {
 		return jdbcTemplate.query(SELECT_SCANNED_PLATES_BY_BATCH_NO,
-				(rs, rowNum) -> ScannedPlateInfo.builder().ownerName(rs.getString("owner_name"))
-						.ward(rs.getString("ward")).propertyId(rs.getString("property_id")).build(),
+				(rs, rowNum) -> ScannedPlateRaw.builder().tenantId(rs.getString("tenant_id"))
+						.systemPropertyId(rs.getString("system_property_id"))
+						.propertyId(rs.getString("property_id")).build(),
 				batchNo);
 	}
 
