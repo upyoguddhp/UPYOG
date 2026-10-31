@@ -607,6 +607,7 @@ public class GarbageAccountRepository {
 				&& (CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getGarbageId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getPropertyId())
+						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getSystemPropertyId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getUuid())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getType())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getName())
@@ -677,7 +678,13 @@ public class GarbageAccountRepository {
             whereClause.append(" acc.property_id IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getPropertyId(),
                     preparedStatementValues)).append(" )");
         }
-        
+
+        if (!CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getSystemPropertyId())) {
+            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+            whereClause.append(" acc.system_property_id IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getSystemPropertyId(),
+                    preparedStatementValues)).append(" )");
+        }
+
         if (!CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getUuid())) {
         	isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
         	whereClause.append(" acc.uuid IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getUuid(),

@@ -4,15 +4,18 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.models.collection.BillResponse;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.AuditDetails;
@@ -35,11 +38,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import java.math.RoundingMode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 
@@ -54,7 +61,10 @@ public class EnrichmentService {
 
 	@Autowired
 	private UserService userService;
-	
+
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -245,6 +255,89 @@ public class EnrichmentService {
 		return criteria;
 	}
 
+	/**
+	 * Fetches isReadyForPrinting/installationDone from garbage-service's DDP
+	 * mapping (eg_grbg_account / eg_grbg_account_ddp) for the given properties,
+	 * matching on systemPropertyId == property.propertyId, and sets them on
+	 * each property. When more than one garbage account maps to the same
+	 * property, the non-child (parentAccount == null) account is preferred,
+	 * with ties broken by the most recently created account. Failures talking
+	 * to garbage-service are logged and swallowed so the property search
+	 * itself never fails because of this enrichment.
+	 */
+	public void enrichGarbageDdpDetails(List<Property> properties, RequestInfo requestInfo) {
+
+		if (CollectionUtils.isEmpty(properties))
+			return;
+
+		Set<String> propertyIds = properties.stream().map(Property::getPropertyId)
+				.filter(id -> id != null && !id.isEmpty()).collect(Collectors.toSet());
+
+		if (propertyIds.isEmpty())
+			return;
+
+		Map<String, Object> searchCriteriaGarbageAccount = new HashMap<>();
+		searchCriteriaGarbageAccount.put("systemPropertyId", propertyIds);
+
+		Set<String> tenantIds = properties.stream().map(Property::getTenantId)
+				.filter(id -> id != null && !id.isEmpty()).collect(Collectors.toSet());
+		// Only pin to a single tenantId when the whole batch shares one; a
+		// state-level search can span multiple ULBs, and systemPropertyId is
+		// unique enough on its own to filter correctly in that case.
+		if (tenantIds.size() == 1)
+			searchCriteriaGarbageAccount.put("tenantId", tenantIds.iterator().next());
+
+		Map<String, Object> request = new HashMap<>();
+		request.put("RequestInfo", requestInfo);
+		request.put("searchCriteriaGarbageAccount", searchCriteriaGarbageAccount);
+
+		StringBuilder uri = new StringBuilder(config.garbageHost).append(config.garbageContextPath)
+				.append(config.garbageSearchEndpoint);
+
+		try {
+			Optional<Object> response = serviceRequestRepository.fetchResult(uri, request);
+			if (!response.isPresent())
+				return;
+
+			JsonNode garbageAccounts = objectMapper.valueToTree(response.get()).path("garbageAccounts");
+
+			Map<String, JsonNode> bestAccountByPropertyId = new HashMap<>();
+			for (JsonNode account : garbageAccounts) {
+				String systemPropertyId = account.path("systemPropertyId").asText(null);
+				if (systemPropertyId == null || systemPropertyId.isEmpty())
+					continue;
+
+				JsonNode existing = bestAccountByPropertyId.get(systemPropertyId);
+				if (existing == null || isPreferredDdpAccount(account, existing))
+					bestAccountByPropertyId.put(systemPropertyId, account);
+			}
+
+			properties.forEach(property -> {
+				JsonNode account = bestAccountByPropertyId.get(property.getPropertyId());
+				if (account == null)
+					return;
+				if (account.hasNonNull("isReadyForPrinting"))
+					property.setIsReadyForPrinting(account.get("isReadyForPrinting").asBoolean());
+				if (account.hasNonNull("installationDone"))
+					property.setInstallationDone(account.get("installationDone").asBoolean());
+			});
+		} catch (Exception e) {
+			log.error("Failed to fetch DDP printing/installation details from garbage-service", e);
+		}
+	}
+
+	private boolean isPreferredDdpAccount(JsonNode candidate, JsonNode current) {
+
+		boolean candidateIsParent = !candidate.hasNonNull("parentAccount");
+		boolean currentIsParent = !current.hasNonNull("parentAccount");
+		if (candidateIsParent != currentIsParent)
+			return candidateIsParent;
+
+		long candidateCreatedTime = candidate.path("auditDetails").path("createdTime").asLong(0);
+		long currentCreatedTime = current.path("auditDetails").path("createdTime").asLong(0);
+		return candidateCreatedTime > currentCreatedTime;
+	}
+
     /**
      *  Enriches the locality object
      * @param property The property object received for create or update
@@ -406,11 +499,13 @@ public class EnrichmentService {
 				.tenantId(property.getTenantId()).financialYear(calculateTaxRequest.getFinancialYear())
 				.fromDate(calculateTaxRequest.getFromDate()).toDate(calculateTaxRequest.getToDate())
 				.fromDateString(formatter.format(calculateTaxRequest.getFromDate()))
-				.toDateString(formatter.format(calculateTaxRequest.getToDate())).propertyTax(finalPropertyTax)
+				.toDateString(formatter.format(calculateTaxRequest.getToDate()))
+				.propertyTax(finalPropertyTax != null ? finalPropertyTax.setScale(0, RoundingMode.HALF_UP) : null)
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
-				.billId(null != bill ? bill.getId() : null).rebateAmount(rebateAmount)
+				.billId(null != bill ? bill.getId() : null)
+				.rebateAmount(rebateAmount != null ? rebateAmount.setScale(0, RoundingMode.HALF_UP) : null)
 				.type(calculateTaxRequest.getType())
-				.propertyTaxWithoutRebate(propertyTaxWithoutRebate)
+				.propertyTaxWithoutRebate(propertyTaxWithoutRebate != null ? propertyTaxWithoutRebate.setScale(0, RoundingMode.HALF_UP) : null)
 				.billStatus(trackerStatus)
 				.demandId(demandId)
 				.ward(ward)

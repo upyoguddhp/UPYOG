@@ -104,6 +104,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import java.math.RoundingMode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1700,6 +1701,8 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getGarbageId())
 						&& CollectionUtils.isEmpty(
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getPropertyId())
+						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccountRequest
+								.getSearchCriteriaGarbageAccount().getSystemPropertyId())
 						&& CollectionUtils.isEmpty(
 								searchCriteriaGarbageAccountRequest.getSearchCriteriaGarbageAccount().getType())
 						&& CollectionUtils.isEmpty(
@@ -1745,6 +1748,7 @@ private RequestInfo buildPublicRequestInfo(String tenantId) {
 	public Boolean isCriteriaEmpty(SearchCriteriaGarbageAccount criteria) {
 		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getId())
 				&& CollectionUtils.isEmpty(criteria.getGarbageId()) && CollectionUtils.isEmpty(criteria.getPropertyId())
+				&& CollectionUtils.isEmpty(criteria.getSystemPropertyId())
 				&& CollectionUtils.isEmpty(criteria.getUuid()) && CollectionUtils.isEmpty(criteria.getType())
 				&& CollectionUtils.isEmpty(criteria.getName()) && CollectionUtils.isEmpty(criteria.getMobileNumber())
 				&& CollectionUtils.isEmpty(criteria.getApplicationNumber())
@@ -2164,7 +2168,8 @@ public GarbageAccountActionResponse openSearchPayPreview(
 						: null)
 				.type(generateBillRequest.getType()).additionaldetail(calculationBreakdown)
 				.ward(garbageAccount.getAddresses().get(0).getWardName()).billId(bill.getId())
-				.grbgBillAmount(billAmount).auditDetails(createAuditDetails).build();
+				.grbgBillAmount(billAmount != null ? billAmount.setScale(0, RoundingMode.HALF_UP) : null)
+				.auditDetails(createAuditDetails).build();
 
 		return GrbgBillTrackerRequest.builder().requestInfo(generateBillRequest.getRequestInfo())
 				.grbgBillTracker(grbgBillTracker).build();

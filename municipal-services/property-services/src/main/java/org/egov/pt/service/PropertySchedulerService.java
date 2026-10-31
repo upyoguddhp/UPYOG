@@ -1679,8 +1679,9 @@ public class PropertySchedulerService {
 	}
 
 	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
-		return tracker.getPropertyTaxWithoutRebate().multiply(BigDecimal.valueOf(penaltyRatePercent))
-				.divide(BigDecimal.valueOf(100));
+		return tracker.getPropertyTaxWithoutRebate()
+				.multiply(BigDecimal.valueOf(penaltyRatePercent))
+				.divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
 	}
 
 	private boolean isValidTracker(PtTaxCalculatorTracker tracker) {

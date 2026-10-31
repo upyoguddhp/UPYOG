@@ -98,6 +98,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import java.util.Comparator;
+import java.math.RoundingMode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -158,6 +159,19 @@ public class DemandService {
 		
 		List<AmendmentUpdate> amendmentUpdates = consumeAmendmentIfExists(demands, auditDetail);
 		generateAndSetIdsForNewDemands(demands, auditDetail);
+		
+		demands.forEach(demand -> {
+			if (demand.getMinimumAmountPayable() != null) {
+				demand.setMinimumAmountPayable(demand.getMinimumAmountPayable().setScale(0, RoundingMode.HALF_UP));
+			}
+			if (!CollectionUtils.isEmpty(demand.getDemandDetails())) {
+				demand.getDemandDetails().forEach(detail -> {
+					if (detail.getTaxAmount() != null) {
+						detail.setTaxAmount(detail.getTaxAmount().setScale(0, RoundingMode.HALF_UP));
+					}
+				});
+			}
+		});
 
 		List<Demand> demandsToBeCreated = new ArrayList<>();
 		List<Demand> demandToBeUpdated = new ArrayList<>();
