@@ -1,22 +1,23 @@
 package org.egov.garbageservice.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpDispatch;
 import org.egov.garbageservice.model.DdpDispatchDetail;
 import org.egov.garbageservice.model.DdpDispatchGenerateQrRequest;
 import org.egov.garbageservice.model.DdpDispatchGenerateQrResponse;
+import org.egov.garbageservice.model.DdpDispatchQrPayload;
 import org.egov.garbageservice.model.DdpDispatchReceiveRequest;
 import org.egov.garbageservice.model.DdpDispatchReceiveResponse;
 import org.egov.garbageservice.model.DdpDispatchScanRequest;
@@ -31,11 +32,18 @@ import org.egov.garbageservice.model.SearchCriteriaDdpDispatchRequest;
 import org.egov.garbageservice.repository.DdpDispatchRepository;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.ResponseInfoFactory;
-import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
  * Backs the "Create Dispatch" flow: scanning plates into a dispatch batch
@@ -48,13 +56,7 @@ public class DdpDispatchService {
 	private static final String BATCH_NO_FORMAT = "DDP-%s-%s-%03d";
 	private static final String BATCH_DATE_FORMAT = "ddMMyy";
 
-	/**
-	 * Matches a plain, already-decrypted batch_no (e.g.
-	 * "DDP-SHIMLA-271026-001"). Anything else passed in as a "batchNo" is
-	 * treated as the raw encrypted payload scanned straight off a dispatch
-	 * QR code (see {@link #generateQrForBatch}) and decrypted first.
-	 */
-	private static final Pattern BATCH_NO_PATTERN = Pattern.compile("^DDP-[A-Za-z0-9]+-\\d{6}-\\d{3,}$");
+	private static final int QR_IMAGE_SIZE = 350;
 
 	@Autowired
 	private DdpDispatchRepository ddpDispatchRepository;
@@ -63,10 +65,7 @@ public class DdpDispatchService {
 	private ResponseInfoFactory responseInfoFactory;
 
 	@Autowired
-	private RestCallRepository restCallRepository;
-
-	@Autowired
-	private GrbgConstants grbgConstants;
+	private ObjectMapper objectMapper;
 
 	public DdpDispatchScanResponse scanPlate(DdpDispatchScanRequest request) {
 
@@ -183,10 +182,12 @@ public class DdpDispatchService {
 	}
 
 	/**
-	 * Generates a QR code for a dispatched batch (encoding just the batch_no,
-	 * via digital-door-plate's generic /qr/_generate), for the ULB side to
-	 * scan on receipt. Allowed once the batch has actually been dispatched
-	 * (SUBMITTED or already RECEIVED, e.g. to reprint); not before.
+	 * Generates a plain (unencrypted) QR code for a dispatched batch,
+	 * encoding a JSON object with batchNo/ulb/totalScannedPlates so any
+	 * generic QR scanner app can read it directly - no decrypt step needed
+	 * anywhere. For the ULB side to scan on receipt. Allowed once the batch
+	 * has actually been dispatched (SUBMITTED or already RECEIVED, e.g. to
+	 * reprint); not before.
 	 */
 	public DdpDispatchGenerateQrResponse generateQrForBatch(DdpDispatchGenerateQrRequest request) {
 
@@ -204,28 +205,48 @@ public class DdpDispatchService {
 					"Batch " + batch.getBatchNo() + " has not been submitted/dispatched yet.");
 		}
 
-		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
-				.append(grbgConstants.getDigitalDoorPlateContextPath())
-				.append(grbgConstants.getDigitalDoorPlateQrGenerateEndpoint());
+		int totalScannedPlates = (int) ddpDispatchRepository.countPlatesByBatchNo(batch.getBatchNo());
 
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("RequestInfo", request.getRequestInfo());
-		requestBody.put("tenantId", request.getTenantId());
-		requestBody.put("data", batch.getBatchNo());
+		DdpDispatchQrPayload payload = DdpDispatchQrPayload.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb())
+				.totalScannedPlates(totalScannedPlates).build();
 
-		Object response = restCallRepository.fetchResult(uri, requestBody);
-		if (null == response || !(response instanceof Map)) {
-			throw new CustomException("QR_GENERATION_FAILED", "Failed to generate QR code for batch " + batch.getBatchNo() + ".");
+		String qrData;
+		try {
+			qrData = objectMapper.writeValueAsString(payload);
+		} catch (Exception e) {
+			throw new CustomException("QR_GENERATION_FAILED",
+					"Failed to build QR payload for batch " + batch.getBatchNo() + ": " + e.getMessage());
 		}
-
-		@SuppressWarnings("unchecked")
-		Map<String, Object> qrResponse = (Map<String, Object>) response;
 
 		return DdpDispatchGenerateQrResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.batchNo(batch.getBatchNo()).ulb(batch.getUlb()).status(batch.getStatus())
-				.qrCodeImage((String) qrResponse.get("qrCodeImage")).encryptedData((String) qrResponse.get("encryptedData"))
-				.build();
+				.totalScannedPlates(totalScannedPlates).qrCodeImage(renderQrCodeImage(qrData)).build();
+	}
+
+	/**
+	 * Renders the given plain text/JSON as a QR code PNG, base64 data URI
+	 * (ready for an &lt;img src="..."&gt;) - no encryption, readable by any
+	 * generic QR scanner.
+	 */
+	private String renderQrCodeImage(String data) {
+		try {
+			Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+			hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+			hints.put(EncodeHintType.MARGIN, 1);
+
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, QR_IMAGE_SIZE, QR_IMAGE_SIZE, hints);
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+
+			return "data:image/png;base64," + Base64.getEncoder().encodeToString(outputStream.toByteArray());
+		} catch (WriterException | IOException e) {
+			throw new CustomException("QR_IMAGE_GENERATION_ERROR",
+					"Error occurred while rendering the dispatch QR code image. Message: " + e.getMessage());
+		}
 	}
 
 	/**
@@ -243,11 +264,9 @@ public class DdpDispatchService {
 			throw new CustomException("INVALID_REQUEST", "receivedBy is mandatory to receive a dispatch batch.");
 		}
 
-		String batchNo = decryptBatchNoIfNeeded(request.getBatchNo(), request.getRequestInfo());
-
-		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(batchNo);
+		DdpDispatch batch = ddpDispatchRepository.findBatchByBatchNo(request.getBatchNo());
 		if (null == batch) {
-			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + batchNo);
+			throw new CustomException("BATCH_NOT_FOUND", "No dispatch batch found for batch_no: " + request.getBatchNo());
 		}
 		if (GrbgConstants.DDP_DISPATCH_STATUS_INITIATED.equals(batch.getStatus())) {
 			throw new CustomException("BATCH_NOT_DISPATCHED",
@@ -285,13 +304,6 @@ public class DdpDispatchService {
 				? request.getSearchCriteriaDdpDispatch()
 				: SearchCriteriaDdpDispatch.builder().build();
 
-		if (!CollectionUtils.isEmpty(criteria.getBatchNo())) {
-			Set<String> decryptedBatchNos = criteria.getBatchNo().stream()
-					.map(batchNo -> decryptBatchNoIfNeeded(batchNo, request.getRequestInfo()))
-					.collect(Collectors.toSet());
-			criteria = criteria.toBuilder().batchNo(decryptedBatchNos).build();
-		}
-
 		List<DdpDispatch> batches = ddpDispatchRepository.searchBatches(criteria);
 		long totalCount = ddpDispatchRepository.countBatches(criteria);
 
@@ -312,43 +324,7 @@ public class DdpDispatchService {
 				.auditDetails(batch.getAuditDetails()).build();
 	}
 
-	/**
-	 * Scanning a dispatch QR code (see {@link #generateQrForBatch}) yields
-	 * the raw encrypted payload, not the plain batch_no - callers that take
-	 * that raw scan straight off a scanner (receive, search) run it through
-	 * this first. A value already shaped like a plain batch_no is returned
-	 * unchanged (so typing/pasting a real batch_no still works); anything
-	 * else is decrypted via digital-door-plate's generic /qr/_decrypt.
-	 */
-	private String decryptBatchNoIfNeeded(String rawValue, RequestInfo requestInfo) {
-		if (StringUtils.isEmpty(rawValue) || BATCH_NO_PATTERN.matcher(rawValue).matches()) {
-			return rawValue;
-		}
-
-		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
-				.append(grbgConstants.getDigitalDoorPlateContextPath())
-				.append(grbgConstants.getDigitalDoorPlateQrDecryptEndpoint());
-
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("RequestInfo", requestInfo);
-		requestBody.put("encryptedData", rawValue);
-
-		Object response = restCallRepository.fetchResult(uri, requestBody);
-		if (null == response || !(response instanceof Map)) {
-			throw new CustomException("QR_DECRYPT_FAILED", "Failed to decrypt the scanned dispatch QR code.");
-		}
-
-		@SuppressWarnings("unchecked")
-		Map<String, Object> decryptResponse = (Map<String, Object>) response;
-		Object data = decryptResponse.get("data");
-		if (null == data || StringUtils.isEmpty(data.toString())) {
-			throw new CustomException("QR_DECRYPT_FAILED", "Failed to decrypt the scanned dispatch QR code.");
-		}
-
-		return data.toString();
-	}
-
-	private void validateRequestInfo(RequestInfo requestInfo) {
+	private void validateRequestInfo(org.egov.common.contract.request.RequestInfo requestInfo) {
 		if (null == requestInfo || null == requestInfo.getUserInfo() || StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
 			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
 		}

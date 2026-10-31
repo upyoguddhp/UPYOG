@@ -230,18 +230,6 @@ public class GrbgConstants {
 	@Value("${egov.update.bill.endpoint}")
 	private String updateBillEndpoint;
 
-	@Value("${egov.digital.door.plate.host}")
-	private String digitalDoorPlateHostUrl;
-
-	@Value("${egov.digital.door.plate.context.path}")
-	private String digitalDoorPlateContextPath;
-
-	@Value("${egov.digital.door.plate.qr.generate.endpoint}")
-	private String digitalDoorPlateQrGenerateEndpoint;
-
-	@Value("${egov.digital.door.plate.qr.decrypt.endpoint}")
-	private String digitalDoorPlateQrDecryptEndpoint;
-
 	public static String generateApplicationNumberFormat(String id, String ulbName, String district) {
 		String appNo = null;
 		appNo = GrbgConstants.APPLICATION_PREFIX;
