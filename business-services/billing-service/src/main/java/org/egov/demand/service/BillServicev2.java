@@ -416,8 +416,7 @@ public class BillServicev2 {
 				GrbgBillTracker tracker = util.getGarbageTracker(request);
 				if (tracker != null) {
 					bill.setDemandId(tracker.getDemandId());
-					bill.setIsPaymentProcessing(tracker.getIsPaymentProcessing());
-					if (billCriteria.getIsProcessing() == true) {
+					if (tracker.getIsPaymentProcessing() == true) {
 						bill.setStatus(BillV2.BillStatus.ACTIVE);
 						Object chequeTxnAmountObj = tracker.getAdditionaldetail().get("chequeTxnAmount");
 						BigDecimal chequeTxnAmount = chequeTxnAmountObj != null
@@ -432,8 +431,7 @@ public class BillServicev2 {
 				PtTaxCalculatorTracker tracker = util.getPropertyTracker(request);
 				if (tracker != null) {
 					bill.setDemandId(tracker.getDemandId());
-					bill.setIsPaymentProcessing(tracker.getIsPaymentProcessing());
-					if (billCriteria.getIsProcessing() == true) {
+					if (tracker.getIsPaymentProcessing() == true) {
 						bill.setStatus(BillV2.BillStatus.ACTIVE);
 						JsonNode additionalDetails = tracker.getAdditionalDetails();
 						JsonNode chequeTxnAmountNode = additionalDetails != null && additionalDetails.isArray()
