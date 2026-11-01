@@ -503,7 +503,7 @@ public class EnrichmentService {
 				.propertyTax(finalPropertyTax != null ? finalPropertyTax.setScale(0, RoundingMode.HALF_UP) : null)
 				.additionalDetails(additionalDetails).auditDetails(createAuditDetails)
 				.billId(null != bill ? bill.getId() : null)
-				.rebateAmount(rebateAmount != null ? rebateAmount.setScale(0, RoundingMode.HALF_UP) : null)
+				.rebateAmount(rebateAmount)
 				.type(calculateTaxRequest.getType())
 				.propertyTaxWithoutRebate(propertyTaxWithoutRebate != null ? propertyTaxWithoutRebate.setScale(0, RoundingMode.HALF_UP) : null)
 				.billStatus(trackerStatus)
