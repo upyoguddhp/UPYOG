@@ -1646,7 +1646,7 @@ public class PropertySchedulerService {
 			if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_PENALTY) && tenantIdPenaltyRateMap != null
 					&& tenantIdPenaltyRateMap.containsKey(tracker.getTenantId())) {
 				penaltyAmount = calculatePenalty(tracker, tenantIdPenaltyRateMap.get(tracker.getTenantId()));
-				newAmount = tracker.getPropertyTax().add(penaltyAmount);
+				newAmount = tracker.getPropertyTax().add(penaltyAmount).setScale(0, RoundingMode.HALF_UP);
 
 				tracker.setPenaltyAmount(
 						(tracker.getPenaltyAmount() != null ? tracker.getPenaltyAmount() : BigDecimal.ZERO)
@@ -1681,7 +1681,7 @@ public class PropertySchedulerService {
 	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
 		return tracker.getPropertyTaxWithoutRebate()
 				.multiply(BigDecimal.valueOf(penaltyRatePercent))
-				.divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+				.divide(BigDecimal.valueOf(100));
 	}
 
 	private boolean isValidTracker(PtTaxCalculatorTracker tracker) {
