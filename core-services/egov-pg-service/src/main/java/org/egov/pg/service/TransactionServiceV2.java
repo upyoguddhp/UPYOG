@@ -467,6 +467,11 @@ public class TransactionServiceV2 {
 			throw new CustomException("INVALID_TRANSACTION_STATUS", "Cheque transaction must be in PROCESSING state");
 		}
 
+		if ("GB".equalsIgnoreCase(txn.getProductInfo())) {
+			// The bill search only loads matching details; cheque actions apply to the whole transaction.
+			mapTransactionDetails(Collections.singletonList(txn));
+		}
+
 		if (Transaction.TxnStatusEnum.SUCCESS.equals(request.getAction())) {
 			txn.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
@@ -498,11 +503,23 @@ public class TransactionServiceV2 {
 	}
 	
 	private void updatePaymentProcessing(Transaction transaction, boolean isPaymentProcessing) {
+		if ("GB".equalsIgnoreCase(transaction.getProductInfo())
+				&& !CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
+			for (TransactionDetails detail : transaction.getTransactionDetails()) {
+				pushPaymentProcessing(transaction, isPaymentProcessing, detail.getBillId(), detail.getTxnAmount());
+			}
+			return;
+		}
+		pushPaymentProcessing(transaction, isPaymentProcessing, transaction.getBillId(), transaction.getTxnAmount());
+	}
+
+	private void pushPaymentProcessing(Transaction transaction, boolean isPaymentProcessing, String billId,
+			String txnAmount) {
 		Map<String, Object> payload = new HashMap<>();
-		payload.put("billId", transaction.getBillId());
+		payload.put("billId", billId);
 		payload.put("txnId", transaction.getTxnId());
 		payload.put("isPaymentProcessing", isPaymentProcessing);
-		payload.put("txnAmount", transaction.getTxnAmount());
+		payload.put("txnAmount", txnAmount);
 		payload.put("AddiitonalDetails", transaction.getAdditionalDetails());
 
 		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
