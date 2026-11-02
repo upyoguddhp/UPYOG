@@ -1140,13 +1140,40 @@ public class PropertySchedulerService {
 				createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
 			}
 
+			String ownerOrOccupier = property.getOwners().stream().flatMap(owner -> {
+				List<String> names = new ArrayList<>();
+
+				if (owner.getPropertyOwnerName() != null) {
+					names.add(owner.getPropertyOwnerName());
+				}
+
+				if (owner.getAdditionalDetails() != null && owner.getAdditionalDetails().has("coOwnerName")) {
+
+					String anyOtherCoWorker = owner.getAdditionalDetails().has("anyOtherCoWorker")
+							? owner.getAdditionalDetails().get("anyOtherCoWorker").asText()
+							: null;
+
+					if (!"No".equalsIgnoreCase(anyOtherCoWorker)) {
+						String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
+
+						if (coOwner != null && !coOwner.isEmpty()) {
+							names.add(coOwner);
+						}
+					}
+				}
+
+				return names.stream();
+			}).distinct().collect(Collectors.joining(" & "));
+			
 			Object address = objectMapper.convertValue(property.getAddress(), Object.class);
 			previewResponses.add(CalculateTaxPreviewResponse.builder().propertyId(properties.get(0).getPropertyId())
 					.tenantId(properties.get(0).getTenantId())
 					.totalAnnualTax(totalPropertyTax.setScale(2, RoundingMode.HALF_UP)).address(address)
 					.propertyTaxWithoutRebate(finalPropertyTax.setScale(2, RoundingMode.HALF_UP))
 					.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP)).days(days)
-					.calculationDetails(trackeradditionalDetails).build());
+					.calculationDetails(trackeradditionalDetails)
+					.ownerOrOccupier(ownerOrOccupier)
+					.build());
 
 		}
 
