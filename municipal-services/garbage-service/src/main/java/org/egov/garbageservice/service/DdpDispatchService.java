@@ -1,7 +1,12 @@
 package org.egov.garbageservice.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,11 +14,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpDispatch;
 import org.egov.garbageservice.model.DdpDispatchDetail;
 import org.egov.garbageservice.model.DdpDispatchGenerateQrRequest;
 import org.egov.garbageservice.model.DdpDispatchGenerateQrResponse;
+import org.egov.garbageservice.model.DdpDispatchQrPayload;
 import org.egov.garbageservice.model.DdpDispatchReceiveRequest;
 import org.egov.garbageservice.model.DdpDispatchReceiveResponse;
 import org.egov.garbageservice.model.DdpDispatchScanRequest;
@@ -22,7 +29,11 @@ import org.egov.garbageservice.model.DdpDispatchSearchResponse;
 import org.egov.garbageservice.model.DdpDispatchSubmitRequest;
 import org.egov.garbageservice.model.DdpDispatchSubmitResponse;
 import org.egov.garbageservice.model.DispatchPlateLookup;
+import org.egov.garbageservice.model.PtOwnerInfo;
+import org.egov.garbageservice.model.PtProperty;
+import org.egov.garbageservice.model.PtPropertyResponse;
 import org.egov.garbageservice.model.ScannedPlateInfo;
+import org.egov.garbageservice.model.ScannedPlateRaw;
 import org.egov.garbageservice.model.SearchCriteriaDdpDispatch;
 import org.egov.garbageservice.model.SearchCriteriaDdpDispatchRequest;
 import org.egov.garbageservice.repository.DdpDispatchRepository;
@@ -32,6 +43,16 @@ import org.egov.garbageservice.util.RestCallRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
  * Backs the "Create Dispatch" flow: scanning plates into a dispatch batch
@@ -44,11 +65,16 @@ public class DdpDispatchService {
 	private static final String BATCH_NO_FORMAT = "DDP-%s-%s-%03d";
 	private static final String BATCH_DATE_FORMAT = "ddMMyy";
 
+	private static final int QR_IMAGE_SIZE = 350;
+
 	@Autowired
 	private DdpDispatchRepository ddpDispatchRepository;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Autowired
 	private RestCallRepository restCallRepository;
@@ -107,7 +133,7 @@ public class DdpDispatchService {
 
 		ddpDispatchRepository.assignPlateToBatch(plate.getGarbageAccountUuid(), batch.getBatchNo());
 
-		List<ScannedPlateInfo> scannedPlates = ddpDispatchRepository.findScannedPlatesByBatchNo(batch.getBatchNo());
+		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), request.getRequestInfo());
 
 		return DdpDispatchScanResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
@@ -162,7 +188,7 @@ public class DdpDispatchService {
 					"Batch " + batch.getBatchNo() + " was already submitted by another request.");
 		}
 
-		List<ScannedPlateInfo> scannedPlates = ddpDispatchRepository.findScannedPlatesByBatchNo(batch.getBatchNo());
+		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), request.getRequestInfo());
 
 		return DdpDispatchSubmitResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
@@ -171,10 +197,12 @@ public class DdpDispatchService {
 	}
 
 	/**
-	 * Generates a QR code for a dispatched batch (encoding just the batch_no,
-	 * via digital-door-plate's generic /qr/_generate), for the ULB side to
-	 * scan on receipt. Allowed once the batch has actually been dispatched
-	 * (SUBMITTED or already RECEIVED, e.g. to reprint); not before.
+	 * Generates a plain (unencrypted) QR code for a dispatched batch,
+	 * encoding a JSON object with batchNo/ulb/totalScannedPlates so any
+	 * generic QR scanner app can read it directly - no decrypt step needed
+	 * anywhere. For the ULB side to scan on receipt. Allowed once the batch
+	 * has actually been dispatched (SUBMITTED or already RECEIVED, e.g. to
+	 * reprint); not before.
 	 */
 	public DdpDispatchGenerateQrResponse generateQrForBatch(DdpDispatchGenerateQrRequest request) {
 
@@ -192,28 +220,48 @@ public class DdpDispatchService {
 					"Batch " + batch.getBatchNo() + " has not been submitted/dispatched yet.");
 		}
 
-		StringBuilder uri = new StringBuilder(grbgConstants.getDigitalDoorPlateHostUrl())
-				.append(grbgConstants.getDigitalDoorPlateContextPath())
-				.append(grbgConstants.getDigitalDoorPlateQrGenerateEndpoint());
+		int totalScannedPlates = (int) ddpDispatchRepository.countPlatesByBatchNo(batch.getBatchNo());
 
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("RequestInfo", request.getRequestInfo());
-		requestBody.put("tenantId", request.getTenantId());
-		requestBody.put("data", batch.getBatchNo());
+		DdpDispatchQrPayload payload = DdpDispatchQrPayload.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb())
+				.totalScannedPlates(totalScannedPlates).build();
 
-		Object response = restCallRepository.fetchResult(uri, requestBody);
-		if (null == response || !(response instanceof Map)) {
-			throw new CustomException("QR_GENERATION_FAILED", "Failed to generate QR code for batch " + batch.getBatchNo() + ".");
+		String qrData;
+		try {
+			qrData = objectMapper.writeValueAsString(payload);
+		} catch (Exception e) {
+			throw new CustomException("QR_GENERATION_FAILED",
+					"Failed to build QR payload for batch " + batch.getBatchNo() + ": " + e.getMessage());
 		}
-
-		@SuppressWarnings("unchecked")
-		Map<String, Object> qrResponse = (Map<String, Object>) response;
 
 		return DdpDispatchGenerateQrResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.batchNo(batch.getBatchNo()).ulb(batch.getUlb()).status(batch.getStatus())
-				.qrCodeImage((String) qrResponse.get("qrCodeImage")).encryptedData((String) qrResponse.get("encryptedData"))
-				.build();
+				.totalScannedPlates(totalScannedPlates).qrCodeImage(renderQrCodeImage(qrData)).build();
+	}
+
+	/**
+	 * Renders the given plain text/JSON as a QR code PNG, base64 data URI
+	 * (ready for an &lt;img src="..."&gt;) - no encryption, readable by any
+	 * generic QR scanner.
+	 */
+	private String renderQrCodeImage(String data) {
+		try {
+			Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+			hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+			hints.put(EncodeHintType.MARGIN, 1);
+
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, QR_IMAGE_SIZE, QR_IMAGE_SIZE, hints);
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+
+			return "data:image/png;base64," + Base64.getEncoder().encodeToString(outputStream.toByteArray());
+		} catch (WriterException | IOException e) {
+			throw new CustomException("QR_IMAGE_GENERATION_ERROR",
+					"Error occurred while rendering the dispatch QR code image. Message: " + e.getMessage());
+		}
 	}
 
 	/**
@@ -254,7 +302,7 @@ public class DdpDispatchService {
 					"Batch " + batch.getBatchNo() + " was already received by another request.");
 		}
 
-		List<ScannedPlateInfo> scannedPlates = ddpDispatchRepository.findScannedPlatesByBatchNo(batch.getBatchNo());
+		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), request.getRequestInfo());
 
 		return DdpDispatchReceiveResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
@@ -274,16 +322,16 @@ public class DdpDispatchService {
 		List<DdpDispatch> batches = ddpDispatchRepository.searchBatches(criteria);
 		long totalCount = ddpDispatchRepository.countBatches(criteria);
 
-		List<DdpDispatchDetail> dispatchBatches = batches.stream().map(this::toDispatchDetail)
-				.collect(Collectors.toList());
+		List<DdpDispatchDetail> dispatchBatches = batches.stream()
+				.map(batch -> toDispatchDetail(batch, request.getRequestInfo())).collect(Collectors.toList());
 
 		return DdpDispatchSearchResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.totalCount(totalCount).dispatchBatches(dispatchBatches).build();
 	}
 
-	private DdpDispatchDetail toDispatchDetail(DdpDispatch batch) {
-		List<ScannedPlateInfo> scannedPlates = ddpDispatchRepository.findScannedPlatesByBatchNo(batch.getBatchNo());
+	private DdpDispatchDetail toDispatchDetail(DdpDispatch batch, RequestInfo requestInfo) {
+		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), requestInfo);
 		return DdpDispatchDetail.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb()).ward(batch.getWard())
 				.dispatchDate(batch.getDispatchDate()).receivedBy(batch.getReceivedBy())
 				.ulbReceivingDate(batch.getUlbReceivingDate()).status(batch.getStatus())
@@ -291,7 +339,112 @@ public class DdpDispatchService {
 				.auditDetails(batch.getAuditDetails()).build();
 	}
 
-	private void validateRequestInfo(org.egov.common.contract.request.RequestInfo requestInfo) {
+	/**
+	 * Enriches the raw plates assigned to a batch with ownerName and ward
+	 * from property-services (looked up by each plate's systemPropertyId) -
+	 * the same mechanism GarbageAccountService's DDP printing search
+	 * (/garbage-accounts/_searchDdpPrintingData) uses, kept separate here so
+	 * the dispatch feature doesn't depend on that class. ownerName comes
+	 * from the property's primary owner (no fallback to the garbage
+	 * account's own name); ward comes from the property address's
+	 * wardNo/wardNumber, since property-services has no ward-name string.
+	 * A plate with no linked property (or no match found) comes back with
+	 * null ownerName/ward.
+	 */
+	private List<ScannedPlateInfo> buildScannedPlateInfos(String batchNo, RequestInfo requestInfo) {
+		List<ScannedPlateRaw> rawPlates = ddpDispatchRepository.findScannedPlateRawByBatchNo(batchNo);
+		if (CollectionUtils.isEmpty(rawPlates)) {
+			return Collections.emptyList();
+		}
+
+		String tenantId = rawPlates.stream().map(ScannedPlateRaw::getTenantId).filter(StringUtils::isNotEmpty)
+				.findFirst().orElse(null);
+
+		List<String> systemPropertyIds = rawPlates.stream().map(ScannedPlateRaw::getSystemPropertyId)
+				.filter(StringUtils::isNotEmpty).distinct().collect(Collectors.toList());
+
+		Map<String, PtProperty> propertyBySystemPropertyId = fetchPropertiesBySystemPropertyId(requestInfo, tenantId,
+				systemPropertyIds);
+
+		return rawPlates.stream().map(raw -> toScannedPlateInfo(raw, propertyBySystemPropertyId))
+				.collect(Collectors.toList());
+	}
+
+	private ScannedPlateInfo toScannedPlateInfo(ScannedPlateRaw raw, Map<String, PtProperty> propertyBySystemPropertyId) {
+		PtProperty property = StringUtils.isEmpty(raw.getSystemPropertyId()) ? null
+				: propertyBySystemPropertyId.get(raw.getSystemPropertyId());
+
+		String ownerName = null;
+		String ward = null;
+
+		if (null != property) {
+			PtOwnerInfo owner = findPrimaryOwner(property.getOwners());
+			if (null != owner) {
+				ownerName = owner.getPropertyOwnerName();
+			}
+			ward = (property != null && property.getAddress() != null
+					&& property.getAddress().getAdditionalDetails() != null)
+							? property.getAddress().getAdditionalDetails().path("wardNumber").asText(null)
+							: null;
+		}
+
+		return ScannedPlateInfo.builder().ownerName(ownerName).ward(ward).propertyId(raw.getPropertyId()).build();
+	}
+
+	private PtOwnerInfo findPrimaryOwner(List<PtOwnerInfo> owners) {
+		if (CollectionUtils.isEmpty(owners)) {
+			return null;
+		}
+		return owners.stream().filter(owner -> Boolean.TRUE.equals(owner.getIsPrimaryOwner())).findFirst()
+				.orElse(owners.get(0));
+	}
+
+	/**
+	 * Batch-fetches property-services Property records for the given
+	 * systemPropertyIds (50 per call, matching property-services' own search
+	 * convention), keyed by propertyId for lookup - same mechanism as
+	 * {@code GarbageAccountService.fetchPropertiesBySystemPropertyId}, kept
+	 * separate here so the dispatch feature doesn't depend on that class.
+	 */
+	private Map<String, PtProperty> fetchPropertiesBySystemPropertyId(RequestInfo requestInfo, String tenantId,
+			List<String> systemPropertyIds) {
+
+		if (CollectionUtils.isEmpty(systemPropertyIds) || StringUtils.isEmpty(tenantId)) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, PtProperty> propertyMap = new HashMap<>();
+		int batchSize = 50;
+
+		for (int i = 0; i < systemPropertyIds.size(); i += batchSize) {
+			List<String> batch = systemPropertyIds.subList(i, Math.min(i + batchSize, systemPropertyIds.size()));
+
+			StringBuilder uri = new StringBuilder(grbgConstants.getPropertyServiceHostUrl())
+					.append(grbgConstants.getPropertySearchEndpoint()).append("?tenantId=").append(tenantId)
+					.append("&propertyIds=").append(String.join(",", batch));
+
+			Map<String, Object> requestBody = new HashMap<>();
+			requestBody.put("RequestInfo", requestInfo);
+
+			Object response = restCallRepository.fetchResult(uri, requestBody);
+			if (null == response) {
+				continue;
+			}
+
+			PtPropertyResponse propertyResponse = objectMapper.convertValue(response, PtPropertyResponse.class);
+			if (null != propertyResponse && !CollectionUtils.isEmpty(propertyResponse.getProperties())) {
+				propertyResponse.getProperties().forEach(property -> {
+					if (StringUtils.isNotEmpty(property.getPropertyId())) {
+						propertyMap.put(property.getPropertyId(), property);
+					}
+				});
+			}
+		}
+
+		return propertyMap;
+	}
+
+	private void validateRequestInfo(RequestInfo requestInfo) {
 		if (null == requestInfo || null == requestInfo.getUserInfo() || StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
 			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
 		}

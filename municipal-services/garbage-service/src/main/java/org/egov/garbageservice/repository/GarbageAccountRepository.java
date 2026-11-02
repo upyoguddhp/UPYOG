@@ -607,6 +607,7 @@ public class GarbageAccountRepository {
 				&& (CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getGarbageId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getPropertyId())
+						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getSystemPropertyId())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getUuid())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getType())
 						&& CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getName())
@@ -677,7 +678,13 @@ public class GarbageAccountRepository {
             whereClause.append(" acc.property_id IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getPropertyId(),
                     preparedStatementValues)).append(" )");
         }
-        
+
+        if (!CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getSystemPropertyId())) {
+            isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
+            whereClause.append(" acc.system_property_id IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getSystemPropertyId(),
+                    preparedStatementValues)).append(" )");
+        }
+
         if (!CollectionUtils.isEmpty(searchCriteriaGarbageAccount.getUuid())) {
         	isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, whereClause);
         	whereClause.append(" acc.uuid IN ( ").append(getQueryForCollection(searchCriteriaGarbageAccount.getUuid(),
@@ -1032,7 +1039,8 @@ public class GarbageAccountRepository {
 				"SELECT app.application_no FROM eg_grbg_account acc"
 						+ " LEFT OUTER JOIN eg_grbg_application app ON app.garbage_id = acc.garbage_id"
 						+ " WHERE acc.system_property_id = ? AND acc.tenant_id = ?"
-						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?",
+						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?"
+						+ " AND acc.status != 'REJECTED'",
 				String.class, systemPropertyId, tenantId, garbageId);
 	}
 
