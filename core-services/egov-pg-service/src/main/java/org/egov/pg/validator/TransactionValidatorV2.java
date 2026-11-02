@@ -112,9 +112,9 @@ public class TransactionValidatorV2 {
 			}
 			
 			if ("PROCESSING".equalsIgnoreCase(curr.getStatus())) {
-			    errorMap.put("TXN_PAYMENT_PROCESSING",
-			            "A payment for this bill is currently being processed, please retry after the payment is completed");
-			    return;
+				errorMap.put("TXN_PAYMENT_PROCESSING",
+						"Payment for this bill is currently being processed against a cheque. A second payment attempt will be allowed once the current cheque status is marked as PAID or REJECTED in the system.");
+				return;
 			}
 
 			if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
