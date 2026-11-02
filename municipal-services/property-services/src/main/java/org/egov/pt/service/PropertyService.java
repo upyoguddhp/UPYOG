@@ -1017,7 +1017,7 @@ public class PropertyService {
 
 		Property property = properties.stream().findFirst().orElse(null);
 		if (null == property) {
-			return null;
+			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for propertyId: " + propertyId);
 		}
 
 		PtTaxCalculatorTrackerSearchCriteria ptTaxCalculatorTrackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria
@@ -1028,7 +1028,8 @@ public class PropertyService {
 
 		PtTaxCalculatorTracker ptTaxCalculatorTracker = ptTaxCalculatorTrackers.stream().findFirst().orElse(null);
 		if (null == ptTaxCalculatorTracker) {
-			return null;
+			throw new CustomException("BILL_TRACKER_NOT_FOUND",
+					"No tax calculator tracker found for propertyId: " + propertyId + " and billId: " + billId);
 		}
 
 		BillSearchCriteria.BillSearchCriteriaBuilder builder =
@@ -1049,12 +1050,13 @@ public class PropertyService {
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
 		if (null == billResponse || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND",
+					"No bill found for billId: " + ptTaxCalculatorTracker.getBillId() + " and status: " + status);
 		}
 
 		Bill bill = billResponse.getBill().stream().findFirst().orElse(null);
 		if (null == bill) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for billId: " + ptTaxCalculatorTracker.getBillId());
 		}
 
 		MdmsResponse mdmsResponse = mdmsService.getPropertyReabateDaysMdmsData(requestInfoWrapper.getRequestInfo(),
