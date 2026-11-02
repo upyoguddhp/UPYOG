@@ -145,7 +145,8 @@ public class GarbageAccountSchedulerService {
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
-		AtomicInteger skippedCount = new AtomicInteger(0);
+		AtomicInteger overlappingCount = new AtomicInteger(0);
+		AtomicInteger paymentProcessingCount = new AtomicInteger(0);
 		setFromDateToDate(generateBillRequest);
 		String message = null;
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
@@ -191,7 +192,7 @@ public class GarbageAccountSchedulerService {
 					if (null != garbageAccount.getUserUuid()) {
 
 						if (validateExistingBillOverlap(generateBillRequest, garbageAccount, trackerMap)) {
-							skippedCount.incrementAndGet();
+							overlappingCount.incrementAndGet();
 							errorList.add("Bill already exists for application "
 									+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
 							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
@@ -200,6 +201,21 @@ public class GarbageAccountSchedulerService {
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 							}
 							return;
+						}
+						
+						List<GrbgBillTracker> existingApplicationTrackers = trackerMap.get(garbageAccount.getGrbgApplicationNumber());
+						if (!CollectionUtils.isEmpty(existingApplicationTrackers)) {
+							boolean paymentProcessing = existingApplicationTrackers.stream()
+									.anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+							if (paymentProcessing) {
+								log.info(
+										"Skipping bill generation for application {} because payment is being processed",
+										garbageAccount.getGrbgApplicationNumber());
+								errorList.add("Bill generation skipped because payment is currently being processed");
+								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+								paymentProcessingCount.incrementAndGet();
+								return;
+							}
 						}
 
 						Object mdmsResponse = mdmsFeeResponseByTenant.computeIfAbsent(garbageAccount.getTenantId(),
@@ -398,15 +414,20 @@ public class GarbageAccountSchedulerService {
 			message = "Garbage Acc Not Found";
 		}
 		int generatedCount = grbgBillTrackers.size();
-		int skipped = skippedCount.get();
+		int overlapping = overlappingCount.get();
+		int processing = paymentProcessingCount.get();
+		StringBuilder messageBuilder = new StringBuilder();
 
-		if (generatedCount > 0 && skipped > 0) {
-			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + skipped
+		if (generatedCount > 0 && overlapping > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + overlapping
 					+ " Application Id(s) due to overlapping bill periods.";
 		} else if (generatedCount > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Application Id(s).";
-		} else if (skipped > 0) {
-			message = "No bills generated. " + skipped + " Application Id(s) failed due to overlapping bill periods.";
+		} else if (overlapping > 0) {
+			message = "No bills generated. " + overlapping + " Application Id(s) failed due to overlapping bill periods.";
+		} else if (processing > 0) {
+		    message = "No bills generated. " + processing
+		            + " Application Id(s) skipped because payment is currently being processed.";
 		}
 
 		sanatizeFailureLog(generateBillRequest);
