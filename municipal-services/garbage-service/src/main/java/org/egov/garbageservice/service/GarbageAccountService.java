@@ -2136,10 +2136,21 @@ public GarbageAccountActionResponse openSearchPayPreview(
     }
 
   
-    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
-            .stream()
-            .map(acc -> acc.getGrbgApplication().getApplicationNo())
-            .collect(Collectors.toList());
+    // Account search nests tenant accounts under their parent. Include their
+    // application numbers so the bill lookup searches every related account.
+    List<String> applicationNumbers = new ArrayList<>();
+    for (GarbageAccount account : searchResponse.getGarbageAccounts()) {
+        applicationNumbers.add(account.getGrbgApplication().getApplicationNo());
+        if (!CollectionUtils.isEmpty(account.getChildGarbageAccounts())) {
+            for (GarbageAccount child : account.getChildGarbageAccounts()) {
+                if (child.getGrbgApplication() != null
+                        && StringUtils.isNotBlank(child.getGrbgApplication().getApplicationNo())) {
+                    applicationNumbers.add(child.getGrbgApplication().getApplicationNo());
+                }
+            }
+        }
+    }
+    applicationNumbers = applicationNumbers.stream().distinct().collect(Collectors.toList());
 
     
     GarbageAccountActionRequest actionRequest =
