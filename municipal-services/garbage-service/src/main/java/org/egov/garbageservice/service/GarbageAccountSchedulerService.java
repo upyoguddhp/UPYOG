@@ -426,8 +426,8 @@ public class GarbageAccountSchedulerService {
 		} else if (overlapping > 0) {
 			message = "No bills generated. " + overlapping + " Application Id(s) failed due to overlapping bill periods.";
 		} else if (processing > 0) {
-		    message = "No bills generated. " + processing
-		            + " Application Id(s) skipped because payment is currently being processed.";
+		    message = "Cheque clearance is pending. " + processing
+		            + " Application Id(s) skipped. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
 		}
 
 		sanatizeFailureLog(generateBillRequest);

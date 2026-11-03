@@ -1479,7 +1479,7 @@ public class PropertyService {
 			if (arrearGenerated.get()) {
 				message = "Arrear Generated Successfully";
 			} else if (processingFound.get()) {
-				message = "No arrear generated. Payment is currently being processed.";
+				message = "Cheque clearance is pending. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
 				isSuccess = false;
 			} else {
 				message = "No arrear generated. Bill already exists for overlapping period.";
