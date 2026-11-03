@@ -19,7 +19,6 @@ import org.egov.pg.config.AppProperties;
 import org.egov.pg.constants.PgConstants;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.models.TransactionDetails;
-import org.egov.pg.models.TransactionDetailsWrapper;
 import org.egov.pg.models.TransactionDump;
 import org.egov.pg.models.TransactionDumpRequest;
 import org.egov.pg.producer.Producer;
@@ -187,20 +186,21 @@ public class TransactionServiceV2 {
 				dump.setTxnRequest(uri.toString());
 			}
 
-			// Persist transaction and transaction dump objects
-			producer.push(appProperties.getSaveTxnTopic(),
-					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
-			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
-
+			if (CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
+				transaction.setTransactionDetails(Collections.singletonList(TransactionDetails.builder()
+						.txnAmount(transaction.getTxnAmount()).billId(transaction.getBillId())
+						.consumerCode(transaction.getConsumerCode()).build()));
+			}
 			// Enrich transaction Details by generating uuid, txnid, audit details and
 			// additional details
 			if (!CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
 				enrichmentService.populateTransactionsDetails(transaction, requestInfo);
-				transaction.getTransactionDetails().forEach(transactionDetails -> {
-					producer.push(appProperties.getSaveTxnDetailsTopic(),
-							TransactionDetailsWrapper.builder().transactionDetails(transactionDetails).build());
-				});
 			}
+
+			// Persist the parent and its enriched details atomically from one message.
+			producer.push(appProperties.getSaveTxnWithDetailsTopic(),
+					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
+			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
 
 			transactions.add(transaction);
 		});
