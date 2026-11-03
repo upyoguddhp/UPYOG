@@ -1363,7 +1363,19 @@ public class PropertyService {
 		if (!CollectionUtils.isEmpty(properties)) {
 			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
+			
+			List<PtTaxCalculatorTracker> existingTrackers = propertyService.getTaxCalculatedProperties(
+			        PtTaxCalculatorTrackerSearchCriteria.builder()
+			                .propertyIds(Collections.singleton(properties.get(0).getPropertyId()))
+			                .build());
+
+			boolean paymentProcessing = !CollectionUtils.isEmpty(existingTrackers)
+			        && existingTrackers.stream()
+			                .anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+
 			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
+			AtomicBoolean processingFound = new AtomicBoolean(false);
+			
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
@@ -1373,6 +1385,13 @@ public class PropertyService {
 					log.warn("Skipping arrear generation for property {} due to overlapping bill period",
 							properties.get(0).getPropertyId());
 
+					return;
+				}
+				
+				if (paymentProcessing) {
+					log.info("Skipping arrear generation for property {} because payment is being processed",
+							properties.get(0).getPropertyId());
+					processingFound.set(true);
 					return;
 				}
 
@@ -1458,10 +1477,13 @@ public class PropertyService {
 				}
 			});
 			if (arrearGenerated.get()) {
-			    message = "Arrear Generated Successfully";
+				message = "Arrear Generated Successfully";
+			} else if (processingFound.get()) {
+				message = "No arrear generated. Payment is currently being processed.";
+				isSuccess = false;
 			} else {
-			    message = "No arrear generated. Bill already exists for overlapping period.";
-			    isSuccess = false;
+				message = "No arrear generated. Bill already exists for overlapping period.";
+				isSuccess = false;
 			}
 		} else {
 			message = "Invalid Property Details";
