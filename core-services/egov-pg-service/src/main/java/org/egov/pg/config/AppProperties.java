@@ -17,6 +17,9 @@ public class AppProperties {
     private final Integer earlyReconcileJobRunInterval;
 
     private final String saveTxnTopic;
+
+    @Value("${persister.save.pg.txns.with.details:save-pg-txns-with-details}")
+    private String saveTxnWithDetailsTopic;
     
     private final String saveTxnDetailsTopic;
 
