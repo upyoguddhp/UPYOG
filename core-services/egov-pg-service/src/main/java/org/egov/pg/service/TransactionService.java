@@ -21,7 +21,6 @@ import org.egov.pg.models.CollectionPayment;
 import org.egov.pg.models.CollectionPaymentDetail;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.models.TransactionDetails;
-import org.egov.pg.models.TransactionDetailsWrapper;
 import org.egov.pg.models.TransactionDump;
 import org.egov.pg.models.TransactionDumpRequest;
 import org.egov.pg.producer.Producer;
@@ -120,11 +119,6 @@ public class TransactionService {
 			dump.setTxnRequest(uri.toString());
 		}
 
-		// Persist transaction and transaction dump objects
-		producer.push(appProperties.getSaveTxnTopic(),
-				new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
-		producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
-		
 		if (CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
 			// populate transaction Details object
 			transaction.setTransactionDetails(
@@ -136,11 +130,12 @@ public class TransactionService {
 		// additional details
 		if (!CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
 			enrichmentService.populateTransactionsDetails(transaction, requestInfo);
-			transaction.getTransactionDetails().forEach(transactionDetails -> {
-				producer.push(appProperties.getSaveTxnDetailsTopic(),
-						TransactionDetailsWrapper.builder().transactionDetails(transactionDetails).build());
-			});
 		}
+
+		// Persist the parent and its enriched details atomically from one message.
+		producer.push(appProperties.getSaveTxnWithDetailsTopic(),
+				new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
+		producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
 
 		return transaction;
 	}

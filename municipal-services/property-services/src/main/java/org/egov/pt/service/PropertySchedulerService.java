@@ -145,6 +145,7 @@ public class PropertySchedulerService {
 
 		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
 		AtomicInteger skippedCount = new AtomicInteger(0);
+		AtomicInteger paymentProcessingCount = new AtomicInteger(0);
 
 		Boolean isBilling = false;
 		JsonNode ulbModules = null;
@@ -222,6 +223,16 @@ public class PropertySchedulerService {
 				overlapErrors.add(
 						"Bill already exists for property " + property.getPropertyId() + " for the selected period");
 //				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
+				continue;
+			}
+			
+			List<PtTaxCalculatorTracker> propertyTrackers = trackerMap.get(property.getPropertyId());
+			boolean paymentProcessing = !CollectionUtils.isEmpty(propertyTrackers) && propertyTrackers.stream()
+					.anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+			if (paymentProcessing) {
+				log.info("Skipping tax calculation for property {} because payment is being processed",
+						property.getPropertyId());
+				paymentProcessingCount.incrementAndGet();
 				continue;
 			}
 
@@ -685,6 +696,7 @@ public class PropertySchedulerService {
 
 		int generatedCount = taxCalculatorTrackers.size();
 		int skipped = skippedCount.get();
+		int processing = paymentProcessingCount.get();
 
 		String message = null;
 		
@@ -696,6 +708,9 @@ public class PropertySchedulerService {
 			message = "Bills generated successfully for " + generatedCount + " Property Id(s).";
 		} else if (skipped > 0) {
 			message = "No bills generated. " + skipped + " Property Id(s) failed due to overlapping bill periods.";
+		} else if (processing > 0) {
+		    message = "Cheque clearance is pending. " + processing
+		            + " Property Id(s) skipped. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
 		}
 
 		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();

@@ -2136,10 +2136,21 @@ public GarbageAccountActionResponse openSearchPayPreview(
     }
 
   
-    List<String> applicationNumbers = searchResponse.getGarbageAccounts()
-            .stream()
-            .map(acc -> acc.getGrbgApplication().getApplicationNo())
-            .collect(Collectors.toList());
+    // Account search nests tenant accounts under their parent. Include their
+    // application numbers so the bill lookup searches every related account.
+    List<String> applicationNumbers = new ArrayList<>();
+    for (GarbageAccount account : searchResponse.getGarbageAccounts()) {
+        applicationNumbers.add(account.getGrbgApplication().getApplicationNo());
+        if (!CollectionUtils.isEmpty(account.getChildGarbageAccounts())) {
+            for (GarbageAccount child : account.getChildGarbageAccounts()) {
+                if (child.getGrbgApplication() != null
+                        && StringUtils.isNotBlank(child.getGrbgApplication().getApplicationNo())) {
+                    applicationNumbers.add(child.getGrbgApplication().getApplicationNo());
+                }
+            }
+        }
+    }
+    applicationNumbers = applicationNumbers.stream().distinct().collect(Collectors.toList());
 
     
     GarbageAccountActionRequest actionRequest =
@@ -2646,15 +2657,36 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				false);
 		if (!CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
 			GarbageAccount garbageAccount = garbageAccountResponse.getGarbageAccounts().get(0);
+			List<GrbgBillTracker> existingTrackers = getBillCalculatedGarbageAccounts(
+			                GrbgBillTrackerSearchCriteria.builder()
+			                        .grbgApplicationIds(Collections.singleton(
+			                                garbageAccount.getGrbgApplicationNumber()))
+			                        .tenantId(garbageAccount.getTenantId())
+			                        .build());
+
+			boolean paymentProcessing = !CollectionUtils.isEmpty(existingTrackers)
+			        && existingTrackers.stream()
+			                .anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+
 			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
+			AtomicBoolean overlappingFound = new AtomicBoolean(false);
+			AtomicBoolean processingFound = new AtomicBoolean(false);
 //			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 
 				if (validateBillPeriodOverlap(demand, genrateArrearRequest.getRequestInfo(), garbageAccount)) {
 					log.warn("Skipping arrear generation for application {} due to overlapping bill period",
 							garbageAccount.getGrbgApplicationNumber());
+					 overlappingFound.set(true);
 					return;
 				};
+				
+				if (paymentProcessing) {
+					log.info("Skipping arrear generation for application {} because payment is being processed",
+							garbageAccount.getGrbgApplicationNumber());
+					processingFound.set(true);
+					return;
+				}
 				
 				Map<String, Object> additionalDetails = (Map<String, Object>) demand.getAdditionalDetails();
 
@@ -2714,11 +2746,18 @@ public GarbageAccountActionResponse openSearchPayPreview(
 					throw new CustomException("INVALID_CONSUMERCODE",
 							"Bill not generated due to no Demand found for the given consumerCode");				}
 			});
-			if (arrearGenerated.get()) {
-			    message = "Arrear Generated Successfully";
-			} else {
-			    message = "No arrear generated. Bill already exists for overlapping period.";
-			    isSuccess = false;
+			if (arrearGenerated.get() && overlappingFound.get()) {
+			    message = "Arrear Generated Successfully. Some demands were skipped due to overlapping bill periods.";
+
+			} else if (arrearGenerated.get()) {
+				message = "Arrear Generated Successfully";
+			} else if (overlappingFound.get()) {
+				message = "No arrear generated. Bill already exists for overlapping period.";
+				isSuccess = false;
+
+			} else if (processingFound.get()) {
+				message = "Cheque clearance is pending. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
+				isSuccess = false;
 			}
 		} else {
 			message = "Invalid Garbage Details";
