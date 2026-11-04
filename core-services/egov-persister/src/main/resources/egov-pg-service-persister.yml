@@ -179,3 +179,94 @@ serviceMaps:
            - jsonPath: $.TransactionDump.auditDetails.lastModifiedTime
 
            - jsonPath: $.TransactionDump.txnId
+
+ - version: 1.0
+   name: pg-service
+   description: Persists transactions and their details atomically
+   fromTopic: save-pg-txns-with-details
+   isTransaction: true
+   queryMaps:
+    - query: INSERT INTO eg_pg_transactions (txn_id, txn_amount, txn_status, gateway, bill_id, "module", order_id, product_info,user_uuid, user_name, mobile_number, email_id, name, user_tenant_id,  tenant_id, gateway_txn_id, gateway_payment_mode, gateway_status_code, gateway_status_msg, created_time, last_modified_time, additional_details, consumer_code, created_by, last_modified_by, is_multi_transaction, receipt) VALUES (?, ?::numeric, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?);
+
+      basePath: Transaction
+      jsonMaps:
+
+       - jsonPath: $.Transaction.txnId
+
+       - jsonPath: $.Transaction.txnAmount
+
+       - jsonPath: $.Transaction.txnStatus
+
+       - jsonPath: $.Transaction.gateway
+
+       - jsonPath: $.Transaction.billId
+
+       - jsonPath: $.Transaction.module
+
+       - jsonPath: $.Transaction.orderId
+
+       - jsonPath: $.Transaction.productInfo
+
+       - jsonPath: $.Transaction.user.uuid
+
+       - jsonPath: $.Transaction.user.userName
+
+       - jsonPath: $.Transaction.user.mobileNumber
+
+       - jsonPath: $.Transaction.user.emailId
+
+       - jsonPath: $.Transaction.user.name
+
+       - jsonPath: $.Transaction.user.tenantId
+
+       - jsonPath: $.Transaction.tenantId
+
+       - jsonPath: $.Transaction.gatewayTxnId
+
+       - jsonPath: $.Transaction.gatewayPaymentMode
+
+       - jsonPath: $.Transaction.gatewayStatusCode
+
+       - jsonPath: $.Transaction.gatewayStatusMsg
+
+       - jsonPath: $.Transaction.auditDetails.createdTime
+
+       - jsonPath: $.Transaction.auditDetails.lastModifiedTime
+
+       - jsonPath: $.Transaction.additionalDetails
+         type: JSON
+         dbType: JSONB
+
+       - jsonPath: $.Transaction.consumerCode
+
+       - jsonPath: $.Transaction.auditDetails.createdBy
+
+       - jsonPath: $.Transaction.auditDetails.lastModifiedBy
+       - jsonPath: $.Transaction.isMultiTransaction
+       - jsonPath: $.Transaction.receipt
+
+    - query: INSERT INTO eg_pg_transactions_details (uuid, txn_id, txn_amount, bill_id, consumer_code, module, module_id,created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?::numeric, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Transaction.TransactionDetails.*
+      jsonMaps:
+
+      - jsonPath: $.Transaction.TransactionDetails.*.uuid
+
+      - jsonPath: $.Transaction.TransactionDetails.*.txnId
+
+      - jsonPath: $.Transaction.TransactionDetails.*.txnAmount
+
+      - jsonPath: $.Transaction.TransactionDetails.*.billId
+
+      - jsonPath: $.Transaction.TransactionDetails.*.consumerCode
+
+      - jsonPath: $.Transaction.TransactionDetails.*.module
+
+      - jsonPath: $.Transaction.TransactionDetails.*.moduleId
+
+      - jsonPath: $.Transaction.TransactionDetails.*.auditDetails.createdBy
+
+      - jsonPath: $.Transaction.TransactionDetails.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Transaction.TransactionDetails.*.auditDetails.createdTime
+
+      - jsonPath: $.Transaction.TransactionDetails.*.auditDetails.lastModifiedTime
