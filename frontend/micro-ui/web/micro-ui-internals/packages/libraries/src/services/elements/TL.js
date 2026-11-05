@@ -2,6 +2,39 @@ import Urls from "../atoms/urls";
 import { Request } from "../atoms/Utils/Request";
 
 export const TLService = {
+  // HP "NewTL" flow: same tl-services controller, addressed by workflow/service name.
+  newTLCreate: (details, service = "NewTL") =>
+    Request({
+      url: `/tl-services/v1/${service}/_create`,
+      data: details,
+      useCache: false,
+      setTimeParam: false,
+      userService: true,
+      method: "POST",
+      params: {},
+      auth: true,
+    }),
+  newTLUpdate: (details, service = "NewTL") =>
+    Request({
+      url: `/tl-services/v1/${service}/_update`,
+      data: details,
+      useCache: false,
+      setTimeParam: false,
+      userService: true,
+      method: "POST",
+      params: {},
+      auth: true,
+    }),
+  newTLSearch: (params, service = "NewTL") =>
+    Request({
+      url: `/tl-services/v1/${service}/_search`,
+      useCache: false,
+      setTimeParam: false,
+      userService: true,
+      method: "POST",
+      params,
+      auth: true,
+    }),
   create: (details, tenantId) =>
     Request({
       url: Urls.tl.create,

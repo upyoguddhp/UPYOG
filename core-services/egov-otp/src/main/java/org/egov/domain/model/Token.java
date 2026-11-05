@@ -3,6 +3,7 @@ package org.egov.domain.model;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @Builder
@@ -35,6 +35,8 @@ public class Token {
     @Setter
     private boolean validated;
     private Date createdDate;
+    // HP-specific: optionally carries a user access token issued alongside a
+    // successful OTP validation - see TokenService.getUserAccesToken().
     @Setter
     private String accessToken;
 

@@ -3,6 +3,14 @@ import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import ChangeCity from "../ChangeCity";
 import ChangeLanguage from "../ChangeLanguage";
+import AccessibilityTools from "../AccessibilityTools";
+
+// a localization key that has no translation yet is shown as readable words instead of the raw key
+const readable = (t, key, drop) => {
+  const v = t(key);
+  if (v && v !== key) return v;
+  return String(key).replace(drop, "").split("_").map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w)).join(" ").trim();
+};
 
 const TextToImg = (props) => (
   <span className="user-img-txt" onClick={props.toggleMenu} title={props.name}>
@@ -91,10 +99,15 @@ const TopBar = ({
           userDetails={userDetails}
           notificationCount={unreadNotificationCount < 99 ? unreadNotificationCount : 99}
           notificationCountLoaded={notificationCountLoaded}
-          cityOfCitizenShownBesideLogo={t(CitizenHomePageTenantId)}
+          cityOfCitizenShownBesideLogo={CitizenHomePageTenantId ? t(CitizenHomePageTenantId) : ""}
           onNotificationIconClick={onNotificationIconClick}
           hideNotificationIconOnSomeUrlsWhenNotLoggedIn={urlsToDisableNotificationIcon(pathname)}
-          changeLanguage={!mobileView ? <ChangeLanguage dropdown={true} /> : null}
+          changeLanguage={
+            <React.Fragment>
+              <AccessibilityTools compact buttonClassName="TopBarA11yBtn" />
+              <ChangeLanguage dropdown={true} />
+            </React.Fragment>
+          }
         />
       </div>
     );
@@ -108,8 +121,8 @@ const TopBar = ({
         {loggedin &&
           (cityDetails?.city?.ulbGrade ? (
             <p className="ulb" style={mobileView ? { fontSize: "14px", display: "inline-block" } : {}}>
-              {t(cityDetails?.i18nKey).toUpperCase()}{" "}
-              {t(`ULBGRADE_${cityDetails?.city?.ulbGrade.toUpperCase().replace(" ", "_").replace(".", "_")}`).toUpperCase()}
+              {readable(t, cityDetails?.i18nKey, /^TENANT_TENANTS_HP_/).toUpperCase()}{" "}
+              {readable(t, `ULBGRADE_${cityDetails?.city?.ulbGrade.toUpperCase().replace(" ", "_").replace(".", "_")}`, /^ULBGRADE_/).toUpperCase()}
             </p>
           ) : (
             <img className="state" src={logoUrl} />
@@ -126,6 +139,7 @@ const TopBar = ({
                 <ChangeCity dropdown={true} t={t} />
               )}
             </div>
+            <div className="left"><AccessibilityTools compact buttonClassName="TopBarA11yBtn TopBarA11yBtn--dark" /></div>
             <div className="left">{showLanguageChange && <ChangeLanguage dropdown={true} />}</div>
             {userDetails?.access_token && (
               <div className="left">

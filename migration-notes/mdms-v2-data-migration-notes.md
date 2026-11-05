@@ -1,0 +1,44 @@
+# egov-mdms-service → mdms-v2 data migration notes
+
+Goal: obsolete `egov-mdms-service` (v1, file-based) in favor of `mdms-v2` (Postgres-backed), migrating all of HP's existing master data (`mdms/data/hp/**`, ~90 tenants: state-level `hp` + ~84 ULBs) into `mdms-v2`'s tables.
+
+## What was already done before this session
+`eg_mdms_schema_definition` / `eg_mdms_data` already had 47 schemas / 2,629 rows, all under the state-level tenant `hp` — a prior partial migration. None of the ~84 ULB-specific tenants (`hp.Amb`, `hp.Shimla`, `hp.Kullu`, etc.) had any data.
+
+## `mdms-v2` module
+Replaced with the `UPYOG-master-Latest` version (Spring Boot 2.2.13→3.2.2, Java 8→17). Port kept at `9080` (HP's existing convention, matching the gateway's route). No real HP customization existed to port forward beyond `spring.flyway.enabled=false` (already the upstream default).
+
+## Why the official `mdms-migration-toolkit` couldn't just be run as-is
+Copied it from `UPYOG-master-Latest/utilities/mdms-migration-toolkit` and had to fix, in order:
+1. **Didn't compile**: ~10 files were missing an `import org.egov.common.contract.request.RequestInfo;` despite using the type; `WorkflowUtil.java` referenced a `digit.models.coremodels.Workflow` class that doesn't exist in the pinned `digit-models:1.0.0-SNAPSHOT` dependency at all (deleted — unused by the master-data-migration path).
+2. **Type mismatches**: `Mdms.auditDetails` is `digit.models.coremodels.AuditDetails`, but the code tried to enrich it via `AuditDetailsEnrichmentUtil` (services-common), which expects `org.egov.common.contract.models.AuditDetails` — replaced with a direct manual build. `ResponseInfoFactory` tried to set a `String` where `ResponseInfo.StatusEnum` was required.
+3. **Two hardcoded URLs** pointed at `localhost:8094` (egov-mdms-service's port) instead of `9080` (where `mdms-v2` actually runs here).
+4. **`FileWriter.java` bug**: concatenated the schema output directory and filename with no path separator, silently writing 232 generated schema files into `.upyog-runtime/` with garbled names instead of the configured scratch directory. Fixed to use `new File(dir, name)`.
+5. **No resilience**: both `SchemaDefinitionMigrationService.beginMigration()` and `MasterDataMigrationService.migrateMasterData()` aborted the *entire* batch on the first failed record (e.g. one missing schema, one duplicate). Added try/catch-and-continue with a logged summary in both, since a real bulk migration must not die on the first bad row.
+6. **Schema validator gap**: `mdms-v2`'s `SchemaDefinitionValidator` requires a non-empty `x-unique` array (subset of `required`) — a custom eGov extension the toolkit's `JsonSchemaInferrer`-based generation never produced. Injected `x-unique = required` as a safe default when generating schemas from scratch (see below for where a better source was used instead).
+7. **Async pipeline was unusable for this**: schema/data "create" calls publish to Kafka (`save-mdms-schema-definition`, `save-mdms-data`) for `egov-persister` to actually write to Postgres. Starting `egov-persister` revealed a **poisoned batch already stuck in the topic** (an old duplicate `hp`/`FireNOC.AreaServedUrban` schema-create from a prior attempt) — the consumer retried the same failing batch **400 times** before I killed it, and never got past it to reach any new messages. Manipulating a shared consumer-group's offsets to skip past this felt too risky for a one-time migration, so I **abandoned the toolkit's HTTP+Kafka path entirely** and went direct-to-Postgres instead (see below). `egov-persister` was stopped and left off.
+
+## Actual migration method used (direct SQL, not the toolkit's API path)
+A one-off Python script (not checked in — scratch/throwaway) walked `mdms/data/hp/**`, replicating `egov-mdms-service`'s own file-loading semantics (respecting `isMergeAllowed` from `master-config.json` for masters declared in multiple files), then generated batched multi-row `INSERT ... ON CONFLICT DO NOTHING` statements executed directly against `hpupyog_5` in one transaction. This bypassed the Kafka/persister pipeline and the toolkit's per-record HTTP overhead entirely — safe because `ON CONFLICT DO NOTHING` on the real primary keys (`(tenantid, code)` / `(tenantid, schemacode, uniqueidentifier)`) makes it naturally idempotent and re-runnable.
+
+**Schema resolution priority** (per `module.master` code), most-trusted first:
+1. **Already exists for tenant `hp`** in the DB — reused as-is where possible, *except* several codes whose "existing" `x-unique` turned out to be an over-broad bulk-generated artifact (every field, including rate/boolean values) — see next point.
+2. **`mdms/master-config.json`'s `uniqueKeys`** — hand-curated by HP's team; preferred over an over-broad existing DB schema when both exist for the same code (e.g. `BillingService.BusinessService` existing had a 9-field `x-unique`; master-config says just `code`).
+3. **3 manual overrides** for codes covered by neither: `Garbage.Categories`, `Garbage.FeeStructure` (existing `x-unique` wrongly included rate/boolean fields like `variableUnitCost`, `fee`; corrected to the actual categorical identity `[categories, subcategories, subcategorytype]`), and `TradeLicense.FeeStructure` (dropped `price` from the key, keeping `[tenantId, feeStructureOf, type, periodOfLicense]`).
+4. **Inferred fallback** (`x-unique = required`, from `JsonSchemaInferrer`) for the remaining new codes with no other source.
+
+## Results
+- **Schema definitions**: 275 → **1,261** (986 new, one per new `(tenant, code)` combination needed).
+- **Data rows**: 4,393 → **81,180** (76,787 new rows across 84 ULB tenants + `hp`).
+- **89,733 candidate records attempted, 1,509 skipped (1.7%)** — genuine per-record data gaps in the source files (a field the resolved unique key needs is null/missing for that specific record), not a script or schema bug. Breakdown: `TradeLicense.FeeStructure` (666), `FinanceModule.AccountCodeTemplate` (570 — this master's unique key includes nested object fields like `debitCodeDetails`, absent on some templates), `Signature.Signature` (83, missing `ulbName` in the source record), `TradeLicense.RenewalFeeStructure` (69), `TradeLicense.AccessoriesCategoryPart1` (58), `Parwanoo.AccountCodeTemplate` (19 — note the module name here is literally "Parwanoo" in the source file, not "FinanceModule"; looks like a data-entry anomaly, left as-is rather than guessed at), `ASSET.Assetconfiguration` (12), `CHB.CommunityHalls` / `Garbage.Categories` / `Garbage.FeeStructure` (10 each), `TradeLicense.Category1` (2). None of these were "fixed" further since doing so would mean inventing values or business-key semantics I have no authority to guess at.
+- Verified via `mdms-v2`'s own `/v2/_search` API against multiple tenants (`hp.Amb`, `hp.Kullu`) post-migration, not just row counts.
+
+## Cutover (done)
+Rather than repoint 64 individual services' own `egov.mdms.host`/`egov.mdms.search.endpoint` config, `mdms-v2` took over `egov-mdms-service`'s identity directly:
+- `mdms-v2`'s `server.servlet.context-path` changed from `/mdms-v2` to `/egov-mdms-service` — since all 64 services read the *shared* `EGOV_MDMS_HOST` env var plus a hardcoded `egov-mdms-service/v1/_search` path segment, this alone makes every one of them resolve correctly with zero per-service changes.
+- `EGOV_MDMS_HOST` in `.upyog.env` (untracked, outside this repo) updated from `http://localhost:8094` to `http://localhost:9080`.
+- Gateway: the `egov-mdms-service` route's target updated to port `9080`; the `mdms-v2` route (still `/mdms-v2/**` externally) got a `RewritePath` filter (`/mdms-v2/(.*)` → `/egov-mdms-service/$1`) so both external path conventions keep resolving against the same backend.
+- Verified: `mdms-v2` serves the old v1 contract correctly with real migrated data both directly (`localhost:9080/egov-mdms-service/v1/_search`) and through the gateway on both route paths (auth rejection on unauthenticated test calls confirms the request reached the filter chain — i.e. routing matched — and matches HP's own pre-cutover whitelist, which never covered this endpoint either).
+- **Hit and fixed along the way**: Maven's local snapshot metadata for `org.egov.services:services-common:2.9.0-SNAPSHOT` pointed at a newer remote build (`20260219.143052-5`) that was never actually downloadable, breaking the gateway's build. Cleared the stale metadata in `~/.m2` to fall back to the last known-good cached snapshot (`20250402.062316-4`) — a local environment issue, not a code change.
+
+`egov-mdms-service` itself is **not removed** from the repo and is not started — retired, not deleted, per your earlier direction to keep it dormant for now.

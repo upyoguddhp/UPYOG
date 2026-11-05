@@ -20,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
+@Slf4j
 public class PaymentService {
 
     private ApportionerService apportionerService;
@@ -106,6 +108,8 @@ public class PaymentService {
         paymentEnricher.enrichPaymentPostValidate(paymentRequest);
 
         Payment payment = paymentRequest.getPayment();
+        log.info("***Collection Service*** ==> Payment: {}",payment);
+
         Map<String, Bill> billIdToApportionedBill = apportionerService.apportionBill(paymentRequest);
         paymentEnricher.enrichAdvanceTaxHead(new LinkedList<>(billIdToApportionedBill.values()));
         setApportionedBillsToPayment(billIdToApportionedBill,payment);
@@ -189,6 +193,49 @@ public class PaymentService {
         paymentValidator.validatePaymentForCreate(paymentRequest);
         
         return paymentRequest.getPayment();
+    }
+
+    /**
+     * Publishes the payments of a date range to the voucher replay topic so that the voucher consumer creates the
+     * vouchers (and instruments) again for them. The regular payment-create topic is deliberately not used, because
+     * notifications and the module services also listen to it. The voucher consumer skips payments that already have
+     * a voucher.
+     *
+     * @return summary with the number of payments found and published and the offset for the next batch
+     */
+    public Map<String, Object> republishPaymentsForVoucher(RequestInfo requestInfo, String tenantId, Long fromDate,
+            Long toDate, boolean includeCancelled, int offset, int limit, boolean dryRun) {
+
+        List<String> ids = paymentRepository.fetchPaymentIdsForVoucherReplay(tenantId, fromDate, toDate,
+                includeCancelled, offset, limit);
+
+        int published = 0;
+        if (!ids.isEmpty()) {
+            List<Payment> payments = paymentRepository.fetchPaymentsForPlainSearch(
+                    PaymentSearchCriteria.builder().ids(new HashSet<String>(ids)).build());
+
+            // the consumer creates an admin token itself when the request carries none
+            RequestInfo replayRequestInfo = requestInfo != null ? requestInfo : new RequestInfo();
+            replayRequestInfo.setAuthToken(null);
+
+            for (Payment payment : payments) {
+                if (!dryRun) {
+                    producer.producer(applicationProperties.getPaymentVoucherReplayTopicName(),
+                            new PaymentRequest(replayRequestInfo, payment));
+                    published++;
+                }
+            }
+            log.info("***Collection Service*** ==> voucher replay: tenant {}, offset {}, found {}, published {}, dryRun {}",
+                    tenantId, offset, payments.size(), published, dryRun);
+        }
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("found", ids.size());
+        summary.put("published", published);
+        summary.put("dryRun", dryRun);
+        summary.put("nextOffset", offset + ids.size());
+        summary.put("done", ids.size() < limit);
+        return summary;
     }
 
     public List<Payment> plainSearch(PaymentSearchCriteria paymentSearchCriteria) {

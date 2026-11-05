@@ -45,6 +45,8 @@ public class RazorpayGateway implements Gateway {
 	private static final String PAYMENT_AUTO_CAPTURE = "1";
 
 	private static final String ORDER_ID = "ORDER_ID";
+	
+	private static final String ACCOUNT_ID = "ACCOUNT_ID";
 
 	private final RestTemplate restTemplate;
 
@@ -90,6 +92,7 @@ public class RazorpayGateway implements Gateway {
 
 		transaction.setOrderId(order.getOrderId());
 		additionalDetails.put(ORDER_ID, order.getOrderId());
+		additionalDetails.put(ACCOUNT_ID, transaction.getPayTo());
 		transaction.setAdditionalDetails(additionalDetails);
 
 		return URI.create(StringUtils.EMPTY); // Return an empty URI

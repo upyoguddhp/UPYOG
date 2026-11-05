@@ -39,6 +39,7 @@
  */
 package org.egov.demand.repository;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.egov.demand.web.contract.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -198,7 +200,8 @@ public class DemandRepository {
 				ps.setString(14, status);
 				ps.setObject(15, util.getPGObject(demand.getAdditionalDetails()));
 				ps.setObject(16, demand.getBillExpiryTime());
-				ps.setObject(17, demand.getFixedBillExpiryDate());
+				ps.setBoolean(17, Boolean.TRUE.equals(demand.getIsPaymentCompleted()));
+				ps.setObject(18, demand.getFixedBillExpiryDate());
 			}
 
 			@Override
@@ -430,5 +433,31 @@ public class DemandRepository {
 		}
 
 		return paymentId;
+	}
+	
+	public void updateAdvanceCollectionAmount(DemandDetail advanceDetail) {
+
+	    String query = DemandQueryBuilder.DEMAND_DETAIL_COLLECTION_AMOUNT_UPDATE;
+
+	    jdbcTemplate.update(query,
+	            advanceDetail.getCollectionAmount(),
+	            advanceDetail.getAuditDetails().getLastModifiedBy(),
+	            advanceDetail.getAuditDetails().getLastModifiedTime(),
+	            advanceDetail.getId());
+	}
+	
+	public void updateCustomDemandAmount(CustomAmountUpdateRequest request) {
+
+		String demandId = request.getDemandId();
+		BigDecimal customAmount = request.getCustomAmount();
+		String tenantId = request.getTenantId();
+		String userId = request.getRequestInfo().getUserInfo().getUuid();
+		Long currentTime = System.currentTimeMillis();
+
+		jdbcTemplate.update(DemandQueryBuilder.DEMAND_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId,
+				currentTime, demandId, tenantId);
+
+		jdbcTemplate.update(DemandQueryBuilder.DEMAND_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId, currentTime,
+				demandId, tenantId);
 	}
 }

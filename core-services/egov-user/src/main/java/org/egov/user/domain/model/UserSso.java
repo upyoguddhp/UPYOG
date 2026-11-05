@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserSso {
-	
+
 	private Long id;
 	private Long ssoId;
 	private String userUuid;

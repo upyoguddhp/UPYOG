@@ -1,0 +1,3056 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "GRB_MENU_NEW_REGISTRATION",
+      "message": "New garbage collection registration",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MENU_NEW_REGISTRATION",
+      "message": "नया कचरा संग्रहण पंजीकरण",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MENU_MY_APPLICATIONS",
+      "message": "My garbage collection applications",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MENU_MY_APPLICATIONS",
+      "message": "मेरे कचरा संग्रहण आवेदन",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "MODULE_NEWTL",
+      "message": "Garbage Collection",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "MODULE_NEWTL",
+      "message": "कचरा संग्रहण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SELECT",
+      "message": "Select",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SELECT_FIRST",
+      "message": "Select {{parent}} first",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SELECT_FIRST",
+      "message": "पहले {{parent}} चुनें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SUBMITTING",
+      "message": "आपका आवेदन जमा हो रहा है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LOOKUP_FAILED",
+      "message": "Could not load {{what}}. Please try again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LOOKUP_FAILED",
+      "message": "{{what}} लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RETRY",
+      "message": "Try again",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_propertyId",
+      "message": "Property ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_propertyId",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_propertyOwnerName",
+      "message": "Property Owner Name",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_propertyOwnerName",
+      "message": "संपत्ति स्वामी का नाम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_propertyAddress",
+      "message": "Address",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_propertyAddress",
+      "message": "पता",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_districtName",
+      "message": "District",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_districtName",
+      "message": "जिला",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_ulbName",
+      "message": "ULB Name",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_ulbName",
+      "message": "शहरी स्थानीय निकाय का नाम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_ulbType",
+      "message": "ULB Type",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_ulbType",
+      "message": "शहरी स्थानीय निकाय का प्रकार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_wardNumber",
+      "message": "Ward Name",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_wardNumber",
+      "message": "वार्ड का नाम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_zone",
+      "message": "Zone",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_zone",
+      "message": "क्षेत्र (ज़ोन)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_propertyPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_propertyPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_applicantName",
+      "message": "Name of Applicant",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_applicantName",
+      "message": "आवेदक का नाम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_applicantMobileNumber",
+      "message": "Mobile Number",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_applicantMobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_YES",
+      "message": "Yes",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_YES",
+      "message": "हाँ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_NO",
+      "message": "No",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_NO",
+      "message": "नहीं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_MALE",
+      "message": "पुरुष",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_FEMALE",
+      "message": "महिला",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_E_REQUIRED",
+      "message": "This field is required.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_E_MOBILE",
+      "message": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_E_EMAIL",
+      "message": "Enter a valid email address.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_E_EMAIL",
+      "message": "सही ईमेल पता दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_E_PIN",
+      "message": "Enter a valid 6-digit pin code.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_E_PIN",
+      "message": "6 अंकों का सही पिन कोड दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_REVIEW_HINT",
+      "message": "Check your details. Use Edit to change anything.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_REVIEW_HINT",
+      "message": "अपना विवरण जाँचें। कुछ बदलने के लिए 'बदलें' दबाएं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SUBMIT_FAILED",
+      "message": "We could not submit your application.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SUBMIT_FAILED",
+      "message": "हम आपका आवेदन जमा नहीं कर सके।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_SUCCESS",
+      "message": "Application submitted successfully",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_SUCCESS",
+      "message": "आवेदन सफलतापूर्वक जमा हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_FAILED",
+      "message": "Application submission failed",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_FAILED",
+      "message": "आवेदन जमा नहीं हो सका",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_APP_NO",
+      "message": "Application Number",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_HINT",
+      "message": "Keep this number to track your application.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_HINT",
+      "message": "अपने आवेदन को ट्रैक करने के लिए इस संख्या को सुरक्षित रखें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_GO_APPS",
+      "message": "My Applications",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_GO_APPS",
+      "message": "मेरे आवेदन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_GO_HOME",
+      "message": "Go to Dashboard",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_TITLE",
+      "message": "My Garbage Collection Applications",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_TITLE",
+      "message": "मेरे कचरा संग्रहण आवेदन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_EMPTY",
+      "message": "You have no garbage collection applications yet.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_EMPTY",
+      "message": "आपका अभी कोई कचरा संग्रहण आवेदन नहीं है।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_NEW",
+      "message": "Apply for a new connection",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_NEW",
+      "message": "नए कनेक्शन के लिए आवेदन करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_FAILED",
+      "message": "We could not load your applications.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_FAILED",
+      "message": "हम आपके आवेदन लोड नहीं कर सके।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_COL_APP_NO",
+      "message": "Application No.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_COL_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_COL_STATUS",
+      "message": "Status",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_COL_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_COL_ULB",
+      "message": "ULB",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_COL_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_CRUMB_HOME",
+      "message": "होम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_CRUMB_PT",
+      "message": "Garbage Collection",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_CRUMB_PT",
+      "message": "कचरा संग्रहण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_CRUMB_NEW",
+      "message": "New registration",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_CRUMB_NEW",
+      "message": "नया पंजीकरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PROGRESS_TITLE",
+      "message": "Your application",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PROGRESS_TITLE",
+      "message": "आपका आवेदन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PROGRESS_DRAFT",
+      "message": "Saved on this device as a draft",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर ड्राफ्ट के रूप में सहेजा गया",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_TIP_1",
+      "message": "Find your property ID before you start",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_TIP_1",
+      "message": "शुरू करने से पहले अपनी संपत्ति आईडी ढूंढ लें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_TIP_3",
+      "message": "You can save a draft and return",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_TIP_3",
+      "message": "आप ड्राफ्ट सहेजकर बाद में लौट सकते हैं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_ONLY",
+      "message": "PDF, JPG or PNG, up to 10 MB each.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_ONLY",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_TITLE",
+      "message": "आवश्यक दस्तावेज़",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_HELP_TITLE",
+      "message": "Stuck? We will help.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_HELP_TITLE",
+      "message": "अटक गए? हम मदद करेंगे।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_HELP_LINE",
+      "message": "Call 177-2809784 · 9:30 AM–6:00 PM",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_HELP_LINE",
+      "message": "कॉल करें 177-2809784 · प्रातः 9:30–सायं 6:00",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DRAFT_SAVED",
+      "message": "Draft saved on this device.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DRAFT_SAVED",
+      "message": "ड्राफ्ट इस डिवाइस पर सहेजा गया।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PAGE_SUB",
+      "message": "Garbage Collection · Takes about 8 minutes",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PAGE_SUB",
+      "message": "कचरा संग्रहण · लगभग 8 मिनट",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_SAVE_DRAFT",
+      "message": "Save draft",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_SAVE_DRAFT",
+      "message": "ड्राफ्ट सहेजें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_STEP",
+      "message": "आगे: {{step}}",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_MINE",
+      "message": "My properties",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_MINE",
+      "message": "मेरी संपत्तियां",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_ID",
+      "message": "Property ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_ID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_PH_ID",
+      "message": "Enter the property ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_PH_ID",
+      "message": "संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_MOBILE",
+      "message": "Owner mobile",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_MOBILE",
+      "message": "स्वामी का मोबाइल",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_PH_MOBILE",
+      "message": "Enter the owner's 10-digit mobile number",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_PH_MOBILE",
+      "message": "स्वामी का 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_OLD",
+      "message": "Old property ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_MODE_OLD",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_PH_OLD",
+      "message": "Enter the old property ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_PH_OLD",
+      "message": "पुरानी संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_ACTIVE",
+      "message": "Active",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_ACTIVE",
+      "message": "सक्रिय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_INACTIVE",
+      "message": "Inactive",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_INACTIVE",
+      "message": "निष्क्रिय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_PROGRESS",
+      "message": "Under process",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_STATUS_PROGRESS",
+      "message": "प्रक्रियाधीन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_E_PICK",
+      "message": "Please select a property to continue.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_E_PICK",
+      "message": "आगे बढ़ने के लिए कृपया एक संपत्ति चुनें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_FIND_BY",
+      "message": "Find your property by",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_FIND_BY",
+      "message": "अपनी संपत्ति इससे खोजें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_MINE_HINT",
+      "message": "Showing properties linked to your mobile number {{mobile}}.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_MINE_HINT",
+      "message": "आपके मोबाइल नंबर {{mobile}} से जुड़ी संपत्तियां दिखाई जा रही हैं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_SEARCH",
+      "message": "Search",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_SEARCH",
+      "message": "खोजें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_NO_MOBILE",
+      "message": "No mobile number is linked to your account. Search by property ID instead.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_NO_MOBILE",
+      "message": "आपके खाते से कोई मोबाइल नंबर जुड़ा नहीं है। संपत्ति आईडी से खोजें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_ENTER_TERM",
+      "message": "Enter a value above and press Search.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_ENTER_TERM",
+      "message": "ऊपर मान दर्ज करें और खोजें दबाएं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_SEARCHING",
+      "message": "Searching properties...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_SEARCHING",
+      "message": "संपत्तियां खोजी जा रही हैं...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_FAILED",
+      "message": "We could not search properties. Please try again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_FAILED",
+      "message": "हम संपत्तियां नहीं खोज सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_EMPTY",
+      "message": "No property found",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_EMPTY",
+      "message": "कोई संपत्ति नहीं मिली",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_EMPTY_HINT",
+      "message": "Check the value and try another way to search, or register the property first.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_EMPTY_HINT",
+      "message": "मान जांचें और खोजने का दूसरा तरीका आज़माएं, या पहले संपत्ति पंजीकृत करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_RESULTS",
+      "message": "Matching properties",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_RESULTS",
+      "message": "मिलती-जुलती संपत्तियां",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_PICKED",
+      "message": "Selected property {{id}}",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_PICKED",
+      "message": "चुनी गई संपत्ति {{id}}",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_NOT_FOUND",
+      "message": "Property not found?",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_NOT_FOUND",
+      "message": "संपत्ति नहीं मिली?",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PS_REGISTER_LINK",
+      "message": "Register it first",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PS_REGISTER_LINK",
+      "message": "पहले इसे पंजीकृत करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_PAGE_HINT",
+      "message": "PDF, JPG or PNG, up to 10 MB each. A document already on file shows as uploaded.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_PAGE_HINT",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी। पहले से उपलब्ध दस्तावेज़ अपलोड हुआ दिखेगा।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_REMOVE",
+      "message": "हटाएं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_TITLE",
+      "message": "Application details",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_TITLE",
+      "message": "आवेदन विवरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_GARBAGEID",
+      "message": "Garbage ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_GARBAGEID",
+      "message": "कचरा आईडी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_NODOCS",
+      "message": "No documents attached",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_BACK",
+      "message": "Back to my applications",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_BACK",
+      "message": "मेरे आवेदनों पर वापस",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_NOTFOUND",
+      "message": "This application could not be found.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_NOTFOUND",
+      "message": "यह आवेदन नहीं मिला।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_FAILED",
+      "message": "Could not load the application. Please try again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_TIMELINE",
+      "message": "Application progress",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_TIMELINE",
+      "message": "आवेदन की प्रगति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_NOHISTORY",
+      "message": "No progress recorded yet",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_YES",
+      "message": "Yes",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_YES",
+      "message": "हाँ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_NO",
+      "message": "No",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_NO",
+      "message": "नहीं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_VIEW_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_UPLOADED",
+      "message": "अपलोड हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY",
+      "message": "Modify",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY",
+      "message": "संशोधित करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE",
+      "message": "Close account",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE",
+      "message": "खाता बंद करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CONTINUE_MODIFY",
+      "message": "Continue modification",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CONTINUE_MODIFY",
+      "message": "संशोधन जारी रखें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_BADGE_MODIFICATION",
+      "message": "Modification",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_BADGE_MODIFICATION",
+      "message": "संशोधन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_BADGE_CLOSED",
+      "message": "Closed",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_BADGE_CLOSED",
+      "message": "बंद",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_TITLE",
+      "message": "Modify garbage account",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_TITLE",
+      "message": "कचरा खाता संशोधित करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_TITLE",
+      "message": "Close garbage account",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_TITLE",
+      "message": "कचरा खाता बंद करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_SUB",
+      "message": "Change the collection details of this account and send it to your ULB for verification.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_SUB",
+      "message": "इस खाते का संग्रहण विवरण बदलें और सत्यापन के लिए अपने ULB को भेजें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_SUB",
+      "message": "Closing stops billing for this account.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_SUB",
+      "message": "खाता बंद करने पर इसके लिए बिल बनना बंद हो जाएगा।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_WARN",
+      "message": "The account comes back to you for editing. After you submit, your ULB verifies the change again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_WARN",
+      "message": "खाता संपादन के लिए आपके पास आ जाएगा। जमा करने के बाद आपका ULB बदलाव का फिर से सत्यापन करेगा।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_WARN",
+      "message": "Closing is final: the account is marked closed and no further bills are raised. Clear any dues first.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_WARN",
+      "message": "बंद करना अंतिम है: खाता बंद हो जाएगा और आगे बिल नहीं बनेंगे। पहले सभी बकाया चुकाएँ।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_REASON",
+      "message": "Reason for closing",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_REASON",
+      "message": "बंद करने का कारण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_REASON_PH",
+      "message": "For example: property sold, premises vacated",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_REASON_PH",
+      "message": "उदाहरण: संपत्ति बेची गई, परिसर खाली किया गया",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_REASON_REQUIRED",
+      "message": "Please tell us why you are closing this account.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_REASON_REQUIRED",
+      "message": "कृपया बताएँ कि आप यह खाता क्यों बंद कर रहे हैं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CONFIRM_MODIFY",
+      "message": "Start modification",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CONFIRM_MODIFY",
+      "message": "संशोधन शुरू करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CONFIRM_CLOSE",
+      "message": "Close this account",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CONFIRM_CLOSE",
+      "message": "यह खाता बंद करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CHECKING",
+      "message": "Checking the account...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CHECKING",
+      "message": "खाते की जाँच हो रही है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CHECKING_DUES",
+      "message": "Checking pending dues...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CHECKING_DUES",
+      "message": "लंबित बकाया की जाँच हो रही है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_STARTING",
+      "message": "Starting modification...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_STARTING",
+      "message": "संशोधन शुरू हो रहा है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSING",
+      "message": "Closing the account...",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSING",
+      "message": "खाता बंद हो रहा है...",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_NOT_ELIGIBLE",
+      "message": "This account cannot be modified right now. Only approved accounts can be modified.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_NOT_ELIGIBLE",
+      "message": "यह खाता अभी संशोधित नहीं हो सकता। केवल स्वीकृत खाते संशोधित हो सकते हैं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_NOT_ALLOWED",
+      "message": "This account can only be closed by your ULB office. Please contact them.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSE_NOT_ALLOWED",
+      "message": "यह खाता केवल आपके ULB कार्यालय द्वारा बंद किया जा सकता है। कृपया उनसे संपर्क करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_DUES",
+      "message": "Pending dues found for: {{codes}}. Please pay them first.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_DUES",
+      "message": "इनके लिए बकाया लंबित है: {{codes}}। कृपया पहले भुगतान करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_FAILED",
+      "message": "Could not complete this request. Please try again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_FAILED",
+      "message": "यह अनुरोध पूरा नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSED_TITLE",
+      "message": "Account closed",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSED_TITLE",
+      "message": "खाता बंद हो गया",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSED_SUB",
+      "message": "This garbage account is now closed and no further bills will be raised.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_CLOSED_SUB",
+      "message": "यह कचरा खाता अब बंद है और आगे बिल नहीं बनेंगे।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_ACK_TITLE",
+      "message": "Modification submitted",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_ACK_TITLE",
+      "message": "संशोधन जमा हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_ACK_SUB",
+      "message": "Your changes were sent to the ULB for verification.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_MODIFY_ACK_SUB",
+      "message": "आपके बदलाव सत्यापन के लिए ULB को भेज दिए गए हैं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_DECL_CLOSE",
+      "message": "I confirm that I want to close this garbage account.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_DECL_CLOSE",
+      "message": "मैं पुष्टि करता/करती हूं कि मैं यह कचरा खाता बंद करना चाहता/चाहती हूं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_DECL_REQUIRED",
+      "message": "Please confirm to continue.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_DECL_REQUIRED",
+      "message": "जारी रखने के लिए कृपया पुष्टि करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_BACK",
+      "message": "Back to application",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_BACK",
+      "message": "आवेदन पर वापस",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_NOT_FOUND",
+      "message": "This account could not be found.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_NOT_FOUND",
+      "message": "यह खाता नहीं मिला।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LC_STATUS_NOW",
+      "message": "Current status",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LC_STATUS_NOW",
+      "message": "वर्तमान स्थिति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list. Please try again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_TYPE_ERROR",
+      "message": "केवल पीडीएफ, जेपीजी या पीएनजी फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_SIZE_ERROR",
+      "message": "File must be smaller than 10 MB.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 10 एमबी से छोटी होनी चाहिए।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_REQUIRED_ERROR",
+      "message": "Please upload this document.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_REQUIRED_ERROR",
+      "message": "कृपया यह दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCV_PAGES",
+      "message": "pages",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCV_FAILED",
+      "message": "This file could not be displayed. Please try again or choose the file again.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCV_FAILED",
+      "message": "यह फ़ाइल नहीं दिखाई जा सकी। कृपया पुनः प्रयास करें या फ़ाइल दोबारा चुनें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_DOCUMENTS",
+      "message": "Upload the documents for this application.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_DOCUMENTS",
+      "message": "इस आवेदन के लिए दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOC_UPLOAD_FAILED",
+      "message": "Your application was created, but these documents could not be uploaded: {{docs}}. Press Submit again to retry.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOC_UPLOAD_FAILED",
+      "message": "आपका आवेदन बन गया है, पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए जमा करें दबाएं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_REVIEW_SUB",
+      "message": "Garbage Collection · Last step",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_REVIEW_SUB",
+      "message": "कचरा संग्रहण · अंतिम चरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूं कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DECLARE_REQUIRED",
+      "message": "Please tick the declaration to submit.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा पर टिक करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_BANNER_SUB",
+      "message": "Your application is with the ULB for verification.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_BANNER_SUB",
+      "message": "आपका आवेदन सत्यापन के लिए निकाय के पास है।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_COPIED",
+      "message": "कॉपी हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_COPY_ID",
+      "message": "Copy ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_COPY_ID",
+      "message": "आईडी कॉपी करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_WHERE",
+      "message": "Where your application is now",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_WHERE",
+      "message": "आपका आवेदन अभी कहाँ है",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_DEPT",
+      "message": "Urban Development Department · Citizen Seva",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_DEPT",
+      "message": "शहरी विकास विभाग · सिटिजन सेवा",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_TITLE",
+      "message": "Acknowledgement Receipt",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_TITLE",
+      "message": "पावती रसीद",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_DATE",
+      "message": "Submitted on",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_DATE",
+      "message": "जमा करने की तिथि",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_STATUS_V",
+      "message": "Submitted for verification",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_STATUS_V",
+      "message": "सत्यापन हेतु जमा",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_PROPERTY",
+      "message": "Property details",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_PROPERTY",
+      "message": "संपत्ति विवरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_DOCS",
+      "message": "Documents submitted",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_DOCS",
+      "message": "जमा किए गए दस्तावेज़",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_NOTE",
+      "message": "Keep this receipt and the application number for tracking. This is a computer-generated acknowledgement and does not need a signature.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_NOTE",
+      "message": "ट्रैकिंग के लिए इस रसीद और आवेदन संख्या को सुरक्षित रखें। यह कंप्यूटर जनित पावती है, हस्ताक्षर आवश्यक नहीं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_HELP",
+      "message": "Helpline: 177-2809784 (Mon–Sat, 9:30 AM–6:00 PM)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_HELP",
+      "message": "हेल्पलाइन: 177-2809784 (सोम–शनि, 9:30–6:00)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_SUB",
+      "message": "Every garbage collection application you have made, in one place",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_MY_APPS_SUB",
+      "message": "आपके सभी कचरा संग्रहण आवेदन, एक जगह",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SEARCH_PH",
+      "message": "Search by application no., business or property",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SEARCH_PH",
+      "message": "आवेदन संख्या, व्यवसाय या संपत्ति से खोजें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NO_RESULTS",
+      "message": "No applications match your search.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NO_RESULTS",
+      "message": "आपकी खोज से कोई आवेदन मेल नहीं खाता।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_1",
+      "message": "Submitted",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_1",
+      "message": "जमा हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_2",
+      "message": "Verification",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_2",
+      "message": "सत्यापन",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_3",
+      "message": "Approval",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_3",
+      "message": "स्वीकृति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_4",
+      "message": "Account active",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_4",
+      "message": "खाता सक्रिय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_FILTER_DRAFT",
+      "message": "Draft",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_FILTER_DRAFT",
+      "message": "ड्राफ्ट",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STAGE_DRAFT",
+      "message": "Not submitted",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STAGE_DRAFT",
+      "message": "जमा नहीं हुआ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STAGE_PROGRESS",
+      "message": "With the ULB",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STAGE_PROGRESS",
+      "message": "निकाय के पास",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STAGE_APPROVED",
+      "message": "Account active",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STAGE_APPROVED",
+      "message": "खाता सक्रिय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_PROPERTY",
+      "message": "Property",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_PROPERTY",
+      "message": "संपत्ति",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_DOCS_FAILED",
+      "message": "We could not load the document list. Keep your ID proof ready.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_DOCS_FAILED",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। अपना पहचान प्रमाण तैयार रखें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "ACTION_TEST_GB",
+      "message": "Garbage Collection",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_GB",
+      "message": "कचरा संग्रहण",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_APP_TITLE",
+      "message": "New Garbage Collection Registration",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_APP_TITLE",
+      "message": "नया कचरा संग्रहण पंजीकरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_DETAILS",
+      "message": "Garbage Collection Details",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_DETAILS",
+      "message": "कचरा संग्रहण विवरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_DETAILS",
+      "message": "Tell us the type of collection and the units you want registered.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_DETAILS",
+      "message": "संग्रहण का प्रकार और पंजीकृत कराई जाने वाली इकाइयाँ बताएं।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_PROPERTY",
+      "message": "Find the property the garbage collection is for and select it.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_STEP_HINT_PROPERTY",
+      "message": "वह संपत्ति खोजें जिसके लिए कचरा संग्रहण चाहिए और उसे चुनें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SEC_SPEC",
+      "message": "Garbage Specifications",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SEC_SPEC",
+      "message": "कचरा विनिर्देश",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_SEC_UNITS",
+      "message": "Collection Units",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_SEC_UNITS",
+      "message": "संग्रहण इकाइयाँ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_UNIT_FIRST",
+      "message": "Account holder (unit 1)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_UNIT_FIRST",
+      "message": "खाताधारक (इकाई 1)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_UNIT_N",
+      "message": "Collection unit {{n}}",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_UNIT_N",
+      "message": "संग्रहण इकाई {{n}}",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_ADD_UNIT",
+      "message": "Add another collection unit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_ADD_UNIT",
+      "message": "एक और संग्रहण इकाई जोड़ें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_BTN_REMOVE_UNIT",
+      "message": "Remove unit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_BTN_REMOVE_UNIT",
+      "message": "इकाई हटाएं",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_PICK_TYPE_FIRST",
+      "message": "Choose the type of collection above to see the categories.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_PICK_TYPE_FIRST",
+      "message": "श्रेणियाँ देखने के लिए ऊपर संग्रहण का प्रकार चुनें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_oldGarbageId",
+      "message": "Old Garbage ID",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_oldGarbageId",
+      "message": "पुरानी कचरा आईडी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_typeOfCollection",
+      "message": "Type of Collection Unit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_typeOfCollection",
+      "message": "संग्रहण इकाई का प्रकार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_propertyOwnerType",
+      "message": "Are you Owner or Tenant?",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_propertyOwnerType",
+      "message": "क्या आप स्वामी हैं या किरायेदार?",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_name",
+      "message": "Name",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_name",
+      "message": "नाम",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_phoneNumber",
+      "message": "Phone Number",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_phoneNumber",
+      "message": "फ़ोन नंबर",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_gender",
+      "message": "Gender",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_gender",
+      "message": "लिंग",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_email",
+      "message": "Email",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_email",
+      "message": "ईमेल",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_category",
+      "message": "Collection Unit Category",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_category",
+      "message": "संग्रहण इकाई की श्रेणी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_subCategory",
+      "message": "Collection Unit Sub Category",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_subCategory",
+      "message": "संग्रहण इकाई की उप श्रेणी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_subCategoryType",
+      "message": "Sub Category Type",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_subCategoryType",
+      "message": "उप श्रेणी का प्रकार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_calcType",
+      "message": "Type of Calculation",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_calcType",
+      "message": "गणना का प्रकार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_no_of_units",
+      "message": "Additional Units",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_no_of_units",
+      "message": "अतिरिक्त इकाइयाँ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_F_isbplunit",
+      "message": "Is BPL?",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_F_isbplunit",
+      "message": "क्या बीपीएल है?",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_H_oldGarbageId",
+      "message": "If you already had a garbage ID under the old system, enter it.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_H_oldGarbageId",
+      "message": "यदि पुरानी प्रणाली में आपकी कचरा आईडी थी तो उसे दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_H_typeOfCollection",
+      "message": "Single: one unit on the property. Multi: several units (e.g. flats or shops).",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_H_typeOfCollection",
+      "message": "एकल: संपत्ति पर एक इकाई। बहु: कई इकाइयाँ (जैसे फ्लैट या दुकानें)।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_H_no_of_units",
+      "message": "Enter only the additional number of beds, rooms or units.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_H_no_of_units",
+      "message": "केवल अतिरिक्त बिस्तर, कमरे या इकाइयों की संख्या दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_H_isbplunit",
+      "message": "Tick only if a rebate applies to the BPL category.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_H_isbplunit",
+      "message": "केवल तब चुनें जब बीपीएल श्रेणी पर छूट लागू हो।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_OWNER",
+      "message": "Owner",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_OWNER",
+      "message": "स्वामी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_TENANT",
+      "message": "Tenant",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_TENANT",
+      "message": "किरायेदार",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_FIXED",
+      "message": "Fixed",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_FIXED",
+      "message": "निश्चित",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_VARIABLE",
+      "message": "Variable",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_VARIABLE",
+      "message": "परिवर्तनीय",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_HH_SINGLE",
+      "message": "Household (Single-Collection)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_HH_SINGLE",
+      "message": "घरेलू (एकल संग्रहण)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_HH_MULTI",
+      "message": "Household (Multi-Collection)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_HH_MULTI",
+      "message": "घरेलू (बहु संग्रहण)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_COM_SINGLE",
+      "message": "Commercial (Single-Collection)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_COM_SINGLE",
+      "message": "वाणिज्यिक (एकल संग्रहण)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_COM_MULTI",
+      "message": "Commercial (Multi-Collection)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_COM_MULTI",
+      "message": "वाणिज्यिक (बहु संग्रहण)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_O_MIX",
+      "message": "Mix-Property (Household + Commercial)",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_O_MIX",
+      "message": "मिश्रित संपत्ति (घरेलू + वाणिज्यिक)",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_E_UNITS",
+      "message": "Enter a whole number between 1 and 99999.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_E_UNITS",
+      "message": "1 से 99999 के बीच पूर्ण संख्या दर्ज करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_TIP_2",
+      "message": "Know the type of collection and category for each unit",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_TIP_2",
+      "message": "प्रत्येक इकाई के लिए संग्रहण का प्रकार और श्रेणी जानें",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_SERVICE",
+      "message": "Garbage Collection · New registration",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_SERVICE",
+      "message": "कचरा संग्रहण · नया पंजीकरण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_OWNER",
+      "message": "Applicant",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_OWNER",
+      "message": "आवेदक",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_RCPT_UNITS",
+      "message": "Collection units",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_RCPT_UNITS",
+      "message": "संग्रहण इकाइयाँ",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_LIST_KIND",
+      "message": "Garbage collection",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_LIST_KIND",
+      "message": "कचरा संग्रहण",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_START_HINT",
+      "message": "Register garbage collection for a property.",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_START_HINT",
+      "message": "किसी संपत्ति के लिए कचरा संग्रहण पंजीकृत करें।",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_ACK_PENDING",
+      "message": "Pending with ULB verifier",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_ACK_PENDING",
+      "message": "निकाय सत्यापनकर्ता के पास लंबित",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_3_D",
+      "message": "Your account is created once approved",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_3_D",
+      "message": "स्वीकृति के बाद आपका खाता बनेगा",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_1_D",
+      "message": "You get an acknowledgement",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_1_D",
+      "message": "आपको पावती मिलेगी",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRB_NEXT_2_D",
+      "message": "The ULB checks your details and property",
+      "module": "rainmaker-gb",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRB_NEXT_2_D",
+      "message": "निकाय आपके विवरण और संपत्ति की जांच करेगा",
+      "module": "rainmaker-gb",
+      "locale": "hi_IN"
+    }
+  ]
+}

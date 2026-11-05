@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserSsoQueryBuilder {
 
-	public static final String SELECT_USER_SSO_QUERY = "SELECT usersso.id, usersso.sso_id, usersso.user_uuid " 
+	public static final String SELECT_USER_SSO_QUERY = "SELECT usersso.id, usersso.sso_id, usersso.user_uuid "
             + " FROM ud_user_sso usersso WHERE sso_id = :ssoId";
 
 	public static final String COUNT_USER_SSO_QUERY = "SELECT count(*) FROM ud_user_sso WHERE sso_id = :ssoId ";

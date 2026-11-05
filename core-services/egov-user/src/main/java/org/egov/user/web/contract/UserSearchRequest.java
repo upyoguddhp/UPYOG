@@ -2,10 +2,9 @@ package org.egov.user.web.contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.egov.common.contract.request.RequestInfo;
@@ -13,17 +12,12 @@ import org.egov.user.config.UserServiceConstants;
 import org.egov.user.domain.model.UserSearchCriteria;
 import org.egov.user.domain.model.enums.UserType;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserSearchRequest {
 
     @JsonProperty("RequestInfo")
@@ -86,12 +80,9 @@ public class UserSearchRequest {
 
     @JsonProperty("roleCodes")
     private List<String> roleCodes;
-    
-    @JsonProperty("ulbName")
-    private String ulbName;
-    
-    @Builder.Default
-    private Boolean skipValidate = false;
+
+//    @JsonProperty("digilockerSearch")
+//    private boolean digilockerSearch;
 
     public UserSearchCriteria toDomain() {
         return UserSearchCriteria.builder()
@@ -108,10 +99,9 @@ public class UserSearchRequest {
                 .sort(sort)
                 .type(UserType.fromValue(userType))
                 .tenantId(tenantId)
-                .ulbName(ulbName)
                 .roleCodes(roleCodes)
                 .uuid(uuid)
-                .skipValidate(skipValidate)
+                //.digilockersearch(digilockerSearch)
                 .build();
     }
 }

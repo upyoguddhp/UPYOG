@@ -40,18 +40,17 @@
 
 package org.egov.hrms.model;
 
-import lombok.*;
-import org.egov.hrms.web.contract.User;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.constraints.SafeHtml;
-import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.*;
+import org.egov.hrms.validation.SanitizeHtml;
+import org.egov.hrms.web.contract.User;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,25 +66,28 @@ public class Employee {
 
     private Long id;
 
-    @SafeHtml
+    @SanitizeHtml
     @Size(max = 1024)
     private String uuid;
 
-    @SafeHtml
+    @SanitizeHtml
     @Size(min = 1, max = 256)
     private String code;
 
-    @SafeHtml
+    @SanitizeHtml
     @Size(max = 250)
     private String employeeStatus;
 
-    @SafeHtml
+    @SanitizeHtml
     @NotNull
     @Size(max = 250)
     private String employeeType;
 
     private Long dateOfAppointment;
 
+    // HP-specific: jurisdiction validation is disabled - required jurisdiction data
+    // isn't reliably available in this deployment (see EmployeeValidator and
+    // Jurisdiction.java, where the same relaxation is applied).
 //    @Valid
 //    @NotEmpty
 //    @Size(min = 1,max = 50)
@@ -93,8 +95,6 @@ public class Employee {
 
 
     @Valid
-    @NotEmpty
-    @Size(min = 1)
     private List<Assignment> assignments = new ArrayList<>();
 
     @Valid
@@ -112,7 +112,7 @@ public class Employee {
     @Size(max=25)
     private List<DepartmentalTest> tests = new ArrayList<>();
 
-    @SafeHtml
+    @SanitizeHtml
     @NotNull
     @Size(max = 250)
     private String tenantId;
@@ -134,9 +134,8 @@ public class Employee {
     @NotNull
     private User user;
 
+    // HP-specific: arbitrary additional employee data, stored as JSONB.
     @JsonProperty("additionalDetail")
-    private JsonNode additionalDetail = null;
-
-
+    private JsonNode additionalDetail;
 
 }

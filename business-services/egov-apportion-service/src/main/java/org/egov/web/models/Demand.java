@@ -114,7 +114,9 @@ public class Demand   {
 
         @JsonProperty("status")
         private StatusEnum status;
-
+        
+        @JsonProperty("isPaymentCompleted")
+        private Boolean isPaymentCompleted;
 
         public Demand addDemandDetailsItem(DemandDetail demandDetailsItem) {
         this.demandDetails.add(demandDetailsItem);

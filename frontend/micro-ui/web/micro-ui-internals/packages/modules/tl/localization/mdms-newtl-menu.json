@@ -1,0 +1,4 @@
+[
+  {"id":1706,"url":"digit-ui-card","code":"null","name":"NTL_MENU_NEW_REGISTRATION","path":"","enabled":true,"displayName":"New trade licence registration","orderNumber":1,"serviceCode":"NewTL","parentModule":"NewTL","navigationURL":"/digit-ui/citizen/newtl/new-registration"},
+  {"id":1707,"url":"digit-ui-card","code":"null","name":"NTL_MENU_MY_APPLICATIONS","path":"","enabled":true,"displayName":"My trade licence applications","orderNumber":2,"serviceCode":"NewTL","parentModule":"NewTL","navigationURL":"/digit-ui/citizen/newtl/my-registrations"}
+]

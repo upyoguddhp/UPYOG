@@ -1,9 +1,23 @@
 package org.egov.wf.service;
 
+import static org.egov.wf.util.WorkflowConstants.JSONPATH_BUSINESSSERVICE_STATELEVEL;
+import static org.egov.wf.util.WorkflowConstants.MDMS_AUTOESCALTION;
+import static org.egov.wf.util.WorkflowConstants.MDMS_BUSINESSSERVICE;
+import static org.egov.wf.util.WorkflowConstants.MDMS_COMMON_MASTERS;
+import static org.egov.wf.util.WorkflowConstants.MDMS_MODULE_TENANT;
+import static org.egov.wf.util.WorkflowConstants.MDMS_TENANTS;
+import static org.egov.wf.util.WorkflowConstants.MDMS_WF_SLA_CONFIG;
+import static org.egov.wf.util.WorkflowConstants.MDMS_WORKFLOW;
+import static org.egov.wf.util.WorkflowConstants.SLOT_PERCENTAGE_PATH;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -12,16 +26,16 @@ import org.egov.mdms.model.ModuleDetail;
 import org.egov.wf.config.WorkflowConfig;
 import org.egov.wf.repository.ServiceRequestRepository;
 import org.egov.wf.util.WorkflowConstants;
-import org.egov.wf.web.models.ProcessInstanceRequest;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.egov.wf.web.models.ProcessInstanceRequest;
 
 import java.util.*;
 
 import static org.egov.wf.util.WorkflowConstants.*;
 
-@Slf4j
 @Service
 public class MDMSService {
 
@@ -52,10 +66,7 @@ public class MDMSService {
 
         Object mdmsData = getBusinessServiceMDMS();
         List<HashMap<String, Object>> configs = JsonPath.read(mdmsData,JSONPATH_BUSINESSSERVICE_STATELEVEL);
-log.info("####### value from mdms $.MdmsRes.Workflow.BusinessServiceMasterConfig : "+config.toString());
-for (HashMap<String, Object> config : configs) {
-    log.info("Config: {}", config.toString());
-}
+
 
         for (Map map : configs){
 

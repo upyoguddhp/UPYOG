@@ -29,7 +29,7 @@ const PTSelectStreet = ({ t, config, onSelect, userType, formData, formState, se
         name: "street",
         isMandatory:"true",
         validation: {
-          pattern: "[a-zA-Z0-9 !@#$%^&*()_+\-={};':\\\\|,.<>/?]{1,64}",
+          pattern: "[a-zA-Z0-9 !@#$%^&*()_+\-={};':\\\\|,.<React.Fragment>/?]{1,64}",
           isRequired: true,
           title: t("CORE_COMMON_STREET_INVALID"),
         },
@@ -40,7 +40,7 @@ const PTSelectStreet = ({ t, config, onSelect, userType, formData, formState, se
         name: "doorNo",
         isMandatory:"true",
         validation: {
-          pattern: "[a-zA-Z0-9 !@#$%^&*()_+\-={};':\\\\|,.<>/?]{1,64}",
+          pattern: "[a-zA-Z0-9 !@#$%^&*()_+\-={};':\\\\|,.<React.Fragment>/?]{1,64}",
           isRequired: true,
           title: t("CORE_COMMON_DOOR_INVALID"),
         },

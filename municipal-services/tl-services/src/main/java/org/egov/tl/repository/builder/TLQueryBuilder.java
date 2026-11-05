@@ -127,8 +127,15 @@ public class TLQueryBuilder {
 
             if (criteria.getTenantId() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
-                builder.append(" tl.tenantid=? ");
-                preparedStmtList.add(criteria.getTenantId());
+                if (criteria.getTenantId().contains(".")) {
+                    builder.append(" tl.tenantid=? ");
+                    preparedStmtList.add(criteria.getTenantId());
+                } else {
+                    // state-level tenant (e.g. "hp") = every ULB under it, so a citizen sees applications from all ULBs
+                    builder.append(" (tl.tenantid=? OR tl.tenantid LIKE ?) ");
+                    preparedStmtList.add(criteria.getTenantId());
+                    preparedStmtList.add(criteria.getTenantId() + ".%");
+                }
             }
             List<String> ids = criteria.getIds();
             if (!CollectionUtils.isEmpty(ids)) {

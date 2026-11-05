@@ -1,0 +1,1808 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_GRIEVANCE",
+      "message": "Grievances",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_GRIEVANCE",
+      "message": "शिकायतें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_MENU_NEW",
+      "message": "Register a grievance",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_MENU_NEW",
+      "message": "शिकायत दर्ज करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_MENU_LIST",
+      "message": "My grievances",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_MENU_LIST",
+      "message": "मेरी शिकायतें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_CRUMB_LIST",
+      "message": "Grievances",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_CRUMB_LIST",
+      "message": "शिकायतें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_CRUMB_NEW",
+      "message": "New grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_CRUMB_NEW",
+      "message": "नई शिकायत",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_TITLE",
+      "message": "Register a grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_TITLE",
+      "message": "शिकायत दर्ज करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_PAGE_SUB",
+      "message": "Complete the steps below. You can go back and change any step before you submit.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_PAGE_SUB",
+      "message": "नीचे दिए चरण पूरे करें। जमा करने से पहले आप किसी भी चरण पर वापस जाकर बदलाव कर सकते हैं।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEPPER_LABEL",
+      "message": "Grievance steps",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEPPER_LABEL",
+      "message": "शिकायत के चरण",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_LOCATION",
+      "message": "Grievance location",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_LOCATION",
+      "message": "शिकायत का स्थान",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_DOCUMENTS",
+      "message": "Photo or document",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_DOCUMENTS",
+      "message": "फ़ोटो या दस्तावेज़",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_APPLICANT",
+      "message": "Your details come from your account. Add your father's name if you wish.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_APPLICANT",
+      "message": "आपका विवरण आपके खाते से लिया गया है। चाहें तो पिता का नाम जोड़ें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_DOCUMENTS",
+      "message": "Attach a photo or document that shows the problem. It is optional.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_DOCUMENTS",
+      "message": "समस्या दिखाने वाली फ़ोटो या दस्तावेज़ संलग्न करें। यह वैकल्पिक है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_districtName",
+      "message": "District",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_districtName",
+      "message": "ज़िला",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_ulbName",
+      "message": "Urban local body",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_ulbName",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_ward",
+      "message": "Ward",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_ward",
+      "message": "वार्ड",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_name",
+      "message": "Name",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_name",
+      "message": "नाम",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_fatherName",
+      "message": "Father / husband name",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_fatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_mobileNumber",
+      "message": "Mobile number",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_mobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_emailId",
+      "message": "Email",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_emailId",
+      "message": "ईमेल",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_SELECT",
+      "message": "Select",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_SELECT_FIRST",
+      "message": "Select {{field}} first",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_SELECT_FIRST",
+      "message": "पहले {{field}} चुनें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LOADING_OPTIONS",
+      "message": "Loading options...",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LOADING_OPTIONS",
+      "message": "विकल्प लोड हो रहे हैं...",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LOOKUP_FAILED",
+      "message": "Could not load the options. Please check your connection and retry.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LOOKUP_FAILED",
+      "message": "विकल्प लोड नहीं हो सके। कृपया अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_E_REQUIRED",
+      "message": "This field is required",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_E_MOBILE",
+      "message": "मान्य 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_E_EMAIL",
+      "message": "Enter a valid email address",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_E_EMAIL",
+      "message": "मान्य ईमेल पता दर्ज करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_SUBMIT",
+      "message": "Submit grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_SUBMIT",
+      "message": "शिकायत दर्ज करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_NEXT_STEP",
+      "message": "अगला: {{step}}",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_PROGRESS_TITLE",
+      "message": "Your progress",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_PROGRESS_TITLE",
+      "message": "आपकी प्रगति",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_PROGRESS_DRAFT",
+      "message": "Saved as you go on this device",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर आगे बढ़ते हुए सहेजा जाता है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_TIP_1",
+      "message": "Pick the district, urban local body and ward where the problem is.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_TIP_1",
+      "message": "ज़िला, शहरी स्थानीय निकाय और वार्ड चुनें जहाँ समस्या है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_TIP_2",
+      "message": "Choose the grievance type and sub type that best match your problem.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_TIP_2",
+      "message": "अपनी समस्या से सबसे अच्छी तरह मेल खाने वाला शिकायत प्रकार और उप-प्रकार चुनें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_TIP_3",
+      "message": "A photo helps the officer understand and resolve it faster.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_TIP_3",
+      "message": "फ़ोटो से अधिकारी को समझने और जल्दी हल करने में मदद मिलती है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_HELP_TITLE",
+      "message": "Need help?",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_HELP_TITLE",
+      "message": "सहायता चाहिए?",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_HELP_LINE",
+      "message": "Contact your urban local body or the Citizen Seva helpline.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_HELP_LINE",
+      "message": "अपने शहरी स्थानीय निकाय या सिटीज़न सेवा हेल्पलाइन से संपर्क करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_TITLE",
+      "message": "Supporting documents",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_TITLE",
+      "message": "सहायक दस्तावेज़",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_FAILED",
+      "message": "The document list could not be loaded.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_FAILED",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_ONLY",
+      "message": "Only the documents listed above can be attached.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_ONLY",
+      "message": "केवल ऊपर सूचीबद्ध दस्तावेज़ ही संलग्न किए जा सकते हैं।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_PAGE_HINT",
+      "message": "Upload a PDF or image (optional).",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_PAGE_HINT",
+      "message": "PDF या चित्र अपलोड करें (वैकल्पिक)।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCS_LOAD_ERROR",
+      "message": "Could not load the document list.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCS_LOAD_ERROR",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_UPLOADED",
+      "message": "अपलोड हो गया",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_TYPE_ERROR",
+      "message": "This file type is not allowed",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_TYPE_ERROR",
+      "message": "इस प्रकार की फ़ाइल की अनुमति नहीं है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_SIZE_ERROR",
+      "message": "The file is too large",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_SIZE_ERROR",
+      "message": "फ़ाइल बहुत बड़ी है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_UPLOAD_FAILED",
+      "message": "These documents could not be uploaded: {{docs}}. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_UPLOAD_FAILED",
+      "message": "ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCV_PAGES",
+      "message": "Page",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOCV_FAILED",
+      "message": "The document could not be opened. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOCV_FAILED",
+      "message": "दस्तावेज़ नहीं खुल सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REVIEW_HINT",
+      "message": "Check everything before you submit. Use Edit to change a section.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REVIEW_HINT",
+      "message": "जमा करने से पहले सब कुछ जाँच लें। बदलाव के लिए 'बदलें' दबाएँ।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूँ कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DECLARE_REQUIRED",
+      "message": "Please accept the declaration to continue.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DECLARE_REQUIRED",
+      "message": "जारी रखने के लिए कृपया घोषणा स्वीकार करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_SUBMITTING",
+      "message": "Submitting your grievance...",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_SUBMITTING",
+      "message": "आपकी शिकायत दर्ज की जा रही है...",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_SUBMIT_FAILED",
+      "message": "The grievance could not be submitted. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_SUBMIT_FAILED",
+      "message": "शिकायत दर्ज नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_SUCCESS",
+      "message": "Grievance registered",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_SUCCESS",
+      "message": "शिकायत दर्ज हो गई",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_BANNER_SUB",
+      "message": "Your grievance has been sent to the urban local body.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_BANNER_SUB",
+      "message": "आपकी शिकायत शहरी स्थानीय निकाय को भेज दी गई है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_APP_NO",
+      "message": "Grievance number",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_APP_NO",
+      "message": "शिकायत संख्या",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_COPY_ID",
+      "message": "Copy",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_COPY_ID",
+      "message": "कॉपी करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_GO_APPS",
+      "message": "My grievances",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_GO_APPS",
+      "message": "मेरी शिकायतें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_GO_HOME",
+      "message": "Go to dashboard",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएँ",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ACK_HINT",
+      "message": "Keep the grievance number to track it later.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ACK_HINT",
+      "message": "बाद में ट्रैक करने के लिए शिकायत संख्या सँभालकर रखें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_PRINT",
+      "message": "Print",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_DEPT",
+      "message": "Urban Development Department",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_DEPT",
+      "message": "शहरी विकास विभाग",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_TITLE",
+      "message": "Grievance Acknowledgement",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_TITLE",
+      "message": "शिकायत पावती",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_DATE",
+      "message": "Date",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_STATUS_V",
+      "message": "Submitted",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_STATUS_V",
+      "message": "जमा किया गया",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_NOTE",
+      "message": "This is a system generated acknowledgement.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_NOTE",
+      "message": "यह सिस्टम द्वारा बनाई गई पावती है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_RCPT_HELP",
+      "message": "For help, contact your urban local body.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_RCPT_HELP",
+      "message": "सहायता के लिए अपने शहरी स्थानीय निकाय से संपर्क करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LIST_TITLE",
+      "message": "My grievances",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LIST_TITLE",
+      "message": "मेरी शिकायतें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LIST_SUB",
+      "message": "Track the grievances you have registered.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LIST_SUB",
+      "message": "आपके द्वारा दर्ज शिकायतों को ट्रैक करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_NEW",
+      "message": "New grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_NEW",
+      "message": "नई शिकायत",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LIST_EMPTY",
+      "message": "No grievances yet",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LIST_EMPTY",
+      "message": "अभी कोई शिकायत नहीं",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_START_HINT",
+      "message": "Register a grievance about streetlights, garbage, water supply or any civic service.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_START_HINT",
+      "message": "स्ट्रीट लाइट, कूड़ा, जल आपूर्ति या किसी भी नागरिक सेवा के बारे में शिकायत दर्ज करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_LIST_FAILED",
+      "message": "Your grievances could not be loaded. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_LIST_FAILED",
+      "message": "आपकी शिकायतें लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_SEARCH_PH",
+      "message": "Search by number, type or description",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_SEARCH_PH",
+      "message": "संख्या, प्रकार या विवरण से खोजें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_NO_RESULTS",
+      "message": "No grievances match",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_NO_RESULTS",
+      "message": "कोई शिकायत मेल नहीं खाती",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FILTER_CLOSED",
+      "message": "Rejected",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FILTER_CLOSED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_TITLE",
+      "message": "Grievance details",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_TITLE",
+      "message": "शिकायत विवरण",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_APPNO",
+      "message": "Grievance number",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_APPNO",
+      "message": "शिकायत संख्या",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_NODOCS",
+      "message": "No photo or document was attached.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_NODOCS",
+      "message": "कोई फ़ोटो या दस्तावेज़ संलग्न नहीं किया गया।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_OPENING",
+      "message": "दस्तावेज़ खोला जा रहा है...",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_TIMELINE",
+      "message": "Progress timeline",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_TIMELINE",
+      "message": "प्रगति समयरेखा",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_NOHISTORY",
+      "message": "No progress recorded yet.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_BACK",
+      "message": "Back to my grievances",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_BACK",
+      "message": "मेरी शिकायतों पर वापस",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_FAILED",
+      "message": "The grievance could not be loaded. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_FAILED",
+      "message": "शिकायत लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_VIEW_NOTFOUND",
+      "message": "This grievance was not found in your account.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_VIEW_NOTFOUND",
+      "message": "यह शिकायत आपके खाते में नहीं मिली।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_GRIEVANCE",
+      "message": "Grievance details",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_GRIEVANCE",
+      "message": "शिकायत विवरण",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_GRIEVANCE",
+      "message": "Tell us where the problem is and what it is about.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_STEP_HINT_GRIEVANCE",
+      "message": "बताएँ कि समस्या कहाँ है और किस बारे में है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_grievanceType",
+      "message": "Grievance type",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_grievanceType",
+      "message": "शिकायत का प्रकार",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_grievanceSubType",
+      "message": "Grievance sub type",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_grievanceSubType",
+      "message": "शिकायत का उप-प्रकार",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_description",
+      "message": "Describe your grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_description",
+      "message": "अपनी शिकायत का विवरण",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_F_address",
+      "message": "Address of the problem",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_F_address",
+      "message": "समस्या का पता",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_BTN_CANCEL",
+      "message": "Cancel",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_BTN_CANCEL",
+      "message": "रद्द करें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FILTER_ACTION",
+      "message": "Needs your action",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FILTER_ACTION",
+      "message": "आपकी कार्रवाई आवश्यक",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_FILTER_RESOLVED",
+      "message": "Resolved",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_FILTER_RESOLVED",
+      "message": "निपटाई गई",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORASSIGNMENT",
+      "message": "Pending assignment",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORASSIGNMENT",
+      "message": "नियुक्ति लंबित",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGATLME",
+      "message": "With the field officer",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGATLME",
+      "message": "क्षेत्र अधिकारी के पास",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGATLMHE",
+      "message": "With the senior officer",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGATLMHE",
+      "message": "वरिष्ठ अधिकारी के पास",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORREASSIGNMENT",
+      "message": "Pending reassignment",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORREASSIGNMENT",
+      "message": "पुनः नियुक्ति लंबित",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORMODIFICATION",
+      "message": "Needs your changes",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_PENDINGFORMODIFICATION",
+      "message": "आपके बदलाव आवश्यक",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_OPEN",
+      "message": "Open",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_OPEN",
+      "message": "खुली",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_RESOLVED",
+      "message": "Resolved",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_RESOLVED",
+      "message": "निपटाई गई",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_CLOSEDAFTERRESOLUTION",
+      "message": "Closed after resolution",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_CLOSEDAFTERRESOLUTION",
+      "message": "समाधान के बाद बंद",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_CLOSEDAFTERREJECTION",
+      "message": "Closed after rejection",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_CLOSEDAFTERREJECTION",
+      "message": "अस्वीकृति के बाद बंद",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_ST_REJECTED",
+      "message": "Rejected",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_ST_REJECTED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN",
+      "message": "Reopen grievance",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN",
+      "message": "शिकायत फिर से खोलें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_LABEL",
+      "message": "Why are you reopening it?",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_LABEL",
+      "message": "आप इसे फिर से क्यों खोल रहे हैं?",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_PH",
+      "message": "Describe what is still not resolved",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_PH",
+      "message": "बताएँ कि क्या अब भी हल नहीं हुआ है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_SUBMIT",
+      "message": "Reopen",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_SUBMIT",
+      "message": "फिर से खोलें",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_COMMENT_REQUIRED",
+      "message": "Please tell us why you are reopening the grievance.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_COMMENT_REQUIRED",
+      "message": "कृपया बताएँ कि आप शिकायत फिर से क्यों खोल रहे हैं।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_SAVING",
+      "message": "Reopening your grievance...",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_SAVING",
+      "message": "आपकी शिकायत फिर से खोली जा रही है...",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_DONE",
+      "message": "Your grievance has been reopened.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_DONE",
+      "message": "आपकी शिकायत फिर से खोल दी गई है।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_REOPEN_FAILED",
+      "message": "The grievance could not be reopened. Please try again.",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_REOPEN_FAILED",
+      "message": "शिकायत फिर से नहीं खोली जा सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "GRV_DOC_REQUIRED_ERROR",
+      "message": "This document is required",
+      "module": "rainmaker-grievance",
+      "locale": "en_IN"
+    },
+    {
+      "code": "GRV_DOC_REQUIRED_ERROR",
+      "message": "यह दस्तावेज़ आवश्यक है",
+      "module": "rainmaker-grievance",
+      "locale": "hi_IN"
+    }
+  ]
+}

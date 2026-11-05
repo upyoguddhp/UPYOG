@@ -1,0 +1,178 @@
+{
+	"key": "grbgArrearBillReceipt",
+	"DataConfigs": {
+		"version": "1.0.0",
+		"baseKeyPath": "$.grbg",
+		"mappings": [
+			{
+				"direct": [
+					{
+						"variable": "ulbType",
+						"value": {
+							"path": "$.ulbType"
+						}
+					},
+					{
+						"variable": "ulbName",
+						"value": {
+							"path": "$.ulbName"
+						}
+					},
+					{
+						"variable": "billNo",
+						"value": {
+							"path": "$.billNo"
+						}
+					},
+					{
+						"variable": "date",
+						"value": {
+							"path": "$.date"
+						}
+					},
+					{
+						"variable": "billPeriod",
+						"value": {
+							"path": "$.billPeriod"
+						}
+					},
+					{
+						"variable": "from",
+						"value": {
+							"path": "$.from"
+						}
+					},
+					{
+						"variable": "to",
+						"value": {
+							"path": "$.to"
+						}
+					},
+					{
+						"variable": "finYear",
+						"value": {
+							"path": "$.finYear"
+						}
+					},
+					{
+						"variable": "billDueDate",
+						"value": {
+							"path": "$.billDueDate"
+						}
+					},
+					{
+						"variable": "district",
+						"value": {
+							"path": "$.district"
+						}
+					},
+					{
+						"variable": "wardNumber",
+						"value": {
+							"path": "$.wardNumber"
+						}
+					},
+					{
+						"variable": "address",
+						"value": {
+							"path": "$.address"
+						}
+					},
+					{
+						"variable": "unitCategory",
+						"value": {
+							"path": "$.unitCategory"
+						}
+					},
+					{
+						"variable": "propertyId",
+						"value": {
+							"path": "$.propertyId"
+						}
+					},
+					{
+						"variable": "grbgId",
+						"value": {
+							"path": "$.grbgId"
+						}
+					},
+					{
+						"variable": "ownerOrOccupier",
+						"value": {
+							"path": "$.ownerOrOccupier"
+						}
+					},
+					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+						   "path": "$.fatherOrHusbandName"
+						}
+					},
+					{
+						"variable": "totalTax",
+						"value": {
+							"path": "$.totalTax"
+					}
+					},
+					{
+						"variable": "billGeneratedDate",
+						"value": {
+							"path": "$.billGeneratedDate"
+					}
+					},
+					{
+					  "variable": "amountDue",
+					  "value": { "path": "$.amountDue" 
+				  		}
+					},
+					{
+					  "variable": "amountPaid",
+					  "value": { "path": "$.amountPaid" 
+				  		}
+					},
+					{
+						"variable": "totalAmount",
+						"value": { "path": "$.totalAmount" 
+						}
+					},
+					{
+					  "variable": "rebateAmount",
+					  "value": { "path": "$.rebateAmount" }
+					},
+					{
+					  "variable": "amountWithoutRebate",
+					  "value": { "path": "$.amountWithoutRebate" }
+					},
+					{
+					  "variable": "arrearAmount",
+					  "value": { "path": "$.arrearAmount" }
+					},
+					{
+						"variable": "qrCodeText",
+						"value": {
+							"path": "$.qrCodeText"
+						}
+					},
+					{
+						"variable": "mobileNo",
+						"value": {
+							"path": "$.mobileNo"
+						}
+					},
+					{
+						"variable": "oldGarbageId",
+						"value": {
+							"path": "$.oldGarbageId"
+						}
+					},
+					{
+						"variable": "fatherOrHusbandName",
+						"value": {
+								"path": "$.fatherOrHusbandName"
+						}
+					}
+				]
+			}
+		]
+	}
+}

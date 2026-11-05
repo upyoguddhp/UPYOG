@@ -44,6 +44,8 @@ public class TransactionCriteria {
     
     private Set<String> notTxnSettlementStatusses;
     
+    private Boolean isSettlementResponseNull;
+    
     @JsonIgnore
     private Long endDateTime;
 

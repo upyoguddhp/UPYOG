@@ -56,6 +56,21 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                         .uuid(rs.getString("uuid"))
                         .garbageId(rs.getLong("garbage_id"))
                         .propertyId(rs.getString("property_id"))
+                        .systemPropertyId(rs.getString("system_property_id"))
+                        .himParivarId(rs.getString("him_parivar_id"))
+                        .ddpModifiedDate(rs.getLong("ddp_modified_date"))
+                        .ddpPrintVerified((Boolean) rs.getObject("ddp_print_verified"))
+                        .isDdpVerified((Boolean) rs.getObject("ddp_verified"))
+                        .isReadyForPrinting(getBooleanOrFalse(rs, "ddp_dtl_is_ready_for_printing"))
+                        .vendorPrintVerified(rs.getString("ddp_dtl_vendor_print_verified"))
+                        .ulbVerified(getBooleanOrFalse(rs, "ddp_dtl_ulb_verified"))
+                        .installationDone(getBooleanOrFalse(rs, "ddp_dtl_installation_done"))
+                        .ddpLatitude(rs.getString("ddp_dtl_ddp_latitude"))
+                        .ddpLongitude(rs.getString("ddp_dtl_ddp_longitude"))
+                        .ddpPrintingDone(getBooleanOrFalse(rs, "ddp_dtl_ddp_printing_done"))
+                        .ddpDispatched(getBooleanOrFalse(rs, "ddp_dtl_ddp_dispatched"))
+                        .ddpRejectionReason(rs.getString("ddp_dtl_ddp_rejection_reason"))
+                        .remarks(rs.getString("ddp_dtl_remarks"))
                         .type(rs.getString("type"))
                         .name(rs.getString("name"))
                         .mobileNumber(rs.getString("mobile_number"))
@@ -220,6 +235,15 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
     }
 
     
+    /**
+     * DDP flags come from a left join on eg_grbg_account_ddp, so accounts with
+     * no DDP row yet read as null; treat those as false (the old column default).
+     */
+    private Boolean getBooleanOrFalse(ResultSet rs, String columnLabel) throws SQLException {
+        Boolean value = (Boolean) rs.getObject(columnLabel);
+        return null == value ? Boolean.FALSE : value;
+    }
+
     private boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         int columns = rsmd.getColumnCount();
@@ -372,6 +396,11 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                 .uuid(rs.getString(prefix + "uuid"))
                 .garbageId(rs.getLong(prefix + "garbage_id"))
                 .propertyId(rs.getString(prefix + "property_id"))
+                .systemPropertyId(rs.getString(prefix + "system_property_id"))
+                .himParivarId(rs.getString(prefix + "him_parivar_id"))
+                .ddpModifiedDate(rs.getLong(prefix + "ddp_modified_date"))
+                .ddpPrintVerified((Boolean) rs.getObject(prefix + "ddp_print_verified"))
+                .isDdpVerified((Boolean) rs.getObject(prefix + "ddp_verified"))
                 .type(rs.getString(prefix + "type"))
                 .name(rs.getString(prefix + "name"))
                 .mobileNumber(rs.getString(prefix + "mobile_number"))

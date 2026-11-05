@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/digit-ui",
   "workspaces": [
+    "micro-ui-internals/packages/css",
     "micro-ui-internals/packages/libraries",
     "micro-ui-internals/packages/react-components",
     "micro-ui-internals/packages/modules/common",
@@ -11,6 +12,14 @@
     "micro-ui-internals/packages/modules/commonPt",
     "micro-ui-internals/packages/modules/dss",
     "micro-ui-internals/packages/modules/pt",
+    "micro-ui-internals/packages/modules/grbg",
+    "micro-ui-internals/packages/modules/booking",
+    "micro-ui-internals/packages/modules/reqsvc",
+    "micro-ui-internals/packages/modules/grievance",
+    "micro-ui-internals/packages/modules/hpnoc",
+    "micro-ui-internals/packages/modules/payments",
+    "micro-ui-internals/packages/modules/hpwork",
+    "micro-ui-internals/packages/modules/ots",
     "micro-ui-internals/packages/modules/obps"
   ],
   "engines": {
@@ -31,6 +40,15 @@
     "@upyog/digit-ui-module-obps": "1.7.0-beta.7",
     "@upyog/digit-ui-module-noc": "1.7.0-beta.3",
     "@upyog/digit-ui-module-pgr": "1.7.0-beta.6",
+    "@upyog/digit-ui-module-grbg": "1.0.0",
+    "@upyog/digit-ui-module-booking": "1.0.0",
+    "@upyog/digit-ui-module-reqsvc": "1.0.0",
+    "@upyog/digit-ui-module-grievance": "1.0.0",
+    "@upyog/digit-ui-module-hpnoc": "1.0.0",
+    "@upyog/digit-ui-module-payments": "1.0.0",
+    "@upyog/digit-ui-module-hpwork": "1.0.0",
+    "@upyog/digit-ui-module-ots": "1.0.0",
+    "@upyog/digit-ui-module-feedback": "1.0.0",
     "@upyog/digit-ui-module-pt": "1.7.0-beta.4",
     "@upyog/digit-ui-module-receipts": "1.7.0-beta.3",
     "@upyog/digit-ui-module-tl": "1.7.0-beta.8",
@@ -54,11 +72,12 @@
     "**/babel-loader": "8.2.2",
     "**/@babel/core": "7.14.0",
     "**/@babel/preset-env": "7.14.0",
-    "**/@babel/plugin-transform-modules-commonjs": "7.14.0"
+    "**/@babel/plugin-transform-modules-commonjs": "7.14.0",
+    "**/node-sass": "npm:sass@^1.49.11"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false SKIP_PREFLIGHT_CHECK=true react-scripts build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false SKIP_PREFLIGHT_CHECK=true react-scripts build",
     "build:prepare": "./build.sh"
   },
   "eslintConfig": {

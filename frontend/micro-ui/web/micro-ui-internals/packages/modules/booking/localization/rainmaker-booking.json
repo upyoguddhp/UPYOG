@@ -1,0 +1,2876 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_BOOKING",
+      "message": "Bookings",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_BOOKING",
+      "message": "बुकिंग",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_MENU_SITE_NEW",
+      "message": "Book an advertisement site",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_MENU_SITE_NEW",
+      "message": "विज्ञापन स्थल बुक करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_MENU_SITE_LIST",
+      "message": "My advertisement site bookings",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_MENU_SITE_LIST",
+      "message": "मेरी विज्ञापन स्थल बुकिंग",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_MENU_ASSET_NEW",
+      "message": "Book a community hall",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_MENU_ASSET_NEW",
+      "message": "सामुदायिक भवन बुक करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_MENU_ASSET_LIST",
+      "message": "My community hall bookings",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_MENU_ASSET_LIST",
+      "message": "मेरी सामुदायिक भवन बुकिंग",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CRUMB_SITE",
+      "message": "Advertisement site bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CRUMB_SITE",
+      "message": "विज्ञापन स्थल बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CRUMB_ASSET",
+      "message": "Community hall bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CRUMB_ASSET",
+      "message": "सामुदायिक भवन बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CRUMB_NEW",
+      "message": "New booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CRUMB_NEW",
+      "message": "नई बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SITE_TITLE",
+      "message": "Book an advertisement site",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SITE_TITLE",
+      "message": "विज्ञापन स्थल बुक करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ASSET_TITLE",
+      "message": "Book a community hall",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ASSET_TITLE",
+      "message": "सामुदायिक भवन बुक करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PAGE_SUB",
+      "message": "Complete the steps below. You can go back and change any step before you submit.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PAGE_SUB",
+      "message": "नीचे दिए चरण पूरे करें। जमा करने से पहले आप किसी भी चरण पर वापस जाकर बदलाव कर सकते हैं।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEPPER_LABEL",
+      "message": "Booking steps",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEPPER_LABEL",
+      "message": "बुकिंग के चरण",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_SELECT_SITE",
+      "message": "Choose site",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_SELECT_SITE",
+      "message": "स्थल चुनें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_SELECT_ASSET",
+      "message": "Choose hall",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_SELECT_ASSET",
+      "message": "भवन चुनें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_BOOKING",
+      "message": "Booking details",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_BOOKING",
+      "message": "बुकिंग विवरण",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_ADDRESS",
+      "message": "Applicant address",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_ADDRESS",
+      "message": "आवेदक का पता",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_SELECT_SITE",
+      "message": "Pick an approved, available advertisement site. Use the filters to narrow the list.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_SELECT_SITE",
+      "message": "स्वीकृत और उपलब्ध विज्ञापन स्थल चुनें। सूची छोटी करने के लिए फ़िल्टर का उपयोग करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_SELECT_ASSET",
+      "message": "Pick the community hall or ground you want to book. Use the filters to narrow the list.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_SELECT_ASSET",
+      "message": "जिस सामुदायिक भवन या मैदान को बुक करना है उसे चुनें। सूची छोटी करने के लिए फ़िल्टर का उपयोग करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_BOOKING_SITE",
+      "message": "Choose the dates inside the site's bookable period and the type of hoarding or canopy.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_BOOKING_SITE",
+      "message": "स्थल की बुकिंग अवधि के भीतर तिथियाँ और होर्डिंग/कैनोपी का प्रकार चुनें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_BOOKING_ASSET",
+      "message": "Choose the dates (at most 7 consecutive days), what you are booking for and the purpose.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_BOOKING_ASSET",
+      "message": "तिथियाँ (अधिकतम लगातार 7 दिन), बुकिंग किस श्रेणी के लिए है और उद्देश्य चुनें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_APPLICANT",
+      "message": "Your name and mobile number are filled from your account. Check them and complete the rest.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_APPLICANT",
+      "message": "आपका नाम और मोबाइल नंबर आपके खाते से भरे गए हैं। जांचें और शेष विवरण पूरा करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_APPLICANT_ASSET",
+      "message": "Your name and mobile number are filled from your account. Bank details are needed to refund the security amount.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_APPLICANT_ASSET",
+      "message": "आपका नाम और मोबाइल नंबर आपके खाते से भरे गए हैं। सुरक्षा राशि लौटाने के लिए बैंक विवरण आवश्यक है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_ADDRESS",
+      "message": "Your postal address.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_ADDRESS",
+      "message": "आपका डाक पता।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_DOCUMENTS",
+      "message": "Attach the documents listed below. They are sent with your application.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_STEP_HINT_DOCUMENTS",
+      "message": "नीचे सूचीबद्ध दस्तावेज़ संलग्न करें। ये आपके आवेदन के साथ भेजे जाएँगे।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BTN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEXT_STEP",
+      "message": "अगला: {{step}}",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SELECT",
+      "message": "Select",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SELECT_THIS",
+      "message": "Select",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SELECT_THIS",
+      "message": "चुनें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SELECTED",
+      "message": "Selected",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SELECTED",
+      "message": "चयनित",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SEARCH_LIST",
+      "message": "Type to search",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SEARCH_LIST",
+      "message": "खोजने के लिए लिखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ALL",
+      "message": "All",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ALL",
+      "message": "सभी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LOADING_SITES",
+      "message": "Loading available sites...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LOADING_SITES",
+      "message": "उपलब्ध स्थल लोड हो रहे हैं...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LOADING_ASSETS",
+      "message": "Loading community halls...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LOADING_ASSETS",
+      "message": "सामुदायिक भवन लोड हो रहे हैं...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LOADING_AVAILABILITY",
+      "message": "Checking availability...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LOADING_AVAILABILITY",
+      "message": "उपलब्धता जांची जा रही है...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SUBMITTING",
+      "message": "Submitting your booking...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SUBMITTING",
+      "message": "आपकी बुकिंग जमा हो रही है...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SUBMIT_FAILED",
+      "message": "We could not submit your booking. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SUBMIT_FAILED",
+      "message": "हम आपकी बुकिंग जमा नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PER_DAY",
+      "message": "per day",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PER_DAY",
+      "message": "प्रति दिन",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SITES_FAILED",
+      "message": "We could not load the sites. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SITES_FAILED",
+      "message": "हम स्थल लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ASSETS_FAILED",
+      "message": "We could not load the community halls. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ASSETS_FAILED",
+      "message": "हम सामुदायिक भवन लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NO_SITES",
+      "message": "No sites are open for booking right now.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NO_SITES",
+      "message": "अभी बुकिंग के लिए कोई स्थल उपलब्ध नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NO_ASSETS",
+      "message": "No community halls are open for booking right now.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NO_ASSETS",
+      "message": "अभी बुकिंग के लिए कोई सामुदायिक भवन उपलब्ध नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NO_RESULTS",
+      "message": "Nothing matches your search.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NO_RESULTS",
+      "message": "आपकी खोज से कुछ मेल नहीं खाता।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SEARCH_PH",
+      "message": "Search by name, ID or address",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SEARCH_PH",
+      "message": "नाम, आईडी या पते से खोजें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RESULTS",
+      "message": "{{count}} found",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RESULTS",
+      "message": "{{count}} मिले",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SHOW_MORE",
+      "message": "Show more",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SHOW_MORE",
+      "message": "और दिखाएँ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SEL_SITE",
+      "message": "Selected site",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SEL_SITE",
+      "message": "चयनित स्थल",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SEL_ASSET",
+      "message": "Selected hall",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SEL_ASSET",
+      "message": "चयनित भवन",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BOOKED_TITLE",
+      "message": "Dates already booked",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BOOKED_TITLE",
+      "message": "पहले से बुक तिथियाँ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_BOOKED_NONE",
+      "message": "No upcoming dates are booked.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_BOOKED_NONE",
+      "message": "आगामी कोई तिथि बुक नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_HALL_MAX_NOTE",
+      "message": "The maximum booking period is 7 consecutive days.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_HALL_MAX_NOTE",
+      "message": "अधिकतम बुकिंग अवधि लगातार 7 दिन है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_AVAIL_FAILED",
+      "message": "We could not check which dates are booked. The ULB will confirm availability.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_AVAIL_FAILED",
+      "message": "हम बुक तिथियाँ नहीं जांच सके। उपलब्धता की पुष्टि निकाय करेगा।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RATES_FAILED",
+      "message": "We could not load the rates for this hall.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RATES_FAILED",
+      "message": "हम इस भवन की दरें लोड नहीं कर सके।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_TITLE",
+      "message": "Estimated charges",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_TITLE",
+      "message": "अनुमानित शुल्क",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_DAYS",
+      "message": "Number of days",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_DAYS",
+      "message": "दिनों की संख्या",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_RATE",
+      "message": "Rate per day (excl. GST)",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_RATE",
+      "message": "प्रति दिन दर (जीएसटी रहित)",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_RENT",
+      "message": "Rent",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_RENT",
+      "message": "किराया",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_GST",
+      "message": "GST ({{pct}}%)",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_GST",
+      "message": "जीएसटी ({{pct}}%)",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_SECURITY",
+      "message": "Security amount",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_SECURITY",
+      "message": "सुरक्षा राशि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_TOTAL",
+      "message": "Estimated total",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_TOTAL",
+      "message": "अनुमानित कुल",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_EST_NOTE",
+      "message": "This is only an estimate. The final amount is shown when you pay.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_EST_NOTE",
+      "message": "यह केवल अनुमान है। अंतिम राशि भुगतान के समय दिखाई जाएगी।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_siteID",
+      "message": "Site ID",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_siteID",
+      "message": "स्थल आईडी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_siteName",
+      "message": "Site name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_siteName",
+      "message": "स्थल का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_siteType",
+      "message": "Site type",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_siteType",
+      "message": "स्थल का प्रकार",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_siteAddress",
+      "message": "Site address",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_siteAddress",
+      "message": "स्थल का पता",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_siteCost",
+      "message": "Rate per day",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_siteCost",
+      "message": "प्रति दिन दर",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_size",
+      "message": "Size (length x width)",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_size",
+      "message": "आकार (लंबाई x चौड़ाई)",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_bookablePeriod",
+      "message": "Bookable period",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_bookablePeriod",
+      "message": "बुकिंग योग्य अवधि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_ulbName",
+      "message": "ULB",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_ulbName",
+      "message": "नगर निकाय",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_districtName",
+      "message": "District",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_districtName",
+      "message": "जिला",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_assetName",
+      "message": "Hall name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_assetName",
+      "message": "भवन का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_applicationNo",
+      "message": "Hall code",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_applicationNo",
+      "message": "भवन कोड",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_assetParentCategory",
+      "message": "Category",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_assetParentCategory",
+      "message": "श्रेणी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_street",
+      "message": "Location",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_street",
+      "message": "स्थान",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_fromDate",
+      "message": "From date",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_fromDate",
+      "message": "प्रारंभ तिथि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_toDate",
+      "message": "To date",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_toDate",
+      "message": "समाप्ति तिथि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_hoardingType",
+      "message": "Hoarding / canopy type",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_hoardingType",
+      "message": "होर्डिंग / कैनोपी का प्रकार",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_bookingFor",
+      "message": "Booking for",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_bookingFor",
+      "message": "बुकिंग किसके लिए",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_purpose",
+      "message": "Purpose of booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_purpose",
+      "message": "बुकिंग का उद्देश्य",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_applicantName",
+      "message": "Applicant name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_applicantName",
+      "message": "आवेदक का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_applicantFatherName",
+      "message": "Father / husband name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_applicantFatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_gender",
+      "message": "Gender",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_gender",
+      "message": "लिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_mobileNumber",
+      "message": "Mobile number",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_mobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_emailId",
+      "message": "Email ID",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_emailId",
+      "message": "ईमेल आईडी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_gstNumber",
+      "message": "GST number",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_gstNumber",
+      "message": "जीएसटी नंबर",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_accountHolderName",
+      "message": "Account holder name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_accountHolderName",
+      "message": "खाताधारक का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_accountNumber",
+      "message": "Account number",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_accountNumber",
+      "message": "खाता संख्या",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_bankName",
+      "message": "Bank name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_bankName",
+      "message": "बैंक का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_bankBranchName",
+      "message": "Bank branch name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_bankBranchName",
+      "message": "बैंक शाखा का नाम",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_ifscCode",
+      "message": "IFSC code",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_ifscCode",
+      "message": "आईएफएससी कोड",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_addressLine1",
+      "message": "Address line 1",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_addressLine1",
+      "message": "पता पंक्ति 1",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_locality",
+      "message": "Locality",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_locality",
+      "message": "मोहल्ला",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_landmark",
+      "message": "Landmark",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_landmark",
+      "message": "निकटतम पहचान",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_city",
+      "message": "City",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_city",
+      "message": "शहर",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_F_pincode",
+      "message": "PIN code",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_F_pincode",
+      "message": "पिन कोड",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_H_gstNumber",
+      "message": "15-character GST number, for example 02ABCDE1234F1Z5. Leave blank if you do not have one.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_H_gstNumber",
+      "message": "15 अक्षरों का जीएसटी नंबर, जैसे 02ABCDE1234F1Z5। न हो तो खाली छोड़ें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_H_ifscCode",
+      "message": "11 characters: four letters, a zero, then six letters or digits. It is printed on your cheque book.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_H_ifscCode",
+      "message": "11 अक्षर: चार अक्षर, एक शून्य, फिर छह अक्षर या अंक। यह आपकी चेकबुक पर छपा होता है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_MALE",
+      "message": "पुरुष",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_FEMALE",
+      "message": "महिला",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_EVENT_HOARDING",
+      "message": "Event Hoarding / Canopy",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_EVENT_HOARDING",
+      "message": "इवेंट होर्डिंग / कैनोपी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_RETAIL_HOARDING",
+      "message": "Retail Hoarding / Canopy",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_RETAIL_HOARDING",
+      "message": "रिटेल होर्डिंग / कैनोपी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_PRIVATE_EVENT",
+      "message": "Private Event",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_PRIVATE_EVENT",
+      "message": "निजी आयोजन",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_O_PUBLIC_EVENT",
+      "message": "Public Fair or Public Event",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_O_PUBLIC_EVENT",
+      "message": "सार्वजनिक मेला या सार्वजनिक आयोजन",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_REQUIRED",
+      "message": "This field is required.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_MOBILE",
+      "message": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_EMAIL",
+      "message": "Enter a valid email address.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_EMAIL",
+      "message": "सही ईमेल पता दर्ज करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_PIN",
+      "message": "Enter a valid 6-digit PIN code.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_PIN",
+      "message": "6 अंकों का सही पिन कोड दर्ज करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_GST",
+      "message": "Enter a valid 15-character GST number.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_GST",
+      "message": "15 अक्षरों का सही जीएसटी नंबर दर्ज करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_IFSC",
+      "message": "Enter a valid IFSC code, for example SBIN0001234.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_IFSC",
+      "message": "सही आईएफएससी कोड दर्ज करें, जैसे SBIN0001234।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_ACCOUNT",
+      "message": "Enter a valid account number (9 to 18 digits).",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_ACCOUNT",
+      "message": "सही खाता संख्या दर्ज करें (9 से 18 अंक)।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_PAST_DATE",
+      "message": "The booking cannot start in the past.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_PAST_DATE",
+      "message": "बुकिंग बीती तिथि से शुरू नहीं हो सकती।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_TO_BEFORE_FROM",
+      "message": "The to date cannot be before the from date.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_TO_BEFORE_FROM",
+      "message": "समाप्ति तिथि प्रारंभ तिथि से पहले नहीं हो सकती।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_OUTSIDE_PERIOD",
+      "message": "Choose dates inside the site's bookable period.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_OUTSIDE_PERIOD",
+      "message": "स्थल की बुकिंग अवधि के भीतर की तिथियाँ चुनें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_MAX_DAYS",
+      "message": "A hall can be booked for at most 7 consecutive days.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_MAX_DAYS",
+      "message": "भवन अधिकतम लगातार 7 दिन के लिए बुक हो सकता है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_E_BOOKED_DATES",
+      "message": "Some of these dates are already booked. Choose other dates.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_E_BOOKED_DATES",
+      "message": "इनमें से कुछ तिथियाँ पहले से बुक हैं। अन्य तिथियाँ चुनें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_PAGE_HINT",
+      "message": "Allowed: PDF, JPG or PNG up to 5 MB.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_PAGE_HINT",
+      "message": "अनुमत: PDF, JPG या PNG, अधिकतम 5 MB।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_UPLOADED",
+      "message": "Attached",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_UPLOADED",
+      "message": "संलग्न",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_TYPE_ERROR",
+      "message": "केवल PDF, JPG या PNG फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_SIZE_ERROR",
+      "message": "The file is larger than 5 MB.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 5 MB से बड़ी है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_REQUIRED_ERROR",
+      "message": "Attach this document.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_REQUIRED_ERROR",
+      "message": "यह दस्तावेज़ संलग्न करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_REQUIRED_TOAST",
+      "message": "Attach all the required documents to continue.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_REQUIRED_TOAST",
+      "message": "आगे बढ़ने के लिए सभी आवश्यक दस्तावेज़ संलग्न करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOC_UPLOAD_FAILED",
+      "message": "Your booking was created but these documents could not be uploaded: {{docs}}. Press submit again to retry.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOC_UPLOAD_FAILED",
+      "message": "आपकी बुकिंग बन गई पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए फिर जमा करें दबाएँ।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCV_PAGES",
+      "message": "Page",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCV_FAILED",
+      "message": "We could not open this document. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCV_FAILED",
+      "message": "हम यह दस्तावेज़ नहीं खोल सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_TITLE",
+      "message": "आपको ये दस्तावेज़ चाहिए होंगे",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_ONLY",
+      "message": "Keep clear scans or photos ready.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_ONLY",
+      "message": "साफ़ स्कैन या फ़ोटो तैयार रखें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DOCS_FAILED",
+      "message": "The document list could not be loaded.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DOCS_FAILED",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PROGRESS_TITLE",
+      "message": "Your progress",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PROGRESS_TITLE",
+      "message": "आपकी प्रगति",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PROGRESS_DRAFT",
+      "message": "Nothing is submitted until the last step",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PROGRESS_DRAFT",
+      "message": "अंतिम चरण तक कुछ जमा नहीं होता",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_1",
+      "message": "Choose a site and note its bookable period",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_1",
+      "message": "स्थल चुनें और उसकी बुकिंग अवधि देखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_2",
+      "message": "Keep your ID proof ready to upload",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_2",
+      "message": "अपलोड के लिए पहचान प्रमाण तैयार रखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_3",
+      "message": "Pay online once the ULB approves your booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_SITE_3",
+      "message": "निकाय द्वारा बुकिंग स्वीकृत होने पर ऑनलाइन भुगतान करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_1",
+      "message": "Check the dates already booked before you choose yours",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_1",
+      "message": "अपनी तिथियाँ चुनने से पहले बुक तिथियाँ देखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_2",
+      "message": "Keep your ID proof and bank details ready",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_2",
+      "message": "पहचान प्रमाण और बैंक विवरण तैयार रखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_3",
+      "message": "Pay online once the ULB approves your booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_TIP_ASSET_3",
+      "message": "निकाय द्वारा बुकिंग स्वीकृत होने पर ऑनलाइन भुगतान करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_HELP_TITLE",
+      "message": "Need help?",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_HELP_TITLE",
+      "message": "सहायता चाहिए?",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_HELP_LINE",
+      "message": "Call your ULB office or the helpline.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_HELP_LINE",
+      "message": "अपने नगर निकाय कार्यालय या हेल्पलाइन पर कॉल करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_REVIEW_HINT",
+      "message": "Check everything. You can edit any section before submitting.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_REVIEW_HINT",
+      "message": "सब कुछ जांच लें। जमा करने से पहले किसी भी भाग में बदलाव कर सकते हैं।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DECLARATION",
+      "message": "I declare that the information given is true and I will follow the booking rules of the municipality.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूँ कि दी गई जानकारी सही है और मैं नगर निकाय के बुकिंग नियमों का पालन करूँगा/करूँगी।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_DECLARE_REQUIRED",
+      "message": "Please accept the declaration to submit.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा स्वीकार करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_SUCCESS",
+      "message": "Booking submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_SUCCESS",
+      "message": "बुकिंग जमा हो गई",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_BANNER_SUB",
+      "message": "Your booking has been sent to the ULB for review.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_BANNER_SUB",
+      "message": "आपकी बुकिंग समीक्षा के लिए नगर निकाय को भेज दी गई है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_APP_NO",
+      "message": "Application number",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_COPY_ID",
+      "message": "Copy",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_COPY_ID",
+      "message": "कॉपी करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_WHERE",
+      "message": "What happens next",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_WHERE",
+      "message": "आगे क्या होगा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEXT_1",
+      "message": "Booking submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEXT_1",
+      "message": "बुकिंग जमा हुई",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEXT_2",
+      "message": "ULB reviews your booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEXT_2",
+      "message": "निकाय आपकी बुकिंग की समीक्षा करेगा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEXT_3",
+      "message": "Pay online once approved",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEXT_3",
+      "message": "स्वीकृति के बाद ऑनलाइन भुगतान करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEXT_4",
+      "message": "Booking confirmed",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEXT_4",
+      "message": "बुकिंग की पुष्टि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_PENDING",
+      "message": "Pending with the ULB",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_PENDING",
+      "message": "निकाय के पास लंबित",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_NEXT_TITLE",
+      "message": "What would you like to do?",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_NEXT_TITLE",
+      "message": "आप आगे क्या करना चाहेंगे?",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_GO_APPS",
+      "message": "View my bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_GO_APPS",
+      "message": "मेरी बुकिंग देखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_GO_HOME",
+      "message": "Go to dashboard",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएँ",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ACK_HINT",
+      "message": "Note your application number. You will need it to track the booking.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ACK_HINT",
+      "message": "अपनी आवेदन संख्या नोट कर लें। बुकिंग ट्रैक करने के लिए यह आवश्यक होगी।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_DEPT",
+      "message": "Urban Development Department",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_DEPT",
+      "message": "शहरी विकास विभाग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_TITLE",
+      "message": "Booking Acknowledgement",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_TITLE",
+      "message": "बुकिंग पावती",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_SERVICE_SITE",
+      "message": "Advertisement site booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_SERVICE_SITE",
+      "message": "विज्ञापन स्थल बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_SERVICE_ASSET",
+      "message": "Community hall booking",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_SERVICE_ASSET",
+      "message": "सामुदायिक भवन बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_DATE",
+      "message": "Date",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_STATUS_V",
+      "message": "Submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_STATUS_V",
+      "message": "जमा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_PERIOD",
+      "message": "Booking period",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_PERIOD",
+      "message": "बुकिंग अवधि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_DOCS",
+      "message": "Documents attached",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_DOCS",
+      "message": "संलग्न दस्तावेज़",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_NOTE",
+      "message": "This is a system generated acknowledgement. It is not a confirmation of the booking.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_NOTE",
+      "message": "यह सिस्टम द्वारा बनाई गई पावती है। यह बुकिंग की पुष्टि नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_RCPT_HELP",
+      "message": "For help, contact your ULB office.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_RCPT_HELP",
+      "message": "सहायता के लिए अपने नगर निकाय कार्यालय से संपर्क करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SITE_LIST_TITLE",
+      "message": "My advertisement site bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SITE_LIST_TITLE",
+      "message": "मेरी विज्ञापन स्थल बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SITE_LIST_SUB",
+      "message": "Track your bookings, pay when approved and open the details.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SITE_LIST_SUB",
+      "message": "अपनी बुकिंग ट्रैक करें, स्वीकृति पर भुगतान करें और विवरण खोलें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ASSET_LIST_TITLE",
+      "message": "My community hall bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ASSET_LIST_TITLE",
+      "message": "मेरी सामुदायिक भवन बुकिंग",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ASSET_LIST_SUB",
+      "message": "Track your bookings, pay when approved and open the details.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ASSET_LIST_SUB",
+      "message": "अपनी बुकिंग ट्रैक करें, स्वीकृति पर भुगतान करें और विवरण खोलें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEW_SITE",
+      "message": "Book a site",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEW_SITE",
+      "message": "स्थल बुक करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_NEW_ASSET",
+      "message": "Book a hall",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_NEW_ASSET",
+      "message": "भवन बुक करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LIST_FAILED",
+      "message": "We could not load your bookings. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LIST_FAILED",
+      "message": "हम आपकी बुकिंग लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_LIST_EMPTY",
+      "message": "You have no bookings yet.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_LIST_EMPTY",
+      "message": "अभी आपकी कोई बुकिंग नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_START_HINT_SITE",
+      "message": "Book an advertisement site to see it here.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_START_HINT_SITE",
+      "message": "यहाँ देखने के लिए कोई विज्ञापन स्थल बुक करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_START_HINT_ASSET",
+      "message": "Book a community hall to see it here.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_START_HINT_ASSET",
+      "message": "यहाँ देखने के लिए कोई सामुदायिक भवन बुक करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_SEARCH_APPS_PH",
+      "message": "Search by application number or name",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_SEARCH_APPS_PH",
+      "message": "आवेदन संख्या या नाम से खोजें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_DRAFT",
+      "message": "Not submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_DRAFT",
+      "message": "जमा नहीं",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_PAYMENT",
+      "message": "Payment due",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_PAYMENT",
+      "message": "भुगतान देय",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_FILTER_CLOSED",
+      "message": "Rejected / cancelled",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_FILTER_CLOSED",
+      "message": "अस्वीकृत / रद्द",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_PAY_NOW",
+      "message": "Pay now",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_PAY_NOW",
+      "message": "अभी भुगतान करें",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_INITIATED",
+      "message": "Not submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_INITIATED",
+      "message": "जमा नहीं",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_APPLIED",
+      "message": "Submitted",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_APPLIED",
+      "message": "जमा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORVERIFICATION",
+      "message": "Pending verification",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORVERIFICATION",
+      "message": "सत्यापन लंबित",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORAPPROVAL",
+      "message": "Pending approval",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORAPPROVAL",
+      "message": "स्वीकृति लंबित",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORPAYMENT",
+      "message": "Payment due",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORPAYMENT",
+      "message": "भुगतान देय",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORMODIFICATION",
+      "message": "Sent back for changes",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_PENDINGFORMODIFICATION",
+      "message": "बदलाव के लिए वापस भेजा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_REJECTED",
+      "message": "Rejected",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_REJECTED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_ST_CANCELLED",
+      "message": "Cancelled",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_ST_CANCELLED",
+      "message": "रद्द",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_TITLE",
+      "message": "Booking details",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_TITLE",
+      "message": "बुकिंग विवरण",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_NOTFOUND",
+      "message": "We could not find this booking in your account.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_NOTFOUND",
+      "message": "यह बुकिंग आपके खाते में नहीं मिली।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_FAILED",
+      "message": "We could not load this booking. Please try again.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_FAILED",
+      "message": "हम यह बुकिंग लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_PERIOD",
+      "message": "Booking period",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_PERIOD",
+      "message": "बुकिंग अवधि",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_NODOCS",
+      "message": "No documents were attached.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं है।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_OPENING",
+      "message": "Opening the document...",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_TIMELINE",
+      "message": "Application timeline",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_TIMELINE",
+      "message": "आवेदन की समयरेखा",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_NOHISTORY",
+      "message": "No updates yet.",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_NOHISTORY",
+      "message": "अभी कोई अपडेट नहीं।",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "BKG_VIEW_BACK",
+      "message": "Back to my bookings",
+      "module": "rainmaker-booking",
+      "locale": "en_IN"
+    },
+    {
+      "code": "BKG_VIEW_BACK",
+      "message": "मेरी बुकिंग पर वापस",
+      "module": "rainmaker-booking",
+      "locale": "hi_IN"
+    }
+  ]
+}

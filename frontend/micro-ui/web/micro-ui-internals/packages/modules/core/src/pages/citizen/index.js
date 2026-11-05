@@ -1,7 +1,7 @@
 import { BackButton, WhatsappIcon, Card, CitizenHomeCard, CitizenInfoLabel, PrivateRoute } from "@upyog/digit-ui-react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Route, Switch, useRouteMatch, useHistory, Link } from "react-router-dom";
+import { Redirect, Route, Switch, useRouteMatch, useHistory, Link } from "react-router-dom";
 import ErrorBoundary from "../../components/ErrorBoundaries";
 import { AppHome, processLinkData } from "../../components/Home";
 import TopBarSideBar from "../../components/TopBarSideBar";
@@ -20,13 +20,22 @@ import CitizenFeedback from "../../components/CitizenFeedback";
 import Search from "./SearchApp";
 import QRCode from "./QRCode";
 import ChallanQRCode from "./ChallanQRCode";
+import ActionDock from "../../components/ActionDock";
+import { getWebsitePage } from "./Website";
+import CitizenShell from "./Dashboard/CitizenShell";
+import AllServices from "./Dashboard/AllServices";
+import { applyStoredAccessibility } from "../../components/AccessibilityTools/settings";
 const sidebarHiddenFor = [
+  "/digit-ui/citizen/accessibility-statement",
   "digit-ui/citizen/register/name",
   "/digit-ui/citizen/select-language",
   "/digit-ui/citizen/select-location",
   "/digit-ui/citizen/login",
   "/digit-ui/citizen/register/otp",
 ];
+
+// modules rendered inside the dashboard chrome (see Dashboard/CitizenShell)
+const SHELL_MODULES = ["PROPERTY", "NewTL", "PTR", "BOOKING", "FEEDBACK", "OTS", "REQSVC", "HPNOC", "HPPAY", "GB", "GRIEVANCE", "MCollect"];
 
 const getTenants = (codes, tenants) => {
   return tenants.filter((tenant) => codes.map((item) => item.code).includes(tenant.code));
@@ -71,6 +80,9 @@ const Home = ({
   );
   const isMobile = window.Digit.Utils.browser.isMobile();
   const classname = Digit.Hooks.fsm.useRouteSubscription(pathname);
+  React.useEffect(() => {
+    applyStoredAccessibility(); // saved accessibility preferences apply on every citizen page
+  }, []);
   const { t } = useTranslation();
   const { path } = useRouteMatch();
   sourceUrl = "https://s3.ap-south-1.amazonaws.com/egov-qa-assets";
@@ -105,11 +117,11 @@ const Home = ({
           <div className="moduleLinkHomePage">
             <img src={ "https://nugp-assets.s3.ap-south-1.amazonaws.com/nugp+asset/Banner+UPYOG+%281920x500%29B+%282%29.jpg"||bannerImage || stateInfo?.bannerUrl} alt="noimagefound" />
             <BackButton className="moduleLinkHomePageBackButton" />
-           {isMobile? <h4 style={{top: "calc(16vw + 40px)",left:"1.5rem",position:"absolute",color:"white"}}>{t("MODULE_" + code.toUpperCase())}</h4>:<h1>{t("MODULE_" + code.toUpperCase())}</h1>}
+           {isMobile? <h4 style={{top: "calc(16vw + 40px)",left:"1.5rem",position:"absolute",color:"white"}}>{t("MODULE_" + code.toUpperCase(), { defaultValue: code })}</h4>:<h1>{t("MODULE_" + code.toUpperCase(), { defaultValue: code })}</h1>}
             <div className="moduleLinkHomePageModuleLinks">
               {mdmsDataObj && (
                 <CitizenHomeCard
-                  header={t(mdmsDataObj?.header)}
+                  header={t(mdmsDataObj?.header, { defaultValue: code })}
                   links={mdmsDataObj?.links}
                   Icon={() => <span />}
                   Info={
@@ -140,6 +152,51 @@ const Home = ({
       </React.Fragment>
     );
   });
+
+  // Landing + website pages: standalone pages with their own header and footer
+  const isLanding = pathname?.replace(/\/+$/, "") === "/digit-ui/citizen";
+  const WebsitePage = getWebsitePage(pathname);
+  if (isLanding || WebsitePage) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        {isLanding ? <CitizenHome /> : <WebsitePage />}
+        <ActionDock />
+      </div>
+    );
+  }
+
+  // "All services" uses the dashboard chrome too
+  if (new RegExp(`^${path}/all-services/?$`).test(pathname || "")) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        <CitizenShell active="svc">
+          <AllServices linkData={linkData} isLoading={islinkDataLoading} />
+        </CitizenShell>
+        <ActionDock />
+      </div>
+    );
+  }
+
+  // the stock PGR screens are replaced by the Grievance module
+  if (new RegExp(`^${path}/pgr(/|$)`).test(pathname || "")) {
+    return <Redirect to={/create-complaint/.test(pathname) ? `${path}/grievance/new/grievance` : `${path}/grievance/my-grievances`} />;
+  }
+
+  // Service modules that use the dashboard chrome (side nav + tab bar) instead of the legacy top bar
+  const shellModule = (modules || []).find((m) => SHELL_MODULES.includes(m.code) && new RegExp(`^${path}/${m.code.toLowerCase()}(/|$)`).test(pathname || ""));
+  const ShellModuleApp = shellModule && Digit.ComponentRegistryService.getComponent(`${shellModule.code}Module`);
+  if (ShellModuleApp) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        <CitizenShell active="apps">
+          <Route path={`${path}/${shellModule.code.toLowerCase()}`}>
+            <ShellModuleApp stateCode={stateCode} moduleCode={shellModule.code} userType="citizen" tenants={getTenants(shellModule.tenants, appTenants)} />
+          </Route>
+        </CitizenShell>
+        <ActionDock />
+      </div>
+    );
+  }
 
   return (
     <div className={classname}>
@@ -225,17 +282,13 @@ const Home = ({
         </Switch>
       </div>
 
+      <ActionDock />
+
       <div style={{ width: '100%', position: 'fixed', bottom: 0,backgroundColor:"white",textAlign:"center" }}>
         <div style={{ display: 'flex', justifyContent: 'center', color:"black" }}>
           {/* <span style={{ cursor: "pointer", fontSize: window.Digit.Utils.browser.isMobile()?"12px":"14px", fontWeight: "400"}} onClick={() => { window.open('https://www.digit.org/', '_blank').focus();}} >Powered by DIGIT</span>
           <span style={{ margin: "0 10px" ,fontSize: window.Digit.Utils.browser.isMobile()?"12px":"14px"}}>|</span> */}
-          <a style={{ cursor: "pointer", fontSize: window.Digit.Utils.browser.isMobile()?"12px":"14px", fontWeight: "400"}} href="#" target='_blank'>UPYOG License</a>
-
-          <span  className="upyog-copyright-footer" style={{ margin: "0 10px",fontSize: window.Digit.Utils.browser.isMobile()?"12px":"14px" }} >|</span>
-          <span  className="upyog-copyright-footer" style={{ cursor: "pointer", fontSize: window.Digit.Utils.browser.isMobile()?"12px":"14px", fontWeight: "400"}} onClick={() => { window.open('https://niua.in/', '_blank').focus();}} >Copyright © 2022 National Institute of Urban Affairs</span>
           
-          {/* <a style={{ cursor: "pointer", fontSize: "16px", fontWeight: "400"}} href="#" target='_blank'>UPYOG License</a> */}
-
         </div>
         <div className="upyog-copyright-footer-web">
           <span className="" style={{ cursor: "pointer", fontSize:  window.Digit.Utils.browser.isMobile()?"12px":"14px", fontWeight: "400"}} onClick={() => { window.open('https://niua.in/', '_blank').focus();}} >Copyright © 2022 National Institute of Urban Affairs</span>

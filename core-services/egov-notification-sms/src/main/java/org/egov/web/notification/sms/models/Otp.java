@@ -1,6 +1,6 @@
 package org.egov.web.notification.sms.models;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

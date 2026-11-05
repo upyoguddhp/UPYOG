@@ -49,39 +49,34 @@ public class EmployeeRowMapper implements ResultSetExtractor<List<Employee>> {
 						.employeeStatus(rs.getString("employee_status")).employeeType(rs.getString("employee_type")).auditDetails(auditDetails).reActivateEmployee(rs.getBoolean("employee_reactive"))
 						.jurisdictions(new ArrayList<Jurisdiction>()).assignments(new ArrayList<Assignment>()).user(new User())
 						.build();
-				
-				
+
 				JsonNode additionalDetail = fetchAdditionalDetailJson(rs, "employee_additionaldetail");
 				currentEmployee.setAdditionalDetail(additionalDetail);
-				
 			}
 			addChildrenToEmployee(rs, currentEmployee);
 			employeeMap.put(currentid, currentEmployee);
 		}
-		
+
 		return new ArrayList<>(employeeMap.values());
 
 	}
 
+	// HP-specific: employee.additionaldetail is a JSONB column - see Employee.java.
 	private JsonNode fetchAdditionalDetailJson(ResultSet rs, String columnName) throws SQLException {
 		JsonNode additionalDetail = null;
 		PGobject pgObj = (PGobject) rs.getObject(columnName);
-		if(pgObj!=null){
-		    
+		if (pgObj != null) {
 			try {
 				additionalDetail = mapper.readTree(pgObj.getValue());
 			} catch (JsonMappingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Error parsing employee additionalDetail JSON: ", e);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Error parsing employee additionalDetail JSON: ", e);
 			}
-		    
 		}
 		return additionalDetail;
 	}
-	
+
 	/**
 	 * Adds all the children data to a employee object.
 	 * 

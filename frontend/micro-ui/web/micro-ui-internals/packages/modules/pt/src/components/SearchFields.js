@@ -33,7 +33,7 @@ const SearchFields = ({register, control, reset, tenantId, t, formState, setShow
         },
     ]
 
-    return <>
+    return <React.Fragment>
          <SearchField>
                     <label>{t("PT_APPLICATION_NO_LABEL")}</label>
                     <TextInput name="acknowledgementIds" inputRef={register({})} />
@@ -140,6 +140,6 @@ const SearchFields = ({register, control, reset, tenantId, t, formState, setShow
                         previousPage();
                     }}>{t(`ES_COMMON_CLEAR_ALL`)}</p>
                 </SearchField>
-    </>
+    </React.Fragment>
 }
 export default SearchFields

@@ -1,6 +1,8 @@
 package org.egov.garbageservice.controller;
 
 import org.egov.garbageservice.model.GenerateBillRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingRequest;
+import org.egov.garbageservice.model.MarkReadyForPrintingResponse;
 import org.egov.garbageservice.model.OnDemandBillRequest;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.egov.garbageservice.service.GarbageAccountSchedulerService;
@@ -13,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.egov.garbageservice.model.BillIdRequest;
+import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.garbageservice.model.CustomAmountUpdateResponse;
 
 
 
@@ -70,6 +74,24 @@ public class GarbageAccountSchedulerController {
 	@PostMapping("/extract-tracker")
 	public ResponseEntity<?> getTrackerByBillId(@RequestBody BillIdRequest request) {
 	    return ResponseEntity.ok(service.getTrackerByBillId(request));
+	}
+	
+	@PostMapping("/_updateCustomAmount")
+	public ResponseEntity<CustomAmountUpdateResponse> updateCustomAmount(@RequestBody CustomAmountUpdateRequest request) {
+
+	    CustomAmountUpdateResponse response = service.updateCustomAmount(request);
+	    return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * Fetches the ULB/ward combinations added today to the ULBS.DdpPrinting
+	 * MDMS master and, for each, marks all ddpVerified garbage accounts in
+	 * that ULB/ward as ready for printing (batch-wise per ULB/ward).
+	 */
+	@PostMapping("/ddp/mark-ready-for-printing")
+	public ResponseEntity<MarkReadyForPrintingResponse> markReadyForPrinting(
+			@RequestBody MarkReadyForPrintingRequest markReadyForPrintingRequest) {
+		return ResponseEntity.ok(service.markReadyForPrinting(markReadyForPrintingRequest));
 	}
 
 }

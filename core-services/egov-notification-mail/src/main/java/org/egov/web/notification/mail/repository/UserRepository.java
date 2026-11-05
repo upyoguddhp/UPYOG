@@ -2,6 +2,7 @@ package org.egov.web.notification.mail.repository;
 
 import java.util.List;
 
+
 import org.egov.tracer.model.CustomException;
 import org.egov.web.notification.mail.config.ApplicationConfiguration;
 import org.egov.web.notification.mail.consumer.contract.UserSearchRequest;

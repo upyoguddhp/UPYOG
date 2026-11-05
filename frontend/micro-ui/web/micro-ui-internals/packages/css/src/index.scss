@@ -106,6 +106,22 @@
 @import "./pages/citizen/updatePropertyNumber.scss";
 @import "./pages/citizen/citizenDocument.scss";
 @import "./pages/employee/surveys.scss";
+@import "./components/actiondock.scss";
+@import "./components/accessibility.scss";
+@import "./pages/citizen/AccessibilityStatement.scss";
+@import "./pages/citizen/Landing.scss";
+@import "./pages/citizen/Website.scss";
+@import "./pages/citizen/Dashboard.scss";
+@import "./pages/citizen/NewTL.scss";
+@import "./pages/citizen/NewGRB.scss";
+@import "./pages/citizen/NewPT.scss";
+@import "./pages/citizen/NewPet.scss";
+@import "./pages/citizen/NewBooking.scss";
+@import "./pages/citizen/NewOTS.scss";
+@import "./pages/citizen/NewPayments.scss";
+@import "./pages/citizen/NewFeedback.scss";
+@import "./pages/employee/HpWork.scss";
+@import "./pages/employee/EmployeeTheme.scss";
 
 .display-none {
   display: none;
@@ -765,4 +781,3 @@ min-height: calc(100vh - 8em);
     font-size: 1rem;
   }
 }
-

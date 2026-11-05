@@ -157,6 +157,12 @@
 						}
 					},
 					{
+						"variable": "advancePaid",
+						"value": {
+							"path": "$.advancePaid"
+						}
+					},
+					{
 						"variable": "amountDue",
 						"value": {
 							"path": "$.amountDue"
@@ -191,7 +197,13 @@
 						"value": {
 						"path": "$.billDueDate"
 						}
-				}
+					},
+					{
+						"variable": "paymentDueDate",
+						"value": {
+						"path": "$.paymentDueDate"
+						}
+					}
 				]
 			}
 		]

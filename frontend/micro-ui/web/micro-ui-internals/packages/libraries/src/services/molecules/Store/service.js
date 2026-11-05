@@ -4,8 +4,8 @@ import { Storage } from "../../atoms/Utils/Storage";
 import { ApiCacheService } from "../../atoms/ApiCacheService";
 
 const getImgUrl = (url, fallbackUrl) => {
-  if (!url && fallbackUrl) {
-    return fallbackUrl;
+  if (!url) {
+    return fallbackUrl || "";
   }
   if (url.includes("s3.ap-south-1.amazonaws.com")) {
     const baseDomain = window?.location?.origin;
@@ -29,7 +29,7 @@ const addLogo = (id, url, fallbackUrl = "") => {
 };
 
 const renderTenantLogos = (stateInfo, tenants) => {
-  addLogo(stateInfo.code, stateInfo.logoUrl);
+  if (stateInfo.logoUrl) addLogo(stateInfo.code, stateInfo.logoUrl);
   tenants.forEach((tenant) => {
     addLogo(tenant.code, tenant.logoId, stateInfo.logoUrl);
   });
@@ -63,7 +63,7 @@ export const StoreService = {
     const initData = {
       languages: stateInfo.hasLocalisation ? stateInfo.languages : [{ label: "ENGLISH", value: "en_IN" }],
       stateInfo: {
-        code: stateInfo.code,
+        code: stateInfo.code || stateCode,
         name: stateInfo.name,
         logoUrl: stateInfo.logoUrl,
         statelogo: stateInfo.statelogo,

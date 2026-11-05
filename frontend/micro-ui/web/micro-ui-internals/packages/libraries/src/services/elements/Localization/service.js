@@ -35,8 +35,8 @@ const LocalizationStore = {
     const AllNamespaces = LocalizationStore.getAllList();
     const Namespaces = LocalizationStore.getList(locale);
     modules.forEach((module) => {
-      if (!Namespaces.includes(module)) {
-        Namespaces.push(module);
+      if (!Namespaces.includes(module) || !Array.isArray(LocalizationStore.getCaheData(LOCALE_MODULE(locale, module)))) {
+        if (!Namespaces.includes(module)) Namespaces.push(module);
         const moduleMessages = messages.filter((message) => message.module === module);
         LocalizationStore.setCacheData(LOCALE_MODULE(locale, module), moduleMessages);
       }
@@ -46,11 +46,18 @@ const LocalizationStore = {
   },
   get: (locale, modules) => {
     const storedModules = LocalizationStore.getList(locale);
-    const newModules = modules.filter((module) => !storedModules.includes(module));
     const messages = [];
+    const missingModules = [];
     storedModules.forEach((module) => {
-      messages.push(...LocalizationStore.getCaheData(LOCALE_MODULE(locale, module)));
+      const moduleMessages = LocalizationStore.getCaheData(LOCALE_MODULE(locale, module));
+      if (Array.isArray(moduleMessages)) {
+        messages.push(...moduleMessages);
+      } else {
+        // module list survived but its messages expired/were cleared: refetch it
+        missingModules.push(module);
+      }
     });
+    const newModules = modules.filter((module) => !storedModules.includes(module) || missingModules.includes(module));
     return [newModules, messages];
   },
 

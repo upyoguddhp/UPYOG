@@ -1,0 +1,1772 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_HPWORK",
+      "message": "Work",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_HPWORK",
+      "message": "कार्य",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MENU_INBOX",
+      "message": "Applications inbox",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MENU_INBOX",
+      "message": "आवेदन इनबॉक्स",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CRUMB_INBOX",
+      "message": "Inbox",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CRUMB_INBOX",
+      "message": "इनबॉक्स",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_TITLE",
+      "message": "Applications inbox",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_TITLE",
+      "message": "आवेदन इनबॉक्स",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SUB",
+      "message": "Applications waiting for your action, by service.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SUB",
+      "message": "आपकी कार्रवाई की प्रतीक्षा में आवेदन, सेवा के अनुसार।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_LOADING",
+      "message": "Loading your work...",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_LOADING",
+      "message": "आपका कार्य लोड हो रहा है...",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_RETRY",
+      "message": "Try again",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BACK",
+      "message": "Back to inbox",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BACK",
+      "message": "इनबॉक्स पर लौटें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_TL",
+      "message": "Trade licence",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_TL",
+      "message": "व्यापार लाइसेंस",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_PET",
+      "message": "Pet registration",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_PET",
+      "message": "पालतू पशु पंजीकरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_GRV",
+      "message": "Grievances",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_GRV",
+      "message": "शिकायतें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_GB",
+      "message": "Garbage collection",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_GB",
+      "message": "कचरा संग्रहण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_PT",
+      "message": "Property tax",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_PT",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_NOC",
+      "message": "NOC",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_NOC",
+      "message": "अनापत्ति प्रमाणपत्र",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_SITE",
+      "message": "Site booking",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_SITE",
+      "message": "स्थल बुकिंग",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SVC_HALL",
+      "message": "Hall booking",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SVC_HALL",
+      "message": "हॉल बुकिंग",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SOON",
+      "message": "Coming soon",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SOON",
+      "message": "जल्द आ रहा है",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PENDING_N",
+      "message": "{{n}} pending",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PENDING_N",
+      "message": "{{n}} लंबित",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_NO_SERVICES",
+      "message": "No service is assigned to your roles yet.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_NO_SERVICES",
+      "message": "आपकी भूमिकाओं को अभी कोई सेवा नहीं दी गई है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_NO_SERVICES_SUB",
+      "message": "Ask your administrator to give you a workflow role such as verifier or approver.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_NO_SERVICES_SUB",
+      "message": "अपने प्रशासक से सत्यापनकर्ता या अनुमोदनकर्ता जैसी कार्यप्रवाह भूमिका देने को कहें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_TAB_ALL",
+      "message": "All statuses",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_TAB_ALL",
+      "message": "सभी स्थितियाँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEARCH_PH",
+      "message": "Application no. or mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEARCH_PH",
+      "message": "आवेदन संख्या या मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEARCH_PH_TL",
+      "message": "Application no., trade name or mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEARCH_PH_TL",
+      "message": "आवेदन संख्या, व्यापार नाम या मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEARCH_BTN",
+      "message": "Search",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEARCH_BTN",
+      "message": "खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CLEAR",
+      "message": "Clear",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CLEAR",
+      "message": "साफ़ करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ULB",
+      "message": "Urban local body",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ULB_ALL",
+      "message": "All my ULBs",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ULB_ALL",
+      "message": "मेरे सभी निकाय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_STATUS",
+      "message": "Status",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_STATUS_ALL",
+      "message": "All statuses",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_STATUS_ALL",
+      "message": "सभी स्थितियाँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_STATUS_MINE",
+      "message": "Needs my action",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_STATUS_MINE",
+      "message": "मेरी कार्रवाई आवश्यक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SS_SEARCH",
+      "message": "Type to search",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SS_SEARCH",
+      "message": "खोजने के लिए लिखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SS_NONE",
+      "message": "Nothing matches",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SS_NONE",
+      "message": "कुछ नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_LIST_EMPTY",
+      "message": "No applications found",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_LIST_EMPTY",
+      "message": "कोई आवेदन नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_LIST_EMPTY_SUB",
+      "message": "Change the filters or the search and try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_LIST_EMPTY_SUB",
+      "message": "फ़िल्टर या खोज बदलकर फिर प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_LIST_FAILED",
+      "message": "The applications could not be loaded. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_LIST_FAILED",
+      "message": "आवेदन लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_COUNTS_FAILED",
+      "message": "Counts could not be loaded.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_COUNTS_FAILED",
+      "message": "संख्या लोड नहीं हो सकी।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_OPEN",
+      "message": "Open",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_OPEN",
+      "message": "खोलें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_APPLIED_ON",
+      "message": "Applied on",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_APPLIED_ON",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SHOWING",
+      "message": "{{from}}-{{to}} of {{total}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SHOWING",
+      "message": "{{from}}-{{to}} / {{total}}",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PREV",
+      "message": "Previous",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PREV",
+      "message": "पिछला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_NEXT",
+      "message": "Next",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_NEXT",
+      "message": "अगला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_TITLE",
+      "message": "Application",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_TITLE",
+      "message": "आवेदन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_LOADING",
+      "message": "Loading the application...",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_LOADING",
+      "message": "आवेदन लोड हो रहा है...",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_FAILED",
+      "message": "The application could not be loaded. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_NOTFOUND",
+      "message": "This application was not found.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_NOTFOUND",
+      "message": "यह आवेदन नहीं मिला।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_NODOCS",
+      "message": "No documents were uploaded.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ अपलोड नहीं किया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DOCS_FAILED",
+      "message": "The documents could not be loaded.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DOCS_FAILED",
+      "message": "दस्तावेज़ लोड नहीं हो सके।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DOCV_OPENING",
+      "message": "Opening the document...",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DOCV_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DOCV_FAILED",
+      "message": "The document could not be opened. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DOCV_FAILED",
+      "message": "दस्तावेज़ नहीं खुल सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_TIMELINE",
+      "message": "Workflow history",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_TIMELINE",
+      "message": "कार्यप्रवाह इतिहास",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_VIEW_NOHISTORY",
+      "message": "No history yet.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_VIEW_NOHISTORY",
+      "message": "अभी कोई इतिहास नहीं।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_CURRENT",
+      "message": "Current",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_CURRENT",
+      "message": "वर्तमान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_COUNT",
+      "message": "{{n}} steps",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_COUNT",
+      "message": "{{n}} चरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_SYSTEM",
+      "message": "System",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_SYSTEM",
+      "message": "सिस्टम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_NOTE",
+      "message": "Remark",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_NOTE",
+      "message": "टिप्पणी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_INITIATE",
+      "message": "Application submitted",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_INITIATE",
+      "message": "आवेदन जमा किया गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_VERIFY",
+      "message": "Verified and forwarded",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_VERIFY",
+      "message": "सत्यापित कर आगे भेजा गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_FORWARD",
+      "message": "Forwarded",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_FORWARD",
+      "message": "आगे भेजा गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_APPROVE",
+      "message": "Approved",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_APPROVE",
+      "message": "स्वीकृत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_REJECT",
+      "message": "Rejected",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_REJECT",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_RETURN_TO_INITIATOR",
+      "message": "Returned to applicant",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_RETURN_TO_INITIATOR",
+      "message": "आवेदक को वापस भेजा गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_PENDING_FOR_MODIFICATION",
+      "message": "Marked for modification",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_PENDING_FOR_MODIFICATION",
+      "message": "संशोधन हेतु चिह्नित",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_PAY",
+      "message": "Payment received",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_PAY",
+      "message": "भुगतान प्राप्त",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_ASSIGN",
+      "message": "Assigned",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_ASSIGN",
+      "message": "सौंपा गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_REOPEN",
+      "message": "Reopened",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_REOPEN",
+      "message": "पुनः खोला गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_RESOLVE",
+      "message": "Resolved",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_RESOLVE",
+      "message": "निराकृत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_HIST_CLOSE",
+      "message": "Closed",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_HIST_CLOSE",
+      "message": "बंद",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BY",
+      "message": "By",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BY",
+      "message": "द्वारा",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ASSIGNED_TO",
+      "message": "Assigned to",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ASSIGNED_TO",
+      "message": "सौंपा गया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACTIONS",
+      "message": "Actions",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACTIONS",
+      "message": "कार्रवाइयाँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACTIONS_NONE",
+      "message": "No action is available to you on this application.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACTIONS_NONE",
+      "message": "इस आवेदन पर आपके लिए कोई कार्रवाई उपलब्ध नहीं है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_PENDING_FOR_MODIFICATION",
+      "message": "Send for modification",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_PENDING_FOR_MODIFICATION",
+      "message": "संशोधन हेतु भेजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_APPROVE",
+      "message": "Approve",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_APPROVE",
+      "message": "स्वीकृत करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_VERIFY",
+      "message": "Verify and forward",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_VERIFY",
+      "message": "सत्यापित कर आगे भेजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_REJECT",
+      "message": "Reject",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_REJECT",
+      "message": "अस्वीकृत करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_RESOLVE",
+      "message": "Resolve",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_RESOLVE",
+      "message": "समाधान करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_RESOLVED",
+      "message": "Mark resolved",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_RESOLVED",
+      "message": "समाधान चिह्नित करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_FORWARD_TO_APPROVER",
+      "message": "Forward to approver",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_FORWARD_TO_APPROVER",
+      "message": "अनुमोदनकर्ता को भेजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_INITIATOR",
+      "message": "Return to applicant",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_INITIATOR",
+      "message": "आवेदक को लौटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_INITIATOR_FOR_PAYMENT",
+      "message": "Return to applicant for payment",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_INITIATOR_FOR_PAYMENT",
+      "message": "भुगतान हेतु आवेदक को लौटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_VERIFIER",
+      "message": "Return to verifier",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ACT_RETURN_TO_VERIFIER",
+      "message": "सत्यापनकर्ता को लौटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT",
+      "message": "Comment",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT",
+      "message": "टिप्पणी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT_PH",
+      "message": "Write a short note for the record",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT_PH",
+      "message": "रिकॉर्ड के लिए संक्षिप्त टिप्पणी लिखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT_REQ",
+      "message": "A comment is required for this action.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_COMMENT_REQ",
+      "message": "इस कार्रवाई के लिए टिप्पणी आवश्यक है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE",
+      "message": "Assign to",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE",
+      "message": "इन्हें सौंपें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_PICK",
+      "message": "Select an employee",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_PICK",
+      "message": "कर्मचारी चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_REQ",
+      "message": "Select the employee to assign this application to.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_REQ",
+      "message": "आवेदन सौंपने के लिए कर्मचारी चुनें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_NONE",
+      "message": "No employee with the required role was found in this ULB.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_NONE",
+      "message": "इस निकाय में आवश्यक भूमिका वाला कोई कर्मचारी नहीं मिला।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_FAILED",
+      "message": "The employee list could not be loaded.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_ASSIGNEE_FAILED",
+      "message": "कर्मचारी सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_SUBMIT",
+      "message": "Submit",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_SUBMIT",
+      "message": "जमा करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_CANCEL",
+      "message": "Cancel",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_CANCEL",
+      "message": "रद्द करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_SAVING",
+      "message": "Saving your action...",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_SAVING",
+      "message": "आपकी कार्रवाई सहेजी जा रही है...",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MODAL_FAILED",
+      "message": "The action could not be completed. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MODAL_FAILED",
+      "message": "कार्रवाई पूरी नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DONE",
+      "message": "Action completed: the application is now {{status}}.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DONE",
+      "message": "कार्रवाई पूर्ण: आवेदन अब {{status}} है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_DONE_BACK",
+      "message": "Back to inbox",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_DONE_BACK",
+      "message": "इनबॉक्स पर लौटें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_APPLICATION",
+      "message": "Application",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_APPLICATION",
+      "message": "आवेदन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_TRADE",
+      "message": "Trade details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_TRADE",
+      "message": "व्यापार विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_LOCATION",
+      "message": "Location",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_LOCATION",
+      "message": "स्थान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_OWNER",
+      "message": "Owner details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_OWNER",
+      "message": "स्वामी विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_PET",
+      "message": "Pet details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_PET",
+      "message": "पालतू पशु विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_GRIEVANCE",
+      "message": "Grievance",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_GRIEVANCE",
+      "message": "शिकायत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SEC_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SEC_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_appNo",
+      "message": "Application number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_appNo",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_type",
+      "message": "Application type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_type",
+      "message": "आवेदन प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_appliedOn",
+      "message": "Applied on",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_appliedOn",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_fy",
+      "message": "Financial year",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_fy",
+      "message": "वित्तीय वर्ष",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_validity",
+      "message": "Validity",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_validity",
+      "message": "वैधता",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_ulb",
+      "message": "Urban local body",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_ulb",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_businessName",
+      "message": "Business name",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_businessName",
+      "message": "व्यवसाय का नाम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_scale",
+      "message": "Scale of business",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_scale",
+      "message": "व्यवसाय का पैमाना",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_gst",
+      "message": "GST number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_gst",
+      "message": "जीएसटी संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_businessDetails",
+      "message": "Business details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_businessDetails",
+      "message": "व्यवसाय विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_category",
+      "message": "Trade category",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_category",
+      "message": "व्यापार श्रेणी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_trade",
+      "message": "Trade",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_trade",
+      "message": "व्यापार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_subCategory",
+      "message": "Sub category",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_subCategory",
+      "message": "उप श्रेणी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_period",
+      "message": "Licence period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_period",
+      "message": "लाइसेंस अवधि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_propertyType",
+      "message": "Property type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_propertyType",
+      "message": "संपत्ति प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_ownership",
+      "message": "Ownership",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_ownership",
+      "message": "स्वामित्व",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_propertyId",
+      "message": "Property ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_propertyId",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_address",
+      "message": "Address",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_address",
+      "message": "पता",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_district",
+      "message": "District",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_district",
+      "message": "ज़िला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_ward",
+      "message": "Ward",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_ward",
+      "message": "वार्ड",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_pincode",
+      "message": "Pincode",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_pincode",
+      "message": "पिनकोड",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_name",
+      "message": "Name",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_name",
+      "message": "नाम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_father",
+      "message": "Father / husband name",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_father",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_gender",
+      "message": "Gender",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_gender",
+      "message": "लिंग",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_mobile",
+      "message": "Mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_mobile",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_email",
+      "message": "Email",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_email",
+      "message": "ईमेल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_petName",
+      "message": "Pet name",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_petName",
+      "message": "पालतू का नाम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_petType",
+      "message": "Pet type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_petType",
+      "message": "पालतू का प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_breed",
+      "message": "Breed",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_breed",
+      "message": "नस्ल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_age",
+      "message": "Age",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_age",
+      "message": "आयु",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_vaccinated",
+      "message": "Vaccination status",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_vaccinated",
+      "message": "टीकाकरण स्थिति",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_vaccinationNo",
+      "message": "Vaccination number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_vaccinationNo",
+      "message": "टीकाकरण संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_lastVaccine",
+      "message": "Last vaccination",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_lastVaccine",
+      "message": "अंतिम टीकाकरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_clinic",
+      "message": "Clinic",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_clinic",
+      "message": "क्लिनिक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_doctor",
+      "message": "Doctor",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_doctor",
+      "message": "चिकित्सक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_sterilised",
+      "message": "Sterilisation",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_sterilised",
+      "message": "नसबंदी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_source",
+      "message": "Source",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_source",
+      "message": "स्रोत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_grvType",
+      "message": "Grievance type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_grvType",
+      "message": "शिकायत प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_grvSubType",
+      "message": "Grievance sub type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_grvSubType",
+      "message": "शिकायत उप प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_F_description",
+      "message": "Description",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_F_description",
+      "message": "विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    }
+  ]
+}

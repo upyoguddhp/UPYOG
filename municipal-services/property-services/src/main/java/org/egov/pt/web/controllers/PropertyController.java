@@ -383,6 +383,15 @@ public class PropertyController {
 
 		return response;
 	}
+	
+	@PostMapping("/_generatePropertyNoticePdf")
+	public ResponseEntity<Resource> generatePropertyNoticePdf(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@RequestParam String propertyId, @RequestParam(required = false) String billId,
+			@RequestParam(required = false) String status, @RequestParam String tenantId) {
+		ResponseEntity<Resource> response = propertyService.generatePropertyNoticePdf(requestInfoWrapper, propertyId,
+				billId, status, tenantId);
+		return response;
+	}
 
 	@PostMapping("/_checkMasters")
 	public ResponseEntity<Map<String, Object>> checkMasters(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
@@ -400,13 +409,7 @@ public class PropertyController {
 	@PostMapping("/_createArear")
 	public ResponseEntity<Map<String, Object>> createArear(
 			@Valid @RequestBody GenrateArrearRequest genrateArrearRequest) {
-
-		String message = propertyService.generateArrear(genrateArrearRequest);
-		ResponseInfo resInfo = responseInfoFactory
-				.createResponseInfoFromRequestInfo(genrateArrearRequest.getRequestInfo(), true);
-		Map<String, Object> response = new HashMap<>();
-		response.put("ResponseInfo", resInfo);
-		response.put("message", message);
+		Map<String, Object> response = propertyService.generateArrear(genrateArrearRequest);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	

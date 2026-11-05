@@ -1,13 +1,6 @@
 package org.egov.domain.service;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -151,6 +144,8 @@ public class MessageService {
 	private List<Message> getMessages(MessageSearchCriteria searchCriteria) {
 		final List<Message> cachedMessages = messageCacheRepository.getComputedMessages(searchCriteria.getLocale(),
 				searchCriteria.getTenantId());
+		// HP-specific: treat an empty cached list as a cache miss, not a valid hit -
+		// avoids getting stuck returning [] forever if it was cached before real data existed.
 		if (!CollectionUtils.isEmpty(cachedMessages)) {
 			return cachedMessages;
 		}

@@ -63,6 +63,7 @@ public class TransactionsSchedulerService {
 		TransactionCriteria transactionCriteria = TransactionCriteria.builder().isSchedulerCall(true)
 				.txnStatus(TxnStatusEnum.SUCCESS)
 				.gateway("RAZORPAY")
+				.isSettlementResponseNull(true)
 				.startDateTime(
 						LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli())
 				.endDateTime(LocalDate.now().atTime(23, 59, 59, 999_999_999).atZone(ZoneId.systemDefault())

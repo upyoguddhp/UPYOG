@@ -1,0 +1,320 @@
+/* HP Trade Licence (NewGRB) registration — mobile-first. */
+$grb-primary: #1b3a6b;
+$grb-accent: #f08a24;
+$grb-border: #d6d9de;
+$grb-error: #b3261e;
+$grb-muted: #5b6573;
+
+.grb-progress {
+  padding: 8px 16px 0;
+  max-width: 960px;
+  margin: 0 auto;
+
+  &__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: $grb-primary;
+    margin-bottom: 8px;
+  }
+
+  &__track {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__seg {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #e3e6eb;
+
+    &.is-on {
+      background: $grb-accent;
+    }
+  }
+}
+
+.grb-card {
+  max-width: 960px;
+  margin: 12px auto 96px; /* room for the fixed action bar */
+  padding: 16px;
+}
+
+.grb-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px 20px;
+}
+
+.grb-field {
+  min-width: 0;
+  margin-bottom: 12px;
+
+  textarea,
+  input[type="text"],
+  input[type="date"],
+  .employee-select-wrap--elipses {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  &.has-error input,
+  &.has-error textarea {
+    border-color: $grb-error;
+  }
+}
+
+.grb-req {
+  color: $grb-error;
+}
+
+.grb-lookup-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border-left: 4px solid $grb-error;
+  background: #fdecea;
+  color: #5f130d;
+  font-size: 14px;
+}
+
+.grb-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: $grb-primary;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.grb-review-block {
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid $grb-border;
+}
+
+.grb-review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.grb-ack-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.grb-ack-secondary {
+  color: $grb-primary;
+  font-weight: 600;
+}
+
+.grb-app-list {
+  list-style: none;
+  margin: 8px 0 16px;
+  padding: 0;
+}
+
+.grb-app {
+  padding: 12px 0;
+  border-bottom: 1px solid $grb-border;
+
+  &__no {
+    font-weight: 700;
+    color: $grb-primary;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin-top: 4px;
+    font-size: 14px;
+    color: $grb-muted;
+  }
+
+  &__status {
+    font-weight: 600;
+  }
+}
+
+@media (min-width: 768px) {
+  .grb-card {
+    padding: 24px;
+  }
+
+  .grb-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grb-field--wide {
+    grid-column: 1 / -1;
+  }
+
+  .grb-ack-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* ---- Property search step (NewGRB step 1) — mobile first, reuses the npt-* look ---- */
+.grb-ps {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &__modes {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  &__hint {
+    margin: 0;
+    color: #5b6784;
+    font-size: 14px;
+  }
+  &__bar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
+    .npt-btn { width: 100%; justify-content: center; }
+  }
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  &__card {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    align-items: start;
+    text-align: left;
+    padding: 14px;
+    background: #fff;
+    border: 2px solid #e3eaf6;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #16203f;
+    font: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    &:hover { border-color: #2f6bff; }
+    &.is-on { border-color: #e8730c; box-shadow: 0 0 0 3px rgba(232, 115, 12, 0.18); background: #fffaf5; }
+    .npt-badge { grid-column: 2; justify-self: start; }
+  }
+  &__radio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #b8c4de;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin-top: 2px;
+    .is-on & { background: #e8730c; border-color: #e8730c; }
+  }
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    strong { font-size: 16px; word-break: break-all; }
+    small { color: #5b6784; }
+  }
+  &__picked {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #eaf7ea;
+    color: #0e6b06;
+    font-weight: 600;
+  }
+  &__register { margin: 0; font-size: 14px; }
+}
+
+@media (min-width: 768px) {
+  .grb-ps {
+    &__bar { grid-template-columns: minmax(0, 420px) auto; .npt-btn { width: auto; } }
+    &__list { grid-template-columns: repeat(2, 1fr); }
+    &__card { grid-template-columns: auto 1fr auto; .npt-badge { grid-column: auto; } }
+  }
+}
+@media (min-width: 1280px) {
+  .grb-ps__list { grid-template-columns: repeat(3, 1fr); }
+}
+
+.npt-section__title {
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e3e8ef;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0b3a6f;
+  &:first-of-type { margin-top: 8px; }
+}
+
+/* three fields per row on wide screens for the combined pages */
+@media (min-width: 1024px) {
+  .npt-grid.npt-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* collection unit cards (Garbage Collection details page) */
+.grb-unit {
+  margin: 0 0 16px;
+  padding: 14px 16px 6px;
+  border: 1px solid #e3eaf6;
+  border-radius: 12px;
+  background: #fbfcff;
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #14224d;
+      font-size: 15px;
+    }
+  }
+}
+
+.grb-hint {
+  margin: 0 0 12px;
+  color: #5b6786;
+  font-size: 14px;
+}
+
+.npt-field--check { align-self: end; }
+
+.grb-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  input { width: 20px; height: 20px; accent-color: #2f6bff; }
+  span { color: #14224d; font-weight: 600; }
+  &__hint { display: block; color: #5b6786; font-size: 12px; }
+}

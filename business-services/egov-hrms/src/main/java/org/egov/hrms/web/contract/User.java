@@ -2,11 +2,12 @@ package org.egov.hrms.web.contract;
 
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.egov.hrms.model.Role;
 import org.egov.hrms.model.enums.GuardianRelation;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,9 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
 public class User {
 	
     @JsonProperty("id")
@@ -38,6 +42,13 @@ public class User {
     @JsonProperty("uuid")
     private String uuid;
 
+    @Size(max=64)
+    @JsonProperty("userServiceUuid")
+    private String userServiceUuid;
+
+    // HP-specific: renamed from "userName"/userName to match egov-user's actual
+    // JSON contract more explicitly (egov-user accepts either case via
+    // ACCEPT_CASE_INSENSITIVE_PROPERTIES, so this is a compatible rename, not a fix).
     @Size(max=180)
     @JsonProperty("username")
     private String username;
@@ -172,6 +183,9 @@ public class User {
     @Size(max=256)
     @JsonProperty("tenantId")
     private String tenantId;
+
+    @JsonProperty("rowVersion")
+    private Integer rowVersion;
     
 
 }

@@ -71,13 +71,7 @@ const Login = ({ stateCode, isUserRegistered = true }) => {
     Digit.UserService.setUser(user);
     setCitizenDetail(user?.info, user?.access_token, stateCode);
     const redirectPath = location.state?.from || DEFAULT_REDIRECT_URL;
-    if (!Digit.ULBService.getCitizenCurrentTenant(true)) {
-      history.replace("/digit-ui/citizen/select-location", {
-        redirectBackTo: redirectPath,
-      });
-    } else {
-      history.replace(redirectPath);
-    }
+    history.replace(redirectPath);
   }, [user]);
 
   const stepItems = useMemo(() =>

@@ -3,6 +3,8 @@ import java.util.UUID;
 
 import org.egov.pt.models.CalculateTaxRequest;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.CustomAmountUpdateRequest;
+import org.egov.pt.models.CustomAmountUpdateResponse;
 import org.egov.pt.models.CalculateTaxPreviewResponse;
 import org.egov.pt.service.PropertySchedulerService;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 //import org.egov.ptr.web.contracts.alfresco.DMSResponse;
 //import org.egov.ptr.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.web.contracts.SendPropertyEmailRequest;
+import org.egov.pt.web.contracts.SendPropertyNoticeRequest;
 
 import java.io.*;
 import java.util.*;
@@ -97,6 +100,13 @@ public class PropertySchedulerController {
 //		return ResponseEntity.ok(service.updatePenaltyAmount(requestInfoWrapper)); 
 	}
 	
+	@PostMapping("/_updateCustomAmount")
+	public ResponseEntity<CustomAmountUpdateResponse> updateCustomAmount(@RequestBody CustomAmountUpdateRequest request) {
+
+	    CustomAmountUpdateResponse response = service.updateCustomAmount(request);
+	    return ResponseEntity.ok(response);
+	}
+	
 	
 	@PostMapping("/bulk-uploads")
 	public ResponseEntity<Map<String, Object>> bulkBillUploads(
@@ -119,5 +129,11 @@ public class PropertySchedulerController {
 	public ResponseEntity<?> sendPropertyEmail(@RequestBody SendPropertyEmailRequest request) {
 	    service.sendPropertyEmail(request);
 	    return ResponseEntity.ok("Property email sent successfully");
+	}
+	
+	@PostMapping("/send-property-notice")
+	public ResponseEntity<?> sendPropertyNotice(@RequestBody SendPropertyNoticeRequest request) {
+	    service.sendPropertyNotice(request);
+	    return ResponseEntity.ok("Property Notice sent successfully");
 	}
 }

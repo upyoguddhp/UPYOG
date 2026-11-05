@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dfe9ff"/>
+      <stop offset=".55" stop-color="#fdeedd"/>
+      <stop offset="1" stop-color="#ffe2bd"/>
+    </linearGradient>
+    <radialGradient id="sun" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffb347" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#ffb347" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="tree" width="40" height="70" patternUnits="userSpaceOnUse">
+      <path d="M20 4 L32 30 H8Z M20 22 L36 52 H4Z M17 52 h6 v14 h-6Z" fill="#1f5a4a"/>
+    </pattern>
+  </defs>
+  <rect width="1400" height="520" fill="url(#sky)"/>
+  <circle cx="1090" cy="150" r="170" fill="url(#sun)"/>
+  <circle cx="1090" cy="150" r="46" fill="#ffb347" opacity=".9"/>
+  <g fill="#fff" opacity=".85">
+    <ellipse cx="260" cy="90" rx="90" ry="16"/><ellipse cx="320" cy="78" rx="56" ry="14"/>
+    <ellipse cx="820" cy="60" rx="100" ry="15"/><ellipse cx="880" cy="48" rx="58" ry="12"/>
+  </g>
+  <!-- far range with snow -->
+  <path d="M0 330 L110 230 L190 290 L330 150 L470 300 L580 220 L700 310 L860 170 L1010 300 L1140 210 L1290 300 L1400 240 V520 H0Z" fill="#b9c8e6"/>
+  <path d="M330 150 L296 200 L322 192 L340 216 L360 190 L384 204Z M860 170 L826 222 L852 214 L870 236 L892 212 L916 226Z M1140 210 L1112 248 L1134 242 L1150 258 L1168 240 L1186 250Z M580 220 L560 250 L578 244 L592 254Z" fill="#fff" opacity=".95"/>
+  <!-- mid range -->
+  <path d="M0 400 L150 310 L270 370 L430 280 L590 380 L760 300 L930 385 L1090 300 L1250 380 L1400 320 V520 H0Z" fill="#7f95c7"/>
+  <!-- terraced fields -->
+  <path d="M0 430 Q350 380 700 410 T1400 395 V520 H0Z" fill="#6aa268"/>
+  <path d="M0 458 Q350 416 700 442 T1400 430 V520 H0Z" fill="#4f8d56"/>
+  <path d="M0 488 Q350 456 700 476 T1400 468 V520 H0Z" fill="#3b7345"/>
+  <!-- deodar trees -->
+  <g fill="#1f5a4a">
+    <path d="M90 450 l22 -70 l22 70Z M70 470 l42 -90 l42 90Z"/>
+    <path d="M250 455 l18 -58 l18 58Z M236 472 l32 -76 l32 76Z"/>
+    <path d="M1010 450 l20 -64 l20 64Z M994 470 l36 -84 l36 84Z"/>
+    <path d="M1230 452 l22 -70 l22 70Z M1210 472 l42 -92 l42 92Z"/>
+    <path d="M1340 458 l16 -50 l16 50Z M1328 474 l28 -66 l28 66Z"/>
+  </g>
+  <!-- small hill town -->
+  <g>
+    <rect x="520" y="420" width="46" height="40" fill="#f7efe4"/><path d="M512 420 l31 -24 l31 24Z" fill="#a8452f"/>
+    <rect x="580" y="408" width="38" height="52" fill="#f3e6d3"/><path d="M572 408 l27 -22 l27 22Z" fill="#8f3b2a"/>
+    <rect x="632" y="424" width="52" height="36" fill="#fbf3e8"/><path d="M624 424 l34 -24 l34 24Z" fill="#b9573a"/>
+    <rect x="698" y="414" width="34" height="46" fill="#f1e2cc"/><path d="M690 414 l25 -20 l25 20Z" fill="#8f3b2a"/>
+    <g fill="#ffc25a"><rect x="530" y="432" width="8" height="10"/><rect x="590" y="424" width="8" height="10"/><rect x="646" y="436" width="8" height="10"/><rect x="708" y="428" width="8" height="10"/></g>
+  </g>
+</svg>

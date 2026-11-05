@@ -9,6 +9,8 @@ import {
   PTModule,
   PTLinks,
   PTComponents,
+  NewPTModule,
+  NewPTLinks,
 } from "@upyog/digit-ui-module-pt";
 import { MCollectModule, MCollectLinks, initMCollectComponents } from "@upyog/digit-ui-module-mcollect";
 import { initDSSComponents } from "@upyog/digit-ui-module-dss";
@@ -26,8 +28,19 @@ import {
 import {
   TLModule,
   TLLinks,
+  NewTLModule,
+  NewTLLinks,
   initTLComponents,
 } from "@upyog/digit-ui-module-tl";
+import { GBModule, GBLinks } from "@upyog/digit-ui-module-grbg";
+import { BOOKINGModule, BOOKINGLinks } from "@upyog/digit-ui-module-booking";
+import { REQSVCModule, REQSVCLinks } from "@upyog/digit-ui-module-reqsvc";
+import { GRIEVANCEModule, GRIEVANCELinks } from "@upyog/digit-ui-module-grievance";
+import { HPNOCModule, HPNOCLinks } from "@upyog/digit-ui-module-hpnoc";
+import { HPPAYModule, HPPAYLinks } from "@upyog/digit-ui-module-payments";
+import { HPWORKModule, HPWORKCard } from "@upyog/digit-ui-module-hpwork";
+import { OTSModule, OTSLinks } from "@upyog/digit-ui-module-ots";
+import { FEEDBACKModule, FEEDBACKLinks } from "@upyog/digit-ui-module-feedback";
 import {
   PTRModule,
   PTRLinks,
@@ -69,7 +82,18 @@ const enabledModules = [
   "FireNoc",
   "Birth",
   "Death",
-  "PTR"
+  "PTR",
+  "NewTL",
+  "PROPERTY",
+  "GB",
+  "BOOKING",
+  "REQSVC",
+  "GRIEVANCE",
+  "HPNOC",
+  "HPPAY",
+  "HPWORK",
+  "OTS",
+  "FEEDBACK"
 ];
 window.Digit.ComponentRegistryService.setupRegistry({
   ...paymentConfigs,
@@ -83,6 +107,28 @@ window.Digit.ComponentRegistryService.setupRegistry({
   HRMSModule,
   TLModule,
   TLLinks,
+  NewTLModule,
+  NewTLLinks,
+  PROPERTYModule: NewPTModule,
+  PROPERTYLinks: NewPTLinks,
+  GBModule,
+  GBLinks,
+  BOOKINGModule,
+  BOOKINGLinks,
+  REQSVCModule,
+  REQSVCLinks,
+  GRIEVANCEModule,
+  GRIEVANCELinks,
+  HPNOCModule,
+  HPNOCLinks,
+  HPPAYModule,
+  HPPAYLinks,
+  HPWORKModule,
+  HPWORKCard,
+  OTSModule,
+  OTSLinks,
+  FEEDBACKModule,
+  FEEDBACKLinks,
   ReceiptsModule,
   PTRModule,
   PTRLinks,

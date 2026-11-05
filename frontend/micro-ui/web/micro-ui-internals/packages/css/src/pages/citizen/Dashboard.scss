@@ -1,0 +1,1086 @@
+/* ==========================================================================
+   Citizen dashboard (core module → pages/citizen/Dashboard)
+   Mobile-first. Uses the landing palette ($l-* variables from Landing.scss).
+   Layout: top bar + (sidebar on desktop | bottom tab bar on phones) + main.
+   ========================================================================== */
+
+.Dash .LandingSkip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 14px;
+  background: $l-navy;
+  color: #fff;
+  border-radius: 0 0 10px 0;
+  &:focus {
+    left: 0;
+  }
+}
+
+.Dash {
+  min-height: 100vh;
+  background: $l-bg;
+  color: $l-ink;
+  font-family: inherit;
+  padding-bottom: 76px; /* room for the tab bar + floating dock on phones */
+
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  p {
+    margin: 0;
+  }
+}
+
+/* ---------- top bar ---------- */
+.DashTop {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #fff;
+  border-bottom: 1px solid $l-line;
+  box-shadow: 0 2px 10px rgba(20, 36, 90, 0.05);
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 0;
+    background: none;
+    padding: 0;
+    img {
+      width: auto;
+      max-width: none;
+      height: 38px;
+    }
+    img:nth-child(2) {
+      display: none;
+      height: 28px;
+    }
+  }
+  &__search {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 42px;
+    border: 1px solid $l-line;
+    border-radius: 999px;
+    background: $l-bg;
+    color: $l-muted;
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font: inherit;
+      color: $l-ink;
+    }
+    &:focus-within {
+      border-color: $l-blue;
+      box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+    }
+  }
+  &__user {
+    position: relative;
+  }
+  &__avatarBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    background: none;
+    padding: 2px;
+    border-radius: 999px;
+  }
+  &__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, $l-navy-2, $l-blue);
+  }
+  &__name {
+    display: none;
+    font-weight: 600;
+  }
+  &__menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 180px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid $l-line;
+    border-radius: 12px;
+    box-shadow: $l-shadow;
+    button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border: 0;
+      background: none;
+      border-radius: 8px;
+      color: $l-ink;
+      &:hover,
+      &:focus-visible {
+        background: $l-sky;
+      }
+    }
+  }
+}
+
+/* ---------- sidebar (desktop) / tab bar (phones) ---------- */
+.DashSide {
+  display: none;
+}
+.DashTabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: #fff;
+  border-top: 1px solid $l-line;
+  box-shadow: 0 -4px 16px rgba(20, 36, 90, 0.08);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 2px 7px;
+    border: 0;
+    background: none;
+    color: $l-muted;
+    font-size: 11px;
+    line-height: 1.15;
+    text-align: center;
+    span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    &.is-active {
+      color: $l-blue;
+      font-weight: 700;
+    }
+  }
+}
+
+/* ---------- main ---------- */
+.DashMain {
+  padding: 16px 14px 28px;
+  max-width: 1240px;
+  margin: 0 auto;
+  outline: 0;
+
+  /* service pages (forms, lists) use the whole content area */
+  &.DashMain--fluid {
+    max-width: none;
+    padding: 0 !important;
+  }
+}
+
+.DashHello {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+  h1 {
+    font-size: 24px;
+    line-height: 1.2;
+    color: $l-navy;
+  }
+  p {
+    margin-top: 4px;
+    color: $l-muted;
+  }
+}
+
+.DashBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  &--primary {
+    background: $l-saffron;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(244, 123, 32, 0.28);
+    &:hover {
+      background: darken($l-saffron, 5%);
+    }
+  }
+  &--light {
+    background: #fff;
+    color: $l-navy;
+    &:hover {
+      background: $l-sky;
+    }
+  }
+  &--sm {
+    min-height: 34px;
+    padding: 0 14px;
+    background: $l-blue;
+    color: #fff;
+    font-size: 13px;
+  }
+  &:focus-visible,
+  button:focus-visible {
+    outline: 3px solid rgba(47, 107, 255, 0.5);
+    outline-offset: 2px;
+  }
+}
+
+.DashAlert,
+.DashLoading {
+  margin-bottom: 16px;
+}
+.DashLoading {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-radius: $l-radius;
+  border: 1px solid $l-line;
+}
+
+/* next best action */
+.DashNba {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: $l-radius;
+  color: #fff;
+  background: linear-gradient(120deg, $l-navy, $l-navy-2);
+  box-shadow: $l-shadow;
+
+  &--warn {
+    background: linear-gradient(120deg, #b85a0b, $l-saffron);
+  }
+  &--danger {
+    background: linear-gradient(120deg, #a52a2a, $l-red);
+  }
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    flex: none;
+  }
+  &__body {
+    flex: 1 1 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    strong {
+      font-size: 16px;
+    }
+    span {
+      opacity: 0.92;
+      font-size: 14px;
+    }
+  }
+  .DashBtn {
+    flex: 1 1 100%;
+  }
+}
+
+/* KPI tiles */
+.DashKpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.DashKpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid $l-line;
+  border-radius: $l-radius;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: $l-shadow;
+  }
+  &.is-active {
+    border-color: $l-blue;
+    box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.18);
+  }
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+  }
+  &__value {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: $l-navy;
+    word-break: break-word;
+  }
+  &__label {
+    font-size: 13px;
+    color: $l-muted;
+  }
+  &__hint {
+    font-size: 12px;
+    color: $l-muted;
+  }
+  &--blue &__icon { background: $l-sky; color: $l-blue; }
+  &--amber &__icon { background: #fff4d8; color: #b57800; }
+  &--red &__icon { background: #fde8e8; color: $l-red; }
+  &--green &__icon { background: $l-green-l; color: $l-green; }
+  &--violet &__icon { background: #efe9ff; color: #6a45d8; }
+}
+.DashKpis .DashKpi:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* two-column grid */
+.DashGrid {
+  display: grid;
+  gap: 16px;
+}
+.DashCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.DashCard {
+  background: #fff;
+  border: 1px solid $l-line;
+  border-radius: $l-radius;
+  padding: 16px;
+  scroll-margin-top: 84px;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    h2 {
+      font-size: 17px;
+      color: $l-navy;
+    }
+  }
+  &__note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: $l-muted;
+  }
+}
+
+/* filter tabs */
+.DashTabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 2px;
+  button {
+    flex: none;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid $l-line;
+    background: #fff;
+    color: $l-muted;
+    font-size: 13px;
+    font-weight: 600;
+    &.is-on {
+      background: $l-navy;
+      border-color: $l-navy;
+      color: #fff;
+    }
+  }
+}
+
+/* applications */
+.DashApps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.DashApp {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 12px;
+  border: 1px solid $l-line;
+  border-radius: 14px;
+  background: #fbfcff;
+
+  &__main {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    color: inherit;
+  }
+  &__title {
+    font-weight: 700;
+    color: $l-navy;
+  }
+  &__meta {
+    font-size: 13px;
+    color: $l-muted;
+    word-break: break-word;
+  }
+  &__go {
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid $l-line;
+    background: #fff;
+    color: $l-blue;
+    &:hover {
+      background: $l-sky;
+    }
+  }
+}
+.DashBar {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 99px;
+  background: #e8edf8;
+  overflow: hidden;
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: $l-blue;
+    transition: width 0.4s;
+  }
+  &--action span { background: $l-saffron; }
+  &--done span { background: $l-green; }
+  &--stopped span { background: #9aa3bd; }
+}
+.DashChip {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  &--warn { background: #fff1e5; color: #b4580d; }
+  &--ok { background: $l-green-l; color: #167a4a; }
+  &--info { background: $l-sky; color: $l-navy-2; }
+  &--stop { background: #eceff6; color: #5d6784; }
+}
+
+/* empty */
+.DashEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 12px;
+  text-align: center;
+  color: $l-muted;
+  svg {
+    color: $l-blue;
+  }
+  strong {
+    color: $l-navy;
+    font-size: 16px;
+  }
+  .DashBtn {
+    margin-top: 8px;
+  }
+  &--tight {
+    padding: 14px 8px;
+  }
+}
+
+/* dues */
+.DashDues {
+  &__total {
+    font-size: 28px;
+    font-weight: 800;
+    color: $l-navy;
+    small {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: $l-muted;
+    }
+  }
+  &__list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    li {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid $l-line;
+      small {
+        display: block;
+        color: $l-muted;
+        font-size: 12px;
+        word-break: break-all;
+      }
+      b {
+        color: $l-navy;
+      }
+      b.is-late {
+        color: $l-red;
+      }
+    }
+  }
+}
+
+/* calendar */
+.DashCal__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid $l-line;
+    background: #fff;
+    font-size: 18px;
+    line-height: 1;
+  }
+}
+.DashCal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+
+  &__dow {
+    font-size: 12px;
+    color: $l-muted;
+    padding: 4px 0;
+  }
+  &__day {
+    position: relative;
+    aspect-ratio: 1;
+    min-height: 34px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: $l-ink;
+    &:hover {
+      background: $l-sky;
+    }
+    &.is-today {
+      background: $l-sky;
+      font-weight: 700;
+      color: $l-blue;
+    }
+    &.is-picked {
+      background: $l-navy;
+      color: #fff;
+    }
+    &.has-due::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 6px;
+      height: 6px;
+      margin-left: -3px;
+      border-radius: 50%;
+      background: $l-red;
+    }
+  }
+}
+
+/* activity feed */
+.DashFeed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: start;
+    padding: 10px 0;
+    border-top: 1px solid $l-line;
+    &:first-child {
+      border-top: 0;
+    }
+    small {
+      display: block;
+      color: $l-muted;
+      font-size: 12px;
+    }
+    time {
+      font-size: 12px;
+      color: $l-muted;
+      white-space: nowrap;
+    }
+  }
+  &__dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: $l-blue;
+    &--action { background: $l-saffron; }
+    &--done { background: $l-green; }
+    &--stopped { background: #9aa3bd; }
+  }
+}
+
+/* quick actions */
+.DashQuick__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid $l-line;
+    border-radius: 14px;
+    background: #fbfcff;
+    color: $l-navy;
+    font-weight: 600;
+    text-align: left;
+    svg {
+      color: $l-blue;
+    }
+    &:hover {
+      background: $l-sky;
+    }
+  }
+}
+
+/* ---------- tablet ---------- */
+@media (min-width: 640px) {
+  .DashTop__brand img:nth-child(2) {
+    display: block;
+  }
+  .DashTop__name {
+    display: inline;
+  }
+  .DashHello {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    h1 {
+      font-size: 28px;
+    }
+  }
+  .DashNba .DashBtn {
+    flex: none;
+  }
+  .DashKpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .DashKpis .DashKpi:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+  .DashApp {
+    grid-template-columns: 1fr auto auto;
+    &__main {
+      grid-column: 1;
+    }
+  }
+}
+
+/* ---------- desktop ---------- */
+@media (min-width: 1024px) {
+  .Dash {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    padding-bottom: 0;
+  }
+  .DashTop {
+    grid-column: 1 / -1;
+    padding: 12px 28px;
+    gap: 24px;
+    &__search {
+      max-width: 520px;
+      margin: 0 auto 0 12px;
+    }
+  }
+  .DashTabbar {
+    display: none;
+  }
+  .DashSide {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: sticky;
+    top: 66px;
+    align-self: start;
+    height: calc(100vh - 66px);
+    padding: 20px 14px;
+    background: #fff;
+    border-right: 1px solid $l-line;
+
+    &__link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 11px 14px;
+      margin-bottom: 4px;
+      border: 0;
+      border-radius: 12px;
+      background: none;
+      color: $l-ink;
+      font-weight: 600;
+      text-align: left;
+      &:hover {
+        background: $l-sky;
+      }
+      &.is-active {
+        background: $l-navy;
+        color: #fff;
+      }
+    }
+    &__help {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, $l-sky, #fff4ea);
+      font-size: 13px;
+      color: $l-ink;
+      strong {
+        display: block;
+        margin-bottom: 4px;
+        color: $l-navy;
+      }
+      small {
+        color: $l-muted;
+      }
+    }
+  }
+  .DashMain {
+    width: 100%;
+    padding: 24px 100px 48px 28px; /* right gutter keeps the floating dock off the content */
+  }
+  .DashKpis {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .DashGrid {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* keep the floating dock from covering the tab bar on phones */
+@media (max-width: 1023px) {
+  .CitizenLandingShell .ActionDock {
+    bottom: 76px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .DashKpi,
+  .DashBar span {
+    transition: none;
+  }
+}
+
+.DashShell__spacer {
+  flex: 1;
+}
+
+/* ---------- All services page ---------- */
+.AllSvc {
+  padding: 18px 14px 120px; /* clears the floating help dock on phones */
+  max-width: 1400px;
+  margin: 0 auto;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+    h1 {
+      font-size: 24px;
+      color: $l-navy;
+    }
+    p {
+      margin-top: 4px;
+      color: $l-muted;
+      font-size: 14px;
+    }
+  }
+  &__count {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: $l-sky;
+    color: $l-navy-2;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  &__bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 16px;
+    background: #fff;
+    border: 1px solid $l-line;
+    border-radius: 999px;
+    color: $l-muted;
+    &:focus-within {
+      border-color: $l-blue;
+      box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15);
+    }
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 15px;
+      color: $l-ink;
+      height: 100%;
+    }
+  }
+  &__chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    button {
+      flex: none;
+      min-height: 40px;
+      padding: 0 16px;
+      border: 1px solid $l-line;
+      border-radius: 999px;
+      background: #fff;
+      color: $l-ink;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      &:hover {
+        border-color: $l-blue;
+      }
+      &.is-on {
+        background: $l-navy;
+        border-color: $l-navy;
+        color: #fff;
+      }
+    }
+  }
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  &__card {
+    --tone: #2f6bff;
+    --tone-l: #e8f0ff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid $l-line;
+    border-top: 4px solid var(--tone);
+    border-radius: $l-radius;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $l-shadow;
+    }
+    &--saffron {
+      --tone: #f47b20;
+      --tone-l: #fff1e5;
+    }
+    &--green {
+      --tone: #1e9e62;
+      --tone-l: #e3f6ec;
+    }
+  }
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    h2 {
+      font-size: 18px;
+      color: $l-navy;
+      line-height: 1.25;
+    }
+  }
+  &__icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--tone-l);
+    color: var(--tone);
+  }
+  &__about {
+    margin: 0;
+    color: $l-muted;
+    font-size: 14px;
+    line-height: 1.45;
+    flex: 1;
+  }
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  &__primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--tone);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    transition: filter 0.15s, transform 0.15s;
+    &:hover {
+      filter: brightness(1.08);
+    }
+    &:active {
+      transform: scale(0.99);
+    }
+  }
+  &__link {
+    min-height: 44px;
+    padding: 0 6px;
+    border: 0;
+    background: transparent;
+    color: var(--tone);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 48px 16px;
+    text-align: center;
+    background: #fff;
+    border: 1px dashed $l-line;
+    border-radius: $l-radius;
+    color: $l-muted;
+    h2 {
+      font-size: 18px;
+      color: $l-navy;
+    }
+  }
+}
+@media (min-width: 640px) {
+  .AllSvc {
+    padding: 24px 24px 40px;
+    &__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    &__bar {
+      flex-direction: row;
+      align-items: center;
+    }
+    &__search {
+      flex: 1;
+      max-width: 520px;
+    }
+  }
+}
+@media (min-width: 1100px) {
+  .AllSvc__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1500px) {
+  .AllSvc__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .AllSvc__card,
+  .AllSvc__primary {
+    transition: none;
+  }
+}

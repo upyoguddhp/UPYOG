@@ -1,7 +1,5 @@
 package org.egov.user.domain.service;
 
-import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -13,10 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.user.domain.model.AuditDetails;
 import org.egov.user.domain.model.Role;
+import org.egov.user.domain.model.SecureUser;
 import org.egov.user.domain.model.User;
 import org.egov.user.domain.model.UserSearchCriteria;
 import org.egov.user.domain.model.UserSso;
@@ -29,8 +30,12 @@ import org.egov.user.web.contract.HpSsoValidateTokenResponse;
 import org.egov.user.web.errorhandlers.Error;
 import org.egov.user.web.errorhandlers.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -41,9 +46,6 @@ import org.egov.user.domain.service.utils.Constants;
 @Service
 @Slf4j
 public class SsoService {
-
-//	@Autowired
-//	private HpSsoValidateToken hpSsoValidateToken;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -60,17 +62,19 @@ public class SsoService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	@Qualifier("customAuthenticationManager")
+	private AuthenticationManager authenticationManager;
+
+	@Autowired
+	private TokenIssuanceService tokenIssuanceService;
+
 	public ResponseEntity<?> getHpSsoValidateTokenResponse(String token) {
 
 		ResponseEntity<?> response = null;
 
-		Object obj = customLogin(token);
-		if (null != obj) {
-			return response = new ResponseEntity<Object>(obj, HttpStatus.OK);
-		}
-
 		HpSsoValidateToken hpSsoValidateToken = HpSsoValidateToken.builder().token(token)
-				.secret_key(constants.SECRET_KEY).service_id(constants.SERVICE_ID).build();
+				.secret_key(constants.getSecretKey()).service_id(constants.getServiceId()).build();
 		HpSsoValidateTokenResponse hpSsoValidateTokenResponse = getHpSsoValidateTokenResponse(hpSsoValidateToken);
 
 		if (null != hpSsoValidateTokenResponse) {
@@ -79,23 +83,33 @@ public class SsoService {
 
 			log.info("getUserFromSsoTokenResponse Request {}", user);
 
-			// we can use this api for user's extra details
-//			List<User> userInDb = userService.searchUsers(UserSearchCriteria.builder().mobileNumber(user.getMobileNumber()).build(), false, null);
-//			if (CollectionUtils.isEmpty(userInDb)) {
-//				final User newUser = userService.createUser(user, null);
-//			}
+			User dbUser = checkAndCreateUserSso(hpSsoValidateTokenResponse, user);
 
-			checkAndCreateUserSso(hpSsoValidateTokenResponse, user);
+			// Real password-grant authentication against the fixed CITIZEN_PASSWORD every
+			// SSO-created citizen is given (see getUserFromSsoTokenResponse) - this goes
+			// through the same authentication path as a normal login, rather than a custom
+			// bypass, since the old in-process token-issuance shortcut no longer exists in
+			// the Spring Authorization Server stack.
+			UsernamePasswordAuthenticationToken authToken =
+					new UsernamePasswordAuthenticationToken(
+							// the stored username can differ from the SSO one (update never changes it), so log in as the stored user
+							dbUser != null && dbUser.getUsername() != null ? dbUser.getUsername() : user.getUsername(),
+							user.getPassword());
+			Map<String, String> details = new HashMap<>();
+			details.put("tenantId", constants.getStateLevelTenantId());
+			details.put("userType", UserType.CITIZEN.name());
+			// The HP SSO token was validated above, so the OTP check (citizen.login.password.otp.enabled)
+			// must not run against the fixed SSO password. Set in-process only, never from request data.
+			details.put("isInternal", "true");
+			authToken.setDetails(details);
 
-//			do login;
-			Object loginResponse = userService.getLoginAccess(user, user.getPassword());
+			Authentication authentication = authenticationManager.authenticate(authToken);
+			SecureUser secureUser = (SecureUser) authentication.getPrincipal();
+			Object loginResponse = tokenIssuanceService.issueTokensFor(secureUser, "read");
 
-//			send login response;
 			response = new ResponseEntity<Object>(loginResponse, HttpStatus.OK);
 
 		} else {
-//			response = generateErrorResponse(HttpStatus.Un
-//					,HttpStatus.OK.toString(), "Login failed.", null);
 			response = generateErrorResponse(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.toString(),
 					"Login failed.", null);
 		}
@@ -103,49 +117,24 @@ public class SsoService {
 		return response;
 	}
 
-	private Object customLogin(String token) {
-		ResponseEntity<?> response;
-		if (StringUtils.equals("f93e2337-12af-41f3-80de-1290b02f3073", token)) {
-
-			UserSearchCriteria userSearchCriteria = UserSearchCriteria.builder().userName("hemantkumar0753")
-					.tenantId("hp").build();
-
-			List<User> userModels = userService.searchUsers(userSearchCriteria, false, null);
-
-//			User user = User.builder().username("hemantkumar0753").tenantId("hp").password(constants.CITIZEN_PASSWORD).build();
-//			do login;
-			Object loginResponse = userService.getLoginAccess(userModels.get(0), userModels.get(0).getPassword());
-
-//			send login response;
-			response = new ResponseEntity<Object>(loginResponse, HttpStatus.OK);
-
-			return loginResponse;
-		}
-		return null;
-	}
-
 	private ResponseEntity<?> generateErrorResponse(HttpStatus unauthorized, String message, String description,
 			ResponseInfo responseInfo) {
 
 		org.egov.user.web.errorhandlers.Error error = Error.builder().code(unauthorized.value()).message(message)
 				.description(description).build();
-		ErrorResponse errorResponse = ErrorResponse.builder().responseInfo(responseInfo).error(error).build();
+		ErrorResponse errorResponse = new ErrorResponse(responseInfo, error);
 
 		return new ResponseEntity<ErrorResponse>(errorResponse, unauthorized);
 	}
 
 	private User getUserFromSsoTokenResponse(HpSsoValidateTokenResponse hpSsoValidateTokenResponse) {
-		// String dobStr = hpSsoValidateTokenResponse.getDob();
-		// SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		// Date dob = formatter.parse(dobStr);
 
 		Date dob = null;
 		try {
 			dob = (new SimpleDateFormat("dd-MM-yyyy"))
 					.parse(null != hpSsoValidateTokenResponse.getDob() ? hpSsoValidateTokenResponse.getDob() : null);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Error parsing dob from SSO response: {}", hpSsoValidateTokenResponse.getDob(), e);
 		}
 
 		List<Role> rolesList = Arrays.asList(Role.builder().name(null).code(constants.CITIZEN_ROLE)
@@ -170,7 +159,7 @@ public class SsoService {
 		return user;
 	}
 
-	private void checkAndCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User user) {
+	private User checkAndCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User user) {
 		// check ssoid exist
 		UserSso userSso = userSsoRepository.getCountBySsoId(hpSsoValidateTokenResponse.getSsoId());
 
@@ -190,20 +179,23 @@ public class SsoService {
 
 			newUser = userInDb.get(0);
 			Boolean update = false;
-			if (!user.getUsername().equals(newUser.getUsername())) {
-				newUser.setUsername(user.getUsername());
-				update = true;
+			// The stored username is never changed by an update, so it is not synced here; login uses the stored one.
+			// If decryption failed the stored name/mobile are still ciphertext; comparing them to plain values
+			// would force a pointless (and corrupting) update on every login.
+			boolean storedEncrypted = isEncryptedValue(newUser.getName()) || isEncryptedValue(newUser.getMobileNumber());
+			if (storedEncrypted) {
+				log.warn("Stored user details for {} could not be decrypted; skipping SSO profile sync", newUser.getUuid());
 			}
-			if (!Objects.equals(newUser.getName(), user.getName())) {
+			if (!storedEncrypted && !Objects.equals(newUser.getName(), user.getName())) {
 				newUser.setName(user.getName());
 				update = true;
 			}
-			if (!Objects.equals(newUser.getMobileNumber(), user.getMobileNumber())) {
+			if (!storedEncrypted && !Objects.equals(newUser.getMobileNumber(), user.getMobileNumber())) {
 				newUser.setMobileNumber(user.getMobileNumber());
 				update = true;
 			}
 			if (update) {
-				userService.updateUsernameWithoutOtpValidation(newUser, null);
+				userService.updateWithoutOtpValidation(newUser, null);
 			}
 		}
 		if (userSso == null || userSso.getUserUuid() == null) {
@@ -211,6 +203,11 @@ public class SsoService {
 			UserSso newUserSso = enrichCreateUserSso(hpSsoValidateTokenResponse, newUser);
 			userSsoRepository.create(newUserSso);
 		}
+		return newUser;
+	}
+
+	private boolean isEncryptedValue(String value) {
+		return value != null && value.matches("^\\d+\\|.+");
 	}
 
 	private UserSso enrichCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User newUser) {
@@ -231,7 +228,7 @@ public class SsoService {
 			hpSsoValidateTokenResponse = restTemplate.postForObject(uri.toString(), hpSsoValidateToken,
 					HpSsoValidateTokenResponse.class);
 		} catch (RestClientException e) {
-			System.out.print("Error Occured while rest call to SSO HP service." + e.getLocalizedMessage());
+			log.error("Error occurred while rest call to SSO HP service.", e);
 			return null;
 		}
 
