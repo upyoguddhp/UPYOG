@@ -297,6 +297,15 @@ public class GarbageBillTrackerRepository {
 		namedParameterJdbcTemplate.update(query, params);
 	}
 	
+	public void updatePaymentDetailsInTracker(String paymentMode, String transactionDate) {
+//		String query = UPDATE_BILL_TRACKER_PAYMENT_DETAILS;
+		String query = null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("paymentTxnMode", paymentMode);
+		params.put("paymentTxnDate", transactionDate);
+		namedParameterJdbcTemplate.update(query, params);
+	}
+	
 	public int updateTrackerAdditionalDetails(GrbgBillTracker tracker) {
 
 	    Map<String, Object> params = new HashMap<>();

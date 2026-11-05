@@ -146,7 +146,7 @@ public class TransactionServiceV2 {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
 				paymentsService.registerPayment(TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
-				updateOfflineDetails(transaction);
+				updatePaymentDetails(transaction);
 			}
 			else if (transaction.getGateway().equalsIgnoreCase("OFFLINE")) {
 
@@ -529,15 +529,15 @@ public class TransactionServiceV2 {
 		}
 	}
 	
-	private void updateOfflineDetails(Transaction transaction) {
+	private void updatePaymentDetails(Transaction transaction) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("AdditionalDetails", transaction.getAdditionalDetails());
 		payload.put("PaymentMode", transaction.getGatewayPaymentMode());
 		
 		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
-			producer.push(appProperties.getGrbgUpdateOfflineDetailsTopic(), payload);
+			producer.push(appProperties.getGrbgUpdateDetailsTopic(), payload);
 		} else if ("PROPERTY".equalsIgnoreCase(transaction.getProductInfo())) {
-			producer.push(appProperties.getPropertyUpdateOfflineDetailsTopic(), payload);
+			producer.push(appProperties.getPropertyUpdateDetailsTopic(), payload);
 		}
 	}
 

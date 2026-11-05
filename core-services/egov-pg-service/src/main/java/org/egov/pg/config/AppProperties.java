@@ -127,11 +127,11 @@ public class AppProperties {
     @Value("${egov.grbg.payment.processing.topic}")
     private String grbgPaymentProcessingTopic;
     
-    @Value("${egov.grbg.offline.details.topic}")
-    private String grbgUpdateOfflineDetailsTopic;
+    @Value("${egov.grbg.update.details.topic}")
+    private String grbgUpdateDetailsTopic;
     
-    @Value("${egov.property.offline.details.topic}")
-    private String propertyUpdateOfflineDetailsTopic;
+    @Value("${egov.property.update.details.topic}")
+    private String propertyUpdateDetailsTopic;
 
     @Autowired
     public AppProperties(Environment environment){

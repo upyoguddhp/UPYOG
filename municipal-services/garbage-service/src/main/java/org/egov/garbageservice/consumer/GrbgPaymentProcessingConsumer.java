@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.egov.garbageservice.model.PaymentProcessingUpdateRequest;
+import org.egov.garbageservice.model.PaymentDetailUpdateRequest;
 import org.egov.garbageservice.repository.GarbageBillTrackerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -33,5 +34,17 @@ public class GrbgPaymentProcessingConsumer {
 	        transactionDate = (String) additionalDetails.get("transactionDate");
 	    }
 		trackerRepository.updatePaymentProcessing(request.getBillId(), request.isPaymentProcessing(), request.getTxnAmount(), transactionDate);
+	}
+	
+	@KafkaListener(topics = { "grbg-payment-details-update" })
+	public void paymentDetailsUpdate(HashMap<String, Object> record) {
+		PaymentDetailUpdateRequest request = objectMapper.convertValue(record,PaymentDetailUpdateRequest.class);
+		Map<String, Object> additionalDetails = (Map<String, Object>) record.get("AdditionalDetails");
+		String transactionDate = null;
+
+	    if (additionalDetails != null) {
+	        transactionDate = (String) additionalDetails.get("transactionDate");
+	    }
+		trackerRepository.updatePaymentDetailsInTracker(request.getPaymentMode(), transactionDate);
 	}
 }
