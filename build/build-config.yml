@@ -290,10 +290,10 @@ config:
         image-name: "user-otp"
         dockerfile: "build/maven/Dockerfile"
 
-  - name: "builds/upyog/core-services/zuul"
+  - name: "builds/upyog/core-services/gateway"
     build:
-      - work-dir: "core-services/zuul"
-        image-name: "zuul"
+      - work-dir: "core-services/gateway"
+        image-name: "gateway"
         dockerfile: "build/maven/Dockerfile"
 
   - name: "builds/upyog/core-services/internal-gateway"
@@ -634,13 +634,6 @@ config:
       - work-dir: "municipal-services/garbage-service/src/main/resources/db"
         image-name: "garbage-service-db"
 
-  - name: "builds/municipal-services/digital-door-plate"
-    build:
-      - work-dir: "municipal-services/digital-door-plate"
-        image-name: "digital-door-plate"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "municipal-services/digital-door-plate/src/main/resources/db"
-        image-name: "digital-door-plate-db"
         
   - name: "builds/municipal-services/advertisement-canopy-service"
     build:
