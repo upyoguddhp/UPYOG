@@ -117,6 +117,12 @@ public class AppProperties {
     
     @Value("${egov.egf.master.bankaccount.search.endpoint}")
     private String egfMasterBankaccountSearchEndpoint;
+    
+    @Value("${egov.property.payment.processing.topic}")
+    private String propertyPaymentProcessingTopic;
+
+    @Value("${egov.grbg.payment.processing.topic}")
+    private String grbgPaymentProcessingTopic;
 
     @Autowired
     public AppProperties(Environment environment){

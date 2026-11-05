@@ -223,7 +223,9 @@ public class Transaction {
 
 		PENDING("PENDING"),
 
-		CAPTURED("CAPTURED");
+		CAPTURED("CAPTURED"),
+		
+		PROCESSING("PROCESSING");
 
 		private String value;
 

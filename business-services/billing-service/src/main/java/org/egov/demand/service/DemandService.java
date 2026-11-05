@@ -97,6 +97,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
+import java.util.Comparator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -237,6 +238,7 @@ public class DemandService {
 
 		RequestInfo requestInfo = demandRequest.getRequestInfo();
 		List<Demand> demands = demandRequest.getDemands();
+		restoreAdvanceOnCancellation(demands, demandRequest);
 		
 		Set<String> billIds = demands.stream().map(d -> {
 			if (d.getAdditionalDetails() instanceof Map) {
@@ -639,6 +641,101 @@ public class DemandService {
 	            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
 	    return txnAmount.compareTo(totalTaxAmountOfDemands) == 0;	    
+	}
+	
+	private void restoreAdvanceOnCancellation(List<Demand> demands, DemandRequest demandRequest) {
+
+		if (CollectionUtils.isEmpty(demands)) {
+			return;
+		}
+
+		for (Demand demand : demands) {
+			if (!Demand.StatusEnum.CANCELLED.equals(demand.getStatus())) {
+				continue;
+			}
+
+			boolean hasAdvanceConsumed = demand.getDemandDetails().stream()
+					.anyMatch(detail -> detail.getCollectionAmount() != null
+							&& detail.getCollectionAmount().compareTo(BigDecimal.ZERO) > 0);
+
+			if (!hasAdvanceConsumed) {
+				continue;
+			}
+
+			restoreAdvanceOnCancelledDemand(demand, demandRequest);
+		}
+	}
+
+	private void restoreAdvanceOnCancelledDemand(Demand cancelledDemand, DemandRequest demandRequest) {
+
+		BigDecimal restoreAmount = cancelledDemand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
+				.filter(Objects::nonNull).filter(amount -> amount.compareTo(BigDecimal.ZERO) > 0)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		if (restoreAmount.compareTo(BigDecimal.ZERO) <= 0) {
+			return;
+		}
+
+		Demand advanceDemand = fetchLatestAdvanceDemand(cancelledDemand.getTenantId(),
+				cancelledDemand.getConsumerCode(), cancelledDemand.getBusinessService(), demandRequest);
+
+		if (advanceDemand == null) {
+			log.warn("No advance demand found for consumer {} while restoring advance.",cancelledDemand.getConsumerCode());
+			return;
+		}
+
+		String advanceTaxHead = getAdvanceTaxHead(cancelledDemand.getBusinessService(), demandRequest);
+
+		DemandDetail advanceDetail = advanceDemand.getDemandDetails().stream()
+				.filter(detail -> advanceTaxHead.equals(detail.getTaxHeadMasterCode())).findFirst().orElse(null);
+
+		if (advanceDetail == null) {
+			log.warn("Advance demand detail not found for demand {}", advanceDemand.getId());
+			return;
+		}
+
+		BigDecimal existingCollection = advanceDetail.getCollectionAmount() == null ? BigDecimal.ZERO
+				: advanceDetail.getCollectionAmount();
+
+		advanceDetail.setCollectionAmount(existingCollection.add(restoreAmount));
+
+		demandRepository.updateAdvanceCollectionAmount(advanceDetail);
+	}
+
+	public Demand fetchLatestAdvanceDemand(String tenantId, String consumerCode, String businessService,
+			DemandRequest demandRequest) {
+
+		RequestInfo requestInfo = demandRequest.getRequestInfo();
+
+		DemandCriteria criteria = DemandCriteria.builder().tenantId(tenantId)
+				.consumerCode(Collections.singleton(consumerCode)).businessService(businessService).build();
+
+		List<Demand> demands = getDemands(criteria, requestInfo);
+
+		if (CollectionUtils.isEmpty(demands)) {
+			return null;
+		}
+
+		String advanceTaxHead = getAdvanceTaxHead(businessService, demandRequest);
+
+		return demands.stream()
+				.filter(demand -> demand.getDemandDetails() != null && demand.getDemandDetails().stream()
+						.anyMatch(detail -> advanceTaxHead.equals(detail.getTaxHeadMasterCode())))
+				.max(Comparator.comparing(d -> d.getAuditDetails().getLastModifiedTime())).orElse(null);
+	}
+
+	private String getAdvanceTaxHead(String businessService, DemandRequest demandRequest) {
+
+		DocumentContext mdmsData = util.getMDMSData(demandRequest.getRequestInfo(), TENANT_ID);
+		String jsonPath = ADVANCE_TAXHEAD_JSONPATH_CODE.replace("{}", businessService);
+		List<String> taxHeads = mdmsData.read(jsonPath);
+
+		if (CollectionUtils.isEmpty(taxHeads)) {
+			throw new CustomException("NO TAXHEAD FOUND",
+					"No Advance taxHead found for businessService : " + businessService);
+		}
+
+		return taxHeads.get(0);
 	}
 	
 }

@@ -2,6 +2,8 @@ package org.egov.pt.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -41,12 +43,15 @@ public class PropertyBillTrackerStatusUpdateConsumer {
 			String demandId = (String) record.get("demandId");
 			String status = (String) record.get("status");
 			String consumerCode = (String) record.get("consumerCode");
+			BigDecimal advancePaid = objectMapper.convertValue(record.get("advancePaid"), BigDecimal.class);
+
 
 			PtTaxCalculatorTracker tracker = PtTaxCalculatorTracker.builder()
 			        .propertyId(consumerCode)
 			        .demandId(demandId)
 			        .billStatus(BillStatus.valueOf(status))
 			        .auditDetails(audit)
+			        .advancePaid(advancePaid)
 			        .build();
 
 			propertyRepository.updateStatus(tracker);

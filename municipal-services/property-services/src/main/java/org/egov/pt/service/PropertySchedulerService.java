@@ -51,6 +51,7 @@ import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.PtTaxCalculatorTrackerRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.pt.web.contracts.SendPropertyEmailRequest;
+import org.egov.pt.web.contracts.SendPropertyNoticeRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,8 @@ import java.util.Comparator;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.egov.pt.repository.PropertyRepository;
+import org.egov.pt.models.CustomAmountUpdateRequest;
+import org.egov.pt.models.CustomAmountUpdateResponse;
 
 //pdf
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -79,6 +82,7 @@ import org.egov.pt.web.contracts.alfresco.DmsResponse;
 import org.egov.pt.web.contracts.alfresco.DmsRequest;
 import org.egov.pt.util.PTConstants;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.bill.DemandDetail;
 import org.egov.pt.models.BillIdRequest;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -579,7 +583,8 @@ public class PropertySchedulerService {
 									.builder().propertyIds(Collections.singleton(property.getPropertyId()))
 									.billStatus(new HashSet<>(Arrays.asList(
 										    BillStatus.ACTIVE, 
-										    BillStatus.PARTIALLY_PAID
+										    BillStatus.PARTIALLY_PAID,
+										    BillStatus.ADVANCE_ADJUSTED
 										)))
 									.build();
 
@@ -666,6 +671,7 @@ public class PropertySchedulerService {
 						} catch (Exception e) {
 							log.error("SMS tracker creation failed for billId {}", parentBill.getId(), e);
 						}
+						syncTrackerWithBillStatus(tracker, calculateTaxRequest);
 					}
 				} else {
 					createFailureLog(property, calculateTaxRequest, billResponse, null);
@@ -681,6 +687,7 @@ public class PropertySchedulerService {
 		int skipped = skippedCount.get();
 
 		String message = null;
+		
 
 		if (generatedCount > 0 && skipped > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Property Id(s). Failed for " + skipped
@@ -1167,7 +1174,7 @@ public class PropertySchedulerService {
 			}
 			List<Demand> demand = demandService.searchDemand(tracker.getTenantId(),
 					Collections.singleton(tracker.getDemandId()), null, requestInfo, "PROPERTY");
-			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIspaymentcompleted())) {
+			if (!CollectionUtils.isEmpty(demand) && Boolean.FALSE.equals(demand.get(0).getIsPaymentCompleted())) {
 				return true;
 			}
 		}
@@ -1502,7 +1509,8 @@ public class PropertySchedulerService {
 				.startDateTime(startDateTime).endDateTime(endDateTime).tenantId(tenantId).type("CYCLIC")
 				.rebateamount(BigDecimal.ZERO).billStatus(Collections.singleton(BillStatus.ACTIVE)).build();
 
-		return propertyService.getTaxCalculatedProperties(criteria);
+		return propertyService.getTaxCalculatedProperties(criteria).stream()
+				.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing())).collect(Collectors.toList());
 	}
 
 	private List<PtTaxCalculatorTracker> getTrackersForTenantAndStartDays(String tenantId, int days, int penaltyCycleDays) {
@@ -1518,7 +1526,9 @@ public class PropertySchedulerService {
 
 		long todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-		return trackers.stream().filter(tracker -> {
+		return trackers.stream()
+			.filter(tracker -> !Boolean.TRUE.equals(tracker.getIsPaymentProcessing()))
+			.filter(tracker -> {
 			long createdTime = tracker.getAuditDetails().getCreatedTime();
 			long diffDays = ChronoUnit.DAYS.between(
 					Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault()).toLocalDate(),
@@ -2023,7 +2033,180 @@ public class PropertySchedulerService {
 
 		notificationService.triggerPropertyMail(tracker, bill, request.getRequestInfo(), ulbName, property);
 	}
+	
+	public void sendPropertyNotice(SendPropertyNoticeRequest request) {
 
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(request.getBillId()))
+				.demandId(Collections.singleton(request.getDemandId()))
+				.tenantId(request.getTenantId())
+				.skipValidation(true).build();
+		
+		String ulbName = request.getTenantId().replaceFirst("^hp\\.", "");
+		
+		String tenantId = request.getTenantId();
 
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+		
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder()
+		        .isSchedulerCall(true)
+		        .tenantId(request.getTenantId())
+		        .status(Collections.singleton(Status.APPROVED))
+		        .propertyIds(Collections.singleton(request.getPropertyId()))
+		        .isActiveUnit(true)
+		        .build();
+
+		List<Property> property = propertyService.searchProperty(
+		        propertyCriteria,
+		        request.getRequestInfo(),
+		        null);
+		
+		Property propertyDetail = property.get(0);
+		
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for given billId and demandId");
+		}
+
+		Bill bill = billResponse.getBill().get(0);
+		PtTaxCalculatorTracker tracker = getTrackerByBillId(BillIdRequest.builder()
+				                         .billId(request.getBillId())
+				                         .build());
+
+		notificationService.triggerPropertyNotice(tracker, bill, request.getRequestInfo(), ulbName, property, tenantId);
+		
+		try {
+			if (CollectionUtils.isEmpty(property.get(0).getOwners())) {
+				throw new RuntimeException("No owners found for property " + propertyDetail.getPropertyId());
+			}
+
+			ObjectNode smsRequestJson = notificationService.buildGeneratePropertyBillSmsRequest(propertyDetail, bill, tracker);
+			Map<String, Object> smsRequestMap = new ObjectMapper().convertValue(smsRequestJson,Map.class);
+
+			StringBuilder smsTrackerUri = new StringBuilder();
+			smsTrackerUri.append(smsHost).append(smsTrackerCreateEndpoint);
+
+			Map<String, Object> smsTrackerRequest = new HashMap<>();
+			smsTrackerRequest.put("uuid", UUID.randomUUID().toString());
+			smsTrackerRequest.put("amount", bill.getTotalAmount());
+			smsTrackerRequest.put("applicationNo", propertyDetail.getPropertyId());
+			smsTrackerRequest.put("tenantId", propertyDetail.getTenantId());
+			smsTrackerRequest.put("service", "PROPERTY");
+			smsTrackerRequest.put("fromDate",tracker.getFromDate());
+			smsTrackerRequest.put("toDate", tracker.getToDate());
+			smsTrackerRequest.put("createdBy", "system");
+			smsTrackerRequest.put("createdTime", System.currentTimeMillis());
+			smsTrackerRequest.put("billId", bill.getId());
+			smsTrackerRequest.put("demandId", tracker.getDemandId());
+			smsTrackerRequest.put("smsStatus", false);
+			smsTrackerRequest.put("additionalDetail", tracker.getAdditionalDetails());
+			smsTrackerRequest.put("ownerMobileNo", propertyDetail.getOwners().get(0).getMobileNumber());
+			smsTrackerRequest.put("ownerName", propertyDetail.getOwners().get(0).getName());
+			smsTrackerRequest.put("smsRequest", smsRequestMap);
+			smsTrackerRequest.put("smsResponse", null);
+			smsTrackerRequest.put("ward", tracker.getWard());
+
+			restCallRepository.fetchResult(smsTrackerUri, smsTrackerRequest);
+			log.info("Notice SMS tracker entry created for billId {} demandId {}", bill.getId(), tracker.getDemandId());
+
+		} catch (Exception e) {
+			log.error("Notice SMS tracker creation failed for billId {}", bill.getId(), e);
+		}
+	}
+
+	private void syncTrackerWithBillStatus(PtTaxCalculatorTracker tracker, CalculateTaxRequest calculateTaxRequest) {
+		
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+		
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+                .tenantId(tracker.getTenantId())
+                .consumerCode(Collections.singleton(tracker.getPropertyId()))
+                .service("PROPERTY")
+                .billId(Collections.singleton(tracker.getBillId()))
+                .build();
+		
+		List<Bill> bill = billService
+							.searchBill(billSearchCriteria, calculateTaxRequest.getRequestInfo())
+							.getBill();
+		
+		Bill currentBill = bill.get(0);
+		
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+			JsonNode additionalDetails = tracker.getAdditionalDetails();
+
+			if (additionalDetails != null && additionalDetails.isArray() && additionalDetails.size() > 0) {
+
+				ObjectNode firstObject = (ObjectNode) additionalDetails.get(0);
+				firstObject.put("advanceAdjusted", true);
+
+				tracker.setAdditionalDetails(additionalDetails);
+				repository.updateTrackerAdditionalDetails(tracker);
+			}
+		}
+		
+		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
+     	propertyService.UpdatePtTrackerStatus(tracker);
+	}
+
+	public CustomAmountUpdateResponse updateCustomAmount(CustomAmountUpdateRequest request) {
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
+				.billId(Collections.singleton(request.getBillId()))
+				.tenantId(request.getTenantId())
+				.skipValidation(true)
+				.build();
+
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+
+		if (CollectionUtils.isEmpty(billResponse.getBill())) {
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for given ID");
+	    }
+
+	    Bill bill = billResponse.getBill().get(0);
+
+	    if (Bill.StatusEnum.PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update paid bill");
+	    }
+	    
+	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
+	    }
+	    
+	    if (request.getBillId() == null || request.getBillId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "billId is required");
+	    }
+
+	    if (request.getDemandId() == null || request.getDemandId().trim().isEmpty()) {
+	        throw new CustomException("INVALID_REQUEST", "demandId is required");
+	    }
+
+	    if (request.getCustomAmount() == null) {
+	        throw new CustomException("INVALID_REQUEST", "customAmount is required");
+	    }
+	    
+	    String DemandId =  request.getDemandId(); 
+	    repository.updateCustomTrackerAmount(request);
+	    
+	    Object updatedResponse = billService.searchBill(billSearchCriteria, request.getRequestInfo());
+	    BillResponse updatedBillResponse = objectMapper.convertValue(updatedResponse, BillResponse.class);
+	    Bill updatedBill = updatedBillResponse.getBill().get(0);
+	    
+	    CustomAmountUpdateResponse responseObj = new CustomAmountUpdateResponse();
+	    responseObj.setBillId(request.getBillId());
+	    responseObj.setDemandId(DemandId);
+	    responseObj.setCustomAmount(request.getCustomAmount());
+	    responseObj.setMessage("Custom amount updated successfully");
+	    responseObj.setOldAmount(bill.getTotalAmount());
+	    responseObj.setUpdatedTotalAmount(updatedBill.getTotalAmount());
+	    responseObj.setTenantId(request.getTenantId());
+	    responseObj.setReason(request.getReason());
+	    responseObj.setIsCustomAmountApplied(true);
+	    responseObj.setConsumerCode(bill.getConsumerCode());
+	    responseObj.setStatus(bill.getStatus() != null ? bill.getStatus().toString() : null);
+	    responseObj.setUpdatedTime(System.currentTimeMillis());
+	    responseObj.setUpdatedBy(request.getRequestInfo().getUserInfo().getUuid());
+	    return responseObj;
+	}
 
 }

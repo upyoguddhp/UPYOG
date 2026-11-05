@@ -235,11 +235,13 @@ public class BillingServiceConsumer {
 			criteria.setTenantId(bill.getTenantId());
 			criteria.setBusinessService(bill.getBusinessService());
 			criteria.setConsumerCode(Collections.singleton(bill.getConsumerCode()));
+			criteria.setDemandId(Collections.singleton(bill.getBillDetails().get(0).getDemandId()));
 
 			List<Demand> demands = demandService.getDemands(criteria, billReq.getRequestInfo());
 
 			BigDecimal totalDemand = BigDecimal.ZERO;
 			BigDecimal totalCollected = BigDecimal.ZERO;
+			BigDecimal advancePaid = BigDecimal.ZERO;
 
 			for (Demand demand : demands) {
 
@@ -257,6 +259,18 @@ public class BillingServiceConsumer {
 
 					if (dd.getCollectionAmount() != null)
 						totalCollected = totalCollected.add(dd.getCollectionAmount());
+					
+					if ("GB_ADVANCE_CARRYFORWARD".equals(dd.getTaxHeadMasterCode()) && dd.getTaxAmount() != null
+							&& dd.getTaxAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+						advancePaid = dd.getTaxAmount().abs();
+					}
+
+					if ("PT_ADVANCE_CARRYFORWARD".equals(dd.getTaxHeadMasterCode()) && dd.getTaxAmount() != null
+							&& dd.getTaxAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+						advancePaid = dd.getTaxAmount().abs();
+					}
 				}
 			}
 
@@ -281,11 +295,13 @@ public class BillingServiceConsumer {
 
 			if ("GB".equals(bill.getBusinessService())) {
 				log.info("payload in garbage consumer {}",payload);
+				payload.put("advancePaid", advancePaid);
 				producer.push("garbage-bill-tracker-status-update", payload);
 			}
 
 			if ("PROPERTY".equals(bill.getBusinessService())) {
 				log.info("payload in property consumer {}",payload);
+				payload.put("advancePaid", advancePaid);
 				producer.push("property-bill-tracker-status-update", payload);
 			}
 		}

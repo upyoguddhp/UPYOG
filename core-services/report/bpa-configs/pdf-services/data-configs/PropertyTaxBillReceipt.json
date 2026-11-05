@@ -157,6 +157,12 @@
 						}
 					},
 					{
+						"variable": "advancePaid",
+						"value": {
+							"path": "$.advancePaid"
+						}
+					},
+					{
 						"variable": "amountDue",
 						"value": {
 							"path": "$.amountDue"
