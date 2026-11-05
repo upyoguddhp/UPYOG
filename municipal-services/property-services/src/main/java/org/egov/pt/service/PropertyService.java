@@ -1017,7 +1017,7 @@ public class PropertyService {
 
 		Property property = properties.stream().findFirst().orElse(null);
 		if (null == property) {
-			return null;
+			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for propertyId: " + propertyId);
 		}
 
 		PtTaxCalculatorTrackerSearchCriteria ptTaxCalculatorTrackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria
@@ -1028,7 +1028,8 @@ public class PropertyService {
 
 		PtTaxCalculatorTracker ptTaxCalculatorTracker = ptTaxCalculatorTrackers.stream().findFirst().orElse(null);
 		if (null == ptTaxCalculatorTracker) {
-			return null;
+			throw new CustomException("BILL_TRACKER_NOT_FOUND",
+					"No tax calculator tracker found for propertyId: " + propertyId + " and billId: " + billId);
 		}
 
 		BillSearchCriteria.BillSearchCriteriaBuilder builder =
@@ -1049,12 +1050,13 @@ public class PropertyService {
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
 		if (null == billResponse || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND",
+					"No bill found for billId: " + ptTaxCalculatorTracker.getBillId() + " and status: " + status);
 		}
 
 		Bill bill = billResponse.getBill().stream().findFirst().orElse(null);
 		if (null == bill) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for billId: " + ptTaxCalculatorTracker.getBillId());
 		}
 
 		MdmsResponse mdmsResponse = mdmsService.getPropertyReabateDaysMdmsData(requestInfoWrapper.getRequestInfo(),
@@ -1361,7 +1363,19 @@ public class PropertyService {
 		if (!CollectionUtils.isEmpty(properties)) {
 			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
+			
+			List<PtTaxCalculatorTracker> existingTrackers = propertyService.getTaxCalculatedProperties(
+			        PtTaxCalculatorTrackerSearchCriteria.builder()
+			                .propertyIds(Collections.singleton(properties.get(0).getPropertyId()))
+			                .build());
+
+			boolean paymentProcessing = !CollectionUtils.isEmpty(existingTrackers)
+			        && existingTrackers.stream()
+			                .anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+
 			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
+			AtomicBoolean processingFound = new AtomicBoolean(false);
+			
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
@@ -1371,6 +1385,13 @@ public class PropertyService {
 					log.warn("Skipping arrear generation for property {} due to overlapping bill period",
 							properties.get(0).getPropertyId());
 
+					return;
+				}
+				
+				if (paymentProcessing) {
+					log.info("Skipping arrear generation for property {} because payment is being processed",
+							properties.get(0).getPropertyId());
+					processingFound.set(true);
 					return;
 				}
 
@@ -1456,10 +1477,13 @@ public class PropertyService {
 				}
 			});
 			if (arrearGenerated.get()) {
-			    message = "Arrear Generated Successfully";
+				message = "Arrear Generated Successfully";
+			} else if (processingFound.get()) {
+				message = "Cheque clearance is pending. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
+				isSuccess = false;
 			} else {
-			    message = "No arrear generated. Bill already exists for overlapping period.";
-			    isSuccess = false;
+				message = "No arrear generated. Bill already exists for overlapping period.";
+				isSuccess = false;
 			}
 		} else {
 			message = "Invalid Property Details";

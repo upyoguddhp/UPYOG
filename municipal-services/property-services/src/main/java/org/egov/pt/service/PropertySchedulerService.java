@@ -145,6 +145,7 @@ public class PropertySchedulerService {
 
 		List<PtTaxCalculatorTracker> taxCalculatorTrackers = new ArrayList<>();
 		AtomicInteger skippedCount = new AtomicInteger(0);
+		AtomicInteger paymentProcessingCount = new AtomicInteger(0);
 
 		Boolean isBilling = false;
 		JsonNode ulbModules = null;
@@ -222,6 +223,16 @@ public class PropertySchedulerService {
 				overlapErrors.add(
 						"Bill already exists for property " + property.getPropertyId() + " for the selected period");
 //				createFailureLog(property, calculateTaxRequest, null, overlapErrors);
+				continue;
+			}
+			
+			List<PtTaxCalculatorTracker> propertyTrackers = trackerMap.get(property.getPropertyId());
+			boolean paymentProcessing = !CollectionUtils.isEmpty(propertyTrackers) && propertyTrackers.stream()
+					.anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+			if (paymentProcessing) {
+				log.info("Skipping tax calculation for property {} because payment is being processed",
+						property.getPropertyId());
+				paymentProcessingCount.incrementAndGet();
 				continue;
 			}
 
@@ -685,6 +696,7 @@ public class PropertySchedulerService {
 
 		int generatedCount = taxCalculatorTrackers.size();
 		int skipped = skippedCount.get();
+		int processing = paymentProcessingCount.get();
 
 		String message = null;
 		
@@ -696,6 +708,9 @@ public class PropertySchedulerService {
 			message = "Bills generated successfully for " + generatedCount + " Property Id(s).";
 		} else if (skipped > 0) {
 			message = "No bills generated. " + skipped + " Property Id(s) failed due to overlapping bill periods.";
+		} else if (processing > 0) {
+		    message = "Cheque clearance is pending. " + processing
+		            + " Property Id(s) skipped. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
 		}
 
 		return CalculateTaxResponse.builder().taxCalculatorTrackers(taxCalculatorTrackers).message(message).build();
@@ -1140,13 +1155,40 @@ public class PropertySchedulerService {
 				createFailureLog(property, calculateTaxRequest, null, errorMap.get(property.getPropertyId()));
 			}
 
+			String ownerOrOccupier = property.getOwners().stream().flatMap(owner -> {
+				List<String> names = new ArrayList<>();
+
+				if (owner.getPropertyOwnerName() != null) {
+					names.add(owner.getPropertyOwnerName());
+				}
+
+				if (owner.getAdditionalDetails() != null && owner.getAdditionalDetails().has("coOwnerName")) {
+
+					String anyOtherCoWorker = owner.getAdditionalDetails().has("anyOtherCoWorker")
+							? owner.getAdditionalDetails().get("anyOtherCoWorker").asText()
+							: null;
+
+					if (!"No".equalsIgnoreCase(anyOtherCoWorker)) {
+						String coOwner = owner.getAdditionalDetails().get("coOwnerName").asText();
+
+						if (coOwner != null && !coOwner.isEmpty()) {
+							names.add(coOwner);
+						}
+					}
+				}
+
+				return names.stream();
+			}).distinct().collect(Collectors.joining(" & "));
+			
 			Object address = objectMapper.convertValue(property.getAddress(), Object.class);
 			previewResponses.add(CalculateTaxPreviewResponse.builder().propertyId(properties.get(0).getPropertyId())
 					.tenantId(properties.get(0).getTenantId())
 					.totalAnnualTax(totalPropertyTax.setScale(2, RoundingMode.HALF_UP)).address(address)
 					.propertyTaxWithoutRebate(finalPropertyTax.setScale(2, RoundingMode.HALF_UP))
 					.rebateAmount(rebateAmount.setScale(2, RoundingMode.HALF_UP)).days(days)
-					.calculationDetails(trackeradditionalDetails).build());
+					.calculationDetails(trackeradditionalDetails)
+					.ownerOrOccupier(ownerOrOccupier)
+					.build());
 
 		}
 
@@ -1646,7 +1688,7 @@ public class PropertySchedulerService {
 			if (constantValue.equals(PTConstants.PROPERTY_CONSTANT_PENALTY) && tenantIdPenaltyRateMap != null
 					&& tenantIdPenaltyRateMap.containsKey(tracker.getTenantId())) {
 				penaltyAmount = calculatePenalty(tracker, tenantIdPenaltyRateMap.get(tracker.getTenantId()));
-				newAmount = tracker.getPropertyTax().add(penaltyAmount);
+				newAmount = tracker.getPropertyTax().add(penaltyAmount).setScale(0, RoundingMode.HALF_UP);
 
 				tracker.setPenaltyAmount(
 						(tracker.getPenaltyAmount() != null ? tracker.getPenaltyAmount() : BigDecimal.ZERO)
@@ -1679,7 +1721,8 @@ public class PropertySchedulerService {
 	}
 
 	private BigDecimal calculatePenalty(PtTaxCalculatorTracker tracker, Double penaltyRatePercent) {
-		return tracker.getPropertyTaxWithoutRebate().multiply(BigDecimal.valueOf(penaltyRatePercent))
+		return tracker.getPropertyTaxWithoutRebate()
+				.multiply(BigDecimal.valueOf(penaltyRatePercent))
 				.divide(BigDecimal.valueOf(100));
 	}
 

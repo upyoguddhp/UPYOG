@@ -59,7 +59,7 @@ public class GarbageAccountRowMapper implements ResultSetExtractor<List<GarbageA
                         .systemPropertyId(rs.getString("system_property_id"))
                         .himParivarId(rs.getString("him_parivar_id"))
                         .ddpModifiedDate(rs.getLong("ddp_modified_date"))
-                        .ddpPrintVerified((Boolean) rs.getObject("ddp_print_verified"))
+                        .ddpPrintVerified((Boolean) rs.getObject("ddp_dtl_ddp_print_verified"))
                         .isDdpVerified((Boolean) rs.getObject("ddp_verified"))
                         .isReadyForPrinting(getBooleanOrFalse(rs, "ddp_dtl_is_ready_for_printing"))
                         .vendorPrintVerified(rs.getString("ddp_dtl_vendor_print_verified"))

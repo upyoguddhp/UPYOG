@@ -116,6 +116,7 @@ import org.egov.demand.model.BillCancelRequest;
 import java.util.Objects;
 import org.egov.demand.web.contract.CustomAmountUpdateRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -408,7 +409,7 @@ public class BillServicev2 {
 	 */
 	public BillResponseV2 searchBill(BillSearchCriteria billCriteria, RequestInfo requestInfo) {
 		List<BillV2> bills = billRepository.findBill(billCriteria);
-		
+
 		for (BillV2 bill : bills) {
 			BillIdRequest request = BillIdRequest.builder().billId(bill.getId()).requestInfo(requestInfo).build();
 			if ("GB".equalsIgnoreCase(bill.getBusinessService())) {
@@ -416,10 +417,15 @@ public class BillServicev2 {
 				if (tracker != null) {
 					bill.setDemandId(tracker.getDemandId());
 					bill.setIsPaymentProcessing(tracker.getIsPaymentProcessing());
-					if (billCriteria.getIsProcessing() == true) {
+					if (tracker.getIsPaymentProcessing() == true) {
 						bill.setStatus(BillV2.BillStatus.ACTIVE);
-					} else if (tracker.getIsPaymentProcessing() == true) {
-						bill.setStatus(BillV2.BillStatus.PAID);
+						Object chequeTxnAmountObj = tracker.getAdditionaldetail().get("chequeTxnAmount");
+						BigDecimal chequeTxnAmount = chequeTxnAmountObj != null
+								? new BigDecimal(chequeTxnAmountObj.toString())
+								: BigDecimal.ZERO;
+						bill.setProcessingAmount(chequeTxnAmount);	
+					} else if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+						bill.setStatus(resolveProcessingPaymentStatus(bill, tracker.getAdditionaldetail()));
 					}
 				}
 			} else if ("PROPERTY".equalsIgnoreCase(bill.getBusinessService())) {
@@ -427,16 +433,61 @@ public class BillServicev2 {
 				if (tracker != null) {
 					bill.setDemandId(tracker.getDemandId());
 					bill.setIsPaymentProcessing(tracker.getIsPaymentProcessing());
-					if (billCriteria.getIsProcessing() == true) {
+					if (tracker.getIsPaymentProcessing() == true) {
 						bill.setStatus(BillV2.BillStatus.ACTIVE);
-					} else if (tracker.getIsPaymentProcessing() == true) {
-						bill.setStatus(BillV2.BillStatus.PAID);
+						JsonNode additionalDetails = tracker.getAdditionalDetails();
+						JsonNode chequeTxnAmountNode = additionalDetails != null && additionalDetails.isArray()
+								&& !additionalDetails.isEmpty() ? additionalDetails.get(0).get("chequeTxnAmount")
+										: null;
+						BigDecimal chequeTxnAmount = chequeTxnAmountNode != null && !chequeTxnAmountNode.isNull()
+								? chequeTxnAmountNode.decimalValue()
+								: BigDecimal.ZERO;
+						bill.setProcessingAmount(chequeTxnAmount);	
+					} else if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+						bill.setStatus(resolveProcessingPaymentStatus(bill, tracker.getAdditionalDetails()));
 					}
 				}
 			}
 		}
 		return BillResponseV2.builder().resposneInfo(responseFactory.getResponseInfo(requestInfo, HttpStatus.OK))
 				.bill(bills).build();
+	}
+
+	/**
+	 * While a bill's payment is PROCESSING (e.g. a cheque txn pending clearance, reflected
+	 * as status PROCESSING in eg_pg_transaction), the bill should not be blindly marked PAID.
+	 * Compares the amount tendered (tracker's txn amount + any already adjusted amount) against
+	 * the bill's total amount to decide between PARTIALLY_PAID, PAID and ADVANCE_PAID.
+	 */
+	private BillStatus resolveProcessingPaymentStatus(BillV2 bill, JsonNode trackerAdditionalDetail) {
+
+		BigDecimal txnAmount = BigDecimal.ZERO;
+		if (trackerAdditionalDetail != null && trackerAdditionalDetail.has("chequeTxnAmount")
+				&& !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
+			txnAmount = trackerAdditionalDetail.get("chequeTxnAmount").decimalValue();
+		}
+
+		BigDecimal adjustedAmount = BigDecimal.ZERO;
+		if (bill.getBillDetails() != null) {
+			for (BillDetailV2 billDetail : bill.getBillDetails()) {
+				if (billDetail.getBillAccountDetails() != null) {
+					for (BillAccountDetailV2 accDetail : billDetail.getBillAccountDetails()) {
+						if (accDetail.getAdjustedAmount() != null) {
+							adjustedAmount = adjustedAmount.add(accDetail.getAdjustedAmount());
+						}
+					}
+				}
+			}
+		}
+
+		BigDecimal totalPaidAmount = txnAmount.add(adjustedAmount);
+		int comparison = totalPaidAmount.compareTo(bill.getTotalAmount());
+		if (comparison < 0) {
+			return BillStatus.PARTIALLY_PAID;
+		} else if (comparison > 0) {
+			return BillStatus.ADVANCE_PAID;
+		}
+		return BillStatus.PAID;
 	}
 	
 	/**
