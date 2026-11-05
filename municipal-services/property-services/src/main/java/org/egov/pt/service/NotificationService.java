@@ -132,6 +132,36 @@ private static final String SMS_BODY_GENERATE_BILL ="Dear " + RECIPINTS_NAME_PLA
 	@Autowired
 	private RestCallRepository restCallRepository;
 	
+	/**
+	 * SMS sent to the owner(s) when a new property registration is submitted (citizen FORWARD_TO_VERIFIER /
+	 * employee VERIFY on a CREATE request). Never fails the submit: any problem is only logged.
+	 */
+	public void sendApplicationSubmittedSMS(PropertyRequest propertyRequest) {
+		try {
+			Property property = propertyRequest.getProperty();
+			ProcessInstance wf = property.getWorkflow();
+			if (wf == null || property.getCreationReason() == null || !"CREATE".equals(property.getCreationReason().toString()))
+				return;
+			if (!"FORWARD_TO_VERIFIER".equals(wf.getAction()) && !"VERIFY".equals(wf.getAction()))
+				return;
+
+			Map<String, String> mobileToName = new LinkedHashMap<>();
+			if (property.getOwners() != null)
+				property.getOwners().forEach(o -> {
+					if (o.getMobileNumber() != null && !o.getMobileNumber().trim().isEmpty())
+						mobileToName.putIfAbsent(o.getMobileNumber(), o.getName() == null ? "Citizen" : o.getName());
+				});
+			if (mobileToName.isEmpty())
+				return;
+
+			String msg = "Dear " + NOTIFICATION_OWNERNAME + ", your property registration application has been submitted for verification. "
+					+ "Property ID: " + property.getPropertyId() + ". Track it on the CitizenSeva portal. Citizen Seva H.P.";
+			notifUtil.sendSMS(notifUtil.createSMSRequest(msg, mobileToName));
+		} catch (Exception e) {
+			log.error("Could not send the property submission SMS", e);
+		}
+	}
+
 	public void sendNotificationForMutation(PropertyRequest propertyRequest) {
 
 		String msg = null;

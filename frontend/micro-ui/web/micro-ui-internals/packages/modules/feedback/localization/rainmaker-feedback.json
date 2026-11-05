@@ -1,0 +1,944 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_FEEDBACK",
+      "message": "Feedback",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_FEEDBACK",
+      "message": "प्रतिक्रिया",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_MENU_NEW",
+      "message": "Give feedback",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_MENU_NEW",
+      "message": "प्रतिक्रिया दें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_MENU_LIST",
+      "message": "My feedback",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_MENU_LIST",
+      "message": "मेरी प्रतिक्रियाएँ",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_CRUMB_FEEDBACK",
+      "message": "Feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_CRUMB_FEEDBACK",
+      "message": "प्रतिक्रिया",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_NEW_TITLE",
+      "message": "Share your feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_NEW_TITLE",
+      "message": "अपनी प्रतिक्रिया साझा करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_NEW_SUB",
+      "message": "Tell us how a service worked for you. It helps your ULB improve.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_NEW_SUB",
+      "message": "बताइए कि कोई सेवा आपके लिए कैसी रही। इससे आपके शहरी निकाय को सुधार में मदद मिलती है।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LIST_TITLE",
+      "message": "My feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LIST_TITLE",
+      "message": "मेरी प्रतिक्रियाएँ",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LIST_SUB",
+      "message": "Feedback you have submitted, newest first.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LIST_SUB",
+      "message": "आपके द्वारा दी गई प्रतिक्रियाएँ, नवीनतम पहले।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_NEW_BTN",
+      "message": "Give feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_NEW_BTN",
+      "message": "प्रतिक्रिया दें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SELECT_SERVICE",
+      "message": "Which service is your feedback about?",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SELECT_SERVICE",
+      "message": "आपकी प्रतिक्रिया किस सेवा के बारे में है?",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SELECT_PLACEHOLDER",
+      "message": "Select a service",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SELECT_PLACEHOLDER",
+      "message": "सेवा चुनें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_PICK_SERVICE_HINT",
+      "message": "Select a service to see its questions.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_PICK_SERVICE_HINT",
+      "message": "प्रश्न देखने के लिए सेवा चुनें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_GENERAL_SERVICE",
+      "message": "General feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_GENERAL_SERVICE",
+      "message": "सामान्य प्रतिक्रिया",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_GENERAL_RATING",
+      "message": "How would you rate your overall experience?",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_GENERAL_RATING",
+      "message": "आप अपने समग्र अनुभव को कैसे आंकेंगे?",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_GENERAL_COMMENT",
+      "message": "Anything else you would like to tell us?",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_GENERAL_COMMENT",
+      "message": "क्या आप हमें कुछ और बताना चाहेंगे?",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RESPONSE_PH",
+      "message": "Type your response",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RESPONSE_PH",
+      "message": "अपना उत्तर लिखें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_STAR",
+      "message": "{{n}} out of 5",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_STAR",
+      "message": "5 में से {{n}}",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RATING_1",
+      "message": "Poor",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RATING_1",
+      "message": "खराब",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RATING_2",
+      "message": "Fair",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RATING_2",
+      "message": "ठीक-ठाक",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RATING_3",
+      "message": "Good",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RATING_3",
+      "message": "अच्छा",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RATING_4",
+      "message": "Very good",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RATING_4",
+      "message": "बहुत अच्छा",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RATING_5",
+      "message": "Excellent",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RATING_5",
+      "message": "उत्कृष्ट",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SUBMIT",
+      "message": "Submit feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SUBMIT",
+      "message": "प्रतिक्रिया जमा करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SUBMITTING",
+      "message": "Submitting your feedback...",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SUBMITTING",
+      "message": "आपकी प्रतिक्रिया जमा की जा रही है...",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_E_REQUIRED",
+      "message": "This question is required",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_E_REQUIRED",
+      "message": "यह प्रश्न आवश्यक है",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_E_RATING",
+      "message": "Please choose a rating",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_E_RATING",
+      "message": "कृपया रेटिंग चुनें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_E_SERVICE",
+      "message": "Please select a service",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_E_SERVICE",
+      "message": "कृपया सेवा चुनें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_E_MOBILE",
+      "message": "Your profile has no mobile number. Update your profile and try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_E_MOBILE",
+      "message": "आपकी प्रोफ़ाइल में मोबाइल नंबर नहीं है। प्रोफ़ाइल अपडेट करके पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SUBMIT_FAILED",
+      "message": "We could not submit your feedback. Please try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SUBMIT_FAILED",
+      "message": "हम आपकी प्रतिक्रिया जमा नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LOADING_FORM",
+      "message": "Loading the feedback form...",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LOADING_FORM",
+      "message": "प्रतिक्रिया फ़ॉर्म लोड हो रहा है...",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SERVICES_FAILED",
+      "message": "Could not load the list of services. Please try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SERVICES_FAILED",
+      "message": "सेवाओं की सूची लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_QUESTIONS_FAILED",
+      "message": "Could not load the questions. Please try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_QUESTIONS_FAILED",
+      "message": "प्रश्न लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SEARCH_LIST",
+      "message": "Type to search",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SEARCH_LIST",
+      "message": "खोजने के लिए लिखें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_NO_RESULTS",
+      "message": "Nothing matches your search",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_NO_RESULTS",
+      "message": "आपकी खोज से कुछ नहीं मिला",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_TITLE",
+      "message": "Thank you for your feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_TITLE",
+      "message": "आपकी प्रतिक्रिया के लिए धन्यवाद",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_SUB",
+      "message": "Your feedback has been recorded.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_SUB",
+      "message": "आपकी प्रतिक्रिया दर्ज हो गई है।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_NUMBER",
+      "message": "Feedback number",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_NUMBER",
+      "message": "प्रतिक्रिया संख्या",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_COPY",
+      "message": "Copy number",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_COPY",
+      "message": "संख्या कॉपी करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_NOTE",
+      "message": "It may take a minute to appear in My feedback.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_NOTE",
+      "message": "इसे मेरी प्रतिक्रियाएँ में दिखने में एक मिनट लग सकता है।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_PRINT",
+      "message": "Print",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_MINE",
+      "message": "View my feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_MINE",
+      "message": "मेरी प्रतिक्रियाएँ देखें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_AGAIN",
+      "message": "Give more feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_AGAIN",
+      "message": "और प्रतिक्रिया दें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ACK_HOME",
+      "message": "Back to home",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ACK_HOME",
+      "message": "मुखपृष्ठ पर वापस",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_FILTER_PROGRESS",
+      "message": "Submitted",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_FILTER_PROGRESS",
+      "message": "जमा",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_FILTER_DONE",
+      "message": "Closed",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_FILTER_DONE",
+      "message": "बंद",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SEARCH_PH",
+      "message": "Search by number or service",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SEARCH_PH",
+      "message": "संख्या या सेवा से खोजें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LIST_EMPTY",
+      "message": "You have not given any feedback yet",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LIST_EMPTY",
+      "message": "आपने अभी तक कोई प्रतिक्रिया नहीं दी है",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LIST_EMPTY_HINT",
+      "message": "Pick a service and tell us how it went.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LIST_EMPTY_HINT",
+      "message": "कोई सेवा चुनें और बताएँ कि अनुभव कैसा रहा।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_LIST_FAILED",
+      "message": "Could not load your feedback. Please try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_LIST_FAILED",
+      "message": "आपकी प्रतिक्रियाएँ लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_TITLE",
+      "message": "Feedback details",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_TITLE",
+      "message": "प्रतिक्रिया विवरण",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_NUMBER",
+      "message": "Feedback number",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_NUMBER",
+      "message": "प्रतिक्रिया संख्या",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_SERVICE",
+      "message": "Service",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_SERVICE",
+      "message": "सेवा",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_RATING",
+      "message": "Rating",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_RATING",
+      "message": "रेटिंग",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_SUBMITTED",
+      "message": "Submitted on",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_SUBMITTED",
+      "message": "जमा करने की तिथि",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_SOURCE",
+      "message": "Submitted from",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_SOURCE",
+      "message": "जमा करने का माध्यम",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_TYPE",
+      "message": "Type",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_TYPE",
+      "message": "प्रकार",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_ANSWERS",
+      "message": "Your responses",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_ANSWERS",
+      "message": "आपके उत्तर",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_NO_ANSWERS",
+      "message": "No responses were recorded",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_NO_ANSWERS",
+      "message": "कोई उत्तर दर्ज नहीं हुआ",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_TIMELINE",
+      "message": "Progress",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_TIMELINE",
+      "message": "प्रगति",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_SUBMITTED_STEP",
+      "message": "Feedback submitted",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_SUBMITTED_STEP",
+      "message": "प्रतिक्रिया जमा की गई",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_BACK",
+      "message": "Back to my feedback",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_BACK",
+      "message": "मेरी प्रतिक्रियाओं पर वापस",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_NOTFOUND",
+      "message": "This feedback could not be found.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_NOTFOUND",
+      "message": "यह प्रतिक्रिया नहीं मिली।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_VIEW_FAILED",
+      "message": "Could not load the feedback. Please try again.",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_VIEW_FAILED",
+      "message": "प्रतिक्रिया लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ST_SUBMITED",
+      "message": "Submitted",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ST_SUBMITED",
+      "message": "जमा",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_ST_CLOSED",
+      "message": "Closed",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_ST_CLOSED",
+      "message": "बंद",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_TYPE_POST_SERVICE",
+      "message": "After using a service",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_TYPE_POST_SERVICE",
+      "message": "सेवा के उपयोग के बाद",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SRC_WEB",
+      "message": "Website",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SRC_WEB",
+      "message": "वेबसाइट",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "FDB_SRC_MOBILE",
+      "message": "Mobile app",
+      "module": "rainmaker-feedback",
+      "locale": "en_IN"
+    },
+    {
+      "code": "FDB_SRC_MOBILE",
+      "message": "मोबाइल ऐप",
+      "module": "rainmaker-feedback",
+      "locale": "hi_IN"
+    }
+  ]
+}

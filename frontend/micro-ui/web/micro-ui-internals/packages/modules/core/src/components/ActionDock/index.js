@@ -24,13 +24,13 @@ const ActionDock = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const { data: initData } = Digit.Hooks.useStore.getInitData();
-  const tt = (key, text) => t(key, { defaultValue: text });
+  const tt = (k) => t(k);
   const links = getHelpLinks(initData);
 
   if (!links.grievance && !links.chat && !links.ticket) return null;
 
   return (
-    <nav className="ActionDock" aria-label={tt("ACTION_DOCK_ARIA", "Help and support")}>
+    <nav className="ActionDock" aria-label={tt("ACTION_DOCK_ARIA")}>
       {links.chat && (
         <button type="button" className="ActionDock__chat" onClick={() => openLink(history, links.chat)}>
           <span className="ActionDock__avatar">
@@ -38,21 +38,21 @@ const ActionDock = () => {
             <i className="ActionDock__online" aria-hidden="true" />
           </span>
           <span className="ActionDock__chatText">
-            <strong>{tt("ACTION_DOCK_ASK", "Ask assistant")}</strong>
-            <small>{tt("ACTION_DOCK_ONLINE", "Online · Hindi / English")}</small>
+            <strong>{tt("ACTION_DOCK_ASK")}</strong>
+            <small>{tt("ACTION_DOCK_ONLINE")}</small>
           </span>
         </button>
       )}
       {links.grievance && (
         <button type="button" className="ActionDock__round ActionDock__round--grievance" onClick={() => openLink(history, links.grievance)}>
           <span className="ActionDock__circle"><Glyph name="alert" /></span>
-          <span className="ActionDock__caption">{tt("ACTION_DOCK_GRIEVANCE", "Grievance")}</span>
+          <span className="ActionDock__caption">{tt("ACTION_DOCK_GRIEVANCE")}</span>
         </button>
       )}
       {links.ticket && (
         <button type="button" className="ActionDock__round ActionDock__round--ticket" onClick={() => openLink(history, links.ticket)}>
           <span className="ActionDock__circle"><Glyph name="ticket" /></span>
-          <span className="ActionDock__caption">{tt("ACTION_DOCK_TICKET", "Ticket")}</span>
+          <span className="ActionDock__caption">{tt("ACTION_DOCK_TICKET")}</span>
         </button>
       )}
     </nav>

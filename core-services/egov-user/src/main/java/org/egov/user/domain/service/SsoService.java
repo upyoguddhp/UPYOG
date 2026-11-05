@@ -83,7 +83,7 @@ public class SsoService {
 
 			log.info("getUserFromSsoTokenResponse Request {}", user);
 
-			checkAndCreateUserSso(hpSsoValidateTokenResponse, user);
+			User dbUser = checkAndCreateUserSso(hpSsoValidateTokenResponse, user);
 
 			// Real password-grant authentication against the fixed CITIZEN_PASSWORD every
 			// SSO-created citizen is given (see getUserFromSsoTokenResponse) - this goes
@@ -91,10 +91,16 @@ public class SsoService {
 			// bypass, since the old in-process token-issuance shortcut no longer exists in
 			// the Spring Authorization Server stack.
 			UsernamePasswordAuthenticationToken authToken =
-					new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+					new UsernamePasswordAuthenticationToken(
+							// the stored username can differ from the SSO one (update never changes it), so log in as the stored user
+							dbUser != null && dbUser.getUsername() != null ? dbUser.getUsername() : user.getUsername(),
+							user.getPassword());
 			Map<String, String> details = new HashMap<>();
 			details.put("tenantId", constants.getStateLevelTenantId());
 			details.put("userType", UserType.CITIZEN.name());
+			// The HP SSO token was validated above, so the OTP check (citizen.login.password.otp.enabled)
+			// must not run against the fixed SSO password. Set in-process only, never from request data.
+			details.put("isInternal", "true");
 			authToken.setDetails(details);
 
 			Authentication authentication = authenticationManager.authenticate(authToken);
@@ -153,7 +159,7 @@ public class SsoService {
 		return user;
 	}
 
-	private void checkAndCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User user) {
+	private User checkAndCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User user) {
 		// check ssoid exist
 		UserSso userSso = userSsoRepository.getCountBySsoId(hpSsoValidateTokenResponse.getSsoId());
 
@@ -173,15 +179,18 @@ public class SsoService {
 
 			newUser = userInDb.get(0);
 			Boolean update = false;
-			if (!user.getUsername().equals(newUser.getUsername())) {
-				newUser.setUsername(user.getUsername());
-				update = true;
+			// The stored username is never changed by an update, so it is not synced here; login uses the stored one.
+			// If decryption failed the stored name/mobile are still ciphertext; comparing them to plain values
+			// would force a pointless (and corrupting) update on every login.
+			boolean storedEncrypted = isEncryptedValue(newUser.getName()) || isEncryptedValue(newUser.getMobileNumber());
+			if (storedEncrypted) {
+				log.warn("Stored user details for {} could not be decrypted; skipping SSO profile sync", newUser.getUuid());
 			}
-			if (!Objects.equals(newUser.getName(), user.getName())) {
+			if (!storedEncrypted && !Objects.equals(newUser.getName(), user.getName())) {
 				newUser.setName(user.getName());
 				update = true;
 			}
-			if (!Objects.equals(newUser.getMobileNumber(), user.getMobileNumber())) {
+			if (!storedEncrypted && !Objects.equals(newUser.getMobileNumber(), user.getMobileNumber())) {
 				newUser.setMobileNumber(user.getMobileNumber());
 				update = true;
 			}
@@ -194,6 +203,11 @@ public class SsoService {
 			UserSso newUserSso = enrichCreateUserSso(hpSsoValidateTokenResponse, newUser);
 			userSsoRepository.create(newUserSso);
 		}
+		return newUser;
+	}
+
+	private boolean isEncryptedValue(String value) {
+		return value != null && value.matches("^\\d+\\|.+");
 	}
 
 	private UserSso enrichCreateUserSso(HpSsoValidateTokenResponse hpSsoValidateTokenResponse, User newUser) {

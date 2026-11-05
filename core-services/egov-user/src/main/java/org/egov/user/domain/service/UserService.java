@@ -510,10 +510,18 @@ public class UserService {
             user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
             validateUserRoles(user);
             user.validateUserModification();
-            validatePassword(user.getPassword());
-            user.setPassword(encryptPwd(user.getPassword()));
+            // A password that is already a BCrypt hash (user loaded from DB) must not be re-validated or re-hashed
+            if (!isBcryptHash(user.getPassword())) {
+                validatePassword(user.getPassword());
+                user.setPassword(encryptPwd(user.getPassword()));
+            }
             user = encryptionDecryptionUtil.encryptObject(user, "User", User.class);
-            userRepository.update(user, existingUser,requestInfo.getUserInfo().getId(), requestInfo.getUserInfo().getUuid() );
+            // Calls without a request context (e.g. SSO login) are audited against the user being updated
+            Long auditUserId = (requestInfo != null && requestInfo.getUserInfo() != null)
+                    ? requestInfo.getUserInfo().getId() : existingUser.getId();
+            String auditUserUuid = (requestInfo != null && requestInfo.getUserInfo() != null)
+                    ? requestInfo.getUserInfo().getUuid() : existingUser.getUuid();
+            userRepository.update(user, existingUser, auditUserId, auditUserUuid);
         /* encrypt */
 
 
@@ -818,6 +826,10 @@ public class UserService {
         }
     }
 
+
+    private boolean isBcryptHash(String password) {
+        return password != null && password.matches("^\\$2[aby]?\\$\\d{2}\\$.{53}$");
+    }
 
     public void validatePassword(String password) {
         Map<String, String> errorMap = new HashMap<>();

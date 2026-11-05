@@ -1,3 +1,4 @@
+import React from "react";
 import { ROUTES } from "./config";
 import Introduction from "./pages/Introduction";
 import Notifications from "./pages/Notifications";
@@ -11,6 +12,13 @@ import { PrivacyPolicy, WebsitePolicy } from "./pages/Policies";
 import PaymentInstructions from "./pages/PaymentInstructions";
 import QuickPay from "./pages/QuickPay";
 import AccessibilityPage from "./pages/Accessibility";
+import CitizenLogin from "./pages/CitizenLogin";
+import SsoCallback from "./pages/SsoCallback";
+import Dashboard from "../Dashboard";
+import { Redirect } from "react-router-dom";
+
+// citizens are not registered on this portal: the old register URL goes to the SSO login
+const RegisterRedirect = () => <Redirect to="/digit-ui/citizen/login" />;
 
 /** path -> page. Each page is a standalone website page (SiteShell). */
 export const websitePages = {
@@ -31,6 +39,10 @@ export const websitePages = {
   [ROUTES.paymentInstructions]: PaymentInstructions,
   [ROUTES.quickPay]: QuickPay,
   [ROUTES.accessibility]: AccessibilityPage,
+  "/digit-ui/citizen/login": CitizenLogin,
+  "/digit-ui/citizen/register": RegisterRedirect,
+  "/digit-ui/citizen/sso-callback": SsoCallback,
+  "/digit-ui/citizen/dashboard": Dashboard,
 };
 
 export const getWebsitePage = (pathname = "") => websitePages[pathname.replace(/\/+$/, "")] || null;

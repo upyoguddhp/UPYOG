@@ -1,0 +1,3020 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "NPR_MENU_NEW_REGISTRATION",
+      "message": "New pet registration",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MENU_NEW_REGISTRATION",
+      "message": "नया पालतू पशु पंजीकरण",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MENU_MY_APPLICATIONS",
+      "message": "My pet applications",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MENU_MY_APPLICATIONS",
+      "message": "मेरे पालतू पशु आवेदन",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_APP_TITLE",
+      "message": "New Pet Registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_APP_TITLE",
+      "message": "नया पालतू पशु पंजीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_CRUMB_PT",
+      "message": "Pet Registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_CRUMB_PT",
+      "message": "पालतू पशु पंजीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PAGE_SUB",
+      "message": "Pet Registration · Takes about 6 minutes",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PAGE_SUB",
+      "message": "पालतू पशु पंजीकरण · लगभग 6 मिनट",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_REVIEW_SUB",
+      "message": "Pet Registration · Last step",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_REVIEW_SUB",
+      "message": "पालतू पशु पंजीकरण · अंतिम चरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_DETAILS",
+      "message": "Pet & Vaccination Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_DETAILS",
+      "message": "पालतू पशु और टीकाकरण विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_PEOPLE",
+      "message": "Owner Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_PEOPLE",
+      "message": "स्वामी का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_PET",
+      "message": "Pet Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_PET",
+      "message": "पालतू पशु का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_VACCINATION",
+      "message": "Vaccination Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_VACCINATION",
+      "message": "टीकाकरण विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_OWNER",
+      "message": "Owner Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_OWNER",
+      "message": "स्वामी का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_ADDRESS",
+      "message": "Address Details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_ADDRESS",
+      "message": "पता विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_DETAILS",
+      "message": "Tell us about your pet and its vaccination.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_DETAILS",
+      "message": "अपने पालतू पशु और उसके टीकाकरण के बारे में बताएं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_PEOPLE",
+      "message": "Who owns the pet.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_PEOPLE",
+      "message": "पालतू पशु का स्वामी कौन है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TIP_1",
+      "message": "Keep your pet's vaccination certificate ready",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TIP_1",
+      "message": "अपने पालतू पशु का टीकाकरण प्रमाणपत्र तैयार रखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TIP_2",
+      "message": "Have a clear photo of your pet and an ID proof handy",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TIP_2",
+      "message": "पालतू पशु की साफ़ फ़ोटो और पहचान प्रमाण पास रखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TIP_3",
+      "message": "You can save a draft and return",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TIP_3",
+      "message": "आप ड्राफ्ट सहेजकर बाद में लौट सकते हैं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_START_HINT",
+      "message": "Register your pet with your urban local body.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_START_HINT",
+      "message": "अपने शहरी स्थानीय निकाय में अपने पालतू पशु का पंजीकरण करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petName",
+      "message": "Pet Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petName",
+      "message": "पालतू पशु का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petType",
+      "message": "Pet Type",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petType",
+      "message": "पशु का प्रकार",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_breedType",
+      "message": "Breed",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_breedType",
+      "message": "नस्ल",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petGender",
+      "message": "Pet Gender",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petGender",
+      "message": "पशु का लिंग",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petAge",
+      "message": "Pet Age (months)",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petAge",
+      "message": "पशु की आयु (माह)",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petColour",
+      "message": "Colour",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petColour",
+      "message": "रंग",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petStrelization",
+      "message": "Is the pet sterilised?",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petStrelization",
+      "message": "क्या पशु की नसबंदी हुई है?",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petPurchaseSource",
+      "message": "How did you get the pet?",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petPurchaseSource",
+      "message": "पशु कैसे प्राप्त हुआ?",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petPurchaseSourceDetail",
+      "message": "Source details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petPurchaseSourceDetail",
+      "message": "स्रोत का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_vaccinationStatus",
+      "message": "Is the pet vaccinated?",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_vaccinationStatus",
+      "message": "क्या पशु का टीकाकरण हुआ है?",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_vaccinationNumber",
+      "message": "Vaccination Certificate Number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_vaccinationNumber",
+      "message": "टीकाकरण प्रमाणपत्र संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_lastVaccineDate",
+      "message": "Last Vaccination Date",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_lastVaccineDate",
+      "message": "अंतिम टीकाकरण तिथि",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_clinicName",
+      "message": "Clinic / Hospital Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_clinicName",
+      "message": "क्लिनिक / अस्पताल का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_doctorName",
+      "message": "Veterinary Doctor Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_doctorName",
+      "message": "पशु चिकित्सक का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_doctorRegistrationNumber",
+      "message": "Doctor Registration Number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_doctorRegistrationNumber",
+      "message": "चिकित्सक पंजीकरण संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_applicantName",
+      "message": "Owner Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_applicantName",
+      "message": "स्वामी का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_fatherName",
+      "message": "Father / Husband Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_fatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_petOwnerGender",
+      "message": "Owner Gender",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_petOwnerGender",
+      "message": "स्वामी का लिंग",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_mobileNumber",
+      "message": "Mobile Number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_mobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_emailId",
+      "message": "Email Address",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_emailId",
+      "message": "ईमेल पता",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_aadharNumber",
+      "message": "Aadhaar Number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_aadharNumber",
+      "message": "आधार संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_districtName",
+      "message": "District",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_districtName",
+      "message": "जिला",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_ulbName",
+      "message": "ULB Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_ulbName",
+      "message": "शहरी स्थानीय निकाय का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_wardNumber",
+      "message": "Ward Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_wardNumber",
+      "message": "वार्ड का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_doorNo",
+      "message": "House / Door No.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_doorNo",
+      "message": "मकान / द्वार संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_street",
+      "message": "Street",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_street",
+      "message": "गली / सड़क",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_landmark",
+      "message": "Landmark",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_landmark",
+      "message": "पहचान चिह्न",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_addressLine1",
+      "message": "Address",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_addressLine1",
+      "message": "पता",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_pincode",
+      "message": "Pin Code",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_pincode",
+      "message": "पिन कोड",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_COL_ULB",
+      "message": "ULB",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_COL_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_YES",
+      "message": "Yes",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_YES",
+      "message": "हाँ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_NO",
+      "message": "No",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_NO",
+      "message": "नहीं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_MALE",
+      "message": "नर / पुरुष",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_FEMALE",
+      "message": "मादा / महिला",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_BREEDER",
+      "message": "Licensed Breeder",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_BREEDER",
+      "message": "लाइसेंस प्राप्त ब्रीडर",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_SHOP",
+      "message": "Pet Shop",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_SHOP",
+      "message": "पेट शॉप",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_ADOPTED",
+      "message": "Adopted",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_ADOPTED",
+      "message": "गोद लिया",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_GIFT",
+      "message": "Gift",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_GIFT",
+      "message": "उपहार",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_O_OTHER",
+      "message": "Other",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_O_OTHER",
+      "message": "अन्य",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_AADHAR",
+      "message": "Enter a valid 12-digit Aadhaar number.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_AADHAR",
+      "message": "12 अंकों की सही आधार संख्या दर्ज करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_AGE",
+      "message": "Enter the age in whole months, e.g. 18.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_AGE",
+      "message": "आयु पूर्ण माह में दर्ज करें, जैसे 18।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_DATE_FUTURE",
+      "message": "The date cannot be in the future.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_DATE_FUTURE",
+      "message": "तिथि भविष्य की नहीं हो सकती।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_W_BANNED_BREED",
+      "message": "This breed is on the restricted list. Your application can still be filed, but the ULB may reject it.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_W_BANNED_BREED",
+      "message": "यह नस्ल प्रतिबंधित सूची में है। आवेदन जमा हो सकता है, परंतु निकाय उसे अस्वीकार कर सकता है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_H_petAge",
+      "message": "Enter the age in months, e.g. 18 for one and a half years.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_H_petAge",
+      "message": "आयु माह में दर्ज करें, जैसे डेढ़ वर्ष के लिए 18।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_H_vaccinationStatus",
+      "message": "Choose Yes if the pet has an anti-rabies vaccination record.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_H_vaccinationStatus",
+      "message": "यदि पशु का रेबीज़ टीकाकरण रिकॉर्ड है तो हाँ चुनें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_H_aadharNumber",
+      "message": "Optional. 12 digits.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_H_aadharNumber",
+      "message": "वैकल्पिक। 12 अंक।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_BANNER_SUB",
+      "message": "Your application is with the ULB for verification.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_BANNER_SUB",
+      "message": "आपका आवेदन सत्यापन के लिए निकाय के पास है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_SERVICE",
+      "message": "Pet Registration · New registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_SERVICE",
+      "message": "पालतू पशु पंजीकरण · नया पंजीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_OWNER",
+      "message": "Owner details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_OWNER",
+      "message": "स्वामी का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_PET",
+      "message": "Pet details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_PET",
+      "message": "पालतू पशु का विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_ADDRESS",
+      "message": "Address details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_ADDRESS",
+      "message": "पता विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_TITLE",
+      "message": "My Pet Applications",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_TITLE",
+      "message": "मेरे पालतू पशु आवेदन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_SUB",
+      "message": "Every pet registration you have made, in one place",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_SUB",
+      "message": "आपके सभी पालतू पशु पंजीकरण, एक जगह",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_EMPTY",
+      "message": "You have no pet applications yet.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_EMPTY",
+      "message": "आपका अभी कोई पालतू पशु आवेदन नहीं है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_NEW",
+      "message": "Register a pet",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_NEW",
+      "message": "पालतू पशु पंजीकृत करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_FAILED",
+      "message": "We could not load your applications.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_MY_APPS_FAILED",
+      "message": "हम आपके आवेदन लोड नहीं कर सके।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_SEARCH_PH",
+      "message": "Search by application no., pet or breed",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_SEARCH_PH",
+      "message": "आवेदन संख्या, पशु या नस्ल से खोजें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_1",
+      "message": "Submitted",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_1",
+      "message": "जमा हुआ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_2",
+      "message": "Verification",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_2",
+      "message": "सत्यापन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_3",
+      "message": "Approval",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_3",
+      "message": "स्वीकृति",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_4",
+      "message": "Registration issued",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_4",
+      "message": "पंजीकरण जारी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_1_D",
+      "message": "You get an acknowledgement",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_1_D",
+      "message": "आपको पावती मिलेगी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_2_D",
+      "message": "The ULB checks your details and documents",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_2_D",
+      "message": "निकाय आपके विवरण और दस्तावेज़ों की जांच करेगा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_3_D",
+      "message": "Fee is payable once approved",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_3_D",
+      "message": "स्वीकृति के बाद शुल्क देय होगा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STAGE_DRAFT",
+      "message": "Not submitted",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STAGE_DRAFT",
+      "message": "जमा नहीं हुआ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STAGE_PROGRESS",
+      "message": "With the ULB",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STAGE_PROGRESS",
+      "message": "निकाय के पास",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STAGE_APPROVED",
+      "message": "Registered",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STAGE_APPROVED",
+      "message": "पंजीकृत",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_SELECT",
+      "message": "Select",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_SELECT_FIRST",
+      "message": "Select {{parent}} first",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_SELECT_FIRST",
+      "message": "पहले {{parent}} चुनें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_SUBMITTING",
+      "message": "आपका आवेदन जमा हो रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_LOOKUP_FAILED",
+      "message": "Could not load {{what}}. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_LOOKUP_FAILED",
+      "message": "{{what}} लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RETRY",
+      "message": "Try again",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_REQUIRED",
+      "message": "This field is required.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_MOBILE",
+      "message": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_EMAIL",
+      "message": "Enter a valid email address.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_EMAIL",
+      "message": "सही ईमेल पता दर्ज करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_E_PIN",
+      "message": "Enter a valid 6-digit pin code.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_E_PIN",
+      "message": "6 अंकों का सही पिन कोड दर्ज करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_REVIEW_HINT",
+      "message": "Check your details. Use Edit to change anything.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_REVIEW_HINT",
+      "message": "अपना विवरण जाँचें। कुछ बदलने के लिए 'बदलें' दबाएं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_SUBMIT_FAILED",
+      "message": "We could not submit your application.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_SUBMIT_FAILED",
+      "message": "हम आपका आवेदन जमा नहीं कर सके।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_SUCCESS",
+      "message": "Application submitted successfully",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_SUCCESS",
+      "message": "आवेदन सफलतापूर्वक जमा हुआ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_FAILED",
+      "message": "Application submission failed",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_FAILED",
+      "message": "आवेदन जमा नहीं हो सका",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_APP_NO",
+      "message": "Application Number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_HINT",
+      "message": "Keep this number to track your application.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_HINT",
+      "message": "अपने आवेदन को ट्रैक करने के लिए इस संख्या को सुरक्षित रखें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_GO_APPS",
+      "message": "My Applications",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_GO_APPS",
+      "message": "मेरे आवेदन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_GO_HOME",
+      "message": "Go to Dashboard",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_CRUMB_HOME",
+      "message": "होम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_CRUMB_NEW",
+      "message": "New registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_CRUMB_NEW",
+      "message": "नया पंजीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PROGRESS_TITLE",
+      "message": "Your application",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PROGRESS_TITLE",
+      "message": "आपका आवेदन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PROGRESS_DRAFT",
+      "message": "Saved on this device as a draft",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर ड्राफ्ट के रूप में सहेजा गया",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_FAILED",
+      "message": "We could not load the document list. Keep your ID and vaccination proof ready.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_FAILED",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। अपनी पहचान और टीकाकरण का प्रमाण तैयार रखें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_ONLY",
+      "message": "PDF, JPG or PNG, up to 10 MB each.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_ONLY",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_TITLE",
+      "message": "आवश्यक दस्तावेज़",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_HELP_TITLE",
+      "message": "Stuck? We will help.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_HELP_TITLE",
+      "message": "अटक गए? हम मदद करेंगे।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_HELP_LINE",
+      "message": "Call 177-2809784 · 9:30 AM–6:00 PM",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_HELP_LINE",
+      "message": "कॉल करें 177-2809784 · प्रातः 9:30–सायं 6:00",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DRAFT_SAVED",
+      "message": "Draft saved on this device.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DRAFT_SAVED",
+      "message": "ड्राफ्ट इस डिवाइस पर सहेजा गया।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_SAVE_DRAFT",
+      "message": "Save draft",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_SAVE_DRAFT",
+      "message": "ड्राफ्ट सहेजें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NEXT_STEP",
+      "message": "आगे: {{step}}",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_PAGE_HINT",
+      "message": "PDF, JPG or PNG, up to 10 MB each. A document already on file shows as uploaded.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_PAGE_HINT",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी। पहले से उपलब्ध दस्तावेज़ अपलोड हुआ दिखेगा।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_BTN_REMOVE",
+      "message": "हटाएं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_UPLOADED",
+      "message": "अपलोड हुआ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_TITLE",
+      "message": "Application details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_TITLE",
+      "message": "आवेदन विवरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_NODOCS",
+      "message": "No documents attached",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_BACK",
+      "message": "Back to my applications",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_BACK",
+      "message": "मेरे आवेदनों पर वापस",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_NOTFOUND",
+      "message": "This application could not be found.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_NOTFOUND",
+      "message": "यह आवेदन नहीं मिला।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_FAILED",
+      "message": "Could not load the application. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_TIMELINE",
+      "message": "Application progress",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_TIMELINE",
+      "message": "आवेदन की प्रगति",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_VALIDITY",
+      "message": "Registration valid till",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_VALIDITY",
+      "message": "पंजीकरण की वैधता",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_NOHISTORY",
+      "message": "No progress recorded yet",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_BTN",
+      "message": "Renew",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_BTN",
+      "message": "नवीनीकरण करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_TITLE",
+      "message": "Renew pet registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_TITLE",
+      "message": "पालतू पशु पंजीकरण का नवीनीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_SUB",
+      "message": "Keep your pet's registration active",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_SUB",
+      "message": "अपने पालतू पशु का पंजीकरण सक्रिय रखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_STEP_CONFIRM",
+      "message": "Renewal",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_STEP_CONFIRM",
+      "message": "नवीनीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_STEP_UPDATE",
+      "message": "Update details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_STEP_UPDATE",
+      "message": "विवरण अद्यतन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_CONFIRM_TITLE",
+      "message": "Renew registration {{no}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_CONFIRM_TITLE",
+      "message": "पंजीकरण {{no}} का नवीनीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_CONFIRM_HINT",
+      "message": "Check the registration below, then start the renewal.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_CONFIRM_HINT",
+      "message": "नीचे पंजीकरण देखें, फिर नवीनीकरण शुरू करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_P1",
+      "message": "Pet and owner details stay as registered",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_P1",
+      "message": "पशु और स्वामी का विवरण पंजीकरण के अनुसार रहेगा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_P2",
+      "message": "You only update the pet's age and vaccination details",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_P2",
+      "message": "आप केवल पशु की आयु और टीकाकरण विवरण अद्यतन करेंगे",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_P3",
+      "message": "Earlier documents are attached automatically; replace any that changed",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_P3",
+      "message": "पहले के दस्तावेज़ स्वतः संलग्न होंगे; जो बदले हों उन्हें बदलें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_P4",
+      "message": "A renewal fee set by your ULB is payable after verification",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_P4",
+      "message": "सत्यापन के बाद आपके ULB द्वारा निर्धारित नवीनीकरण शुल्क देय होगा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_START",
+      "message": "Start renewal",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_START",
+      "message": "नवीनीकरण शुरू करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_STARTING",
+      "message": "Starting your renewal...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_STARTING",
+      "message": "आपका नवीनीकरण शुरू हो रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_START_FAILED",
+      "message": "Could not start the renewal. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_START_FAILED",
+      "message": "नवीनीकरण शुरू नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_LOADING",
+      "message": "Loading your registration...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_LOADING",
+      "message": "आपका पंजीकरण लोड हो रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_LOAD_FAILED",
+      "message": "Could not load the registration. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_LOAD_FAILED",
+      "message": "पंजीकरण लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_NOT_FOUND",
+      "message": "This registration could not be found.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_NOT_FOUND",
+      "message": "यह पंजीकरण नहीं मिला।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_NOT_ELIGIBLE",
+      "message": "Only approved registrations can be renewed. Current status: {{status}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_NOT_ELIGIBLE",
+      "message": "केवल स्वीकृत पंजीकरण का नवीनीकरण हो सकता है। वर्तमान स्थिति: {{status}}",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_IN_PROGRESS",
+      "message": "A renewal of this registration is already in progress. Status: {{status}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_IN_PROGRESS",
+      "message": "इस पंजीकरण का नवीनीकरण पहले से प्रगति में है। स्थिति: {{status}}",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_LOCKED_TITLE",
+      "message": "Registered details (cannot be changed)",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_LOCKED_TITLE",
+      "message": "पंजीकृत विवरण (बदले नहीं जा सकते)",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_EDIT_TITLE",
+      "message": "Update for renewal",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_EDIT_TITLE",
+      "message": "नवीनीकरण हेतु अद्यतन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_EDIT_HINT",
+      "message": "Enter your pet's current age and fresh vaccination details.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_EDIT_HINT",
+      "message": "अपने पशु की वर्तमान आयु और नया टीकाकरण विवरण दर्ज करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_REVIEW_HINT",
+      "message": "Check the details before submitting your renewal.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_REVIEW_HINT",
+      "message": "नवीनीकरण जमा करने से पहले विवरण जांचें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_DECLARATION",
+      "message": "I declare that the updated details are true to the best of my knowledge.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूं कि अद्यतन विवरण मेरी जानकारी में सत्य हैं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMIT",
+      "message": "Submit renewal",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMIT",
+      "message": "नवीनीकरण जमा करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMITTING",
+      "message": "Submitting your renewal...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMITTING",
+      "message": "आपका नवीनीकरण जमा हो रहा है...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMIT_FAILED",
+      "message": "Could not submit the renewal. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_SUBMIT_FAILED",
+      "message": "नवीनीकरण जमा नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_ACK_TITLE",
+      "message": "Renewal submitted",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_ACK_TITLE",
+      "message": "नवीनीकरण जमा हो गया",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_ACK_SUB",
+      "message": "Your renewal has been sent to the ULB for verification. Any renewal fee will be shown for payment after verification.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_ACK_SUB",
+      "message": "आपका नवीनीकरण सत्यापन के लिए ULB को भेज दिया गया है। सत्यापन के बाद शुल्क (यदि कोई हो) भुगतान हेतु दिखाया जाएगा।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RN_VIEW",
+      "message": "View application",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RN_VIEW",
+      "message": "आवेदन देखें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TYPE_NEW",
+      "message": "New registration",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TYPE_NEW",
+      "message": "नया पंजीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TYPE_RENEWAL",
+      "message": "Renewal",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TYPE_RENEWAL",
+      "message": "नवीनीकरण",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_TYPE_LABEL",
+      "message": "Type",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_TYPE_LABEL",
+      "message": "प्रकार",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_TYPE_ERROR",
+      "message": "केवल पीडीएफ, जेपीजी या पीएनजी फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_SIZE_ERROR",
+      "message": "File must be smaller than 10 MB.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 10 एमबी से छोटी होनी चाहिए।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_REQUIRED_ERROR",
+      "message": "Please upload this document.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_REQUIRED_ERROR",
+      "message": "कृपया यह दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCV_PAGES",
+      "message": "pages",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOCV_FAILED",
+      "message": "This file could not be displayed. Please try again or choose the file again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOCV_FAILED",
+      "message": "यह फ़ाइल नहीं दिखाई जा सकी। कृपया पुनः प्रयास करें या फ़ाइल दोबारा चुनें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DOC_UPLOAD_FAILED",
+      "message": "Your application was created, but these documents could not be uploaded: {{docs}}. Press Submit again to retry.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DOC_UPLOAD_FAILED",
+      "message": "आपका आवेदन बन गया है, पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए जमा करें दबाएं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूं कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_DECLARE_REQUIRED",
+      "message": "Please tick the declaration to submit.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा पर टिक करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_COPIED",
+      "message": "कॉपी हुआ",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_COPY_ID",
+      "message": "Copy ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_COPY_ID",
+      "message": "आईडी कॉपी करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_WHERE",
+      "message": "Where your application is now",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_WHERE",
+      "message": "आपका आवेदन अभी कहाँ है",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_PENDING",
+      "message": "Pending with ULB verifier",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_PENDING",
+      "message": "निकाय सत्यापनकर्ता के पास लंबित",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_DEPT",
+      "message": "Urban Development Department · Citizen Seva",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_DEPT",
+      "message": "शहरी विकास विभाग · सिटिजन सेवा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_TITLE",
+      "message": "Acknowledgement Receipt",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_TITLE",
+      "message": "पावती रसीद",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_DATE",
+      "message": "Submitted on",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_DATE",
+      "message": "जमा करने की तिथि",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_STATUS_V",
+      "message": "Submitted for verification",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_STATUS_V",
+      "message": "सत्यापन हेतु जमा",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_DOCS",
+      "message": "Documents submitted",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_DOCS",
+      "message": "जमा किए गए दस्तावेज़",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_NOTE",
+      "message": "Keep this receipt and the application number for tracking. This is a computer-generated acknowledgement and does not need a signature.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_NOTE",
+      "message": "ट्रैकिंग के लिए इस रसीद और आवेदन संख्या को सुरक्षित रखें। यह कंप्यूटर जनित पावती है, हस्ताक्षर आवश्यक नहीं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_RCPT_HELP",
+      "message": "Helpline: 177-2809784 (Mon–Sat, 9:30 AM–6:00 PM)",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_RCPT_HELP",
+      "message": "हेल्पलाइन: 177-2809784 (सोम–शनि, 9:30–6:00)",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_NO_RESULTS",
+      "message": "No applications match your search.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_NO_RESULTS",
+      "message": "आपकी खोज से कोई आवेदन मेल नहीं खाता।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएं",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_FILTER_DRAFT",
+      "message": "Draft",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_FILTER_DRAFT",
+      "message": "ड्राफ्ट",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_PROPERTY",
+      "message": "Property",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_PROPERTY",
+      "message": "संपत्ति",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_PROPERTY",
+      "message": "Find the property where the pet lives and select it.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_STEP_HINT_PROPERTY",
+      "message": "वह संपत्ति खोजें जहाँ पालतू पशु रहता है और उसे चुनें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_propertyId",
+      "message": "Property ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_propertyId",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_propertyOwnerName",
+      "message": "Property Owner Name",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_propertyOwnerName",
+      "message": "संपत्ति स्वामी का नाम",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_propertyAddress",
+      "message": "Address",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_propertyAddress",
+      "message": "पता",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_F_propertyPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_F_propertyPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_MINE",
+      "message": "My properties",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_MINE",
+      "message": "मेरी संपत्तियां",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_ID",
+      "message": "Property ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_ID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_PH_ID",
+      "message": "Enter the property ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_PH_ID",
+      "message": "संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_MOBILE",
+      "message": "Owner mobile",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_MOBILE",
+      "message": "स्वामी का मोबाइल",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_PH_MOBILE",
+      "message": "Enter the owner's 10-digit mobile number",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_PH_MOBILE",
+      "message": "स्वामी का 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_OLD",
+      "message": "Old property ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_MODE_OLD",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_PH_OLD",
+      "message": "Enter the old property ID",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_PH_OLD",
+      "message": "पुरानी संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_ACTIVE",
+      "message": "Active",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_ACTIVE",
+      "message": "सक्रिय",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_INACTIVE",
+      "message": "Inactive",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_INACTIVE",
+      "message": "निष्क्रिय",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_PROGRESS",
+      "message": "Under process",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_STATUS_PROGRESS",
+      "message": "प्रक्रियाधीन",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_E_PICK",
+      "message": "Please select a property to continue.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_E_PICK",
+      "message": "आगे बढ़ने के लिए कृपया एक संपत्ति चुनें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_FIND_BY",
+      "message": "Find your property by",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_FIND_BY",
+      "message": "अपनी संपत्ति इससे खोजें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_MINE_HINT",
+      "message": "Showing properties linked to your mobile number {{mobile}}.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_MINE_HINT",
+      "message": "आपके मोबाइल नंबर {{mobile}} से जुड़ी संपत्तियां दिखाई जा रही हैं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_SEARCH",
+      "message": "Search",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_SEARCH",
+      "message": "खोजें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_NO_MOBILE",
+      "message": "No mobile number is linked to your account. Search by property ID instead.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_NO_MOBILE",
+      "message": "आपके खाते से कोई मोबाइल नंबर जुड़ा नहीं है। संपत्ति आईडी से खोजें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_ENTER_TERM",
+      "message": "Enter a value above and press Search.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_ENTER_TERM",
+      "message": "ऊपर मान दर्ज करें और खोजें दबाएं।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_SEARCHING",
+      "message": "Searching properties...",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_SEARCHING",
+      "message": "संपत्तियां खोजी जा रही हैं...",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_FAILED",
+      "message": "We could not search properties. Please try again.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_FAILED",
+      "message": "हम संपत्तियां नहीं खोज सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_EMPTY",
+      "message": "No property found",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_EMPTY",
+      "message": "कोई संपत्ति नहीं मिली",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_EMPTY_HINT",
+      "message": "Check the value and try another way to search, or register the property first.",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_EMPTY_HINT",
+      "message": "मान जांचें और खोजने का दूसरा तरीका आज़माएं, या पहले संपत्ति पंजीकृत करें।",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_RESULTS",
+      "message": "Matching properties",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_RESULTS",
+      "message": "मिलती-जुलती संपत्तियां",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_PICKED",
+      "message": "Selected property {{id}}",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_PICKED",
+      "message": "चुनी गई संपत्ति {{id}}",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_NOT_FOUND",
+      "message": "Property not found?",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_NOT_FOUND",
+      "message": "संपत्ति नहीं मिली?",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPR_PS_REGISTER_LINK",
+      "message": "Register it first",
+      "module": "rainmaker-ptr",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPR_PS_REGISTER_LINK",
+      "message": "पहले इसे पंजीकृत करें",
+      "module": "rainmaker-ptr",
+      "locale": "hi_IN"
+    }
+  ]
+}

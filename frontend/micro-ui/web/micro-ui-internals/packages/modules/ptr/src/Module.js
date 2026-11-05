@@ -1,7 +1,8 @@
-import { Header, CitizenHomeCard, PTIcon } from "@upyog/digit-ui-react-components";
+import { Header, CitizenHomeCard, PTIcon, SevaLoader } from "@upyog/digit-ui-react-components";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouteMatch } from "react-router-dom";
+import { nprText } from "./config/newPetMessages";
 import PTRPetdetails from "./pageComponents/PTRPetdetails";
 import PTROwnerDetails from "./pageComponents/PTROwnerDetails";
 import PTRCitizenPet from "./pageComponents/PTRCitizenPet";
@@ -100,7 +101,10 @@ export const PTRModule = ({ stateCode, userType, tenants }) => {
 
   if (userType === "employee") {
     return <EmployeeApp path={path} url={url} userType={userType} />;
-  } else return <CitizenApp />;
+  }
+  // the new flow reads its labels from localization: wait for the module store so the first paint is not raw keys
+  if (isLoading) return <SevaLoader />;
+  return <CitizenApp />;
 };
 
 export const PTRLinks = ({ matchPath, userType }) => {
@@ -114,13 +118,12 @@ export const PTRLinks = ({ matchPath, userType }) => {
   const links = [
     
     {
-      link: `${matchPath}/ptr/petservice/new-application`,
-      i18nKey: t("PTR_CREATE_PET_APPLICATION"),
+      link: `${matchPath}/ptr/petservice/new-registration`,
+      i18nKey: nprText(t, "NPR_APP_TITLE"),
     },
-    
     {
-      link: `${matchPath}/ptr/petservice/my-application`,
-      i18nKey: t("PTR_MY_APPLICATIONS_HEADER"),
+      link: `${matchPath}/ptr/petservice/my-registrations`,
+      i18nKey: nprText(t, "NPR_MY_APPS_TITLE"),
     },
     
     {

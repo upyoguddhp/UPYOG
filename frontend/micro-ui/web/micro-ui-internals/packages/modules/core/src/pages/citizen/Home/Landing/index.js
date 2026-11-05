@@ -197,7 +197,7 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
         isLoggedIn={isLoggedIn}
         userName={user?.info?.name}
         onLogin={() => history.push(LOGIN_URL)}
-        onRegister={() => history.push("/digit-ui/citizen/register")}
+        onOfficialLogin={() => history.push("/digit-ui/employee/user/login")}
         onLogout={logout}
         onNavigate={(item) => item.onClick && item.onClick()}
         onSearch={() => document.querySelector(".LandingSearch input")?.focus()}

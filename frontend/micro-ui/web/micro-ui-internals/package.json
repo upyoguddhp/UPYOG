@@ -12,6 +12,7 @@
     "packages/modules/commonPt",
     "packages/modules/dss",
     "packages/modules/pt",
+    "packages/modules/grbg",
     "packages/modules/obps"
     
   ],

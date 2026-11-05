@@ -1,0 +1,134 @@
+/* HP citizen feedback - mobile-first. Shares the npt-* look from NewPT.scss; only extras live here. */
+$fdb-navy: #16203f;
+$fdb-blue: #1d4fd8;
+$fdb-line: #d9e1f2;
+$fdb-muted: #5b6573;
+$fdb-star: #f5a300;
+$fdb-focus: rgba(29, 79, 216, 0.22);
+$fdb-error: #b42318;
+
+.fdb-citizen {
+  display: block;
+}
+.fdb-q {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $fdb-navy;
+}
+.fdb-select,
+.fdb-text {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid $fdb-line;
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: $fdb-navy;
+  box-sizing: border-box;
+  &:focus {
+    outline: 0;
+    border-color: $fdb-blue;
+    box-shadow: 0 0 0 3px $fdb-focus;
+  }
+}
+.fdb-select {
+  min-height: 44px;
+}
+.fdb-text {
+  min-height: 110px;
+  resize: vertical;
+}
+.fdb-stars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.fdb-star {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  svg {
+    fill: none;
+    stroke: $fdb-muted;
+    stroke-width: 1.6;
+    transition: transform 0.12s ease, fill 0.12s ease;
+  }
+  &:hover svg {
+    transform: scale(1.12);
+  }
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px $fdb-focus;
+  }
+  &.is-on svg {
+    fill: $fdb-star;
+    stroke: $fdb-star;
+  }
+}
+.fdb-stars__label {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fdb-navy;
+}
+.fdb-radios {
+  display: grid;
+  gap: 8px;
+}
+.fdb-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid $fdb-line;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: $fdb-blue;
+  }
+  &:hover {
+    border-color: $fdb-blue;
+  }
+  &.is-on {
+    border-color: $fdb-blue;
+    background: #eef3ff;
+  }
+}
+.fdb-err {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: $fdb-error;
+}
+.fdb-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 16px 18px;
+  .npt-btn {
+    width: 100%;
+  }
+}
+.fdb-ack__rating {
+  margin: 0 0 8px;
+}
+@media (min-width: 640px) {
+  .fdb-actions .npt-btn {
+    width: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fdb-star svg {
+    transition: none;
+  }
+}

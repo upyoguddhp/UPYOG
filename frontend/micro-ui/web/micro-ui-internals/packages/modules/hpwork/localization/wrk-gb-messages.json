@@ -1,0 +1,38 @@
+{
+  "WRK_GB_F_garbageId": {
+    "en": "Garbage account ID",
+    "hi": "कचरा खाता आईडी"
+  },
+  "WRK_GB_F_oldGarbageId": {
+    "en": "Old garbage ID",
+    "hi": "पुराना कचरा आईडी"
+  },
+  "WRK_GB_F_isOwner": {
+    "en": "Applicant is the owner",
+    "hi": "आवेदक स्वामी है"
+  },
+  "WRK_GB_F_propertyOwner": {
+    "en": "Property owner",
+    "hi": "संपत्ति स्वामी"
+  },
+  "WRK_GB_F_zone": {
+    "en": "Zone",
+    "hi": "ज़ोन"
+  },
+  "WRK_GB_F_unit": {
+    "en": "Collection unit",
+    "hi": "संग्रहण इकाई"
+  },
+  "WRK_GB_F_child": {
+    "en": "Additional account",
+    "hi": "अतिरिक्त खाता"
+  },
+  "WRK_GB_SEC_UNITS": {
+    "en": "Collection units",
+    "hi": "संग्रहण इकाइयाँ"
+  },
+  "WRK_GB_SEC_CHILDREN": {
+    "en": "Additional accounts",
+    "hi": "अतिरिक्त खाते"
+  }
+}

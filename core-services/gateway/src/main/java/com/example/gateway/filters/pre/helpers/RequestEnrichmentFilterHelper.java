@@ -82,9 +82,9 @@ public class RequestEnrichmentFilterHelper implements RewriteFunction<Map,Map> {
 
         exchange.getRequest().mutate()
                 .headers(httpHeaders -> {
-                    httpHeaders.add(CORRELATION_ID_HEADER_NAME, correlationId);
+                    httpHeaders.set(CORRELATION_ID_HEADER_NAME, correlationId);
                     if (centralInstanceUtil.getIsEnvironmentCentralInstance()) {
-                        httpHeaders.add(REQUEST_TENANT_ID_KEY, TenantId);
+                        httpHeaders.set(REQUEST_TENANT_ID_KEY, TenantId);
                     }
                 });
     }
@@ -94,7 +94,7 @@ public class RequestEnrichmentFilterHelper implements RewriteFunction<Map,Map> {
             User user = getUser(body);
             exchange.getRequest().mutate().headers(httpHeaders -> {
                 try {
-                    httpHeaders.add(USER_INFO_HEADER_NAME, objectMapper.writeValueAsString(user));
+                    httpHeaders.set(USER_INFO_HEADER_NAME, objectMapper.writeValueAsString(user));
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
@@ -109,7 +109,7 @@ public class RequestEnrichmentFilterHelper implements RewriteFunction<Map,Map> {
     }
     private void addPassThroughGatewayHeader(ServerWebExchange exchange) {
         exchange.getRequest().mutate().headers(httpHeaders -> {
-            httpHeaders.add(PASS_THROUGH_GATEWAY_HEADER_NAME, PASS_THROUGH_GATEWAY_HEADER_VALUE);
+            httpHeaders.set(PASS_THROUGH_GATEWAY_HEADER_NAME, PASS_THROUGH_GATEWAY_HEADER_VALUE);
         });
     }
 

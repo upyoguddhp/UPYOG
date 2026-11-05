@@ -56,6 +56,8 @@ import SearchTradeComponent from "./pages/citizen/SearchTrade";
 import SelectTradeUnitsInitial from "./pageComponents/SelectTradeUnitsInitial";
 import TLTradeUnitsEmployeeInitial from "./pageComponents/TLTradeUnitsEmployeeInitial";
 
+import { ntlText } from "./config/newTLMessages";
+import NewTLApp from "./pages/citizen/NewTL/NewTLApp";
 import CitizenApp from "./pages/citizen";
 import EmployeeApp from "./pages/employee";
 
@@ -72,6 +74,22 @@ export const TLModule = ({ stateCode, userType, tenants }) => {
   if (userType === "employee") {
     return <EmployeeApp path={path} url={url} userType={userType} />;
   } else return <CitizenApp />;
+};
+
+// HP Trade Licence ("NewTL" in MDMS citymodule) — routed at /digit-ui/citizen/newtl
+export const NewTLModule = ({ stateCode, userType }) => {
+  const language = Digit.StoreData.getCurrentLanguage();
+  Digit.Services.useStore({ stateCode, moduleCode: "TL", language });
+  return userType === "employee" ? null : <NewTLApp />;
+};
+
+export const NewTLLinks = ({ matchPath }) => {
+  const { t } = useTranslation();
+  const links = [
+    { link: `${matchPath}/new-registration`, i18nKey: ntlText(t, "NTL_APP_TITLE") },
+    { link: `${matchPath}/my-registrations`, i18nKey: ntlText(t, "NTL_MY_APPS_TITLE") },
+  ];
+  return <CitizenHomeCard header={ntlText(t, "MODULE_NEWTL")} links={links} Icon={() => <CaseIcon className="fill-path-primary-main" />} />;
 };
 
 export const TLLinks = ({ matchPath, userType }) => {

@@ -65,7 +65,7 @@ const cycle = (value, max) => (value >= max ? 0 : value + 1);
  */
 const AccessibilityTools = ({ buttonClassName = "", compact = false }) => {
   const { t } = useTranslation();
-  const tt = (k, d) => t(k, { defaultValue: d });
+  const tt = (k) => t(k);
   const s = useAccessibility();
   const [open, setOpen] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -96,7 +96,7 @@ const AccessibilityTools = ({ buttonClassName = "", compact = false }) => {
     setSpeaking(!!u);
   };
 
-  const satLabels = [tt("A11Y_SATURATION", "Saturation"), tt("A11Y_LOW_SAT", "Low saturation"), tt("A11Y_HIGH_SAT", "High saturation"), tt("A11Y_DESATURATE", "Desaturate")];
+  const satLabels = [tt("A11Y_SATURATION"), tt("A11Y_LOW_SAT"), tt("A11Y_HIGH_SAT"), tt("A11Y_DESATURATE")];
   const changed = JSON.stringify(s) !== JSON.stringify(DEFAULTS);
 
   return (
@@ -106,38 +106,38 @@ const AccessibilityTools = ({ buttonClassName = "", compact = false }) => {
         className={`A11yTools__btn ${buttonClassName}`}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={tt("A11Y_TOOLS", "Accessibility tools")}
-        title={tt("A11Y_TOOLS", "Accessibility tools")}
+        aria-label={tt("A11Y_TOOLS")}
+        title={tt("A11Y_TOOLS")}
         onClick={() => setOpen((o) => !o)}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="4.5" r="2" />
           <path d="M5 8.5l7 1.5 7-1.5M12 10v5M12 15l-3 6M12 15l3 6" />
         </svg>
-        {compact ? null : <span>{tt("A11Y_SHORT", "Accessibility")}</span>}
+        {compact ? null : <span>{tt("A11Y_SHORT")}</span>}
       </button>
 
       {open && (
-        <div className="A11yPanel" role="dialog" aria-label={tt("A11Y_TOOLS", "Accessibility tools")}>
-          <div className="A11yPanel__head">{tt("A11Y_TOOLS", "Accessibility tools")}</div>
+        <div className="A11yPanel" role="dialog" aria-label={tt("A11Y_TOOLS")}>
+          <div className="A11yPanel__head">{tt("A11Y_TOOLS")}</div>
           <div className="A11yPanel__grid">
-            {speechSupported() && <Tile icon="speaker" label={tt("A11Y_TTS", "Text to speech")} active={speaking} onClick={toggleSpeech} />}
-            <Tile icon="spacing" label={tt("A11Y_SPACING", "Text spacing")} active={s.spacing > 0} steps={3} level={s.spacing} onClick={() => setAccessibility({ spacing: cycle(s.spacing, 3) })} />
-            <Tile icon="lineheight" label={tt("A11Y_LINE_HEIGHT", "Line height")} active={s.lineHeight > 0} steps={3} level={s.lineHeight} onClick={() => setAccessibility({ lineHeight: cycle(s.lineHeight, 3) })} />
-            <Tile icon="plus" label={tt("A11Y_FONT_UP", "Increase font size")} active={s.fontSize > 0} onClick={() => setAccessibility({ fontSize: Math.min(2, s.fontSize + 1) })} />
-            <Tile icon="a" label={tt("A11Y_FONT_NORMAL", "Normal fonts")} active={s.fontSize === 0} onClick={() => setAccessibility({ fontSize: 0 })} />
-            <Tile icon="minus" label={tt("A11Y_FONT_DOWN", "Decrease font size")} active={s.fontSize < 0} onClick={() => setAccessibility({ fontSize: -1 })} />
-            <Tile icon="link" label={tt("A11Y_LINKS", "Highlight links")} active={s.links} onClick={() => setAccessibility({ links: !s.links })} />
-            <Tile icon="dyslexia" label={tt("A11Y_DYSLEXIA", "Dyslexia friendly")} active={s.dyslexia} onClick={() => setAccessibility({ dyslexia: !s.dyslexia })} />
-            <Tile icon="image" label={tt("A11Y_HIDE_IMAGES", "Hide images")} active={s.hideImages} onClick={() => setAccessibility({ hideImages: !s.hideImages })} />
-            <Tile icon="cursor" label={tt("A11Y_CURSOR", "Cursor")} active={s.cursor} onClick={() => setAccessibility({ cursor: !s.cursor })} />
-            <Tile icon="moon" label={tt("A11Y_DARK", "Contrast: light / dark")} active={s.theme === "dark"} onClick={() => setAccessibility({ theme: s.theme === "dark" ? "normal" : "dark" })} />
-            <Tile icon="invert" label={tt("A11Y_INVERT", "Invert colors")} active={s.theme === "invert"} onClick={() => setAccessibility({ theme: s.theme === "invert" ? "normal" : "invert" })} />
-            <Tile icon="eye" label={tt("A11Y_ADHD", "ADHD mode")} active={s.adhd} onClick={() => setAccessibility({ adhd: !s.adhd })} />
+            {speechSupported() && <Tile icon="speaker" label={tt("A11Y_TTS")} active={speaking} onClick={toggleSpeech} />}
+            <Tile icon="spacing" label={tt("A11Y_SPACING")} active={s.spacing > 0} steps={3} level={s.spacing} onClick={() => setAccessibility({ spacing: cycle(s.spacing, 3) })} />
+            <Tile icon="lineheight" label={tt("A11Y_LINE_HEIGHT")} active={s.lineHeight > 0} steps={3} level={s.lineHeight} onClick={() => setAccessibility({ lineHeight: cycle(s.lineHeight, 3) })} />
+            <Tile icon="plus" label={tt("A11Y_FONT_UP")} active={s.fontSize > 0} onClick={() => setAccessibility({ fontSize: Math.min(2, s.fontSize + 1) })} />
+            <Tile icon="a" label={tt("A11Y_FONT_NORMAL")} active={s.fontSize === 0} onClick={() => setAccessibility({ fontSize: 0 })} />
+            <Tile icon="minus" label={tt("A11Y_FONT_DOWN")} active={s.fontSize < 0} onClick={() => setAccessibility({ fontSize: -1 })} />
+            <Tile icon="link" label={tt("A11Y_LINKS")} active={s.links} onClick={() => setAccessibility({ links: !s.links })} />
+            <Tile icon="dyslexia" label={tt("A11Y_DYSLEXIA")} active={s.dyslexia} onClick={() => setAccessibility({ dyslexia: !s.dyslexia })} />
+            <Tile icon="image" label={tt("A11Y_HIDE_IMAGES")} active={s.hideImages} onClick={() => setAccessibility({ hideImages: !s.hideImages })} />
+            <Tile icon="cursor" label={tt("A11Y_CURSOR")} active={s.cursor} onClick={() => setAccessibility({ cursor: !s.cursor })} />
+            <Tile icon="moon" label={tt("A11Y_DARK")} active={s.theme === "dark"} onClick={() => setAccessibility({ theme: s.theme === "dark" ? "normal" : "dark" })} />
+            <Tile icon="invert" label={tt("A11Y_INVERT")} active={s.theme === "invert"} onClick={() => setAccessibility({ theme: s.theme === "invert" ? "normal" : "invert" })} />
+            <Tile icon="eye" label={tt("A11Y_ADHD")} active={s.adhd} onClick={() => setAccessibility({ adhd: !s.adhd })} />
             <Tile icon="drop" label={satLabels[s.saturation]} active={s.saturation > 0} steps={3} level={s.saturation} onClick={() => setAccessibility({ saturation: cycle(s.saturation, 3) })} />
           </div>
           <button type="button" className="A11yPanel__reset" onClick={() => { stopSpeaking(); setSpeaking(false); resetAccessibility(); }} disabled={!changed}>
-            <Glyph name="reset" /> {tt("A11Y_RESET", "Reset all settings")}
+            <Glyph name="reset" /> {tt("A11Y_RESET")}
           </button>
         </div>
       )}

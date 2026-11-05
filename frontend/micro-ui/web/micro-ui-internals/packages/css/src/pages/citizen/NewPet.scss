@@ -1,0 +1,7 @@
+/* Pet registration (NewPet) — reuses the npt-* tokens/components from NewPT.scss; only pet-specific bits live here. */
+.pet-citizen .npt-wrap .npt-lookup-error { margin-top: 12px; }
+
+/* three fields per row (col-4) on wide screens for the combined pages */
+@media (min-width: 1024px) {
+  .npt-grid.npt-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

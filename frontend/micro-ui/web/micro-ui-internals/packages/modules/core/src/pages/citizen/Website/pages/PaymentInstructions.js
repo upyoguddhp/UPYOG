@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import SiteShell from "../SiteShell";
 import Icon from "../../Home/Landing/Icons";
+import { PgCta, Reveal } from "../components";
 import payData from "../data/payment";
 import { QUICK_PAY_URL, ROUTES } from "../config";
 
@@ -19,44 +20,42 @@ const PaymentInstructions = () => {
       subtitle={tt("SITE_PAYINFO_SUB", "Please read these instructions carefully before paying through the Citizen Seva Portal.")}
       icon={<Icon name="pay" size={30} />}
     >
-      <div className="PayGrid">
-        {payData.map((s) => (
-          <article key={s.number} className={`PayStep PayStep--${s.kind}`}>
-            <header>
-              <span className="PayStep__no">{s.number}</span>
-              <h2>{s.title}</h2>
-              <span className="PayStep__icon"><Icon name={kindIcon[s.kind] || "list"} size={22} /></span>
-            </header>
-            {s.intro ? <p className="PayStep__intro">{s.intro}</p> : null}
-            <ul>
-              {s.items.map((it, i) => (
-                <li key={i}>
-                  <Icon name="check" size={18} strokeWidth={2.6} />
-                  <span>{it}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
+      <div className="PgPage">
+        <ol className="PgSteps">
+          {payData.map((s, i) => (
+            <Reveal as="li" key={s.number} className={`PgStep PgStep--${s.kind}`} style={{ "--i": i }} aria-labelledby={`pay-${s.number}`}>
+              <span className="PgStep__no" aria-hidden="true">{s.number}</span>
+              <div className="PgStep__card">
+                <header>
+                  <h2 id={`pay-${s.number}`}>{s.title}</h2>
+                  <span className="PgStep__icon" aria-hidden="true"><Icon name={kindIcon[s.kind] || "list"} size={22} /></span>
+                </header>
+                {s.intro ? <p className="PgStep__intro">{s.intro}</p> : null}
+                <ul>
+                  {s.items.map((it, j) => (
+                    <li key={j}>
+                      <Icon name="check" size={18} strokeWidth={2.8} />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          ))}
+        </ol>
 
-      <aside className="PayCta">
-        <div>
-          <h2>{tt("SITE_PAYINFO_CTA", "Ready to pay your bill?")}</h2>
-          <p>{tt("SITE_PAYINFO_CTA_T", "Use the official Citizen Seva Portal only. We never ask for your OTP or bank details.")}</p>
-        </div>
-        <div className="PayCta__actions">
+        <PgCta title={tt("SITE_PAYINFO_CTA", "Ready to pay your bill?")} text={tt("SITE_PAYINFO_CTA_T", "Use the official Citizen Seva Portal only. We never ask for your OTP or bank details.")}>
           <a className="LandingBtn LandingBtn--primary" href={QUICK_PAY_URL("property")} target="_blank" rel="noopener noreferrer">
             {tt("SITE_NAV_PROPERTY_BILL", "Property Bill")}
           </a>
-          <a className="LandingBtn LandingBtn--glass" href={QUICK_PAY_URL("garbage")} target="_blank" rel="noopener noreferrer">
+          <a className="PgGhost" href={QUICK_PAY_URL("garbage")} target="_blank" rel="noopener noreferrer">
             {tt("SITE_NAV_GARBAGE_BILL", "Garbage Bill")}
           </a>
-          <button type="button" className="LandingBtn LandingBtn--glass" onClick={() => history.push(ROUTES.contact)}>
+          <button type="button" className="PgGhost" onClick={() => history.push(ROUTES.contact)}>
             {tt("SITE_NAV_CONTACT", "Contact Us")}
           </button>
-        </div>
-      </aside>
+        </PgCta>
+      </div>
     </SiteShell>
   );
 };

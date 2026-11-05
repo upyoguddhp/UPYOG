@@ -14,7 +14,9 @@ const AccessibilityPage = () => {
       subtitle={t("A11Y_STMT_SUB", { defaultValue: "Our commitment to an accessible portal for everyone." })}
       icon={<Icon name="users" size={30} />}
     >
-      <AccessibilityStatement embedded />
+      <div className="PgPage">
+        <AccessibilityStatement embedded />
+      </div>
     </SiteShell>
   );
 };

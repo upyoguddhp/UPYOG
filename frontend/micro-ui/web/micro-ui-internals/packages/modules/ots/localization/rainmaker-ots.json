@@ -1,0 +1,2444 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_OTS",
+      "message": "One Time Settlement",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_OTS",
+      "message": "एकमुश्त समाधान",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_MENU_NEW",
+      "message": "Apply for one time settlement",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_MENU_NEW",
+      "message": "एकमुश्त समाधान के लिए आवेदन करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_MENU_LIST",
+      "message": "My settlement applications",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_MENU_LIST",
+      "message": "मेरे समाधान आवेदन",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CRUMB_LIST",
+      "message": "One Time Settlement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CRUMB_LIST",
+      "message": "एकमुश्त समाधान",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CRUMB_NEW",
+      "message": "New application",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CRUMB_NEW",
+      "message": "नया आवेदन",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_TITLE",
+      "message": "One Time Settlement application",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_TITLE",
+      "message": "एकमुश्त समाधान आवेदन",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_PAGE_SUB",
+      "message": "Complete the steps below for settlement of your shop loan dues. You can go back and change any step before you submit.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_PAGE_SUB",
+      "message": "अपनी दुकान के ऋण बकाया के समाधान के लिए नीचे दिए चरण पूरे करें। जमा करने से पहले आप किसी भी चरण पर वापस जाकर बदलाव कर सकते हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_SHOP",
+      "message": "Shop details",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_SHOP",
+      "message": "दुकान विवरण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_LOANS",
+      "message": "Loan details (NPA)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_LOANS",
+      "message": "ऋण विवरण (एनपीए)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_SETTLEMENT",
+      "message": "Settlement details",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_SETTLEMENT",
+      "message": "समाधान विवरण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_APPLICANT",
+      "message": "Your personal details as the loanee. Name and mobile number come from your login.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_APPLICANT",
+      "message": "ऋणी के रूप में आपके व्यक्तिगत विवरण। नाम और मोबाइल नंबर आपके लॉगिन से लिए गए हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_SHOP",
+      "message": "Where your shop is and what it deals in.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_SHOP",
+      "message": "आपकी दुकान कहाँ है और वह किस कार्य में है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_LOANS",
+      "message": "Add every loan that has become a non-performing asset (NPA). At least one loan is needed.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_LOANS",
+      "message": "प्रत्येक ऐसा ऋण जोड़ें जो अनर्जक परिसंपत्ति (एनपीए) बन चुका है। कम से कम एक ऋण आवश्यक है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_SETTLEMENT",
+      "message": "Tell us if you have settled a loan before, and why the dues remained unpaid.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_SETTLEMENT",
+      "message": "बताएँ कि क्या आपने पहले कोई ऋण निपटाया है और बकाया अदा क्यों नहीं हुआ।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_DOCUMENTS",
+      "message": "Upload the documents listed below. They are sent when you submit.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_HINT_DOCUMENTS",
+      "message": "नीचे सूचीबद्ध दस्तावेज़ अपलोड करें। ये जमा करने पर भेजे जाएँगे।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_applicantName",
+      "message": "Name of applicant / loanee",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_applicantName",
+      "message": "आवेदक / ऋणी का नाम",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_fatherName",
+      "message": "Father / husband name",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_fatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_dateOfBirth",
+      "message": "Date of birth",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_dateOfBirth",
+      "message": "जन्म तिथि",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_mobileNumber",
+      "message": "Mobile number",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_mobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_isHimachalResident",
+      "message": "Permanent resident of Himachal Pradesh",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_isHimachalResident",
+      "message": "हिमाचल प्रदेश के स्थायी निवासी",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_ward",
+      "message": "Ward",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_ward",
+      "message": "वार्ड",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_shopAddress",
+      "message": "Shop address",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_shopAddress",
+      "message": "दुकान का पता",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_shopType",
+      "message": "Type / category of shop",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_shopType",
+      "message": "दुकान का प्रकार / श्रेणी",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_shopTypeOther",
+      "message": "Please specify the shop type",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_shopTypeOther",
+      "message": "कृपया दुकान का प्रकार बताएँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_annualTurnover",
+      "message": "Annual turnover (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_annualTurnover",
+      "message": "वार्षिक कारोबार (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_isGovernmentEmployee",
+      "message": "Any family member is a government employee",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_isGovernmentEmployee",
+      "message": "परिवार का कोई सदस्य सरकारी कर्मचारी है",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_ifsc",
+      "message": "IFSC code",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_ifsc",
+      "message": "आईएफएससी कोड",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_bankName",
+      "message": "Bank name",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_bankName",
+      "message": "बैंक का नाम",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_branchName",
+      "message": "Branch name",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_branchName",
+      "message": "शाखा का नाम",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_loanTakenDate",
+      "message": "Date loan was taken",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_loanTakenDate",
+      "message": "ऋण लेने की तिथि",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_npaDeclaredDate",
+      "message": "Date NPA was declared by the bank",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_npaDeclaredDate",
+      "message": "बैंक द्वारा एनपीए घोषित करने की तिथि",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_amountAvailed",
+      "message": "Amount availed (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_amountAvailed",
+      "message": "ली गई राशि (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_principal",
+      "message": "Outstanding principal (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_principal",
+      "message": "बकाया मूलधन (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_interest",
+      "message": "Outstanding interest (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_interest",
+      "message": "बकाया ब्याज (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_total",
+      "message": "Total outstanding (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_total",
+      "message": "कुल बकाया (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_totalRepayment",
+      "message": "Total repayment made so far (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_totalRepayment",
+      "message": "अब तक की कुल अदायगी (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_hasLoanSettlementFacility",
+      "message": "Have you earlier availed a settlement of a loan from a bank or other public financial institution?",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_hasLoanSettlementFacility",
+      "message": "क्या आपने पहले किसी बैंक या अन्य सार्वजनिक वित्तीय संस्थान से ऋण का समाधान लिया है?",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_yearOfSettlement",
+      "message": "Year of settlement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_yearOfSettlement",
+      "message": "समाधान का वर्ष",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_amountSettled",
+      "message": "Amount settled (INR)",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_amountSettled",
+      "message": "निपटाई गई राशि (₹)",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_paidInFull",
+      "message": "Paid in full",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_paidInFull",
+      "message": "पूर्ण भुगतान किया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_schemeName",
+      "message": "Name of scheme",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_schemeName",
+      "message": "योजना का नाम",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_briefHistory",
+      "message": "Brief history of the applicant",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_briefHistory",
+      "message": "आवेदक का संक्षिप्त इतिहास",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_nonPaymentReason",
+      "message": "Reasons for non-payment of bank loans",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_nonPaymentReason",
+      "message": "बैंक ऋण अदा न करने के कारण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_H_ifsc",
+      "message": "11 characters: 4 letters, a zero, then 6 letters or digits (for example SBIN0001234). The bank and branch fill in automatically when the code is known.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_H_ifsc",
+      "message": "11 अक्षर: 4 अक्षर, एक शून्य, फिर 6 अक्षर या अंक (जैसे SBIN0001234)। कोड ज्ञात होने पर बैंक और शाखा अपने आप भर जाते हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_O_YES",
+      "message": "Yes",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_O_YES",
+      "message": "हाँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_O_NO",
+      "message": "No",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_O_NO",
+      "message": "नहीं",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_O_ANY_OTHER",
+      "message": "Any other",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_O_ANY_OTHER",
+      "message": "अन्य",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_AMOUNT",
+      "message": "Enter an amount greater than zero.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_AMOUNT",
+      "message": "शून्य से अधिक राशि दर्ज करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_FUTURE_DATE",
+      "message": "The date cannot be in the future.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_FUTURE_DATE",
+      "message": "तिथि भविष्य की नहीं हो सकती।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_NPA_BEFORE_LOAN",
+      "message": "The NPA date cannot be before the date the loan was taken.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_NPA_BEFORE_LOAN",
+      "message": "एनपीए की तिथि ऋण लेने की तिथि से पहले की नहीं हो सकती।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_LOAN_ATLEAST_ONE",
+      "message": "Add at least one loan to continue.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_LOAN_ATLEAST_ONE",
+      "message": "आगे बढ़ने के लिए कम से कम एक ऋण जोड़ें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_SETTLEMENT_ATLEAST_ONE",
+      "message": "Add at least one earlier settlement, or choose No.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_SETTLEMENT_ATLEAST_ONE",
+      "message": "कम से कम एक पूर्व समाधान जोड़ें, या नहीं चुनें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_MIN_TEXT",
+      "message": "Write at least 20 characters.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_MIN_TEXT",
+      "message": "कम से कम 20 अक्षर लिखें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_ROW_FIX",
+      "message": "Correct the highlighted fields before adding.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_ROW_FIX",
+      "message": "जोड़ने से पहले चिह्नित फ़ील्ड सही करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOADING_LOOKUPS",
+      "message": "Loading the lists...",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOADING_LOOKUPS",
+      "message": "सूचियाँ लोड हो रही हैं...",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ULBS_FAILED",
+      "message": "The list of urban local bodies could not be loaded.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ULBS_FAILED",
+      "message": "नगर निकायों की सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_WARDS_FAILED",
+      "message": "The wards of this urban local body could not be loaded.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_WARDS_FAILED",
+      "message": "इस नगर निकाय के वार्ड लोड नहीं हो सके।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CATEGORIES_FAILED",
+      "message": "The shop categories could not be loaded. You can still choose Any other.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CATEGORIES_FAILED",
+      "message": "दुकान की श्रेणियाँ लोड नहीं हो सकीं। आप फिर भी अन्य चुन सकते हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BANK_LOOKUP",
+      "message": "Looking up the bank...",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BANK_LOOKUP",
+      "message": "बैंक खोजा जा रहा है...",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BANK_FOUND",
+      "message": "Bank and branch filled in from the IFSC code.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BANK_FOUND",
+      "message": "आईएफएससी कोड से बैंक और शाखा भर दी गई।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BANK_NOT_FOUND",
+      "message": "This IFSC code is not in our list. Enter the bank and branch name yourself.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BANK_NOT_FOUND",
+      "message": "यह आईएफएससी कोड हमारी सूची में नहीं है। बैंक और शाखा का नाम स्वयं दर्ज करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_ADD_TITLE",
+      "message": "Add a loan",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_ADD_TITLE",
+      "message": "ऋण जोड़ें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_ADD",
+      "message": "Add this loan",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_ADD",
+      "message": "यह ऋण जोड़ें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_LIST_TITLE",
+      "message": "Loans added",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_LIST_TITLE",
+      "message": "जोड़े गए ऋण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_EMPTY",
+      "message": "No loan added yet.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_EMPTY",
+      "message": "अभी कोई ऋण नहीं जोड़ा गया।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_N",
+      "message": "Loan {{n}}",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_N",
+      "message": "ऋण {{n}}",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOAN_TOTAL",
+      "message": "Total outstanding of all loans",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOAN_TOTAL",
+      "message": "सभी ऋणों का कुल बकाया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_ADD_TITLE",
+      "message": "Add an earlier settlement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_ADD_TITLE",
+      "message": "पूर्व समाधान जोड़ें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_ADD",
+      "message": "Add this settlement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_ADD",
+      "message": "यह समाधान जोड़ें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_LIST_TITLE",
+      "message": "Earlier settlements added",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_LIST_TITLE",
+      "message": "जोड़े गए पूर्व समाधान",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_EMPTY",
+      "message": "No settlement added yet.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_EMPTY",
+      "message": "अभी कोई समाधान नहीं जोड़ा गया।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_N",
+      "message": "Settlement {{n}}",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_N",
+      "message": "समाधान {{n}}",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SET_TEXT_TITLE",
+      "message": "About your loans",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SET_TEXT_TITLE",
+      "message": "आपके ऋणों के बारे में",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_TIP_1",
+      "message": "Keep the bank's NPA notice and loan statements ready.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_TIP_1",
+      "message": "बैंक का एनपीए नोटिस और ऋण विवरण तैयार रखें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_TIP_2",
+      "message": "Add every loan that has been declared an NPA, one by one.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_TIP_2",
+      "message": "एनपीए घोषित हर ऋण को एक-एक करके जोड़ें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_TIP_3",
+      "message": "The scheme does not need any online payment. The department reviews your application.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_TIP_3",
+      "message": "योजना में कोई ऑनलाइन भुगतान नहीं है। विभाग आपके आवेदन की समीक्षा करेगा।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_TITLE",
+      "message": "Declaration",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_TITLE",
+      "message": "घोषणा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_1",
+      "message": "I confirm that I am fully aware of the provisions of the Rajiv Gandhi Laghu Dukandar Sukh Kalyan Yojana-Shahri and consciously apply for settlement of my loan dues under this scheme.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_1",
+      "message": "मैं पुष्टि करता/करती हूँ कि मैं राजीव गांधी लघु दुकानदार सुख कल्याण योजना-शहरी के प्रावधानों से पूरी तरह अवगत हूँ और इस योजना के अंतर्गत अपने ऋण बकाया के समाधान के लिए सोच-समझकर आवेदन करता/करती हूँ।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_2",
+      "message": "I have not defaulted wilfully in repayment of my dues to the bank, and no portion of my income was diverted for creation of assets or investments.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_2",
+      "message": "मैंने बैंक के प्रति अपने बकाया की अदायगी में जानबूझकर चूक नहीं की है और मेरी आय का कोई भाग संपत्ति या निवेश बनाने में नहीं लगाया गया।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_3",
+      "message": "I have not committed any fraud or malfeasance while taking the loan or during its currency.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_3",
+      "message": "ऋण लेते समय या उसकी अवधि के दौरान मैंने कोई धोखाधड़ी या कदाचार नहीं किया है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_4",
+      "message": "I, {{name}}, son/daughter of Shri {{parent}}, aged {{age}} years, resident of {{address}}, affirm that the information given above and in the enclosed documents is true and correct to the best of my knowledge and belief.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_4",
+      "message": "मैं, {{name}}, श्री {{parent}} का पुत्र/पुत्री, आयु {{age}} वर्ष, निवासी {{address}}, पुष्टि करता/करती हूँ कि ऊपर और संलग्न दस्तावेज़ों में दी गई जानकारी मेरी जानकारी और विश्वास के अनुसार सत्य और सही है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECL_NOTE",
+      "message": "Giving false information or hiding facts is a punishable offence under the applicable laws.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECL_NOTE",
+      "message": "झूठी जानकारी देना या तथ्य छिपाना लागू कानूनों के अंतर्गत दंडनीय अपराध है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECLARATION",
+      "message": "I have read the declaration above and I agree to it.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECLARATION",
+      "message": "मैंने ऊपर दी गई घोषणा पढ़ ली है और मैं इससे सहमत हूँ।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SUBMIT_FAILED",
+      "message": "We could not submit your application. Please try again.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SUBMIT_FAILED",
+      "message": "हम आपका आवेदन जमा नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_UPLOAD_FAILED",
+      "message": "Your application was created but these documents could not be uploaded: {{docs}}. Press submit again to retry.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_UPLOAD_FAILED",
+      "message": "आपका आवेदन बन गया पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए फिर जमा करें दबाएँ।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_SUCCESS",
+      "message": "Application submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_SUCCESS",
+      "message": "आवेदन जमा हो गया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_BANNER_SUB",
+      "message": "Your one time settlement application has been sent to the department for review.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_BANNER_SUB",
+      "message": "आपका एकमुश्त समाधान आवेदन समीक्षा के लिए विभाग को भेज दिया गया है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEXT_1",
+      "message": "Application submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEXT_1",
+      "message": "आवेदन जमा हुआ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEXT_2",
+      "message": "Department verifies your loans and documents",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEXT_2",
+      "message": "विभाग आपके ऋण और दस्तावेज़ों का सत्यापन करेगा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEXT_3",
+      "message": "Settlement amount is decided",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEXT_3",
+      "message": "समाधान राशि तय होगी",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEXT_4",
+      "message": "Settlement approved",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEXT_4",
+      "message": "समाधान स्वीकृत",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_GO_APPS",
+      "message": "View my applications",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_GO_APPS",
+      "message": "मेरे आवेदन देखें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_HINT",
+      "message": "Note your application number. You will need it to track the application.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_HINT",
+      "message": "अपनी आवेदन संख्या नोट कर लें। आवेदन ट्रैक करने के लिए यह आवश्यक होगी।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_TITLE",
+      "message": "One Time Settlement Acknowledgement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_TITLE",
+      "message": "एकमुश्त समाधान पावती",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_SERVICE",
+      "message": "Rajiv Gandhi Laghu Dukandar Sukh Kalyan Yojana-Shahri",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_SERVICE",
+      "message": "राजीव गांधी लघु दुकानदार सुख कल्याण योजना-शहरी",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_SHOP",
+      "message": "Shop",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_SHOP",
+      "message": "दुकान",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_LOANS",
+      "message": "Loans declared",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_LOANS",
+      "message": "घोषित ऋण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_NOTE",
+      "message": "This is a system generated acknowledgement. It is not an approval of the settlement.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_NOTE",
+      "message": "यह सिस्टम द्वारा बनाई गई पावती है। यह समाधान की स्वीकृति नहीं है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LIST_TITLE",
+      "message": "My settlement applications",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LIST_TITLE",
+      "message": "मेरे समाधान आवेदन",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LIST_SUB",
+      "message": "Applications made with your mobile number.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LIST_SUB",
+      "message": "आपके मोबाइल नंबर से किए गए आवेदन।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEW",
+      "message": "New application",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEW",
+      "message": "नया आवेदन",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LIST_FAILED",
+      "message": "We could not load your applications. Please try again.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LIST_FAILED",
+      "message": "हम आपके आवेदन लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LIST_EMPTY",
+      "message": "You have not made any application yet.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LIST_EMPTY",
+      "message": "आपने अभी कोई आवेदन नहीं किया है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_START_HINT",
+      "message": "Start a new application to settle your shop loan dues.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_START_HINT",
+      "message": "अपनी दुकान के ऋण बकाया के समाधान के लिए नया आवेदन शुरू करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_SUBMITTED",
+      "message": "Submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_SUBMITTED",
+      "message": "जमा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_INITIATED",
+      "message": "Submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_INITIATED",
+      "message": "जमा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_TITLE",
+      "message": "Application details",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_TITLE",
+      "message": "आवेदन विवरण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_NOTFOUND",
+      "message": "We could not find this application in your account.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_NOTFOUND",
+      "message": "यह आवेदन आपके खाते में नहीं मिला।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_FAILED",
+      "message": "We could not load this application. Please try again.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_FAILED",
+      "message": "हम यह आवेदन लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_BACK",
+      "message": "Back to my applications",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_BACK",
+      "message": "मेरे आवेदनों पर वापस",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_AGE",
+      "message": "Age",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_AGE",
+      "message": "आयु",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_TOTAL_OUT",
+      "message": "Total outstanding",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_TOTAL_OUT",
+      "message": "कुल बकाया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_BTN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NEXT_STEP",
+      "message": "अगला: {{step}}",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SELECT",
+      "message": "Select",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SUBMITTING",
+      "message": "आपका आवेदन जमा हो रहा है...",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_NO_RESULTS",
+      "message": "Nothing matches your search.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_NO_RESULTS",
+      "message": "आपकी खोज से कुछ मेल नहीं खाता।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_ulbName",
+      "message": "ULB",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_ulbName",
+      "message": "नगर निकाय",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_F_pincode",
+      "message": "PIN code",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_F_pincode",
+      "message": "पिन कोड",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_REQUIRED",
+      "message": "This field is required.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_MOBILE",
+      "message": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_PIN",
+      "message": "Enter a valid 6-digit PIN code.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_PIN",
+      "message": "6 अंकों का सही पिन कोड दर्ज करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_E_IFSC",
+      "message": "Enter a valid IFSC code, for example SBIN0001234.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_E_IFSC",
+      "message": "सही आईएफएससी कोड दर्ज करें, जैसे SBIN0001234।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_PAGE_HINT",
+      "message": "Allowed: PDF, JPG or PNG up to 5 MB.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_PAGE_HINT",
+      "message": "अनुमत: PDF, JPG या PNG, अधिकतम 5 MB।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_UPLOADED",
+      "message": "Attached",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_UPLOADED",
+      "message": "संलग्न",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_TYPE_ERROR",
+      "message": "केवल PDF, JPG या PNG फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_SIZE_ERROR",
+      "message": "The file is larger than 5 MB.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 5 MB से बड़ी है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_REQUIRED_ERROR",
+      "message": "Attach this document.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_REQUIRED_ERROR",
+      "message": "यह दस्तावेज़ संलग्न करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOC_REQUIRED_TOAST",
+      "message": "Attach all the required documents to continue.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOC_REQUIRED_TOAST",
+      "message": "आगे बढ़ने के लिए सभी आवश्यक दस्तावेज़ संलग्न करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCV_PAGES",
+      "message": "Page",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCV_FAILED",
+      "message": "We could not open this document. Please try again.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCV_FAILED",
+      "message": "हम यह दस्तावेज़ नहीं खोल सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_TITLE",
+      "message": "आपको ये दस्तावेज़ चाहिए होंगे",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_ONLY",
+      "message": "Keep clear scans or photos ready.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_ONLY",
+      "message": "साफ़ स्कैन या फ़ोटो तैयार रखें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DOCS_FAILED",
+      "message": "The document list could not be loaded.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DOCS_FAILED",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_PROGRESS_TITLE",
+      "message": "Your progress",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_PROGRESS_TITLE",
+      "message": "आपकी प्रगति",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_PROGRESS_DRAFT",
+      "message": "Nothing is submitted until the last step",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_PROGRESS_DRAFT",
+      "message": "अंतिम चरण तक कुछ जमा नहीं होता",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_HELP_TITLE",
+      "message": "Need help?",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_HELP_TITLE",
+      "message": "सहायता चाहिए?",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_HELP_LINE",
+      "message": "Call your ULB office or the helpline.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_HELP_LINE",
+      "message": "अपने नगर निकाय कार्यालय या हेल्पलाइन पर कॉल करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_REVIEW_HINT",
+      "message": "Check everything. You can edit any section before submitting.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_REVIEW_HINT",
+      "message": "सब कुछ जांच लें। जमा करने से पहले किसी भी भाग में बदलाव कर सकते हैं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_DECLARE_REQUIRED",
+      "message": "Please accept the declaration to submit.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा स्वीकार करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_APP_NO",
+      "message": "Application number",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_COPY_ID",
+      "message": "Copy",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_COPY_ID",
+      "message": "कॉपी करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_WHERE",
+      "message": "What happens next",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_WHERE",
+      "message": "आगे क्या होगा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_PENDING",
+      "message": "Pending with the ULB",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_PENDING",
+      "message": "निकाय के पास लंबित",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_NEXT_TITLE",
+      "message": "What would you like to do?",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_NEXT_TITLE",
+      "message": "आप आगे क्या करना चाहेंगे?",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ACK_GO_HOME",
+      "message": "Go to dashboard",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएँ",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_DEPT",
+      "message": "Urban Development Department",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_DEPT",
+      "message": "शहरी विकास विभाग",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_DATE",
+      "message": "Date",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_STATUS_V",
+      "message": "Submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_STATUS_V",
+      "message": "जमा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_DOCS",
+      "message": "Documents attached",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_DOCS",
+      "message": "संलग्न दस्तावेज़",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_RCPT_HELP",
+      "message": "For help, contact your ULB office.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_RCPT_HELP",
+      "message": "सहायता के लिए अपने नगर निकाय कार्यालय से संपर्क करें।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_SEARCH_APPS_PH",
+      "message": "Search by application number or name",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_SEARCH_APPS_PH",
+      "message": "आवेदन संख्या या नाम से खोजें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_NODOCS",
+      "message": "No documents were attached.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं है।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_OPENING",
+      "message": "Opening the document...",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_TIMELINE",
+      "message": "Application timeline",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_TIMELINE",
+      "message": "आवेदन की समयरेखा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_NOHISTORY",
+      "message": "No updates yet.",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_NOHISTORY",
+      "message": "अभी कोई अपडेट नहीं।",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_VIEW_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_APPLIED",
+      "message": "Submitted",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_APPLIED",
+      "message": "जमा",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_PENDINGFORVERIFICATION",
+      "message": "Pending verification",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_PENDINGFORVERIFICATION",
+      "message": "सत्यापन लंबित",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_PENDINGFORAPPROVAL",
+      "message": "Pending approval",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_PENDINGFORAPPROVAL",
+      "message": "स्वीकृति लंबित",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_REJECTED",
+      "message": "Rejected",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_REJECTED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "OTS_ST_CANCELLED",
+      "message": "Cancelled",
+      "module": "rainmaker-ots",
+      "locale": "en_IN"
+    },
+    {
+      "code": "OTS_ST_CANCELLED",
+      "message": "रद्द",
+      "module": "rainmaker-ots",
+      "locale": "hi_IN"
+    }
+  ]
+}

@@ -35,6 +35,13 @@ export const AppModules = ({ stateCode, userType, modules, appTenants }) => {
   </Route>;
   });
 
+  // the application inbox is the employee's landing page; the module cards stay reachable with ?home=1
+  const atRoot = new RegExp(`^${path}/?$`).test(location.pathname);
+  const hasInbox = (modules || []).some((m) => m.code === "HPWORK");
+  if (atRoot && hasInbox && !/[?&]home=1/.test(location.search)) {
+    return <Redirect to="/digit-ui/employee/hpwork/inbox" />;
+  }
+
   return (
     <div className="ground-container">
       <Switch>

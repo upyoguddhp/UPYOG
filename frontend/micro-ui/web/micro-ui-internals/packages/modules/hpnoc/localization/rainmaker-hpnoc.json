@@ -1,0 +1,2168 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_HPNOC",
+      "message": "NOC Services",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_HPNOC",
+      "message": "एनओसी सेवाएँ",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_MENU_NEW",
+      "message": "Apply for NOC",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_MENU_NEW",
+      "message": "एनओसी के लिए आवेदन करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_MENU_LIST",
+      "message": "My NOC applications",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_MENU_LIST",
+      "message": "मेरे एनओसी आवेदन",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_CRUMB_LIST",
+      "message": "NOC services",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_CRUMB_LIST",
+      "message": "एनओसी सेवाएँ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TITLE",
+      "message": "Apply for NOC",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TITLE",
+      "message": "एनओसी के लिए आवेदन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PAGE_SUB",
+      "message": "Complete the steps below. You can go back and change any step before you submit.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PAGE_SUB",
+      "message": "नीचे दिए चरण पूरे करें। जमा करने से पहले आप किसी भी चरण पर वापस जाकर बदलाव कर सकते हैं।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_DOCUMENTS",
+      "message": "Supporting documents",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_DOCUMENTS",
+      "message": "सहायक दस्तावेज़",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_APPLICANT",
+      "message": "Your details are filled in from your account; add the rest.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_APPLICANT",
+      "message": "आपका विवरण खाते से भरा गया है; शेष जानकारी जोड़ें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_DOCUMENTS",
+      "message": "Attach the property documents. The verifier may ask for more if something is missing.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_DOCUMENTS",
+      "message": "संपत्ति के दस्तावेज़ संलग्न करें। कुछ कम होने पर सत्यापनकर्ता और माँग सकता है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_ulbName",
+      "message": "Urban local body",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_ulbName",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_ward",
+      "message": "Ward",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_ward",
+      "message": "वार्ड",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_fatherName",
+      "message": "Father / husband name",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_fatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_pincode",
+      "message": "PIN code",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_pincode",
+      "message": "पिन कोड",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SELECT",
+      "message": "Select",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SELECT_FIRST",
+      "message": "Select {{field}} first",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SELECT_FIRST",
+      "message": "पहले {{field}} चुनें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LOADING_OPTIONS",
+      "message": "Loading options...",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LOADING_OPTIONS",
+      "message": "विकल्प लोड हो रहे हैं...",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LOOKUP_FAILED",
+      "message": "Could not load the options. Please check your connection and retry.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LOOKUP_FAILED",
+      "message": "विकल्प लोड नहीं हो सके। कृपया अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_E_REQUIRED",
+      "message": "This field is required",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_E_MOBILE",
+      "message": "मान्य 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_E_EMAIL",
+      "message": "Enter a valid email address",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_E_EMAIL",
+      "message": "मान्य ईमेल पता दर्ज करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_E_PIN",
+      "message": "Enter a valid 6-digit PIN code",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_E_PIN",
+      "message": "मान्य 6 अंकों का पिन कोड दर्ज करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_BTN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_BTN_SUBMIT",
+      "message": "Submit application",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_NEXT_STEP",
+      "message": "अगला: {{step}}",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PROGRESS_TITLE",
+      "message": "Your progress",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PROGRESS_TITLE",
+      "message": "आपकी प्रगति",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PROGRESS_DRAFT",
+      "message": "Saved as you go on this device",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर आगे बढ़ते हुए सहेजा जाता है",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TIP_1",
+      "message": "Keep the property documents (Jamabandhi, sale deed, allotment letter) ready.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TIP_1",
+      "message": "संपत्ति के दस्तावेज़ (जमाबंदी, बिक्री विलेख, आवंटन पत्र) तैयार रखें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TIP_2",
+      "message": "Select the urban local body the property falls under.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TIP_2",
+      "message": "वह शहरी स्थानीय निकाय चुनें जिसमें संपत्ति आती है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TIP_3",
+      "message": "After verification you pay the NOC fee online and the application then goes to the approver.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TIP_3",
+      "message": "सत्यापन के बाद आप एनओसी शुल्क ऑनलाइन भरेंगे और आवेदन अनुमोदक के पास जाएगा।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_HELP_TITLE",
+      "message": "Need help?",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_HELP_TITLE",
+      "message": "सहायता चाहिए?",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_HELP_LINE",
+      "message": "Contact your urban local body or the Citizen Seva helpline.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_HELP_LINE",
+      "message": "अपने शहरी स्थानीय निकाय या सिटीज़न सेवा हेल्पलाइन से संपर्क करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_TITLE",
+      "message": "Supporting documents",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_TITLE",
+      "message": "सहायक दस्तावेज़",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_FAILED",
+      "message": "The document list could not be loaded.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_FAILED",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_ONLY",
+      "message": "Only the documents listed above can be attached.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_ONLY",
+      "message": "केवल ऊपर सूचीबद्ध दस्तावेज़ ही संलग्न किए जा सकते हैं।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_PAGE_HINT",
+      "message": "Upload a PDF or image for each document you have.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_PAGE_HINT",
+      "message": "आपके पास जो भी दस्तावेज़ हैं, उनके लिए PDF या चित्र अपलोड करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCS_LOAD_ERROR",
+      "message": "Could not load the document list.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCS_LOAD_ERROR",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_UPLOADED",
+      "message": "अपलोड हो गया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_TYPE_ERROR",
+      "message": "This file type is not allowed",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_TYPE_ERROR",
+      "message": "इस प्रकार की फ़ाइल की अनुमति नहीं है",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_SIZE_ERROR",
+      "message": "The file is too large",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_SIZE_ERROR",
+      "message": "फ़ाइल बहुत बड़ी है",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_REQUIRED_ERROR",
+      "message": "This document is required",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_REQUIRED_ERROR",
+      "message": "यह दस्तावेज़ आवश्यक है",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOC_UPLOAD_FAILED",
+      "message": "These documents could not be uploaded: {{docs}}. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOC_UPLOAD_FAILED",
+      "message": "ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCV_PAGES",
+      "message": "Page",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DOCV_FAILED",
+      "message": "The document could not be opened. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DOCV_FAILED",
+      "message": "दस्तावेज़ नहीं खुल सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_REVIEW_HINT",
+      "message": "Check everything before you submit. Use Edit to change a section.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_REVIEW_HINT",
+      "message": "जमा करने से पहले सब कुछ जाँच लें। बदलाव के लिए 'बदलें' दबाएँ।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूँ कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_DECLARE_REQUIRED",
+      "message": "Please accept the declaration to continue.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_DECLARE_REQUIRED",
+      "message": "जारी रखने के लिए कृपया घोषणा स्वीकार करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SUBMITTING",
+      "message": "आपका आवेदन जमा किया जा रहा है...",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SUBMIT_FAILED",
+      "message": "The application could not be submitted. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SUBMIT_FAILED",
+      "message": "आवेदन जमा नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_SUCCESS",
+      "message": "Application submitted",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_SUCCESS",
+      "message": "आवेदन जमा हो गया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_BANNER_SUB",
+      "message": "Your application has gone to the verifier.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_BANNER_SUB",
+      "message": "आपका आवेदन सत्यापनकर्ता के पास भेज दिया गया है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_APP_NO",
+      "message": "Application number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_COPY_ID",
+      "message": "Copy",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_COPY_ID",
+      "message": "कॉपी करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PAY_NOW",
+      "message": "Pay now",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PAY_NOW",
+      "message": "अभी भुगतान करें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_GO_APPS",
+      "message": "My applications",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_GO_APPS",
+      "message": "मेरे आवेदन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_GO_HOME",
+      "message": "Go to dashboard",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएँ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_HINT",
+      "message": "Keep the application number to track it later.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_HINT",
+      "message": "बाद में ट्रैक करने के लिए आवेदन संख्या सँभालकर रखें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PRINT",
+      "message": "Print",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_DEPT",
+      "message": "Urban Development Department",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_DEPT",
+      "message": "शहरी विकास विभाग",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_TITLE",
+      "message": "NOC Application Acknowledgement",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_TITLE",
+      "message": "एनओसी आवेदन पावती",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_DATE",
+      "message": "Date",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_STATUS_V",
+      "message": "Sent for verification",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_STATUS_V",
+      "message": "सत्यापन के लिए भेजा गया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_NOTE",
+      "message": "This is a system generated acknowledgement.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_NOTE",
+      "message": "यह सिस्टम द्वारा बनाई गई पावती है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RCPT_HELP",
+      "message": "For help, contact your urban local body.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RCPT_HELP",
+      "message": "सहायता के लिए अपने शहरी स्थानीय निकाय से संपर्क करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LIST_TITLE",
+      "message": "My NOC applications",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LIST_TITLE",
+      "message": "मेरे एनओसी आवेदन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LIST_SUB",
+      "message": "Track your applications and pay the fee when it is due.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LIST_SUB",
+      "message": "अपने आवेदन ट्रैक करें और शुल्क देय होने पर भरें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_NEW",
+      "message": "New application",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_NEW",
+      "message": "नया आवेदन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LIST_EMPTY",
+      "message": "No applications yet",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LIST_EMPTY",
+      "message": "अभी कोई आवेदन नहीं",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_START_HINT",
+      "message": "Apply for a No Objection Certificate for your property.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_START_HINT",
+      "message": "अपनी संपत्ति के लिए अनापत्ति प्रमाणपत्र हेतु आवेदन करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_LIST_FAILED",
+      "message": "Your applications could not be loaded. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_LIST_FAILED",
+      "message": "आपके आवेदन लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SEARCH_PH",
+      "message": "Search by application number or NOC type",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SEARCH_PH",
+      "message": "आवेदन संख्या या एनओसी प्रकार से खोजें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_NO_RESULTS",
+      "message": "No applications match",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_NO_RESULTS",
+      "message": "कोई आवेदन मेल नहीं खाता",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_PAYMENT",
+      "message": "Payment due",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_PAYMENT",
+      "message": "भुगतान देय",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_CLOSED",
+      "message": "Closed",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_CLOSED",
+      "message": "बंद",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_INITIATED",
+      "message": "Initiated",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_INITIATED",
+      "message": "आरंभ किया",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORPAYMENT",
+      "message": "Fee payment pending",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORPAYMENT",
+      "message": "शुल्क भुगतान लंबित",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORAPPROVAL",
+      "message": "Pending for approval",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORAPPROVAL",
+      "message": "अनुमोदन लंबित",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_REJECTED",
+      "message": "Rejected",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_REJECTED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_TITLE",
+      "message": "NOC application details",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_TITLE",
+      "message": "एनओसी आवेदन विवरण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_NODOCS",
+      "message": "No documents were attached.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं किया गया।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_OPENING",
+      "message": "दस्तावेज़ खोला जा रहा है...",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_TIMELINE",
+      "message": "Progress timeline",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_TIMELINE",
+      "message": "प्रगति समयरेखा",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOHISTORY",
+      "message": "No progress recorded yet.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_BACK",
+      "message": "Back to my applications",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_BACK",
+      "message": "मेरे आवेदनों पर वापस",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_FAILED",
+      "message": "The application could not be loaded. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOTFOUND",
+      "message": "This application was not found in your account.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOTFOUND",
+      "message": "यह आवेदन आपके खाते में नहीं मिला।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_CRUMB_NEW",
+      "message": "New NOC application",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_CRUMB_NEW",
+      "message": "नया एनओसी आवेदन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_TITLE_NOC",
+      "message": "NOC",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_TITLE_NOC",
+      "message": "एनओसी",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_NOC",
+      "message": "NOC details",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_NOC",
+      "message": "एनओसी विवरण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_PROPERTY",
+      "message": "Property details",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_PROPERTY",
+      "message": "संपत्ति विवरण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_NOC",
+      "message": "Choose the kind of NOC, the connection it is for and the reason.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_NOC",
+      "message": "एनओसी का प्रकार, संबंधित कनेक्शन और कारण चुनें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_PROPERTY",
+      "message": "Tell us about the property and the urban local body it falls under.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_STEP_HINT_PROPERTY",
+      "message": "संपत्ति और जिस शहरी स्थानीय निकाय में वह आती है, उसकी जानकारी दें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_typeOfNoc",
+      "message": "NOC type",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_typeOfNoc",
+      "message": "एनओसी का प्रकार",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_connectionType",
+      "message": "Connection type",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_connectionType",
+      "message": "कनेक्शन का प्रकार",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_nocReason",
+      "message": "Reason for NOC",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_nocReason",
+      "message": "एनओसी का कारण",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_oldPropertyId",
+      "message": "Old property ID",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_oldPropertyId",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_plotNo",
+      "message": "Plot / house number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_plotNo",
+      "message": "प्लॉट / मकान संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_coOwnerName",
+      "message": "Co-owner name",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_coOwnerName",
+      "message": "सह-स्वामी का नाम",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_propertyAddress",
+      "message": "Property address",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_propertyAddress",
+      "message": "संपत्ति का पता",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_landType",
+      "message": "Land type",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_landType",
+      "message": "भूमि का प्रकार",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_area",
+      "message": "Area",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_area",
+      "message": "क्षेत्रफल",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_khasraNumber",
+      "message": "Khasra number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_khasraNumber",
+      "message": "खसरा संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_khata",
+      "message": "Khata number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_khata",
+      "message": "खाता संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_applicantName",
+      "message": "Applicant name",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_applicantName",
+      "message": "आवेदक का नाम",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_mobile",
+      "message": "Mobile number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_mobile",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_dob",
+      "message": "Date of birth",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_dob",
+      "message": "जन्म तिथि",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_gender",
+      "message": "Gender",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_gender",
+      "message": "लिंग",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_email",
+      "message": "Email",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_email",
+      "message": "ईमेल",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_F_address",
+      "message": "Address",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_F_address",
+      "message": "पता",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_ELEC_RES",
+      "message": "Electricity NOC - Residential",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_ELEC_RES",
+      "message": "बिजली एनओसी - आवासीय",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_ELEC_COM",
+      "message": "Electricity NOC - Commercial",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_ELEC_COM",
+      "message": "बिजली एनओसी - वाणिज्यिक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_CONN_TEMP",
+      "message": "Temporary / construction connection",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_CONN_TEMP",
+      "message": "अस्थायी / निर्माण कनेक्शन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_CONN_DOM",
+      "message": "Domestic connection",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_CONN_DOM",
+      "message": "घरेलू कनेक्शन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_CONN_COM",
+      "message": "Commercial connection",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_CONN_COM",
+      "message": "वाणिज्यिक कनेक्शन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_REASON_OLD",
+      "message": "Old house (existing prior to 1979)",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_REASON_OLD",
+      "message": "पुराना मकान (1979 से पहले का)",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_REASON_MAP",
+      "message": "On the basis of sanctioned map",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_REASON_MAP",
+      "message": "स्वीकृत नक्शे के आधार पर",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_REASON_GOVT",
+      "message": "Government building",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_REASON_GOVT",
+      "message": "सरकारी भवन",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_RESIDENTIAL",
+      "message": "Residential",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_RESIDENTIAL",
+      "message": "आवासीय",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_COMMERCIAL",
+      "message": "Commercial",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_COMMERCIAL",
+      "message": "वाणिज्यिक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_MALE",
+      "message": "पुरुष",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_FEMALE",
+      "message": "महिला",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_E_FUTURE",
+      "message": "The date cannot be in the future",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_E_FUTURE",
+      "message": "तिथि भविष्य की नहीं हो सकती",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_VERIFY_TITLE",
+      "message": "What happens next",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_VERIFY_TITLE",
+      "message": "आगे क्या होगा",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACK_VERIFY_HINT",
+      "message": "The verifier checks your application. If a fee is due, you will be asked to pay it from the application page.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACK_VERIFY_HINT",
+      "message": "सत्यापनकर्ता आपके आवेदन की जाँच करेगा। शुल्क देय होने पर आवेदन पृष्ठ से उसे भरने को कहा जाएगा।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_FILTER_ACTION",
+      "message": "Action needed",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_FILTER_ACTION",
+      "message": "कार्रवाई आवश्यक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORVERIFICATION",
+      "message": "Pending for verification",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORVERIFICATION",
+      "message": "सत्यापन लंबित",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORMODIFICATION",
+      "message": "Modification required",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ST_PENDINGFORMODIFICATION",
+      "message": "संशोधन आवश्यक",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOCNO",
+      "message": "NOC number",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_VIEW_NOCNO",
+      "message": "एनओसी संख्या",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PAY_HINT",
+      "message": "The verifier has raised the NOC fee. Pay it online, then send the application to the approver.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PAY_HINT",
+      "message": "सत्यापनकर्ता ने एनओसी शुल्क निर्धारित किया है। इसे ऑनलाइन भरें, फिर आवेदन अनुमोदक को भेजें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SEND_APPROVER",
+      "message": "I have paid, send to approver",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SEND_APPROVER",
+      "message": "मैंने भुगतान कर दिया, अनुमोदक को भेजें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_PAY_FIRST",
+      "message": "No payment was found for this application yet. Please pay the fee first.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_PAY_FIRST",
+      "message": "इस आवेदन के लिए अभी कोई भुगतान नहीं मिला। कृपया पहले शुल्क भरें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_SENT_APPROVER",
+      "message": "The application has been sent to the approver.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_SENT_APPROVER",
+      "message": "आवेदन अनुमोदक को भेज दिया गया है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_MODIFY_HINT",
+      "message": "The verifier asked for changes. Check the timeline remarks, then send the application back for verification.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_MODIFY_HINT",
+      "message": "सत्यापनकर्ता ने बदलाव माँगे हैं। समयरेखा की टिप्पणियाँ देखें, फिर आवेदन को सत्यापन के लिए वापस भेजें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RESUBMIT",
+      "message": "Send back for verification",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RESUBMIT",
+      "message": "सत्यापन के लिए वापस भेजें",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_RESUBMITTED",
+      "message": "The application has been sent back for verification.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_RESUBMITTED",
+      "message": "आवेदन सत्यापन के लिए वापस भेज दिया गया है।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACTING",
+      "message": "Updating your application...",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACTING",
+      "message": "आपका आवेदन अपडेट किया जा रहा है...",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "HNC_ACTION_FAILED",
+      "message": "The application could not be updated. Please try again.",
+      "module": "rainmaker-hpnoc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "HNC_ACTION_FAILED",
+      "message": "आवेदन अपडेट नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpnoc",
+      "locale": "hi_IN"
+    }
+  ]
+}

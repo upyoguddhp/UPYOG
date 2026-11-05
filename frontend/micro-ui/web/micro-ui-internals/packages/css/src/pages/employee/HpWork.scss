@@ -1,0 +1,89 @@
+/* HP employee Work module — mobile-first. Shares the npt-* and bkg-* look; only extras live here. */
+$wrk-navy: #16203f;
+$wrk-blue: #1d4fd8;
+$wrk-line: #d9e1f2;
+$wrk-muted: #5b6573;
+$wrk-focus: rgba(29, 79, 216, 0.22);
+
+.wrk-cards { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 8px 0 14px; }
+.wrk-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid $wrk-line;
+  border-radius: 14px;
+  background: #fff;
+  color: $wrk-navy;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  &:hover:not(:disabled) { border-color: $wrk-blue; transform: translateY(-1px); }
+  &:focus-visible { outline: 0; box-shadow: 0 0 0 3px $wrk-focus; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &.is-on { border-color: $wrk-navy; background: $wrk-navy; color: #fff; small { color: #c7d3f5; } .wrk-card__ico { background: rgba(255, 255, 255, 0.16); color: #fff; } }
+  &__ico { grid-row: 1 / span 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #eaf0ff; color: $wrk-blue; }
+  &__label { font-weight: 700; font-size: 15px; }
+  &__n { grid-row: 1 / span 2; font-size: 24px; font-weight: 800; }
+  small { color: $wrk-muted; font-size: 13px; }
+}
+
+.wrk-filters { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 0 0 14px; }
+.wrk-filters .npt-btn { justify-content: center; }
+
+.wrk-pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; font-size: 14px; color: $wrk-muted; }
+.wrk-list .npt-prop__main span { overflow-wrap: anywhere; }
+
+.wrk-done { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 8px 0 12px; padding: 12px 14px; border-radius: 12px; background: #e6f5e4; color: #0f6b0a; font-weight: 600; span { flex: 1; min-width: 180px; } }
+.wrk-warn { margin: 4px 0 0; color: #b45a05; font-size: 14px; }
+.wrk-actions__row { display: flex; flex-wrap: wrap; gap: 10px; .npt-btn { flex: 1 1 100%; justify-content: center; } }
+
+.wrk-modal { display: grid; gap: 14px; padding-top: 12px; }
+.wrk-field { display: grid; gap: 6px; font-size: 14px; color: $wrk-muted; }
+.wrk-field textarea { min-height: 96px; padding: 10px; border: 1px solid $wrk-line; border-radius: 12px; font: inherit; font-size: 15px; color: $wrk-navy; box-sizing: border-box; resize: vertical; &:focus { outline: 0; border-color: $wrk-blue; box-shadow: 0 0 0 3px $wrk-focus; } }
+.wrk-modal__foot { gap: 8px; }
+
+@media (min-width: 600px) {
+  .wrk-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wrk-actions__row .npt-btn { flex: 0 0 auto; }
+}
+@media (min-width: 900px) {
+  .wrk-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wrk-filters { grid-template-columns: minmax(220px, 1.6fr) repeat(2, minmax(160px, 1fr)) auto auto; align-items: center; }
+}
+@media print { .wrk-actions, .wrk-done, .wrk-modal { display: none; } }
+@media (prefers-reduced-motion: reduce) { .wrk-card { transition: none; } }
+
+.wrk-list .npt-prop__main { min-width: 0; strong { overflow-wrap: anywhere; word-break: normal; } }
+.wrk-list .npt-prop .npt-badge { white-space: nowrap; max-width: 100%; }
+
+/* workflow history: vertical rail, one card per step, newest first */
+.wrk-hist { list-style: none; margin: 8px 0 0; padding: 0; position: relative; }
+.wrk-hist__item {
+  position: relative;
+  padding: 0 0 14px 40px;
+  --wh: #1d4fd8;
+  --whbg: #eaf0ff;
+  &::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: $wrk-line; }
+  &:last-child { padding-bottom: 0; &::before { display: none; } }
+  &.is-good { --wh: #138808; --whbg: #e6f5e4; }
+  &.is-warn { --wh: #b45a05; --whbg: #fff3e0; }
+  &.is-bad { --wh: #c62828; --whbg: #fdecea; }
+}
+.wrk-hist__dot { position: absolute; left: 0; top: 2px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--whbg); color: var(--wh); box-shadow: 0 0 0 4px #fff; }
+.wrk-hist__item.is-now .wrk-hist__dot { background: var(--wh); color: #fff; }
+.wrk-hist__card { padding: 10px 12px; border: 1px solid $wrk-line; border-left: 3px solid var(--wh); border-radius: 12px; background: #fff; min-width: 0; }
+.wrk-hist__item.is-now .wrk-hist__card { background: var(--whbg); }
+.wrk-hist__top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; strong { color: $wrk-navy; font-size: 15px; } }
+.wrk-hist__now { font-style: normal; font-size: 12px; font-weight: 700; color: #fff; background: var(--wh); padding: 2px 8px; border-radius: 999px; }
+.wrk-hist__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin-top: 6px; font-size: 13px; color: $wrk-muted; time { margin-left: auto; white-space: nowrap; } }
+.wrk-hist__who { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: $wrk-navy; overflow-wrap: anywhere; i { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: $wrk-navy; color: #fff; font-style: normal; font-size: 11px; } }
+.wrk-hist__note { margin: 8px 0 0; padding: 8px 10px; border-left: 3px solid $wrk-line; border-radius: 0 8px 8px 0; background: #f5f7fc; color: $wrk-navy; font-size: 14px; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .wrk-hist__meta time { margin-left: 0; width: 100%; } }
+
+/* inside a dialog the option panel flows in the (scrollable) body instead of floating past its edge */
+.wrk-modal .bkg-ss__panel { position: static; margin-top: 6px; box-shadow: none; width: auto; }
+.wrk-modal .bkg-ss__list { max-height: 200px; }

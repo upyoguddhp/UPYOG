@@ -38,6 +38,17 @@ export const PTRService = {
       params: {},
       auth: true,
   }),
+  renewal: (details) =>
+    Request({
+      url: Urls.ptr.renewal,
+      data: details,
+      useCache: false,
+      setTimeParam: false,
+      userService: true,
+      method: "POST",
+      params: {},
+      auth: true,
+    }),
   paymentsearch: ({ tenantId, filters, auth }) =>
   Request({
     url: Urls.ptr.payment_search,

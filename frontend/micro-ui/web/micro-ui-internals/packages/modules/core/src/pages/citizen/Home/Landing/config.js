@@ -134,3 +134,15 @@ export const serviceMeta = [
   { re: /noc|layout/i, time: "10 days", fee: "Slab fee",
     docs: ["Ownership proof", "Layout / site plan", "Identity proof", "Approved building plan", "Fire safety certificate", "Water availability proof", "Photograph of the site"] },
 ];
+
+/**
+ * Urban local bodies by tier (state not counted). Confirmed figures: 60 ULBs = 5 + 29 + 26.
+ * Used by the home page (Welcome) and the About page so they always agree.
+ */
+export const ulbTierCounts = { mc: 5, council: 29, np: 26 };
+
+/**
+ * Municipal Corporations of Himachal Pradesh (names as in MDMS tenants). The Council / Nagar Panchayat
+ * split per ULB is not in the data yet, so the map marks only these and shows the rest as "other".
+ */
+export const MUNICIPAL_CORPORATIONS = ["Shimla", "Dharamshala", "Mandi", "Solan", "Palampur"];

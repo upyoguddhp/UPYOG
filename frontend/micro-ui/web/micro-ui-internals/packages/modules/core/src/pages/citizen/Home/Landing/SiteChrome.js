@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
 import Icon from "./Icons";
 import AccessibilityTools from "../../../../components/AccessibilityTools";
 import { setAccessibility, useAccessibility } from "../../../../components/AccessibilityTools/settings";
@@ -183,8 +184,9 @@ export const UtilityBar = ({ helpline, hours, languages, selectedLanguage, onLan
 /** Brand + primary navigation + login/register. Collapses to a menu on small screens. */
 const MAX_INLINE = 6;
 
-export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRegister, onLogout, onNavigate, onSearch }) => {
+export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onOfficialLogin, onLogout, onNavigate, onSearch }) => {
   const { t } = useTranslation();
+  const history = useHistory();
   const tt = (key, text) => t(key, { defaultValue: text });
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState(null);
@@ -355,7 +357,9 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
             </button>
             {isLoggedIn ? (
               <React.Fragment>
-                <span className="LandingNav__user">{userName}</span>
+                <button type="button" className="LandingBtn LandingBtn--primary LandingBtn--sm" onClick={() => history.push("/digit-ui/citizen/dashboard")}>
+                  {userName ? `${tt("LANDING_MY_DASHBOARD", "My dashboard")} · ${userName.split(" ")[0]}` : tt("LANDING_MY_DASHBOARD", "My dashboard")}
+                </button>
                 <button type="button" className="LandingBtn LandingBtn--ghost LandingBtn--sm" onClick={onLogout}>
                   {tt("LANDING_LOGOUT", "Logout")}
                 </button>
@@ -363,10 +367,10 @@ export const SiteHeader = ({ stateInfo, nav, isLoggedIn, userName, onLogin, onRe
             ) : (
               <React.Fragment>
                 <button type="button" className="LandingBtn LandingBtn--ghost LandingBtn--sm" onClick={onLogin}>
-                  {tt("LANDING_LOGIN", "Login")}
+                  {tt("LANDING_CITIZEN_LOGIN", "Citizen Login")}
                 </button>
-                <button type="button" className="LandingBtn LandingBtn--primary LandingBtn--sm" onClick={onRegister}>
-                  {tt("LANDING_REGISTER", "Register")}
+                <button type="button" className="LandingBtn LandingBtn--primary LandingBtn--sm" onClick={onOfficialLogin}>
+                  {tt("LANDING_OFFICIAL_LOGIN", "Official Login")}
                 </button>
               </React.Fragment>
             )}
@@ -471,7 +475,7 @@ const StoneHouse = ({ x, base }) => (
   </g>
 );
 
-const FooterScene = () => {
+export const FooterScene = () => {
   const base = 226;
   return (
     <div className="LandingFooter__scene" aria-hidden="true">

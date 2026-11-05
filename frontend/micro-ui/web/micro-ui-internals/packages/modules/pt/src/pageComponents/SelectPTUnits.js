@@ -447,7 +447,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                 select={(e) => selectUsageCategory(index, e)}
               />
               {field?.usageCategory?.code && field.usageCategory.code.includes("RESIDENTIAL") === false && (
-                <>
+                <React.Fragment>
                   <CardLabel>{`${t("PT_FORM2_SUB_USAGE_TYPE")}*`}</CardLabel>
                   <div className={"form-pt-dropdown-only"}>
                     <Dropdown
@@ -459,7 +459,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                       select={(e) => selectSubUsageCategory(index, e)}
                     />
                   </div>
-                </>
+                </React.Fragment>
               )}
               <CardLabel>{`${t("PT_FORM2_OCCUPANCY")}*`}</CardLabel>
               <div className={"form-pt-dropdown-only"}>
@@ -473,7 +473,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                 />
               </div>
               {field?.occupancyType?.code && field.occupancyType.code.includes("RENTED") && (
-                <>
+                <React.Fragment>
                   <CardLabel>{`${t("PT_FORM2_TOTAL_ANNUAL_RENT")}*`}</CardLabel>
                   <TextInput
                     style={{ background: "#FAFAFA" }}
@@ -504,7 +504,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                 />
               </div>
               { (field?.rentedMonths?.code ==="1" || field?.rentedMonths?.code ==="2" || field?.rentedMonths?.code ==="3" || field?.rentedMonths?.code ==="4" || field?.rentedMonths?.code ==="5" || field?.rentedMonths?.code ==="6" || field?.rentedMonths?.code ==="7" || field?.rentedMonths?.code ==="8" || field?.rentedMonths?.code ==="9" || field?.rentedMonths?.code ==="10" || field?.rentedMonths?.code ==="11") && (
-              <>
+              <React.Fragment>
               <CardLabel>{`${t("PT_FORM2_NONRENTED_MONTHS_USAGE")}*`}</CardLabel>
               <div className={"form-pt-dropdown-only"}>
                 <Dropdown
@@ -516,8 +516,8 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                   select={(e) => selectnonRentedMonthsUsage(index, e)}
                 />
               </div>                
-                </>
-              )} </>                
+                </React.Fragment>
+              )} </React.Fragment>                
               )}
               <CardLabel>{formData?.PropertyType?.i18nKey === "COMMON_PROPTYPE_BUILTUP_SHAREDPROPERTY" ? `${t("PT_FORM2_BUILT_UP_AREA")}*`:`${t("PT_BUILT_UP_AREA_HEADER")}*`}</CardLabel>
               <TextInput
@@ -537,7 +537,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                 }}
               />
               {!isFloor && (
-                <>
+                <React.Fragment>
                   <CardLabel>{`${t("PT_FORM2_SELECT_FLOOR")}*`}</CardLabel>
                   <div className={"form-pt-dropdown-only"}>
                     <Dropdown
@@ -549,7 +549,7 @@ const SelectPTUnits = React.memo(({ t, config, onSelect, userType, formData }) =
                       select={(e) => selectFloor(index, e)}
                     />
                   </div>
-                </>
+                </React.Fragment>
               )}
             </div>
           </div>

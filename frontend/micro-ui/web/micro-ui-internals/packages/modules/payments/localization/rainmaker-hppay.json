@@ -1,0 +1,1184 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_HPPAY",
+      "message": "Dues & payments",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_HPPAY",
+      "message": "बकाया और भुगतान",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_MENU_DUES",
+      "message": "Pay my dues",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_MENU_DUES",
+      "message": "मेरा बकाया चुकाएँ",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_MENU_HISTORY",
+      "message": "My payments",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_MENU_HISTORY",
+      "message": "मेरे भुगतान",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CRUMB_DUES",
+      "message": "Dues & payments",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CRUMB_DUES",
+      "message": "बकाया और भुगतान",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CRUMB_HISTORY",
+      "message": "My payments",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CRUMB_HISTORY",
+      "message": "मेरे भुगतान",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CRUMB_RESULT",
+      "message": "Payment result",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CRUMB_RESULT",
+      "message": "भुगतान परिणाम",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_TAB_DUES",
+      "message": "Pending dues",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_TAB_DUES",
+      "message": "लंबित बकाया",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_TAB_HISTORY",
+      "message": "Payment history",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_TAB_HISTORY",
+      "message": "भुगतान इतिहास",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_TITLE",
+      "message": "Pending dues",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_TITLE",
+      "message": "लंबित बकाया",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_SUB",
+      "message": "Select the bills you want to pay now. You can pay several together.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_SUB",
+      "message": "जिन बिलों का अभी भुगतान करना है उन्हें चुनें। आप एक साथ कई बिल चुका सकते हैं।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_LOADING_DUES",
+      "message": "Fetching your pending bills...",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_LOADING_DUES",
+      "message": "आपके लंबित बिल लाए जा रहे हैं...",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_FAILED",
+      "message": "Your bills could not be loaded. Please try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_FAILED",
+      "message": "आपके बिल लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_PARTIAL",
+      "message": "Some services could not be checked: {{names}}. The rest are shown below.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_PARTIAL",
+      "message": "कुछ सेवाओं की जाँच नहीं हो सकी: {{names}}। शेष नीचे दिखाई गई हैं।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_EMPTY",
+      "message": "You have no pending dues",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_EMPTY",
+      "message": "आपका कोई बकाया लंबित नहीं है",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUES_EMPTY_SUB",
+      "message": "Bills appear here as soon as one is raised against your mobile number.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUES_EMPTY_SUB",
+      "message": "आपके मोबाइल नंबर पर बिल बनते ही वह यहाँ दिखाई देगा।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SEARCH_PH",
+      "message": "Search by consumer number or service",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SEARCH_PH",
+      "message": "उपभोक्ता संख्या या सेवा से खोजें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_NO_RESULTS",
+      "message": "Nothing matches your search.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_NO_RESULTS",
+      "message": "आपकी खोज से कुछ मेल नहीं खाता।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ALL",
+      "message": "All services",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ALL",
+      "message": "सभी सेवाएँ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_FILTER_SERVICE",
+      "message": "Service",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_FILTER_SERVICE",
+      "message": "सेवा",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SEARCH_LIST",
+      "message": "Type to search",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SEARCH_LIST",
+      "message": "खोजने के लिए लिखें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SELECT_ALL",
+      "message": "Select all",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SELECT_ALL",
+      "message": "सभी चुनें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SELECT_NONE",
+      "message": "Clear selection",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SELECT_NONE",
+      "message": "चयन हटाएँ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CONSUMER",
+      "message": "Consumer number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CONSUMER",
+      "message": "उपभोक्ता संख्या",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_BILL_NO",
+      "message": "Bill number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_BILL_NO",
+      "message": "बिल संख्या",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ULB",
+      "message": "ULB",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ULB",
+      "message": "शहरी निकाय",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DUE_DATE",
+      "message": "Due by",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DUE_DATE",
+      "message": "देय तिथि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PERIOD",
+      "message": "Period",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PERIOD",
+      "message": "अवधि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_AMOUNT",
+      "message": "Amount",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_AMOUNT",
+      "message": "राशि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_OVERDUE",
+      "message": "Overdue",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_OVERDUE",
+      "message": "अतिदेय",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SELECTED",
+      "message": "{{count}} selected",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SELECTED",
+      "message": "{{count}} चयनित",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_TOTAL",
+      "message": "Total to pay",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_TOTAL",
+      "message": "कुल देय राशि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_NOW",
+      "message": "Pay now",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_NOW",
+      "message": "अभी भुगतान करें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PICK_ONE",
+      "message": "Select at least one bill to pay.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PICK_ONE",
+      "message": "भुगतान के लिए कम से कम एक बिल चुनें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_MULTI_ULB",
+      "message": "Bills of different cities cannot be paid together. Select bills of one city at a time.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_MULTI_ULB",
+      "message": "अलग-अलग शहरों के बिल एक साथ नहीं चुकाए जा सकते। एक बार में एक शहर के बिल चुनें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SECURE_NOTE",
+      "message": "Payments are made through the secure Razorpay gateway. You will get a receipt after a successful payment.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SECURE_NOTE",
+      "message": "भुगतान सुरक्षित Razorpay गेटवे से होता है। सफल भुगतान के बाद आपको रसीद मिलेगी।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PREPARING",
+      "message": "Preparing your payment...",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PREPARING",
+      "message": "आपका भुगतान तैयार किया जा रहा है...",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CONFIRMING",
+      "message": "Confirming your payment...",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CONFIRMING",
+      "message": "आपके भुगतान की पुष्टि की जा रही है...",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CANCELLING",
+      "message": "Closing the payment...",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CANCELLING",
+      "message": "भुगतान बंद किया जा रहा है...",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CREATE_FAILED",
+      "message": "The payment could not be started. Please try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CREATE_FAILED",
+      "message": "भुगतान शुरू नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SCRIPT_FAILED",
+      "message": "The payment window could not be loaded. Check your connection and try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SCRIPT_FAILED",
+      "message": "भुगतान विंडो लोड नहीं हो सकी। अपना कनेक्शन जाँचकर पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_NOT_CONFIGURED",
+      "message": "Online payment is not set up on this site yet. Please contact your ULB office.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_NOT_CONFIGURED",
+      "message": "इस साइट पर ऑनलाइन भुगतान अभी सेट नहीं है। कृपया अपने शहरी निकाय कार्यालय से संपर्क करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_CONFIRM_FAILED",
+      "message": "We could not confirm the payment status. If money was deducted, it will be reconciled; check My payments after a while.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_CONFIRM_FAILED",
+      "message": "हम भुगतान की स्थिति की पुष्टि नहीं कर सके। यदि राशि कटी है तो उसका मिलान किया जाएगा; कुछ समय बाद मेरे भुगतान देखें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_DISMISSED",
+      "message": "The payment was not completed. No amount has been charged.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_DISMISSED",
+      "message": "भुगतान पूरा नहीं हुआ। कोई राशि नहीं काटी गई।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_PROPERTY",
+      "message": "Property tax",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_PROPERTY",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_GB",
+      "message": "Garbage collection charges",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_GB",
+      "message": "कचरा संग्रहण शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_NEWTL",
+      "message": "Trade licence fee",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_NEWTL",
+      "message": "व्यापार लाइसेंस शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_PET",
+      "message": "Pet licence fee",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_PET",
+      "message": "पालतू पशु लाइसेंस शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_CHB",
+      "message": "Community hall booking fee",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_CHB",
+      "message": "सामुदायिक भवन बुकिंग शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_ADVT",
+      "message": "Advertisement site booking fee",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_ADVT",
+      "message": "विज्ञापन स्थल बुकिंग शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SVC_REQSERV",
+      "message": "Request service fee",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SVC_REQSERV",
+      "message": "अनुरोध सेवा शुल्क",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_TITLE",
+      "message": "Payment status",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_TITLE",
+      "message": "भुगतान की स्थिति",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_SUCCESS",
+      "message": "Payment successful",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_SUCCESS",
+      "message": "भुगतान सफल रहा",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_SUCCESS_SUB",
+      "message": "Thank you. Your payment has been received.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_SUCCESS_SUB",
+      "message": "धन्यवाद। आपका भुगतान प्राप्त हो गया है।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_FAILURE",
+      "message": "Payment failed",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_FAILURE",
+      "message": "भुगतान विफल रहा",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_FAILURE_SUB",
+      "message": "No amount has been charged. Please try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_FAILURE_SUB",
+      "message": "कोई राशि नहीं काटी गई। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_PENDING",
+      "message": "Payment pending",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_PENDING",
+      "message": "भुगतान लंबित",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_PENDING_SUB",
+      "message": "The bank has not confirmed the payment yet. Please check My payments after about 30 minutes before paying again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_PENDING_SUB",
+      "message": "बैंक ने अभी भुगतान की पुष्टि नहीं की है। दोबारा भुगतान से पहले लगभग 30 मिनट बाद मेरे भुगतान देखें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_CANCELLED",
+      "message": "Payment cancelled",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_CANCELLED",
+      "message": "भुगतान रद्द किया गया",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RESULT_NONE",
+      "message": "No payment to show. Start from your pending dues.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RESULT_NONE",
+      "message": "दिखाने के लिए कोई भुगतान नहीं। अपने लंबित बकाया से शुरू करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_TXN_ID",
+      "message": "Transaction number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_TXN_ID",
+      "message": "लेन-देन संख्या",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PAID_ON",
+      "message": "Paid on",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PAID_ON",
+      "message": "भुगतान तिथि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_VIEW_RECEIPT",
+      "message": "View receipt",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_VIEW_RECEIPT",
+      "message": "रसीद देखें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_BACK_DUES",
+      "message": "Back to pending dues",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_BACK_DUES",
+      "message": "लंबित बकाया पर वापस",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_TRY_AGAIN",
+      "message": "Try again",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_TRY_AGAIN",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_GO_HISTORY",
+      "message": "Go to My payments",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_GO_HISTORY",
+      "message": "मेरे भुगतान पर जाएँ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_TITLE",
+      "message": "My payments",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_TITLE",
+      "message": "मेरे भुगतान",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_SUB",
+      "message": "Every payment made against your mobile number, newest first.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_SUB",
+      "message": "आपके मोबाइल नंबर पर किए गए सभी भुगतान, नवीनतम पहले।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_LOADING_HISTORY",
+      "message": "Fetching your payments...",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_LOADING_HISTORY",
+      "message": "आपके भुगतान लाए जा रहे हैं...",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_FAILED",
+      "message": "Your payments could not be loaded. Please try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_FAILED",
+      "message": "आपके भुगतान लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_EMPTY",
+      "message": "No payments yet",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_EMPTY",
+      "message": "अभी कोई भुगतान नहीं",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_EMPTY_SUB",
+      "message": "Your receipts will appear here after you pay a bill.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_EMPTY_SUB",
+      "message": "बिल चुकाने के बाद आपकी रसीदें यहाँ दिखाई देंगी।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_HISTORY_SEARCH_PH",
+      "message": "Search by receipt or consumer number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_HISTORY_SEARCH_PH",
+      "message": "रसीद या उपभोक्ता संख्या से खोजें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NO",
+      "message": "Receipt number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NO",
+      "message": "रसीद संख्या",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_DATE",
+      "message": "Receipt date",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_DATE",
+      "message": "रसीद तिथि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_MODE",
+      "message": "Payment mode",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_MODE",
+      "message": "भुगतान का तरीका",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PAID",
+      "message": "Amount paid",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PAID",
+      "message": "भुगतान की गई राशि",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_STATUS",
+      "message": "Status",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SERVICE",
+      "message": "Service",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SERVICE",
+      "message": "सेवा",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_OPEN",
+      "message": "Open",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_OPEN",
+      "message": "खोलें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_SHOW_MORE",
+      "message": "Show more",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_SHOW_MORE",
+      "message": "और दिखाएँ",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ST_NEW",
+      "message": "Received",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ST_NEW",
+      "message": "प्राप्त",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ST_DEPOSITED",
+      "message": "Deposited",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ST_DEPOSITED",
+      "message": "जमा",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ST_CANCELLED",
+      "message": "Cancelled",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ST_CANCELLED",
+      "message": "रद्द",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ST_DISHONOURED",
+      "message": "Dishonoured",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ST_DISHONOURED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_ST_REMITTED",
+      "message": "Remitted",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_ST_REMITTED",
+      "message": "प्रेषित",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_TITLE",
+      "message": "Payment receipt",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_TITLE",
+      "message": "भुगतान रसीद",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_FAILED",
+      "message": "The receipt could not be loaded. Please try again.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_FAILED",
+      "message": "रसीद लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NOTFOUND",
+      "message": "This receipt was not found in your account.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NOTFOUND",
+      "message": "यह रसीद आपके खाते में नहीं मिली।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_BACK",
+      "message": "Back to my payments",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_BACK",
+      "message": "मेरे भुगतान पर वापस",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PRINT",
+      "message": "Print receipt",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PRINT",
+      "message": "रसीद प्रिंट करें",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PAYER",
+      "message": "Paid by",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PAYER",
+      "message": "भुगतानकर्ता",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_PAYER_MOBILE",
+      "message": "Mobile number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_PAYER_MOBILE",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_INSTRUMENT",
+      "message": "Reference number",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_INSTRUMENT",
+      "message": "संदर्भ संख्या",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_BILL_LINES",
+      "message": "Paid for",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_BILL_LINES",
+      "message": "किसके लिए भुगतान",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NOTE",
+      "message": "This is a computer generated receipt of the Department of Urban Development, Himachal Pradesh.",
+      "module": "rainmaker-hppay",
+      "locale": "en_IN"
+    },
+    {
+      "code": "PAY_RECEIPT_NOTE",
+      "message": "यह शहरी विकास विभाग, हिमाचल प्रदेश की कंप्यूटर जनित रसीद है।",
+      "module": "rainmaker-hppay",
+      "locale": "hi_IN"
+    }
+  ]
+}

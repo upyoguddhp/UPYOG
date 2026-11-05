@@ -55,7 +55,7 @@ const SiteShell = ({ activeId, title, subtitle, icon, children }) => {
         isLoggedIn={isLoggedIn}
         userName={user?.info?.name}
         onLogin={() => history.push("/digit-ui/citizen/login")}
-        onRegister={() => history.push("/digit-ui/citizen/register")}
+        onOfficialLogin={() => history.push("/digit-ui/employee/user/login")}
         onLogout={async () => {
           await Digit.UserService.logout();
         }}

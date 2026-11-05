@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Icon from "./Icons";
+import SearchSelect from "../../../../components/SearchSelect";
 
 /**
  * Hero: headline, service search and the three help calls-to-action
@@ -71,17 +72,18 @@ const HeroSearch = ({ query, onQueryChange, onSubmit, onPopular, popular = [], o
             </button>
           )}
           {tenants.length > 0 && (
-            <label className="LandingSearch__city">
+            <div className="LandingSearch__city">
               <span className="sr-only">{tt("LANDING_CITY", "Your city")}</span>
-              <select value={selectedCity || ""} onChange={(e) => onCityChange(e.target.value)}>
-                <option value="">{tt("LANDING_ALL_CITIES", "All cities")}</option>
-                {tenants.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {t(c.i18nKey, { defaultValue: c.name || c.code })}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <SearchSelect
+                value={selectedCity || ""}
+                options={tenants.map((c) => ({ value: c.code, label: t(c.i18nKey, { defaultValue: c.name || c.code }) }))}
+                onChange={onCityChange}
+                allLabel={tt("LANDING_ALL_CITIES", "All cities")}
+                searchPlaceholder={tt("LANDING_SEARCH_LIST", "Type to search")}
+                emptyLabel={tt("LANDING_NO_MATCH", "Nothing matches your search.")}
+                ariaLabel={tt("LANDING_CITY", "Your city")}
+              />
+            </div>
           )}
           <button type="submit" className="LandingSearch__go" aria-label={tt("LANDING_SEARCH_GO", "Search")}>
             <Icon name="arrow" size={22} strokeWidth={2.4} />

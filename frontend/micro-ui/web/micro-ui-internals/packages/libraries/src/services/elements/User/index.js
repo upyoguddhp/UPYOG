@@ -18,6 +18,18 @@ export const UserService = {
       },
     });
   },
+  // Employee sign-in: JSON body to the open /user/_login endpoint (it issues the same token response as oauth/token).
+  // Same body as the portal: no tenantId, skipTenantCheck so the user is found whichever ULB they are posted in.
+  employeeLogin: ({ tenantId, ...details }) =>
+    Request({
+      url: Urls.EmployeeLogin,
+      data: { ...details, userType: "EMPLOYEE", skipTenantCheck: true },
+      headers: { "Content-Type": "application/json" },
+      auth: false,
+      noRequestInfo: true,
+      setTimeParam: false,
+      locale: false,
+    }),
   logoutUser: () => {
     let user = UserService.getUser();
     if (!user || !user.info || !user.access_token) return false;

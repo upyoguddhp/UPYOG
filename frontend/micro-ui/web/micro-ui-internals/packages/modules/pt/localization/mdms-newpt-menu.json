@@ -1,0 +1,4 @@
+[
+  {"id":1708,"url":"digit-ui-card","code":"null","name":"NPT_MENU_NEW_REGISTRATION","path":"","enabled":true,"displayName":"Register a new property","orderNumber":1,"serviceCode":"PROPERTY","parentModule":"PROPERTY","navigationURL":"/digit-ui/citizen/property/new-registration"},
+  {"id":1709,"url":"digit-ui-card","code":"null","name":"NPT_MENU_MY_PROPERTIES","path":"","enabled":true,"displayName":"My registered properties","orderNumber":2,"serviceCode":"PROPERTY","parentModule":"PROPERTY","navigationURL":"/digit-ui/citizen/property/my-properties"}
+]

@@ -78,8 +78,11 @@ public class LoginService {
 			}
 		}
 
+		// The login page no longer asks for a tenant: use the one the matched user belongs to,
+		// because the oauth token endpoint requires a tenantId.
+		String tokenTenantId = StringUtils.isNotBlank(tenantId) ? tenantId : users.get(0).getTenantId();
 		LinkedHashMap<String, LinkedHashMap<String, String>> authenticateUserResponse = (LinkedHashMap<String, LinkedHashMap<String, String>>) authenticateUser(
-				finalUsername, password, tenantId, userType.name(), skipTenantCheck);
+				finalUsername, password, tokenTenantId, userType.name(), skipTenantCheck);
 
 		if (authenticateUserResponse.get("access_token") != null) {
 			User user = users.get(0);

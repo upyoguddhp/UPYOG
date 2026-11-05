@@ -4,6 +4,7 @@ import Icon from "./Icons";
 import Leaders from "./Leaders";
 import HimachalMap from "./HimachalMap";
 import { HP_MAP } from "./himachalGeo";
+import { ulbTierCounts } from "./config";
 
 const TIERS = [
   { id: "state", tone: "navy", icon: "building", count: 1, label: "State Level", name: "HP Urban Development Dept.", desc: "Nodal authority for all ULB websites" },
@@ -41,9 +42,9 @@ const CountUp = ({ to }) => {
 const Welcome = ({ onOrgChart, onServices, onOpen }) => {
   const { t } = useTranslation();
   const tt = (k, d) => t(k, { defaultValue: d });
-  // counts come from the same ULB list that draws the map; the state itself is not a ULB
-  const tiers = TIERS.map((x) => (x.id === "state" ? x : { ...x, count: HP_MAP.pins.filter((p) => p.tier === x.id).length }));
-  const total = HP_MAP.pins.length;
+  // tier counts are the confirmed figures in config (60 = 5 + 29 + 26); the state itself is not a ULB
+  const tiers = TIERS.map((x) => (x.id === "state" ? x : { ...x, count: ulbTierCounts[x.id] }));
+  const total = Object.values(ulbTierCounts).reduce((a, n) => a + n, 0);
   const [active, setActive] = useState(null);
   const rootRef = useRef(null);
   const [armed, setArmed] = useState(false);

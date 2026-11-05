@@ -1,0 +1,3452 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_NEWTL",
+      "message": "Trade Licence",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_NEWTL",
+      "message": "व्यापार लाइसेंस",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MENU_NEW_REGISTRATION",
+      "message": "New trade licence registration",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MENU_NEW_REGISTRATION",
+      "message": "नया व्यापार लाइसेंस पंजीकरण",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MENU_MY_APPLICATIONS",
+      "message": "My trade licence applications",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MENU_MY_APPLICATIONS",
+      "message": "मेरे व्यापार लाइसेंस आवेदन",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "MODULE_NEWTL",
+      "message": "Trade Licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "MODULE_NEWTL",
+      "message": "व्यापार लाइसेंस",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_APP_TITLE",
+      "message": "New Trade Licence Registration",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_APP_TITLE",
+      "message": "नया व्यापार लाइसेंस पंजीकरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_REGISTRATION",
+      "message": "Registration Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_REGISTRATION",
+      "message": "पंजीकरण विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_TRADE",
+      "message": "Trade Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_TRADE",
+      "message": "व्यापार विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_SPEC",
+      "message": "Licence Specifications",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_SPEC",
+      "message": "लाइसेंस विनिर्देश",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_LOCATION",
+      "message": "Trade Location Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_LOCATION",
+      "message": "व्यापार स्थान विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_OWNER",
+      "message": "Trade Owner Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_OWNER",
+      "message": "व्यापार स्वामी विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_APPLICANT",
+      "message": "Applicant Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_DETAILS",
+      "message": "Registration & Trade Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_DETAILS",
+      "message": "पंजीकरण और व्यापार विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_PEOPLE",
+      "message": "Owner & Applicant Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_PEOPLE",
+      "message": "स्वामी और आवेदक विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_DETAILS",
+      "message": "Registration, business and licence details in one place.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_DETAILS",
+      "message": "पंजीकरण, व्यवसाय और लाइसेंस का विवरण एक ही स्थान पर।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_PEOPLE",
+      "message": "Who owns the trade, and who is applying.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_PEOPLE",
+      "message": "व्यापार का स्वामी कौन है और आवेदन कौन कर रहा है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_REGISTRATION",
+      "message": "Enter your labour registration details, if you have them.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_REGISTRATION",
+      "message": "यदि आपके पास श्रम पंजीकरण है तो उसका विवरण भरें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_TRADE",
+      "message": "Tell us about your business.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_TRADE",
+      "message": "अपने व्यवसाय के बारे में बताएं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_SPEC",
+      "message": "Choose the sector, trade and licence period.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_SPEC",
+      "message": "क्षेत्र, व्यापार और लाइसेंस अवधि चुनें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_LOCATION",
+      "message": "Where will the trade be carried out?",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_LOCATION",
+      "message": "व्यापार कहाँ किया जाएगा?",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_OWNER",
+      "message": "Who owns the trade?",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_OWNER",
+      "message": "व्यापार का स्वामी कौन है?",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_APPLICANT",
+      "message": "These details come from your account.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_APPLICANT",
+      "message": "ये विवरण आपके खाते से लिए गए हैं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_SELECT",
+      "message": "Select",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_SELECT_FIRST",
+      "message": "Select {{parent}} first",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_SELECT_FIRST",
+      "message": "पहले {{parent}} चुनें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_SUBMITTING",
+      "message": "आपका आवेदन जमा हो रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LOOKUP_FAILED",
+      "message": "Could not load {{what}}. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LOOKUP_FAILED",
+      "message": "{{what}} लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RETRY",
+      "message": "Try again",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_registrationLicenseNumber",
+      "message": "Registration / Licence Number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_registrationLicenseNumber",
+      "message": "पंजीकरण / लाइसेंस संख्या",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_registrationCommencementDate",
+      "message": "Registration Commencement Date",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_registrationCommencementDate",
+      "message": "पंजीकरण प्रारंभ तिथि",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_registrationValidityDate",
+      "message": "Registration Validity Date",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_registrationValidityDate",
+      "message": "पंजीकरण वैधता तिथि",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_businessName",
+      "message": "Business Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_businessName",
+      "message": "व्यवसाय का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_scaleOfBusiness",
+      "message": "Scale of Business",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_scaleOfBusiness",
+      "message": "व्यवसाय का पैमाना",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_gstNumber",
+      "message": "GST Number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_gstNumber",
+      "message": "जीएसटी संख्या",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_businessDetails",
+      "message": "Business Details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_businessDetails",
+      "message": "व्यवसाय का विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeIndustryType",
+      "message": "Industry Type",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeIndustryType",
+      "message": "उद्योग का प्रकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_mapApproved",
+      "message": "Is the Map Approved?",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_mapApproved",
+      "message": "क्या नक्शा स्वीकृत है?",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_propertyType",
+      "message": "Property Type",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_propertyType",
+      "message": "संपत्ति का प्रकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_infraStrOwnType",
+      "message": "Infrastructure Ownership Type",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_infraStrOwnType",
+      "message": "अवसंरचना स्वामित्व का प्रकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_licenseCategory",
+      "message": "Sector",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_licenseCategory",
+      "message": "क्षेत्र",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_licenseTrade",
+      "message": "Trade",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_licenseTrade",
+      "message": "व्यापार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_licenseSubCategory",
+      "message": "Sub Category",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_licenseSubCategory",
+      "message": "उप श्रेणी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_licensePeriod",
+      "message": "Licence Period (years)",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_licensePeriod",
+      "message": "लाइसेंस अवधि (वर्ष)",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_propertyId",
+      "message": "Property ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_propertyId",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_propertyOwnerName",
+      "message": "Property Owner Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_propertyOwnerName",
+      "message": "संपत्ति स्वामी का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_propertyAddress",
+      "message": "Address",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_propertyAddress",
+      "message": "पता",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_districtName",
+      "message": "District",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_districtName",
+      "message": "जिला",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_ulbName",
+      "message": "ULB Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_ulbName",
+      "message": "शहरी स्थानीय निकाय का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_ulbType",
+      "message": "ULB Type",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_ulbType",
+      "message": "शहरी स्थानीय निकाय का प्रकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_wardNumber",
+      "message": "Ward Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_wardNumber",
+      "message": "वार्ड का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_zone",
+      "message": "Zone",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_zone",
+      "message": "क्षेत्र (ज़ोन)",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_propertyPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_propertyPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerName",
+      "message": "Trade Owner Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerName",
+      "message": "व्यापार स्वामी का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerFatherName",
+      "message": "Father / Husband Name",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerFatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerGender",
+      "message": "Gender",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerGender",
+      "message": "लिंग",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerMobileNumber",
+      "message": "Mobile Number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerMobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerEmailAddress",
+      "message": "Email Address",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_tradeOwnerEmailAddress",
+      "message": "ईमेल पता",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_applicantName",
+      "message": "Name of Applicant",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_applicantName",
+      "message": "आवेदक का नाम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_applicantMobileNumber",
+      "message": "Mobile Number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_applicantMobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_F_applicantEmailAddress",
+      "message": "Email Address",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_F_applicantEmailAddress",
+      "message": "ईमेल पता",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_SMALL",
+      "message": "Small",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_SMALL",
+      "message": "छोटा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_MEDIUM",
+      "message": "Medium",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_MEDIUM",
+      "message": "मध्यम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_LARGE",
+      "message": "Large",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_LARGE",
+      "message": "बड़ा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_GOODS",
+      "message": "Goods",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_GOODS",
+      "message": "वस्तुएँ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_SERVICES",
+      "message": "Services",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_SERVICES",
+      "message": "सेवाएँ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_YES",
+      "message": "Yes",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_YES",
+      "message": "हाँ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_NO",
+      "message": "No",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_NO",
+      "message": "नहीं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_RESIDENTIAL",
+      "message": "Residential",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_RESIDENTIAL",
+      "message": "आवासीय",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_COMMERCIAL",
+      "message": "Commercial",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_COMMERCIAL",
+      "message": "वाणिज्यिक",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_OWNED",
+      "message": "Owned",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_OWNED",
+      "message": "स्वामित्व",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_RENTED",
+      "message": "Rented",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_RENTED",
+      "message": "किराये पर",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_LEASED",
+      "message": "Leased",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_LEASED",
+      "message": "पट्टे पर",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_MALE",
+      "message": "पुरुष",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_FEMALE",
+      "message": "महिला",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_REQUIRED",
+      "message": "This field is required.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_MOBILE",
+      "message": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_EMAIL",
+      "message": "Enter a valid email address.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_EMAIL",
+      "message": "सही ईमेल पता दर्ज करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_PIN",
+      "message": "Enter a valid 6-digit pin code.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_PIN",
+      "message": "6 अंकों का सही पिन कोड दर्ज करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_GST",
+      "message": "Enter a valid 15-character GST number.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_GST",
+      "message": "15 अक्षरों की सही जीएसटी संख्या दर्ज करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_DATE_ORDER",
+      "message": "Validity date must be after the commencement date.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_DATE_ORDER",
+      "message": "वैधता तिथि प्रारंभ तिथि के बाद की होनी चाहिए।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_E_MAP_NOT_APPROVED",
+      "message": "The map must be approved for trade registration. You cannot continue until it is.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_E_MAP_NOT_APPROVED",
+      "message": "व्यापार पंजीकरण के लिए नक्शा स्वीकृत होना आवश्यक है। इसके बिना आप आगे नहीं बढ़ सकते।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_REVIEW_HINT",
+      "message": "Check your details. Use Edit to change anything.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_REVIEW_HINT",
+      "message": "अपना विवरण जाँचें। कुछ बदलने के लिए 'बदलें' दबाएं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_SUBMIT_FAILED",
+      "message": "We could not submit your application.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_SUBMIT_FAILED",
+      "message": "हम आपका आवेदन जमा नहीं कर सके।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_SUCCESS",
+      "message": "Application submitted successfully",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_SUCCESS",
+      "message": "आवेदन सफलतापूर्वक जमा हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_FAILED",
+      "message": "Application submission failed",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_FAILED",
+      "message": "आवेदन जमा नहीं हो सका",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_APP_NO",
+      "message": "Application Number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_HINT",
+      "message": "Keep this number to track your application.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_HINT",
+      "message": "अपने आवेदन को ट्रैक करने के लिए इस संख्या को सुरक्षित रखें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_GO_APPS",
+      "message": "My Applications",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_GO_APPS",
+      "message": "मेरे आवेदन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_GO_HOME",
+      "message": "Go to Dashboard",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_TITLE",
+      "message": "My Trade Licence Applications",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_TITLE",
+      "message": "मेरे व्यापार लाइसेंस आवेदन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_EMPTY",
+      "message": "You have no trade licence applications yet.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_EMPTY",
+      "message": "आपका अभी कोई व्यापार लाइसेंस आवेदन नहीं है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_NEW",
+      "message": "Apply for a new licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_NEW",
+      "message": "नए लाइसेंस के लिए आवेदन करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_FAILED",
+      "message": "We could not load your applications.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_FAILED",
+      "message": "हम आपके आवेदन लोड नहीं कर सके।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COL_APP_NO",
+      "message": "Application No.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COL_APP_NO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COL_TRADE",
+      "message": "Business",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COL_TRADE",
+      "message": "व्यवसाय",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COL_STATUS",
+      "message": "Status",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COL_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COL_ULB",
+      "message": "ULB",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COL_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_CRUMB_HOME",
+      "message": "होम",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_CRUMB_PT",
+      "message": "Trade Licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_CRUMB_PT",
+      "message": "व्यापार लाइसेंस",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_CRUMB_NEW",
+      "message": "New registration",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_CRUMB_NEW",
+      "message": "नया पंजीकरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PROGRESS_TITLE",
+      "message": "Your application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PROGRESS_TITLE",
+      "message": "आपका आवेदन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PROGRESS_DRAFT",
+      "message": "Saved on this device as a draft",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर ड्राफ्ट के रूप में सहेजा गया",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TIP_1",
+      "message": "Find your property ID before you start",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TIP_1",
+      "message": "शुरू करने से पहले अपनी संपत्ति आईडी ढूंढ लें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TIP_2",
+      "message": "Keep your GST and business details handy",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TIP_2",
+      "message": "जीएसटी और व्यवसाय का विवरण पास रखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TIP_3",
+      "message": "You can save a draft and return",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TIP_3",
+      "message": "आप ड्राफ्ट सहेजकर बाद में लौट सकते हैं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_FAILED",
+      "message": "We could not load the document list. Keep your ID and property proof ready.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_FAILED",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। अपनी पहचान और संपत्ति का प्रमाण तैयार रखें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_ONLY",
+      "message": "PDF, JPG or PNG, up to 10 MB each.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_ONLY",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_TITLE",
+      "message": "आवश्यक दस्तावेज़",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_HELP_TITLE",
+      "message": "Stuck? We will help.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_HELP_TITLE",
+      "message": "अटक गए? हम मदद करेंगे।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_HELP_LINE",
+      "message": "Call 177-2809784 · 9:30 AM–6:00 PM",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_HELP_LINE",
+      "message": "कॉल करें 177-2809784 · प्रातः 9:30–सायं 6:00",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DRAFT_SAVED",
+      "message": "Draft saved on this device.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DRAFT_SAVED",
+      "message": "ड्राफ्ट इस डिवाइस पर सहेजा गया।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PAGE_SUB",
+      "message": "Trade Licence · Takes about 8 minutes",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PAGE_SUB",
+      "message": "व्यापार लाइसेंस · लगभग 8 मिनट",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_SAVE_DRAFT",
+      "message": "Save draft",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_SAVE_DRAFT",
+      "message": "ड्राफ्ट सहेजें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_STEP",
+      "message": "आगे: {{step}}",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_MINE",
+      "message": "My properties",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_MINE",
+      "message": "मेरी संपत्तियां",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_ID",
+      "message": "Property ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_ID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_PH_ID",
+      "message": "Enter the property ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_PH_ID",
+      "message": "संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_MOBILE",
+      "message": "Owner mobile",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_MOBILE",
+      "message": "स्वामी का मोबाइल",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_PH_MOBILE",
+      "message": "Enter the owner's 10-digit mobile number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_PH_MOBILE",
+      "message": "स्वामी का 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_OLD",
+      "message": "Old property ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_MODE_OLD",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_PH_OLD",
+      "message": "Enter the old property ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_PH_OLD",
+      "message": "पुरानी संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_ACTIVE",
+      "message": "Active",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_ACTIVE",
+      "message": "सक्रिय",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_INACTIVE",
+      "message": "Inactive",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_INACTIVE",
+      "message": "निष्क्रिय",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_PROGRESS",
+      "message": "Under process",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_STATUS_PROGRESS",
+      "message": "प्रक्रियाधीन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_E_PICK",
+      "message": "Please select a property to continue.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_E_PICK",
+      "message": "आगे बढ़ने के लिए कृपया एक संपत्ति चुनें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_FIND_BY",
+      "message": "Find your property by",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_FIND_BY",
+      "message": "अपनी संपत्ति इससे खोजें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_MINE_HINT",
+      "message": "Showing properties linked to your mobile number {{mobile}}.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_MINE_HINT",
+      "message": "आपके मोबाइल नंबर {{mobile}} से जुड़ी संपत्तियां दिखाई जा रही हैं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_SEARCH",
+      "message": "Search",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_SEARCH",
+      "message": "खोजें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_NO_MOBILE",
+      "message": "No mobile number is linked to your account. Search by property ID instead.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_NO_MOBILE",
+      "message": "आपके खाते से कोई मोबाइल नंबर जुड़ा नहीं है। संपत्ति आईडी से खोजें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_ENTER_TERM",
+      "message": "Enter a value above and press Search.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_ENTER_TERM",
+      "message": "ऊपर मान दर्ज करें और खोजें दबाएं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_SEARCHING",
+      "message": "Searching properties...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_SEARCHING",
+      "message": "संपत्तियां खोजी जा रही हैं...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_FAILED",
+      "message": "We could not search properties. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_FAILED",
+      "message": "हम संपत्तियां नहीं खोज सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_EMPTY",
+      "message": "No property found",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_EMPTY",
+      "message": "कोई संपत्ति नहीं मिली",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_EMPTY_HINT",
+      "message": "Check the value and try another way to search, or register the property first.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_EMPTY_HINT",
+      "message": "मान जांचें और खोजने का दूसरा तरीका आज़माएं, या पहले संपत्ति पंजीकृत करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_RESULTS",
+      "message": "Matching properties",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_RESULTS",
+      "message": "मिलती-जुलती संपत्तियां",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_PICKED",
+      "message": "Selected property {{id}}",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_PICKED",
+      "message": "चुनी गई संपत्ति {{id}}",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_NOT_FOUND",
+      "message": "Property not found?",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_NOT_FOUND",
+      "message": "संपत्ति नहीं मिली?",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PS_REGISTER_LINK",
+      "message": "Register it first",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PS_REGISTER_LINK",
+      "message": "पहले इसे पंजीकृत करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_PAGE_HINT",
+      "message": "PDF, JPG or PNG, up to 10 MB each. A document already on file shows as uploaded.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_PAGE_HINT",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी। पहले से उपलब्ध दस्तावेज़ अपलोड हुआ दिखेगा।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_BTN_REMOVE",
+      "message": "हटाएं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_UPLOADED",
+      "message": "अपलोड हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_TITLE",
+      "message": "Application details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_TITLE",
+      "message": "आवेदन विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_TRADE",
+      "message": "Trade",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_TRADE",
+      "message": "व्यापार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_OWNER",
+      "message": "Trade owner",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_OWNER",
+      "message": "व्यापार स्वामी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_ADDRESS",
+      "message": "Location",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_ADDRESS",
+      "message": "स्थान",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_NODOCS",
+      "message": "No documents attached",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_BACK",
+      "message": "Back to my applications",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_BACK",
+      "message": "मेरे आवेदनों पर वापस",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_NOTFOUND",
+      "message": "This application could not be found.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_NOTFOUND",
+      "message": "यह आवेदन नहीं मिला।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_FAILED",
+      "message": "Could not load the application. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_TIMELINE",
+      "message": "Application progress",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_TIMELINE",
+      "message": "आवेदन की प्रगति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_VALIDITY",
+      "message": "Licence validity",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_VALIDITY",
+      "message": "लाइसेंस की वैधता",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_FY",
+      "message": "Financial year",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_FY",
+      "message": "वित्तीय वर्ष",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_APPNO",
+      "message": "Application number",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_PERIOD",
+      "message": "Licence period (years)",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_PERIOD",
+      "message": "लाइसेंस अवधि (वर्ष)",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_NOHISTORY",
+      "message": "No progress recorded yet",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW",
+      "message": "Renew trade licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW",
+      "message": "व्यापार लाइसेंस का नवीनीकरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY",
+      "message": "Modify trade licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY",
+      "message": "व्यापार लाइसेंस में संशोधन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE",
+      "message": "Close trade licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE",
+      "message": "व्यापार लाइसेंस बंद करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_RENEW",
+      "message": "Renew",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_RENEW",
+      "message": "नवीनीकरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_MODIFY",
+      "message": "Modify",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_MODIFY",
+      "message": "संशोधन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_RENEW",
+      "message": "Continue renewal",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_RENEW",
+      "message": "नवीनीकरण जारी रखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_MODIFY",
+      "message": "Continue modification",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_MODIFY",
+      "message": "संशोधन जारी रखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_SUB",
+      "message": "Extend the validity of your approved licence. Only the licence period can be changed.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_SUB",
+      "message": "अपने स्वीकृत लाइसेंस की वैधता बढ़ाएँ। केवल लाइसेंस अवधि बदली जा सकती है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_SUB",
+      "message": "Update the details of your approved licence and send it for verification again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_SUB",
+      "message": "अपने स्वीकृत लाइसेंस का विवरण अद्यतन करें और उसे पुनः सत्यापन के लिए भेजें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_SUB",
+      "message": "Ask the ULB to close this licence.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_SUB",
+      "message": "इस लाइसेंस को बंद करने के लिए नगर निकाय से अनुरोध करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P1",
+      "message": "A renewal application is created under the same application number.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P1",
+      "message": "उसी आवेदन संख्या के अंतर्गत नवीनीकरण आवेदन बनाया जाता है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P2",
+      "message": "Choose the new licence period; all other details stay as approved.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P2",
+      "message": "नई लाइसेंस अवधि चुनें; अन्य सभी विवरण स्वीकृत जैसे ही रहेंगे।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P3",
+      "message": "Documents uploaded earlier are attached automatically; replace any that have changed.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_RENEW_P3",
+      "message": "पहले अपलोड किए गए दस्तावेज़ स्वतः संलग्न होते हैं; जो बदले हैं उन्हें बदलें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P1",
+      "message": "Your licence comes back to you for changes and is then verified again by the ULB.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P1",
+      "message": "आपका लाइसेंस बदलाव के लिए आपके पास आता है और फिर नगर निकाय द्वारा दोबारा सत्यापित होता है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P2",
+      "message": "The property cannot be changed here; apply for a new licence to use a different property.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P2",
+      "message": "संपत्ति यहाँ नहीं बदली जा सकती; दूसरी संपत्ति के लिए नया लाइसेंस आवेदन करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P3",
+      "message": "Documents uploaded earlier are attached automatically; replace any that have changed.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_MODIFY_P3",
+      "message": "पहले अपलोड किए गए दस्तावेज़ स्वतः संलग्न होते हैं; जो बदले हैं उन्हें बदलें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P1",
+      "message": "The licence is closed once the ULB verifies and approves your request.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P1",
+      "message": "नगर निकाय के सत्यापन और अनुमोदन के बाद लाइसेंस बंद हो जाता है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P2",
+      "message": "A closed licence cannot be renewed or modified.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P2",
+      "message": "बंद लाइसेंस का नवीनीकरण या संशोधन नहीं हो सकता।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P3",
+      "message": "Closure cannot be undone after approval.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_P3",
+      "message": "अनुमोदन के बाद बंद करना वापस नहीं हो सकता।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_WARN",
+      "message": "Closing a licence cannot be undone once approved.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CLOSE_WARN",
+      "message": "लाइसेंस बंद करना अनुमोदन के बाद वापस नहीं हो सकता।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONFIRM_TITLE",
+      "message": "Before you continue",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONFIRM_TITLE",
+      "message": "आगे बढ़ने से पहले",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CANCEL",
+      "message": "Cancel",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CANCEL",
+      "message": "रद्द करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE",
+      "message": "Continue",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE",
+      "message": "आगे बढ़ें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONFIRM_CLOSE",
+      "message": "Yes, request closure",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONFIRM_CLOSE",
+      "message": "हाँ, बंद करने का अनुरोध करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_STARTING",
+      "message": "Starting your request...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_STARTING",
+      "message": "आपका अनुरोध शुरू हो रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_START_FAILED",
+      "message": "Could not start the request. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_START_FAILED",
+      "message": "अनुरोध शुरू नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_NOT_ALLOWED",
+      "message": "This action is not available for this application right now.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_NOT_ALLOWED",
+      "message": "यह कार्रवाई अभी इस आवेदन के लिए उपलब्ध नहीं है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_LOADING",
+      "message": "Loading your licence...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_LOADING",
+      "message": "आपका लाइसेंस लोड हो रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_LOAD_FAILED",
+      "message": "Could not load the licence. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_LOAD_FAILED",
+      "message": "लाइसेंस लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_REASON",
+      "message": "Reason for closure (optional)",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_REASON",
+      "message": "बंद करने का कारण (वैकल्पिक)",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_SUBMITTING",
+      "message": "Submitting your request...",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_SUBMITTING",
+      "message": "आपका अनुरोध जमा हो रहा है...",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_RENEW",
+      "message": "Renewal request submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_RENEW",
+      "message": "नवीनीकरण अनुरोध जमा हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_MODIFY",
+      "message": "Modification request submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_MODIFY",
+      "message": "संशोधन अनुरोध जमा हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_CLOSE",
+      "message": "Closure request submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_CLOSE",
+      "message": "बंद करने का अनुरोध जमा हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_SUB",
+      "message": "Your request has been sent to the ULB for verification. Track it under My applications.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_SUB",
+      "message": "आपका अनुरोध सत्यापन के लिए नगर निकाय को भेज दिया गया है। इसे मेरे आवेदन में देखें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_DOCS_ON_FILE",
+      "message": "Documents already on file will be used.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_DOCS_ON_FILE",
+      "message": "पहले से उपलब्ध दस्तावेज़ उपयोग किए जाएँगे।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_VALID_TILL",
+      "message": "Valid till",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_VALID_TILL",
+      "message": "वैध तिथि तक",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_VIEW_APP",
+      "message": "View application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_VIEW_APP",
+      "message": "आवेदन देखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_TYPE",
+      "message": "Application type",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_TYPE",
+      "message": "आवेदन प्रकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TYPE_NEW",
+      "message": "New",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TYPE_NEW",
+      "message": "नया",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TYPE_RENEWAL",
+      "message": "Renewal",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TYPE_RENEWAL",
+      "message": "नवीनीकरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TYPE_MODIFICATION",
+      "message": "Modification",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TYPE_MODIFICATION",
+      "message": "संशोधन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_TYPE_CLOSURE",
+      "message": "Closure",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_TYPE_CLOSURE",
+      "message": "बंद करना",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list. Please try again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_TYPE_ERROR",
+      "message": "केवल पीडीएफ, जेपीजी या पीएनजी फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_SIZE_ERROR",
+      "message": "File must be smaller than 10 MB.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 10 एमबी से छोटी होनी चाहिए।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_REQUIRED_ERROR",
+      "message": "Please upload this document.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_REQUIRED_ERROR",
+      "message": "कृपया यह दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCV_PAGES",
+      "message": "pages",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOCV_FAILED",
+      "message": "This file could not be displayed. Please try again or choose the file again.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOCV_FAILED",
+      "message": "यह फ़ाइल नहीं दिखाई जा सकी। कृपया पुनः प्रयास करें या फ़ाइल दोबारा चुनें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_DOCUMENTS",
+      "message": "Upload the documents for this application.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_DOCUMENTS",
+      "message": "इस आवेदन के लिए दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DOC_UPLOAD_FAILED",
+      "message": "Your application was created, but these documents could not be uploaded: {{docs}}. Press Submit again to retry.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DOC_UPLOAD_FAILED",
+      "message": "आपका आवेदन बन गया है, पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए जमा करें दबाएं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_REVIEW_SUB",
+      "message": "Trade Licence · Last step",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_REVIEW_SUB",
+      "message": "व्यापार लाइसेंस · अंतिम चरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूं कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_DECLARE_REQUIRED",
+      "message": "Please tick the declaration to submit.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा पर टिक करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_BANNER_SUB",
+      "message": "Your application is with the ULB for verification.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_BANNER_SUB",
+      "message": "आपका आवेदन सत्यापन के लिए निकाय के पास है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COPIED",
+      "message": "कॉपी हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_COPY_ID",
+      "message": "Copy ID",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_COPY_ID",
+      "message": "आईडी कॉपी करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_WHERE",
+      "message": "Where your application is now",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_WHERE",
+      "message": "आपका आवेदन अभी कहाँ है",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_PENDING",
+      "message": "Pending with ULB verifier",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_PENDING",
+      "message": "निकाय सत्यापनकर्ता के पास लंबित",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_DEPT",
+      "message": "Urban Development Department · Citizen Seva",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_DEPT",
+      "message": "शहरी विकास विभाग · सिटिजन सेवा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_TITLE",
+      "message": "Acknowledgement Receipt",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_TITLE",
+      "message": "पावती रसीद",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_SERVICE",
+      "message": "Trade Licence · New licence application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_SERVICE",
+      "message": "व्यापार लाइसेंस · नया लाइसेंस आवेदन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_DATE",
+      "message": "Submitted on",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_DATE",
+      "message": "जमा करने की तिथि",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_STATUS_V",
+      "message": "Submitted for verification",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_STATUS_V",
+      "message": "सत्यापन हेतु जमा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_OWNER",
+      "message": "Applicant / trade owner",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_OWNER",
+      "message": "आवेदक / व्यापार स्वामी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_TRADE",
+      "message": "Trade details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_TRADE",
+      "message": "व्यापार विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_PROPERTY",
+      "message": "Property details",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_PROPERTY",
+      "message": "संपत्ति विवरण",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_DOCS",
+      "message": "Documents submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_DOCS",
+      "message": "जमा किए गए दस्तावेज़",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_NOTE",
+      "message": "Keep this receipt and the application number for tracking. This is a computer-generated acknowledgement and does not need a signature.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_NOTE",
+      "message": "ट्रैकिंग के लिए इस रसीद और आवेदन संख्या को सुरक्षित रखें। यह कंप्यूटर जनित पावती है, हस्ताक्षर आवश्यक नहीं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_RCPT_HELP",
+      "message": "Helpline: 177-2809784 (Mon–Sat, 9:30 AM–6:00 PM)",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_RCPT_HELP",
+      "message": "हेल्पलाइन: 177-2809784 (सोम–शनि, 9:30–6:00)",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_SUB",
+      "message": "Every trade licence application you have made, in one place",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_MY_APPS_SUB",
+      "message": "आपके सभी व्यापार लाइसेंस आवेदन, एक जगह",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_SEARCH_PH",
+      "message": "Search by application no., business or property",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_SEARCH_PH",
+      "message": "आवेदन संख्या, व्यवसाय या संपत्ति से खोजें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_START_HINT",
+      "message": "Apply for a trade licence for a property you own.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_START_HINT",
+      "message": "अपनी संपत्ति के लिए व्यापार लाइसेंस हेतु आवेदन करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NO_RESULTS",
+      "message": "No applications match your search.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NO_RESULTS",
+      "message": "आपकी खोज से कोई आवेदन मेल नहीं खाता।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएं",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_1",
+      "message": "Submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_1",
+      "message": "जमा हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_2",
+      "message": "Verification",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_2",
+      "message": "सत्यापन",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_3",
+      "message": "Approval",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_3",
+      "message": "स्वीकृति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_4",
+      "message": "Licence issued",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_4",
+      "message": "लाइसेंस जारी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_1_D",
+      "message": "You get an acknowledgement",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_1_D",
+      "message": "आपको पावती मिलेगी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_2_D",
+      "message": "The ULB checks your details and property",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_2_D",
+      "message": "निकाय आपके विवरण और संपत्ति की जांच करेगा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_NEXT_3_D",
+      "message": "Fee is calculated once approved",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_NEXT_3_D",
+      "message": "स्वीकृति के बाद शुल्क निर्धारित होगा",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_FILTER_DRAFT",
+      "message": "Draft",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_FILTER_DRAFT",
+      "message": "ड्राफ्ट",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STAGE_DRAFT",
+      "message": "Not submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STAGE_DRAFT",
+      "message": "जमा नहीं हुआ",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STAGE_PROGRESS",
+      "message": "With the ULB",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STAGE_PROGRESS",
+      "message": "निकाय के पास",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STAGE_APPROVED",
+      "message": "Licensed",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STAGE_APPROVED",
+      "message": "लाइसेंस प्राप्त",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LIST_KIND",
+      "message": "Trade licence",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LIST_KIND",
+      "message": "व्यापार लाइसेंस",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_PROPERTY",
+      "message": "Property",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_PROPERTY",
+      "message": "संपत्ति",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_PROPERTY",
+      "message": "Find the property where the trade will run and select it.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_STEP_HINT_PROPERTY",
+      "message": "वह संपत्ति खोजें जहाँ व्यापार होगा और उसे चुनें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_H_gstNumber",
+      "message": "15-character GSTIN, e.g. 02ABCDE1234F1Z5. Leave blank if not registered.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_H_gstNumber",
+      "message": "15 अक्षरों का जीएसटीआईएन, जैसे 02ABCDE1234F1Z5। पंजीकृत न हो तो खाली छोड़ें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_H_licensePeriod",
+      "message": "Licence is issued for 1 or 5 years (3 years for tobacco).",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_H_licensePeriod",
+      "message": "लाइसेंस 1 या 5 वर्ष के लिए जारी होता है (तंबाकू के लिए 3 वर्ष)।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_H_mapApproved",
+      "message": "The premises must have an approved map to get a licence.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_H_mapApproved",
+      "message": "लाइसेंस के लिए परिसर का नक्शा स्वीकृत होना चाहिए।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_H_registrationLicenseNumber",
+      "message": "Your labour registration number, if you have one.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_H_registrationLicenseNumber",
+      "message": "आपका श्रम पंजीकरण नंबर, यदि हो।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_H_tradeIndustryType",
+      "message": "Choose Goods if you sell products, Services otherwise.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_H_tradeIndustryType",
+      "message": "उत्पाद बेचते हैं तो वस्तुएँ चुनें, अन्यथा सेवाएँ।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    }
+  ]
+}

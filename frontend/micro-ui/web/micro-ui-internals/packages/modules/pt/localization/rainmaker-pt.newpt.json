@@ -1,0 +1,3212 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_PROPERTY",
+      "message": "Property Tax",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_PROPERTY",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MENU_NEW_REGISTRATION",
+      "message": "Register a new property",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MENU_NEW_REGISTRATION",
+      "message": "नई संपत्ति पंजीकृत करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MENU_MY_PROPERTIES",
+      "message": "My registered properties",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MENU_MY_PROPERTIES",
+      "message": "मेरी पंजीकृत संपत्तियां",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "MODULE_NEWPT",
+      "message": "Property Tax",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "MODULE_NEWPT",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_APP_TITLE",
+      "message": "New Property Registration",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_APP_TITLE",
+      "message": "नई संपत्ति पंजीकरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_LOCATION",
+      "message": "Location Details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_LOCATION",
+      "message": "स्थान विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_SPEC",
+      "message": "Property Specification",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_SPEC",
+      "message": "संपत्ति विनिर्देश",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_OWNER",
+      "message": "Owner Details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_OWNER",
+      "message": "स्वामी विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_COOWNER",
+      "message": "Co-owner Details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_COOWNER",
+      "message": "सह-स्वामी विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_LOCATION",
+      "message": "Where is the property located?",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_LOCATION",
+      "message": "संपत्ति कहाँ स्थित है?",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_SPEC",
+      "message": "Tell us whether it is land or a building.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_SPEC",
+      "message": "बताएं कि यह भूमि है या भवन।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_OWNER",
+      "message": "Who owns the property?",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_OWNER",
+      "message": "संपत्ति का स्वामी कौन है?",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_COOWNER",
+      "message": "Details of the other owner of the property.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_COOWNER",
+      "message": "संपत्ति के अन्य स्वामी का विवरण।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_REVIEW_HINT",
+      "message": "Check your details. Use Edit to change anything.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_REVIEW_HINT",
+      "message": "अपना विवरण जांचें। बदलने के लिए 'बदलें' दबाएं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_oldPropertyId",
+      "message": "Old Property ID",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_oldPropertyId",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_propertyAddress",
+      "message": "Address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_propertyAddress",
+      "message": "पता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_districtName",
+      "message": "District",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_districtName",
+      "message": "जिला",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ulbName",
+      "message": "ULB Name",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ulbName",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ulbType",
+      "message": "ULB Type",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ulbType",
+      "message": "निकाय का प्रकार",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_wardNumber",
+      "message": "Ward Name",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_wardNumber",
+      "message": "वार्ड का नाम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_zone",
+      "message": "Zone (F1)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_zone",
+      "message": "ज़ोन (F1)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_propertyPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_propertyPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_gpsLocation",
+      "message": "Property Coordinates",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_gpsLocation",
+      "message": "संपत्ति निर्देशांक",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_multipleKhasra",
+      "message": "Khata / Khasra Details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_multipleKhasra",
+      "message": "खाता / खसरा विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_khataOrKhatauniNo",
+      "message": "Khata/Khatauni No.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_khataOrKhatauniNo",
+      "message": "खाता/खतौनी संख्या",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_khasraNo",
+      "message": "Khasra No.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_khasraNo",
+      "message": "खसरा संख्या",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_area",
+      "message": "Area (in Sq. Mtrs) (As Per Khata/KhatauniNo/KhasraNo)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_area",
+      "message": "क्षेत्रफल (वर्ग मी. में) (खाता/खतौनी/खसरा अनुसार)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_unit",
+      "message": "Unit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_unit",
+      "message": "इकाई",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_KHASRA_ITEM",
+      "message": "Khasra {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_KHASRA_ITEM",
+      "message": "खसरा {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ADD_KHASRA",
+      "message": "Add another khasra",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ADD_KHASRA",
+      "message": "एक और खसरा जोड़ें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_isBilling",
+      "message": "Is Billing Active",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_isBilling",
+      "message": "क्या बिलिंग सक्रिय है",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_propertyType",
+      "message": "Property Registration for",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_propertyType",
+      "message": "संपत्ति पंजीकरण किसके लिए",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_propArea",
+      "message": "Area (in Sq. Mtrs)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_propArea",
+      "message": "क्षेत्रफल (वर्ग मी. में)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_mapRefNo",
+      "message": "Approved Map Reference No.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_mapRefNo",
+      "message": "स्वीकृत मानचित्र संदर्भ संख्या",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_units",
+      "message": "Building Details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_units",
+      "message": "भवन विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_propBuildingType",
+      "message": "Building Type (F2)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_propBuildingType",
+      "message": "भवन का प्रकार (F2)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_propType",
+      "message": "Purpose/Use (F4)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_propType",
+      "message": "उद्देश्य/उपयोग (F4)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_propYearOfCons",
+      "message": "Year of Construction (F3)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_propYearOfCons",
+      "message": "निर्माण वर्ष (F3)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_useOfBuilding",
+      "message": "Uses of Building (F5)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_useOfBuilding",
+      "message": "भवन के उपयोग (F5)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_propArea",
+      "message": "Area (in Sq. Mtrs)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_propArea",
+      "message": "क्षेत्रफल (वर्ग मी. में)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_floorNo",
+      "message": "For Which Floor",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_floorNo",
+      "message": "किस मंज़िल के लिए",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_UNIT_ITEM",
+      "message": "Unit {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_UNIT_ITEM",
+      "message": "इकाई {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ADD_UNIT",
+      "message": "Add another unit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ADD_UNIT",
+      "message": "एक और इकाई जोड़ें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_oldCustomerId",
+      "message": "Old Customer ID",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_oldCustomerId",
+      "message": "पुरानी ग्राहक आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerName",
+      "message": "Name of Owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerName",
+      "message": "स्वामी का नाम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerFatherName",
+      "message": "Owner’s Father/Husband Name",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerFatherName",
+      "message": "स्वामी के पिता/पति का नाम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerGender",
+      "message": "Gender",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerGender",
+      "message": "लिंग",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerMobileNumber",
+      "message": "Mobile Number",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerMobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerEmail",
+      "message": "Email Id",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerEmail",
+      "message": "ईमेल आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerAddress",
+      "message": "Permanent Address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerAddress",
+      "message": "स्थायी पता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_ownerPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_ownerPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_anyOtherCoWorker",
+      "message": "Joint Property",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_anyOtherCoWorker",
+      "message": "संयुक्त संपत्ति",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerName",
+      "message": "Name",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerName",
+      "message": "नाम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerMobile",
+      "message": "Co-owner Mobile Number",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerMobile",
+      "message": "सह-स्वामी का मोबाइल नंबर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerEmail",
+      "message": "Co-owner Email",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerEmail",
+      "message": "सह-स्वामी का ईमेल",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_relationWithCoOwner",
+      "message": "Relationship with co-owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_relationWithCoOwner",
+      "message": "सह-स्वामी से संबंध",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_addressSameAsOwner",
+      "message": "Same address as owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_addressSameAsOwner",
+      "message": "स्वामी के समान पता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerAddress",
+      "message": "Co-owner Address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerAddress",
+      "message": "सह-स्वामी का पता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerPinCode",
+      "message": "Co-owner Pin Code",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwnerPinCode",
+      "message": "सह-स्वामी का पिन कोड",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_YES",
+      "message": "Yes",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_YES",
+      "message": "हाँ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_NO",
+      "message": "No",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_NO",
+      "message": "नहीं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FOR_LAND",
+      "message": "FOR LAND",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FOR_LAND",
+      "message": "भूमि के लिए",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FOR_BUILDING",
+      "message": "FOR BUILDING",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FOR_BUILDING",
+      "message": "भवन के लिए",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_MALE",
+      "message": "Male",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_MALE",
+      "message": "पुरुष",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FEMALE",
+      "message": "Female",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FEMALE",
+      "message": "महिला",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_BIGHA",
+      "message": "Bigha",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_BIGHA",
+      "message": "बीघा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_HECTARE",
+      "message": "Hectare",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_HECTARE",
+      "message": "हेक्टेयर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_ACRE",
+      "message": "Acre",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_ACRE",
+      "message": "एकड़",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_BISWA",
+      "message": "Biswa",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_BISWA",
+      "message": "बिस्वा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_KANAL",
+      "message": "Kanal",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_KANAL",
+      "message": "कनाल",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_SQM",
+      "message": "Square Meter",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_SQM",
+      "message": "वर्ग मीटर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_DECIMETER",
+      "message": "Deci Meter",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_DECIMETER",
+      "message": "डेसी मीटर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_G",
+      "message": "Ground",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_G",
+      "message": "भूतल",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_1",
+      "message": "1",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_1",
+      "message": "1",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_2",
+      "message": "2",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_2",
+      "message": "2",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_3",
+      "message": "3",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_3",
+      "message": "3",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_4",
+      "message": "4",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_4",
+      "message": "4",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_5",
+      "message": "5",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_5",
+      "message": "5",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_6",
+      "message": "6",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_6",
+      "message": "6",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_7",
+      "message": "7",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_7",
+      "message": "7",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_8",
+      "message": "8",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_8",
+      "message": "8",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_9",
+      "message": "9",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_9",
+      "message": "9",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_10",
+      "message": "10",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_FLOOR_10",
+      "message": "10",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_FATHER",
+      "message": "Father",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_FATHER",
+      "message": "पिता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_MOTHER",
+      "message": "Mother",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_MOTHER",
+      "message": "माता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_BROTHER",
+      "message": "Brother",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_BROTHER",
+      "message": "भाई",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_SISTER",
+      "message": "Sister",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_SISTER",
+      "message": "बहन",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_HUSBAND",
+      "message": "Husband",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_HUSBAND",
+      "message": "पति",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_WIFE",
+      "message": "Wife",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_WIFE",
+      "message": "पत्नी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_SON",
+      "message": "Son",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_SON",
+      "message": "पुत्र",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_DAUGHTER",
+      "message": "Daughter",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_DAUGHTER",
+      "message": "पुत्री",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_SPOUSE",
+      "message": "Spouse",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_SPOUSE",
+      "message": "जीवनसाथी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_O_REL_OTHERS",
+      "message": "Others",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_O_REL_OTHERS",
+      "message": "अन्य",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_REQUIRED",
+      "message": "This field is required",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_REQUIRED",
+      "message": "यह जानकारी आवश्यक है",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_MOBILE",
+      "message": "सही 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_EMAIL",
+      "message": "Enter a valid email address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_EMAIL",
+      "message": "सही ईमेल पता दर्ज करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_PIN",
+      "message": "Enter a valid 6-digit pin code",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_PIN",
+      "message": "सही 6 अंकों का पिन कोड दर्ज करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_GPS",
+      "message": "Enter as latitude, longitude (e.g. 31.1048, 77.1734)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_GPS",
+      "message": "अक्षांश, देशांतर के रूप में दर्ज करें (जैसे 31.1048, 77.1734)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_E_NUMBER",
+      "message": "Enter an amount greater than zero",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_E_NUMBER",
+      "message": "शून्य से अधिक मान दर्ज करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FIX_ERRORS",
+      "message": "Please fix the highlighted fields.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FIX_ERRORS",
+      "message": "कृपया चिह्नित जानकारी ठीक करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_LOOKUP_FAILED",
+      "message": "We could not load {{what}}.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_LOOKUP_FAILED",
+      "message": "हम {{what}} लोड नहीं कर सके।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_USE_MY_LOCATION",
+      "message": "Use my current location",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_USE_MY_LOCATION",
+      "message": "मेरा वर्तमान स्थान उपयोग करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RETRY",
+      "message": "Try again",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_SUBMIT",
+      "message": "Submit Application",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_SUBMIT",
+      "message": "आवेदन जमा करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_REMOVE",
+      "message": "हटाएं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SELECT",
+      "message": "Select",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SELECT_FIRST",
+      "message": "Select {{parent}} first",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SELECT_FIRST",
+      "message": "पहले {{parent}} चुनें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SUBMIT_FAILED",
+      "message": "We could not submit your application.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SUBMIT_FAILED",
+      "message": "हम आपका आवेदन जमा नहीं कर सके।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_SUCCESS",
+      "message": "Property registered successfully",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_SUCCESS",
+      "message": "संपत्ति सफलतापूर्वक पंजीकृत हुई",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_APP_NO",
+      "message": "Property ID",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_APP_NO",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_HINT",
+      "message": "Keep this ID to track your application.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_HINT",
+      "message": "अपने आवेदन को ट्रैक करने के लिए इस आईडी को सुरक्षित रखें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_GO_APPS",
+      "message": "My Properties",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_GO_APPS",
+      "message": "मेरी संपत्तियां",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_GO_HOME",
+      "message": "Go to Dashboard",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_TITLE",
+      "message": "My Registered Properties",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_TITLE",
+      "message": "मेरी पंजीकृत संपत्तियां",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_EMPTY",
+      "message": "You have not registered any property yet.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_EMPTY",
+      "message": "आपने अभी कोई संपत्ति पंजीकृत नहीं की है।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_NEW",
+      "message": "Register a new property",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_NEW",
+      "message": "नई संपत्ति पंजीकृत करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_FAILED",
+      "message": "We could not load your properties.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_FAILED",
+      "message": "हम आपकी संपत्तियां लोड नहीं कर सके।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COL_ULB",
+      "message": "ULB",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COL_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COL_TYPE",
+      "message": "Type",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COL_TYPE",
+      "message": "प्रकार",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COL_OWNER",
+      "message": "Owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COL_OWNER",
+      "message": "स्वामी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_CRUMB_HOME",
+      "message": "होम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_CRUMB_PT",
+      "message": "Property Tax",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_CRUMB_PT",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_CRUMB_NEW",
+      "message": "New registration",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_CRUMB_NEW",
+      "message": "नया पंजीकरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_PAGE_SUB",
+      "message": "Property Tax · Takes about 6 minutes",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_PAGE_SUB",
+      "message": "संपत्ति कर · लगभग 6 मिनट",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_REVIEW_SUB",
+      "message": "Property Tax · Last step",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_REVIEW_SUB",
+      "message": "संपत्ति कर · अंतिम चरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEPPER_LABEL",
+      "message": "Application steps",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEPPER_LABEL",
+      "message": "आवेदन के चरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_PROGRESS_TITLE",
+      "message": "Your application",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_PROGRESS_TITLE",
+      "message": "आपका आवेदन",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_PROGRESS_DRAFT",
+      "message": "Saved on this device as a draft",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर ड्राफ्ट के रूप में सहेजा गया",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_TIP_1",
+      "message": "Keep khata / khasra numbers handy",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_TIP_1",
+      "message": "खाता / खसरा संख्या पास रखें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_TIP_2",
+      "message": "Owner mobile number must be active",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_TIP_2",
+      "message": "स्वामी का मोबाइल नंबर चालू होना चाहिए",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_TIP_3",
+      "message": "You can save a draft and return",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_TIP_3",
+      "message": "आप ड्राफ्ट सहेजकर बाद में लौट सकते हैं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_HELP_TITLE",
+      "message": "Stuck? We will help.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_HELP_TITLE",
+      "message": "अटक गए? हम मदद करेंगे।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_HELP_LINE",
+      "message": "Call 177-2809784 · 9:30 AM–6:00 PM",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_HELP_LINE",
+      "message": "कॉल करें 177-2809784 · प्रातः 9:30–सायं 6:00",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_SAVE_DRAFT",
+      "message": "Save draft",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_SAVE_DRAFT",
+      "message": "ड्राफ्ट सहेजें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_BTN_SAVE_EXIT",
+      "message": "Save draft and exit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_BTN_SAVE_EXIT",
+      "message": "ड्राफ्ट सहेजें और बाहर जाएं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DRAFT_SAVED",
+      "message": "Draft saved on this device.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DRAFT_SAVED",
+      "message": "ड्राफ्ट इस डिवाइस पर सहेजा गया।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DRAFT_NOTE",
+      "message": "Your entries are kept as a draft while you fill the form",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DRAFT_NOTE",
+      "message": "फॉर्म भरते समय आपकी प्रविष्टियां ड्राफ्ट के रूप में रखी जाती हैं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_STEP",
+      "message": "आगे: {{step}}",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_REVIEW",
+      "message": "Review",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_REVIEW",
+      "message": "समीक्षा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_READY",
+      "message": "Ready to submit?",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_READY",
+      "message": "जमा करने के लिए तैयार?",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूं कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DECLARE_REQUIRED",
+      "message": "Please tick the declaration to submit.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DECLARE_REQUIRED",
+      "message": "जमा करने के लिए कृपया घोषणा पर टिक करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SMS_NOTE",
+      "message": "You will get an SMS with the property ID.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SMS_NOTE",
+      "message": "आपको संपत्ति आईडी का एसएमएस मिलेगा।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SUBMITTING",
+      "message": "Submitting your application...",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SUBMITTING",
+      "message": "आपका आवेदन जमा हो रहा है...",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_WHATS_NEXT",
+      "message": "What happens next",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_WHATS_NEXT",
+      "message": "आगे क्या होगा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_1",
+      "message": "Submitted",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_1",
+      "message": "जमा हुआ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_1_D",
+      "message": "You get an acknowledgement",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_1_D",
+      "message": "आपको पावती मिलेगी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_2",
+      "message": "Verification",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_2",
+      "message": "सत्यापन",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_2_D",
+      "message": "The ULB verifier checks your details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_2_D",
+      "message": "निकाय सत्यापनकर्ता आपके विवरण जांचेगा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_3",
+      "message": "Assessment",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_3",
+      "message": "निर्धारण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_3_D",
+      "message": "Tax is assessed once approved",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_3_D",
+      "message": "स्वीकृति के बाद कर निर्धारित होगा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NEXT_4",
+      "message": "Tax bill",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NEXT_4",
+      "message": "कर बिल",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_REVIEW_UNIT",
+      "message": "Unit",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_REVIEW_UNIT",
+      "message": "इकाई",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SUBMIT_RETRY",
+      "message": "Your property was created, but moving it to verification failed. Press Submit again.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SUBMIT_RETRY",
+      "message": "आपकी संपत्ति बन गई है, पर सत्यापन में भेजना विफल रहा। कृपया फिर से जमा करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_BANNER_SUB",
+      "message": "Your application is with the ULB for verification.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_BANNER_SUB",
+      "message": "आपका आवेदन सत्यापन के लिए निकाय के पास है।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COPY_ID",
+      "message": "Copy ID",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COPY_ID",
+      "message": "आईडी कॉपी करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COPIED",
+      "message": "कॉपी हुआ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_DEPT",
+      "message": "Urban Development Department · Citizen Seva",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_DEPT",
+      "message": "शहरी विकास विभाग · सिटिजन सेवा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_TITLE",
+      "message": "Acknowledgement Receipt",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_TITLE",
+      "message": "पावती रसीद",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_SERVICE",
+      "message": "Property Tax · New property registration",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_SERVICE",
+      "message": "संपत्ति कर · नई संपत्ति पंजीकरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_DATE",
+      "message": "Submitted on",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_DATE",
+      "message": "जमा करने की तिथि",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_STATUS_V",
+      "message": "Submitted for verification",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_STATUS_V",
+      "message": "सत्यापन हेतु जमा",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_PROPERTY",
+      "message": "Property details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_PROPERTY",
+      "message": "संपत्ति विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_OWNER",
+      "message": "Applicant / owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_OWNER",
+      "message": "आवेदक / स्वामी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_DOCS",
+      "message": "Documents submitted",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_DOCS",
+      "message": "जमा किए गए दस्तावेज़",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_NOTE",
+      "message": "Keep this receipt and the application number for tracking. This is a computer-generated acknowledgement and does not need a signature.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_NOTE",
+      "message": "ट्रैकिंग के लिए इस रसीद और आवेदन संख्या को सुरक्षित रखें। यह कंप्यूटर जनित पावती है, हस्ताक्षर आवश्यक नहीं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_RCPT_HELP",
+      "message": "Helpline: 177-2809784 (Mon–Sat, 9:30 AM–6:00 PM)",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_RCPT_HELP",
+      "message": "हेल्पलाइन: 177-2809784 (सोम–शनि, 9:30–6:00)",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCV_PAGES",
+      "message": "pages",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCV_FAILED",
+      "message": "This file could not be displayed. Please try again or choose the file again.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCV_FAILED",
+      "message": "यह फ़ाइल नहीं दिखाई जा सकी। कृपया पुनः प्रयास करें या फ़ाइल दोबारा चुनें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_PRINT",
+      "message": "Print acknowledgement",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_PRINT",
+      "message": "पावती प्रिंट करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_WHERE",
+      "message": "Where your application is now",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_WHERE",
+      "message": "आपका आवेदन अभी कहाँ है",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_PENDING",
+      "message": "Pending with ULB verifier",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_PENDING",
+      "message": "निकाय सत्यापनकर्ता के पास लंबित",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ACK_CLEARED",
+      "message": "Your draft was cleared from this device.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ACK_CLEARED",
+      "message": "आपका ड्राफ्ट इस डिवाइस से हटा दिया गया।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_SUB",
+      "message": "Every property you have registered, in one place",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_MY_PROPS_SUB",
+      "message": "आपके द्वारा पंजीकृत सभी संपत्तियां, एक जगह",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FILTER_DRAFT",
+      "message": "Draft",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FILTER_DRAFT",
+      "message": "ड्राफ्ट",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_SEARCH_PH",
+      "message": "Search by ID, owner or address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_SEARCH_PH",
+      "message": "आईडी, स्वामी या पते से खोजें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NO_RESULTS",
+      "message": "No properties match your search.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NO_RESULTS",
+      "message": "आपकी खोज से कोई संपत्ति मेल नहीं खाती।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_LIST_KIND",
+      "message": "Property registration",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_LIST_KIND",
+      "message": "संपत्ति पंजीकरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STAGE_DRAFT",
+      "message": "Not submitted",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STAGE_DRAFT",
+      "message": "जमा नहीं हुआ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STAGE_PROGRESS",
+      "message": "With the ULB",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STAGE_PROGRESS",
+      "message": "निकाय के पास",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STAGE_APPROVED",
+      "message": "Registered",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STAGE_APPROVED",
+      "message": "पंजीकृत",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_PAY_TAX",
+      "message": "Pay tax",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_PAY_TAX",
+      "message": "कर चुकाएं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_START_TITLE",
+      "message": "Start something new",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_START_TITLE",
+      "message": "कुछ नया शुरू करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_START_HINT",
+      "message": "Register another property you own.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_START_HINT",
+      "message": "अपनी किसी अन्य संपत्ति को पंजीकृत करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_TITLE",
+      "message": "Documents you will need",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_TITLE",
+      "message": "आवश्यक दस्तावेज़",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_ONLY",
+      "message": "PDF, JPG or PNG, up to 10 MB each.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_ONLY",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_FAILED",
+      "message": "We could not load the document list. Keep your ownership proof and ID ready.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_FAILED",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। अपना स्वामित्व प्रमाण और पहचान पत्र तैयार रखें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerName",
+      "message": "Name",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerName",
+      "message": "नाम",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerMobile",
+      "message": "Mobile Number",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerMobile",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerEmail",
+      "message": "Email Id",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerEmail",
+      "message": "ईमेल आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_relationWithCoOwner",
+      "message": "Relationship With Co-Owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_relationWithCoOwner",
+      "message": "सह-स्वामी से संबंध",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_addressSameAsOwner",
+      "message": "Same As Address Of Owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_addressSameAsOwner",
+      "message": "स्वामी के पते के समान",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerAddress",
+      "message": "Address",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerAddress",
+      "message": "पता",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerPinCode",
+      "message": "Pin Code",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_FI_coOwnerPinCode",
+      "message": "पिन कोड",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propertyAddress",
+      "message": "House / street / locality as it appears in your property records.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propertyAddress",
+      "message": "आपके संपत्ति अभिलेख में दर्ज मकान / गली / मोहल्ले का पता।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_oldPropertyId",
+      "message": "Please enter your old property ID, if you have one.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_oldPropertyId",
+      "message": "यदि आपके पास पुरानी संपत्ति आईडी है तो दर्ज करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_zone",
+      "message": "Zone (F1) decides the tax rate. Pick the zone shown in your ULB's zoning map.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_zone",
+      "message": "ज़ोन (F1) से कर की दर तय होती है। अपने निकाय के ज़ोन मानचित्र के अनुसार चुनें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propertyPinCode",
+      "message": "Please enter a valid 6-digit pin code.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propertyPinCode",
+      "message": "कृपया सही 6 अंकों का पिन कोड दर्ज करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_gpsLocation",
+      "message": "Latitude, longitude of the property, e.g. 31.1048, 77.1734. Use the button below to fill it from your device.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_gpsLocation",
+      "message": "संपत्ति का अक्षांश, देशांतर, जैसे 31.1048, 77.1734। अपने डिवाइस से भरने के लिए नीचे का बटन दबाएं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_isBilling",
+      "message": "Default is ON. Turn off only if tax bills should not be generated for this property.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_isBilling",
+      "message": "डिफ़ॉल्ट चालू है। केवल तभी बंद करें जब इस संपत्ति के लिए कर बिल न बनाना हो।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_mapRefNo",
+      "message": "Reference number of the map approved by the ULB, if any.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_mapRefNo",
+      "message": "निकाय द्वारा स्वीकृत मानचित्र की संदर्भ संख्या, यदि कोई हो।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propArea",
+      "message": "Area in square metres, as per your records.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propArea",
+      "message": "आपके अभिलेख के अनुसार वर्ग मीटर में क्षेत्रफल।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propBuildingType",
+      "message": "F2: the structure of the building, e.g. Pucca or Kuccha.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propBuildingType",
+      "message": "F2: भवन की संरचना, जैसे पक्का या कच्चा।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propYearOfCons",
+      "message": "F3: the period in which the building was constructed.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propYearOfCons",
+      "message": "F3: वह अवधि जिसमें भवन बना।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_propType",
+      "message": "F4: the purpose the building is used for.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_propType",
+      "message": "F4: भवन किस उद्देश्य के लिए प्रयोग होता है।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_useOfBuilding",
+      "message": "F5: how the building is used, e.g. residential or commercial.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_useOfBuilding",
+      "message": "F5: भवन का उपयोग, जैसे आवासीय या वाणिज्यिक।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_oldCustomerId",
+      "message": "Please enter your old customer ID, if you have one.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_oldCustomerId",
+      "message": "यदि आपके पास पुरानी ग्राहक आईडी है तो दर्ज करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_ownerPinCode",
+      "message": "Please enter a valid 6-digit pin code.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_ownerPinCode",
+      "message": "कृपया सही 6 अंकों का पिन कोड दर्ज करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_anyOtherCoWorker",
+      "message": "Choose Yes if the property is owned jointly; you can add every co-owner below.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_anyOtherCoWorker",
+      "message": "संपत्ति संयुक्त स्वामित्व की हो तो हाँ चुनें; सभी सह-स्वामी नीचे जोड़ सकते हैं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_H_coOwnerPinCode",
+      "message": "Please enter a valid 6-digit pin code.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_H_coOwnerPinCode",
+      "message": "कृपया सही 6 अंकों का पिन कोड दर्ज करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_DOCUMENTS",
+      "message": "Documents",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_DOCUMENTS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_DOCUMENTS",
+      "message": "Upload the documents for this application.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_STEP_HINT_DOCUMENTS",
+      "message": "इस आवेदन के लिए दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_ADD_COOWNER",
+      "message": "Add another co-owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_ADD_COOWNER",
+      "message": "एक और सह-स्वामी जोड़ें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_COOWNER_ITEM",
+      "message": "Co-owner {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_COOWNER_ITEM",
+      "message": "सह-स्वामी {{n}}",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_PAGE_HINT",
+      "message": "PDF, JPG or PNG, up to 10 MB each. A document already on file shows as uploaded.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_PAGE_HINT",
+      "message": "पीडीएफ, जेपीजी या पीएनजी, प्रत्येक अधिकतम 10 एमबी। पहले से उपलब्ध दस्तावेज़ अपलोड हुआ दिखेगा।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_UPLOADED",
+      "message": "अपलोड हुआ",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_TITLE",
+      "message": "Application details",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_TITLE",
+      "message": "आवेदन विवरण",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_PID",
+      "message": "Property ID",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_PID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_UPDATED",
+      "message": "Last updated",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_UPDATED",
+      "message": "अंतिम अद्यतन",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_OWNER",
+      "message": "Owner",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_OWNER",
+      "message": "स्वामी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_NODOCS",
+      "message": "No documents attached",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_BACK",
+      "message": "Back to my properties",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_BACK",
+      "message": "मेरी संपत्तियों पर वापस",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_NOTFOUND",
+      "message": "This application could not be found.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_NOTFOUND",
+      "message": "यह आवेदन नहीं मिला।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_FAILED",
+      "message": "Could not load the application. Please try again.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_FAILED",
+      "message": "आवेदन लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_TIMELINE",
+      "message": "Application progress",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_TIMELINE",
+      "message": "आवेदन की प्रगति",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_PRINT",
+      "message": "प्रिंट करें",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_NOHISTORY",
+      "message": "No progress recorded yet",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_VIEW_OPENING",
+      "message": "दस्तावेज़ खुल रहा है...",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOCS_LOAD_ERROR",
+      "message": "We could not load the document list. Please try again.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOCS_LOAD_ERROR",
+      "message": "हम दस्तावेज़ सूची लोड नहीं कर सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_TYPE_ERROR",
+      "message": "Only PDF, JPG or PNG files are allowed.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_TYPE_ERROR",
+      "message": "केवल पीडीएफ, जेपीजी या पीएनजी फ़ाइलें मान्य हैं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_SIZE_ERROR",
+      "message": "File must be smaller than 10 MB.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_SIZE_ERROR",
+      "message": "फ़ाइल 10 एमबी से छोटी होनी चाहिए।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_REQUIRED_ERROR",
+      "message": "Please upload this document.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_REQUIRED_ERROR",
+      "message": "कृपया यह दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_DOC_UPLOAD_FAILED",
+      "message": "Your property was created, but these documents could not be uploaded: {{docs}}. Press Submit again to retry.",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_DOC_UPLOAD_FAILED",
+      "message": "आपकी संपत्ति बन गई है, पर ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। पुनः प्रयास के लिए जमा करें दबाएं।",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_F_coOwners",
+      "message": "Co-owners",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_F_coOwners",
+      "message": "सह-स्वामी",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NPT_LOADING",
+      "message": "Loading your properties...",
+      "module": "rainmaker-pt",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NPT_LOADING",
+      "message": "आपकी संपत्तियां लोड हो रही हैं...",
+      "module": "rainmaker-pt",
+      "locale": "hi_IN"
+    }
+  ]
+}

@@ -75,6 +75,8 @@ import PropertyStructureDetails from "./pageComponents/PropertyStructureDetails"
 //import PTCitizenFeedback from "@upyog/digit-ui-module-core/src/components/PTCitizenFeedback";
 
 import EmployeeApp from "./pages/employee";
+import NewPTApp from "./pages/citizen/NewPT/NewPTApp";
+import { nptText } from "./config/newPTMessages";
 import PTCard from "./components/PTCard";
 import InboxFilter from "./components/inbox/NewInboxFilter";
 import EmptyResultInbox from "./components/empty-result";
@@ -212,6 +214,22 @@ export const PTModule = ({ stateCode, userType, tenants }) => {
   if (userType === "employee") {
     return <EmployeeApp path={path} url={url} userType={userType} />;
   } else return <CitizenApp />;
+};
+
+// HP Property Tax (MDMS citymodule "PROPERTY", registered in App.js as PROPERTYModule/PROPERTYLinks) — routed at /digit-ui/citizen/property and /digit-ui/employee/property
+export const NewPTModule = ({ stateCode }) => {
+  const language = Digit.StoreData.getCurrentLanguage();
+  Digit.Services.useStore({ stateCode, moduleCode: "PT", language });
+  return <NewPTApp />;
+};
+
+export const NewPTLinks = ({ matchPath }) => {
+  const { t } = useTranslation();
+  const links = [
+    { link: `${matchPath}/new-registration`, i18nKey: nptText(t, "NPT_APP_TITLE") },
+    { link: `${matchPath}/my-properties`, i18nKey: nptText(t, "NPT_MY_PROPS_TITLE") },
+  ];
+  return <CitizenHomeCard header={nptText(t, "MODULE_NEWPT")} links={links} Icon={() => <PTIcon className="fill-path-primary-main" />} />;
 };
 
 export const PTLinks = ({ matchPath, userType }) => {

@@ -1,0 +1,119 @@
+/* Employee shell in the same look as the citizen dashboard: white top bar, navy sidebar, soft page background. */
+$et-navy: #14224d;
+$et-blue: #2f6bff;
+$et-saffron: #e8730c;
+$et-line: #e3eaf6;
+$et-bg: #f5f7fc;
+
+.employee {
+  background: $et-bg;
+  min-height: 100vh;
+  font-family: inherit;
+
+  .topbar {
+    padding: 8px 14px;
+    background: #fff;
+    border-bottom: 1px solid $et-line;
+    box-shadow: 0 2px 10px rgba(20, 36, 90, 0.06);
+    gap: 8px;
+    img.city { height: 40px; width: auto; }
+    img.state { min-height: 0; height: 36px; width: auto; }
+    .ulb { color: $et-navy; font-size: 15px; line-height: 1.25; margin: 0 0 0 4px; letter-spacing: 0.2px; }
+    .right { margin-top: 0; display: flex; align-items: center; gap: 12px; float: none; }
+    .left { float: none; }
+    .user-img-txt {
+      display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0;
+      background: linear-gradient(135deg, $et-blue, $et-navy); font-size: 16px; cursor: pointer;
+      box-shadow: 0 0 0 3px #e8f0ff;
+    }
+  }
+
+  .sidebar {
+    background-image: linear-gradient(180deg, $et-navy 0%, #1d3270 100%);
+    background-blend-mode: normal;
+    color: #fff;
+    box-shadow: 2px 0 14px rgba(20, 36, 90, 0.18);
+    .sidebar-link {
+      border-radius: 0 999px 999px 0;
+      margin-right: 8px;
+      &:hover { color: #fff !important; background-color: rgba(255, 255, 255, 0.12); svg { fill: #fff !important; } }
+      &.active { color: #fff !important; background: rgba(47, 107, 255, 0.35); border-right: 4px solid $et-saffron; svg { fill: #fff !important; } }
+    }
+  }
+
+  .main { background: $et-bg; }
+  .employee-app-wrapper { padding-bottom: 48px; }
+  .upyog-copyright-footer-web { background: #fff; border-top: 1px solid $et-line; padding: 6px 0; color: #5b6573; }
+
+  /* DIGIT cards and the back link pick up the same surface and accents */
+  .card, .employeeCard { border-radius: 14px; border: 1px solid $et-line; box-shadow: 0 1px 6px rgba(20, 36, 90, 0.05); background: #fff; }
+  .breadcrumb a, .back-btn { color: $et-blue; }
+  .submit-bar { background: $et-navy; border-radius: 10px; &:hover { background: $et-blue; } }
+}
+
+@media (max-width: 767px) {
+  .employee .topbar .ulb { font-size: 12px; max-width: 46vw; }
+}
+
+/* inner pages: full width beside the collapsed 55px sidebar, same page chrome as the citizen service pages */
+.employee .main { box-sizing: border-box; width: auto; margin-left: 55px; padding: 72px 0 0; }
+.employee .ground-container { margin: 0; padding: 0 12px 56px; width: 100%; box-sizing: border-box; }
+.employee .ground-container .npt-wrap { max-width: none; width: 100%; }
+@media (max-width: 767px) {
+  .employee .main { margin-left: 0; padding-top: 64px; }
+  .employee .ground-container { padding: 0 8px 56px; }
+}
+
+/* employee shell reuses the citizen dashboard chrome (DashTop / DashSide / DashTabbar) */
+.DashShell--employee {
+  .DashTop__tools { display: flex; align-items: center; gap: 10px; margin-right: 8px; .cp, label { color: $et-navy; font-weight: 600; } }
+  .DashMain { padding-bottom: 72px; }
+}
+@media (max-width: 767px) {
+  .DashShell--employee .DashTop__tools .select-wrap:first-child { display: none; }
+}
+
+/* role / city context inside the user menu */
+.DashTop__ctx { display: grid; gap: 2px; padding: 6px 0 8px; margin-bottom: 6px; border-bottom: 1px solid $et-line;
+  small { padding: 4px 12px; color: #5b6573; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  button { text-align: left; &.is-on { background: #e8f0ff; color: $et-navy; font-weight: 700; &:before { content: "\2713  "; color: #138808; } } } }
+
+/* profile screen: stacked labels, card surfaces, branded save button */
+.DashShell--employee .user-profile {
+  max-width: 1100px; margin: 0 auto;
+  > section { margin: 8px 0 12px !important; }
+  > div:nth-of-type(1) { gap: 16px !important; margin: 0 !important; flex-direction: column !important; }
+  > div:nth-of-type(1) > section { border: 1px solid $et-line !important; border-radius: 14px !important; box-shadow: 0 1px 6px rgba(20, 36, 90, 0.05) !important; background: #fff; padding: 18px !important; }
+  .profile-label-margin, .label-field-pair > h2 { width: auto !important; display: block; color: $et-navy; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .label-field-pair { display: grid !important; grid-template-columns: 1fr !important; gap: 2px; margin-bottom: 12px; }
+  input, select { border-radius: 10px; border: 1px solid $et-line; min-height: 44px; width: 100% !important; max-width: none !important; padding: 0 12px; background: #fff; box-sizing: border-box; &:focus { outline: 0; border-color: $et-blue; box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.2); } &:disabled { background: $et-bg; color: #5b6573; } }
+  > div:last-of-type:not(.user-profile) { margin-top: 12px !important; background: transparent !important; }
+  > div:nth-last-of-type(1) button, > div button[style*="a82227"] { background: linear-gradient(135deg, $et-blue, $et-navy) !important; border: 0 !important; border-radius: 12px !important; height: 46px !important; font-weight: 700; margin: 0 !important; }
+}
+@media (min-width: 900px) { .DashShell--employee .user-profile > div:nth-of-type(1) { flex-direction: row !important; align-items: flex-start; } .DashShell--employee .user-profile > div:nth-of-type(1) > section:first-child { flex: 0 0 300px !important; } .DashShell--employee .user-profile > div:nth-of-type(1) > section:last-child { flex: 1 !important; } }
+
+/* top-bar chip + switcher dialog (role and city) */
+.ctxChip { display: grid; text-align: left; gap: 0; min-height: 44px; padding: 4px 14px; border: 1px solid $et-line; border-radius: 12px; background: #fff; color: $et-navy; font: inherit; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+  &:hover { border-color: $et-blue; } &:focus-visible { outline: 0; box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.25); }
+  &__role { font-weight: 700; font-size: 14px; line-height: 1.2; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__city { font-size: 12px; color: #5b6573; } &__city:after { content: " \25BE"; } }
+.ctxModal { position: fixed; inset: 0; z-index: 99999999; display: grid; place-items: start center; padding: 72px 12px 12px; background: rgba(20, 34, 77, 0.45);
+  &__card { width: min(560px, 100%); max-height: calc(100vh - 96px); display: grid; grid-template-rows: auto auto 1fr; gap: 10px; padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 20px 50px rgba(20, 36, 90, 0.3);
+    header { display: flex; gap: 10px; justify-content: space-between; h2 { margin: 0; font-size: 18px; color: $et-navy; } p { margin: 2px 0 0; font-size: 13px; color: #5b6573; } } }
+  &__x { width: 40px; height: 40px; border: 0; border-radius: 50%; background: $et-bg; font-size: 24px; line-height: 1; cursor: pointer; color: $et-navy; }
+  &__q { min-height: 44px; padding: 0 14px; border: 1px solid $et-line; border-radius: 12px; font: inherit; &:focus { outline: 0; border-color: $et-blue; box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.2); } }
+  &__list { overflow: auto; display: grid; gap: 10px; align-content: start; padding-right: 2px;
+    section { border: 1px solid $et-line; border-radius: 12px; padding: 10px 12px; &.is-current { border-color: $et-blue; background: #f3f7ff; }
+      h3 { margin: 0 0 8px; font-size: 14px; color: $et-navy; display: flex; align-items: center; gap: 8px; em { font-style: normal; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #e3f6ec; color: #0f6b0a; } } } }
+  &__roles { display: flex; flex-wrap: wrap; gap: 8px; button { min-height: 40px; padding: 0 14px; border: 1px solid $et-line; border-radius: 999px; background: #fff; color: $et-navy; font: inherit; font-size: 14px; cursor: pointer; transition: background 0.15s, border-color 0.15s; &:hover { border-color: $et-blue; background: #eef3ff; } &.is-on { background: $et-navy; border-color: $et-navy; color: #fff; } } }
+  &__none { margin: 8px 0; color: #5b6573; text-align: center; } }
+@media (max-width: 767px) { .ctxChip__role { max-width: 110px; } .ctxModal { padding-top: 56px; } }
+.ctxModal__err { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #fdecea; color: #a12622; font-size: 14px; button { min-height: 36px; padding: 0 12px; border: 1px solid #a12622; border-radius: 999px; background: #fff; color: #a12622; cursor: pointer; font: inherit; } }
+
+/* sign-out confirmation */
+.emp-logout .npt-modal__card { max-width: 440px; }
+.emp-logout__ico { background: #fdecea; color: #c62828; }
+.emp-logout__msg { margin: 0 0 6px; font-size: 16px; font-weight: 600; color: #16203f; }
+.emp-logout__hint { margin: 0; font-size: 14px; color: #5b6573; }
+.emp-logout .npt-modal__foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; .npt-btn { flex: 1 1 140px; justify-content: center; } }
+.emp-logout__yes { background: #c62828; border-color: #c62828; color: #fff; &:hover, &:focus-visible { background: #a91f1f; } }

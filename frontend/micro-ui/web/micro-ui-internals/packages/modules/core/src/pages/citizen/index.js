@@ -1,7 +1,7 @@
 import { BackButton, WhatsappIcon, Card, CitizenHomeCard, CitizenInfoLabel, PrivateRoute } from "@upyog/digit-ui-react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Route, Switch, useRouteMatch, useHistory, Link } from "react-router-dom";
+import { Redirect, Route, Switch, useRouteMatch, useHistory, Link } from "react-router-dom";
 import ErrorBoundary from "../../components/ErrorBoundaries";
 import { AppHome, processLinkData } from "../../components/Home";
 import TopBarSideBar from "../../components/TopBarSideBar";
@@ -22,6 +22,8 @@ import QRCode from "./QRCode";
 import ChallanQRCode from "./ChallanQRCode";
 import ActionDock from "../../components/ActionDock";
 import { getWebsitePage } from "./Website";
+import CitizenShell from "./Dashboard/CitizenShell";
+import AllServices from "./Dashboard/AllServices";
 import { applyStoredAccessibility } from "../../components/AccessibilityTools/settings";
 const sidebarHiddenFor = [
   "/digit-ui/citizen/accessibility-statement",
@@ -31,6 +33,9 @@ const sidebarHiddenFor = [
   "/digit-ui/citizen/login",
   "/digit-ui/citizen/register/otp",
 ];
+
+// modules rendered inside the dashboard chrome (see Dashboard/CitizenShell)
+const SHELL_MODULES = ["PROPERTY", "NewTL", "PTR", "BOOKING", "FEEDBACK", "OTS", "REQSVC", "HPNOC", "HPPAY", "GB", "GRIEVANCE", "MCollect"];
 
 const getTenants = (codes, tenants) => {
   return tenants.filter((tenant) => codes.map((item) => item.code).includes(tenant.code));
@@ -155,6 +160,39 @@ const Home = ({
     return (
       <div className={`${classname || ""} CitizenLandingShell`}>
         {isLanding ? <CitizenHome /> : <WebsitePage />}
+        <ActionDock />
+      </div>
+    );
+  }
+
+  // "All services" uses the dashboard chrome too
+  if (new RegExp(`^${path}/all-services/?$`).test(pathname || "")) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        <CitizenShell active="svc">
+          <AllServices linkData={linkData} isLoading={islinkDataLoading} />
+        </CitizenShell>
+        <ActionDock />
+      </div>
+    );
+  }
+
+  // the stock PGR screens are replaced by the Grievance module
+  if (new RegExp(`^${path}/pgr(/|$)`).test(pathname || "")) {
+    return <Redirect to={/create-complaint/.test(pathname) ? `${path}/grievance/new/grievance` : `${path}/grievance/my-grievances`} />;
+  }
+
+  // Service modules that use the dashboard chrome (side nav + tab bar) instead of the legacy top bar
+  const shellModule = (modules || []).find((m) => SHELL_MODULES.includes(m.code) && new RegExp(`^${path}/${m.code.toLowerCase()}(/|$)`).test(pathname || ""));
+  const ShellModuleApp = shellModule && Digit.ComponentRegistryService.getComponent(`${shellModule.code}Module`);
+  if (ShellModuleApp) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        <CitizenShell active="apps">
+          <Route path={`${path}/${shellModule.code.toLowerCase()}`}>
+            <ShellModuleApp stateCode={stateCode} moduleCode={shellModule.code} userType="citizen" tenants={getTenants(shellModule.tenants, appTenants)} />
+          </Route>
+        </CitizenShell>
         <ActionDock />
       </div>
     );

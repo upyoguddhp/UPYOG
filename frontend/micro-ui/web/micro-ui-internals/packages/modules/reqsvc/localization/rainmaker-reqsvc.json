@@ -1,0 +1,1832 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker"
+  },
+  "tenantId": "hp",
+  "messages": [
+    {
+      "code": "ACTION_TEST_REQSVC",
+      "message": "Request Services",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "ACTION_TEST_REQSVC",
+      "message": "अनुरोध सेवाएँ",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_MENU_NEW",
+      "message": "Request a service",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_MENU_NEW",
+      "message": "सेवा का अनुरोध करें",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_MENU_LIST",
+      "message": "My service requests",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_MENU_LIST",
+      "message": "मेरे सेवा अनुरोध",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_CRUMB_HOME",
+      "message": "Home",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_CRUMB_HOME",
+      "message": "मुखपृष्ठ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_CRUMB_LIST",
+      "message": "Request services",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_CRUMB_LIST",
+      "message": "अनुरोध सेवाएँ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_CRUMB_NEW",
+      "message": "New request",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_CRUMB_NEW",
+      "message": "नया अनुरोध",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_TITLE",
+      "message": "Request a service",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_TITLE",
+      "message": "सेवा का अनुरोध करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_PAGE_SUB",
+      "message": "Complete the steps below. You can go back and change any step before you submit.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_PAGE_SUB",
+      "message": "नीचे दिए चरण पूरे करें। जमा करने से पहले आप किसी भी चरण पर वापस जाकर बदलाव कर सकते हैं।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEPPER_LABEL",
+      "message": "Request steps",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEPPER_LABEL",
+      "message": "अनुरोध के चरण",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_REQUEST",
+      "message": "Request details",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_REQUEST",
+      "message": "अनुरोध विवरण",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_LOCATION",
+      "message": "Request location",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_LOCATION",
+      "message": "अनुरोध का स्थान",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_APPLICANT",
+      "message": "Applicant details",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_APPLICANT",
+      "message": "आवेदक विवरण",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_DOCUMENTS",
+      "message": "Supporting documents",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_DOCUMENTS",
+      "message": "सहायक दस्तावेज़",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_REVIEW",
+      "message": "Review and Submit",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_REVIEW",
+      "message": "समीक्षा करें और जमा करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_OF",
+      "message": "Step {{current}} of {{total}}",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_OF",
+      "message": "चरण {{current}} / {{total}}",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_REQUEST",
+      "message": "Choose the service you need. The fee is shown once you select it.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_REQUEST",
+      "message": "आवश्यक सेवा चुनें। चुनते ही शुल्क दिखाई देगा।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_LOCATION",
+      "message": "Where the service is needed and which urban local body handles it.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_LOCATION",
+      "message": "सेवा कहाँ चाहिए और कौन सा शहरी स्थानीय निकाय इसे संभालेगा।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_APPLICANT",
+      "message": "Your details are filled in from your account; correct them if needed.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_APPLICANT",
+      "message": "आपका विवरण खाते से भरा गया है; आवश्यकता हो तो सुधारें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_DOCUMENTS",
+      "message": "Attach supporting documents, if any. They are optional.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_STEP_HINT_DOCUMENTS",
+      "message": "यदि कोई सहायक दस्तावेज़ हों तो संलग्न करें। ये वैकल्पिक हैं।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_category",
+      "message": "Service category",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_category",
+      "message": "सेवा श्रेणी",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_issueDate",
+      "message": "Request date",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_issueDate",
+      "message": "अनुरोध की तिथि",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_districtName",
+      "message": "District",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_districtName",
+      "message": "ज़िला",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_ulbName",
+      "message": "Urban local body",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_ulbName",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_ward",
+      "message": "Ward",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_ward",
+      "message": "वार्ड",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_street",
+      "message": "Location address",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_street",
+      "message": "स्थान का पता",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_landmark",
+      "message": "Landmark",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_landmark",
+      "message": "निकटतम पहचान स्थल",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_name",
+      "message": "Name",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_name",
+      "message": "नाम",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_fatherName",
+      "message": "Father / husband name",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_fatherName",
+      "message": "पिता / पति का नाम",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_mobileNumber",
+      "message": "Mobile number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_mobileNumber",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_emailId",
+      "message": "Email",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_emailId",
+      "message": "ईमेल",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_aadhaarNumber",
+      "message": "Aadhaar number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_aadhaarNumber",
+      "message": "आधार संख्या",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_detail",
+      "message": "Address",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_detail",
+      "message": "पता",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_F_pincode",
+      "message": "PIN code",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_F_pincode",
+      "message": "पिन कोड",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FEE_TITLE",
+      "message": "Fee",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FEE_TITLE",
+      "message": "शुल्क",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FEE_AMOUNT",
+      "message": "Fee payable",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FEE_AMOUNT",
+      "message": "देय शुल्क",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FEE_NOTE",
+      "message": "You pay this online after submitting the request.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FEE_NOTE",
+      "message": "अनुरोध जमा करने के बाद आप यह शुल्क ऑनलाइन भरेंगे।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_SELECT",
+      "message": "Select",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_SELECT",
+      "message": "चुनें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_SELECT_FIRST",
+      "message": "Select {{field}} first",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_SELECT_FIRST",
+      "message": "पहले {{field}} चुनें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_NO_OPTIONS",
+      "message": "No options available",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_NO_OPTIONS",
+      "message": "कोई विकल्प उपलब्ध नहीं",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LOADING",
+      "message": "Loading...",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LOADING",
+      "message": "लोड हो रहा है...",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LOADING_OPTIONS",
+      "message": "Loading options...",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LOADING_OPTIONS",
+      "message": "विकल्प लोड हो रहे हैं...",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LOOKUP_FAILED",
+      "message": "Could not load the options. Please check your connection and retry.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LOOKUP_FAILED",
+      "message": "विकल्प लोड नहीं हो सके। कृपया अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RETRY",
+      "message": "Retry",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RETRY",
+      "message": "पुनः प्रयास करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_GOT_IT",
+      "message": "Got it",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_GOT_IT",
+      "message": "समझ गया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FIX_ERRORS",
+      "message": "Please correct the highlighted fields.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FIX_ERRORS",
+      "message": "कृपया चिह्नित फ़ील्ड सुधारें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_E_REQUIRED",
+      "message": "This field is required",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_E_MOBILE",
+      "message": "Enter a valid 10-digit mobile number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_E_MOBILE",
+      "message": "मान्य 10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_E_EMAIL",
+      "message": "Enter a valid email address",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_E_EMAIL",
+      "message": "मान्य ईमेल पता दर्ज करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_E_PIN",
+      "message": "Enter a valid 6-digit PIN code",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_E_PIN",
+      "message": "मान्य 6 अंकों का पिन कोड दर्ज करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_E_AADHAAR",
+      "message": "Enter a valid 12-digit Aadhaar number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_E_AADHAAR",
+      "message": "मान्य 12 अंकों की आधार संख्या दर्ज करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_BTN_BACK",
+      "message": "Back",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_BTN_BACK",
+      "message": "वापस",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_BTN_NEXT",
+      "message": "Next",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_BTN_NEXT",
+      "message": "आगे",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_BTN_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_BTN_EDIT",
+      "message": "बदलें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_BTN_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_BTN_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_BTN_SUBMIT",
+      "message": "Submit request",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_BTN_SUBMIT",
+      "message": "अनुरोध जमा करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_NEXT_STEP",
+      "message": "Next: {{step}}",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_NEXT_STEP",
+      "message": "अगला: {{step}}",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_PROGRESS_TITLE",
+      "message": "Your progress",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_PROGRESS_TITLE",
+      "message": "आपकी प्रगति",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_PROGRESS_DRAFT",
+      "message": "Saved as you go on this device",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_PROGRESS_DRAFT",
+      "message": "इस डिवाइस पर आगे बढ़ते हुए सहेजा जाता है",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_TIPS_TITLE",
+      "message": "Before you apply",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_TIPS_TITLE",
+      "message": "आवेदन से पहले",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_TIP_1",
+      "message": "Choose the category that matches the service you need.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_TIP_1",
+      "message": "अपनी आवश्यक सेवा से मेल खाती श्रेणी चुनें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_TIP_2",
+      "message": "Select the urban local body that will provide the service.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_TIP_2",
+      "message": "उस शहरी स्थानीय निकाय को चुनें जो सेवा प्रदान करेगा।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_TIP_3",
+      "message": "Pay the fee online after submitting; the request then goes to the approver.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_TIP_3",
+      "message": "जमा करने के बाद शुल्क ऑनलाइन भरें; इसके बाद अनुरोध अनुमोदक के पास जाता है।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_HELP_TITLE",
+      "message": "Need help?",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_HELP_TITLE",
+      "message": "सहायता चाहिए?",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_HELP_LINE",
+      "message": "Contact your urban local body or the Citizen Seva helpline.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_HELP_LINE",
+      "message": "अपने शहरी स्थानीय निकाय या सिटीज़न सेवा हेल्पलाइन से संपर्क करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_TITLE",
+      "message": "Supporting documents",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_TITLE",
+      "message": "सहायक दस्तावेज़",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_FAILED",
+      "message": "The document list could not be loaded.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_FAILED",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_ONLY",
+      "message": "Only the documents listed above can be attached.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_ONLY",
+      "message": "केवल ऊपर सूचीबद्ध दस्तावेज़ ही संलग्न किए जा सकते हैं।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_REQUIRED",
+      "message": "Required",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_REQUIRED",
+      "message": "आवश्यक",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_OPTIONAL",
+      "message": "Optional",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_OPTIONAL",
+      "message": "वैकल्पिक",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_PAGE_HINT",
+      "message": "Upload a PDF or image for each document.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_PAGE_HINT",
+      "message": "प्रत्येक दस्तावेज़ के लिए PDF या चित्र अपलोड करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCS_LOAD_ERROR",
+      "message": "Could not load the document list.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCS_LOAD_ERROR",
+      "message": "दस्तावेज़ सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_CHOOSE",
+      "message": "Choose file",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_CHOOSE",
+      "message": "फ़ाइल चुनें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_REPLACE",
+      "message": "Replace",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_REPLACE",
+      "message": "बदलें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_VIEW",
+      "message": "View",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_VIEW",
+      "message": "देखें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_UPLOADED",
+      "message": "Uploaded",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_UPLOADED",
+      "message": "अपलोड हो गया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_CARRIED",
+      "message": "Uploaded earlier, attached automatically",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_CARRIED",
+      "message": "पहले अपलोड किया, स्वतः संलग्न",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_TYPE_ERROR",
+      "message": "This file type is not allowed",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_TYPE_ERROR",
+      "message": "इस प्रकार की फ़ाइल की अनुमति नहीं है",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_SIZE_ERROR",
+      "message": "The file is too large",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_SIZE_ERROR",
+      "message": "फ़ाइल बहुत बड़ी है",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_REQUIRED_ERROR",
+      "message": "This document is required",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_REQUIRED_ERROR",
+      "message": "यह दस्तावेज़ आवश्यक है",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_REQUIRED_TOAST",
+      "message": "Please upload the required documents.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_REQUIRED_TOAST",
+      "message": "कृपया आवश्यक दस्तावेज़ अपलोड करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOC_UPLOAD_FAILED",
+      "message": "These documents could not be uploaded: {{docs}}. Please try again.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOC_UPLOAD_FAILED",
+      "message": "ये दस्तावेज़ अपलोड नहीं हो सके: {{docs}}। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCV_ZOOM_IN",
+      "message": "Zoom in",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCV_ZOOM_IN",
+      "message": "बड़ा करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCV_ZOOM_OUT",
+      "message": "Zoom out",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCV_ZOOM_OUT",
+      "message": "छोटा करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCV_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCV_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCV_PAGES",
+      "message": "Page",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCV_PAGES",
+      "message": "पृष्ठ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DOCV_FAILED",
+      "message": "The document could not be opened. Please try again.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DOCV_FAILED",
+      "message": "दस्तावेज़ नहीं खुल सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_REVIEW_HINT",
+      "message": "Check everything before you submit. Use Edit to change a section.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_REVIEW_HINT",
+      "message": "जमा करने से पहले सब कुछ जाँच लें। बदलाव के लिए 'बदलें' दबाएँ।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_NOT_PROVIDED",
+      "message": "Not provided",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_NOT_PROVIDED",
+      "message": "उपलब्ध नहीं कराया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DECLARATION",
+      "message": "I declare that the information given is true to the best of my knowledge.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DECLARATION",
+      "message": "मैं घोषणा करता/करती हूँ कि दी गई जानकारी मेरी जानकारी में सही है।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_DECLARE_REQUIRED",
+      "message": "Please accept the declaration to continue.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_DECLARE_REQUIRED",
+      "message": "जारी रखने के लिए कृपया घोषणा स्वीकार करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_SUBMITTING",
+      "message": "Submitting your request...",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_SUBMITTING",
+      "message": "आपका अनुरोध जमा किया जा रहा है...",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_SUBMIT_FAILED",
+      "message": "The request could not be submitted. Please try again.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_SUBMIT_FAILED",
+      "message": "अनुरोध जमा नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_SUCCESS",
+      "message": "Request submitted",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_SUCCESS",
+      "message": "अनुरोध जमा हो गया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_BANNER_SUB",
+      "message": "Pay the fee to send your request to the approver.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_BANNER_SUB",
+      "message": "अपना अनुरोध अनुमोदक को भेजने के लिए शुल्क भरें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_APP_NO",
+      "message": "Request number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_APP_NO",
+      "message": "अनुरोध संख्या",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_COPY_ID",
+      "message": "Copy",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_COPY_ID",
+      "message": "कॉपी करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_COPIED",
+      "message": "Copied",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_COPIED",
+      "message": "कॉपी हो गया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_PAY_TITLE",
+      "message": "Pay the fee",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_PAY_TITLE",
+      "message": "शुल्क भरें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_PAY_HINT",
+      "message": "Amount payable: {{amount}}. Your request is processed after payment.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_PAY_HINT",
+      "message": "देय राशि: {{amount}}। भुगतान के बाद आपका अनुरोध संसाधित होगा।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_PAY_NOW",
+      "message": "Pay now",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_PAY_NOW",
+      "message": "अभी भुगतान करें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_NEXT_TITLE",
+      "message": "What would you like to do next?",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_NEXT_TITLE",
+      "message": "आगे आप क्या करना चाहेंगे?",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_GO_APPS",
+      "message": "My requests",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_GO_APPS",
+      "message": "मेरे अनुरोध",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_GO_HOME",
+      "message": "Go to dashboard",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_GO_HOME",
+      "message": "डैशबोर्ड पर जाएँ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ACK_HINT",
+      "message": "Keep the request number to track this request later.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ACK_HINT",
+      "message": "इस अनुरोध को बाद में ट्रैक करने के लिए अनुरोध संख्या सँभालकर रखें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_PRINT",
+      "message": "Print",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_GOV",
+      "message": "Government of Himachal Pradesh",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_GOV",
+      "message": "हिमाचल प्रदेश सरकार",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_DEPT",
+      "message": "Urban Development Department",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_DEPT",
+      "message": "शहरी विकास विभाग",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_TITLE",
+      "message": "Service Request Acknowledgement",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_TITLE",
+      "message": "सेवा अनुरोध पावती",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_DATE",
+      "message": "Date",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_STATUS",
+      "message": "Status",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_STATUS_V",
+      "message": "Payment pending",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_STATUS_V",
+      "message": "भुगतान लंबित",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_APPLICANT",
+      "message": "Applicant",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_APPLICANT",
+      "message": "आवेदक",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_NOTE",
+      "message": "This is a system generated acknowledgement.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_NOTE",
+      "message": "यह सिस्टम द्वारा बनाई गई पावती है।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_RCPT_HELP",
+      "message": "For help, contact your urban local body.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_RCPT_HELP",
+      "message": "सहायता के लिए अपने शहरी स्थानीय निकाय से संपर्क करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LIST_TITLE",
+      "message": "My service requests",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LIST_TITLE",
+      "message": "मेरे सेवा अनुरोध",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LIST_SUB",
+      "message": "Track your requests and pay pending fees.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LIST_SUB",
+      "message": "अपने अनुरोध ट्रैक करें और लंबित शुल्क भरें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_NEW",
+      "message": "New request",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_NEW",
+      "message": "नया अनुरोध",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LIST_EMPTY",
+      "message": "No requests yet",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LIST_EMPTY",
+      "message": "अभी कोई अनुरोध नहीं",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_START_HINT",
+      "message": "Raise a request for a service such as septic tank cleaning, rallies or public events.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_START_HINT",
+      "message": "सेप्टिक टैंक सफ़ाई, रैली या सार्वजनिक आयोजन जैसी सेवा के लिए अनुरोध करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_LIST_FAILED",
+      "message": "Your requests could not be loaded. Please try again.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_LIST_FAILED",
+      "message": "आपके अनुरोध लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_SEARCH_PH",
+      "message": "Search by request number or category",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_SEARCH_PH",
+      "message": "अनुरोध संख्या या श्रेणी से खोजें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_NO_RESULTS",
+      "message": "No requests match",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_NO_RESULTS",
+      "message": "कोई अनुरोध मेल नहीं खाता",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_CLEAR_FILTERS",
+      "message": "Clear filters",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_CLEAR_FILTERS",
+      "message": "फ़िल्टर हटाएँ",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FILTER_ALL",
+      "message": "All",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FILTER_ALL",
+      "message": "सभी",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FILTER_PAYMENT",
+      "message": "Payment due",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FILTER_PAYMENT",
+      "message": "भुगतान देय",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FILTER_PROGRESS",
+      "message": "In progress",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FILTER_PROGRESS",
+      "message": "प्रगति में",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FILTER_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FILTER_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_FILTER_CLOSED",
+      "message": "Closed",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_FILTER_CLOSED",
+      "message": "बंद",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_INITIATED",
+      "message": "Initiated",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_INITIATED",
+      "message": "आरंभ किया",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_ACTIVE",
+      "message": "Payment pending",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_ACTIVE",
+      "message": "भुगतान लंबित",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_PENDINGFORPAYMENT",
+      "message": "Payment pending",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_PENDINGFORPAYMENT",
+      "message": "भुगतान लंबित",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_PAID",
+      "message": "Paid, with approver",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_PAID",
+      "message": "भुगतान हुआ, अनुमोदक के पास",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_PENDINGFORAPPROVAL",
+      "message": "Pending for approval",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_PENDINGFORAPPROVAL",
+      "message": "अनुमोदन लंबित",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_APPROVED",
+      "message": "Approved",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_APPROVED",
+      "message": "स्वीकृत",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_REJECTED",
+      "message": "Rejected",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_REJECTED",
+      "message": "अस्वीकृत",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_ST_CANCELLED",
+      "message": "Cancelled",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_ST_CANCELLED",
+      "message": "रद्द",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_OPEN",
+      "message": "View",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_OPEN",
+      "message": "देखें",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_TITLE",
+      "message": "Request details",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_TITLE",
+      "message": "अनुरोध विवरण",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_APPNO",
+      "message": "Request number",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_APPNO",
+      "message": "अनुरोध संख्या",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_APPLIED",
+      "message": "Applied on",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_APPLIED",
+      "message": "आवेदन तिथि",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_STATUS",
+      "message": "Status",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_STATUS",
+      "message": "स्थिति",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_PRINT",
+      "message": "Print",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_DOCS",
+      "message": "Documents",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_DOCS",
+      "message": "दस्तावेज़",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_NODOCS",
+      "message": "No documents were attached.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_NODOCS",
+      "message": "कोई दस्तावेज़ संलग्न नहीं किया गया।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_OPENING",
+      "message": "Opening document...",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_OPENING",
+      "message": "दस्तावेज़ खोला जा रहा है...",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_TIMELINE",
+      "message": "Progress timeline",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_TIMELINE",
+      "message": "प्रगति समयरेखा",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_NOHISTORY",
+      "message": "No progress recorded yet.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_NOHISTORY",
+      "message": "अभी कोई प्रगति दर्ज नहीं।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_BACK",
+      "message": "Back to my requests",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_BACK",
+      "message": "मेरे अनुरोधों पर वापस",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_FAILED",
+      "message": "The request could not be loaded. Please try again.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_FAILED",
+      "message": "अनुरोध लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "RQS_VIEW_NOTFOUND",
+      "message": "This request was not found in your account.",
+      "module": "rainmaker-reqsvc",
+      "locale": "en_IN"
+    },
+    {
+      "code": "RQS_VIEW_NOTFOUND",
+      "message": "यह अनुरोध आपके खाते में नहीं मिला।",
+      "module": "rainmaker-reqsvc",
+      "locale": "hi_IN"
+    }
+  ]
+}

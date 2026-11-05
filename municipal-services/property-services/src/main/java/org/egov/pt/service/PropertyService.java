@@ -279,6 +279,9 @@ public class PropertyService {
 			}
 		}
 
+		// SMS the owner(s) the property id once a new registration is submitted into the workflow
+		notifService.sendApplicationSubmittedSMS(request);
+
 		request.getProperty().setWorkflow(null);
 
 		// Push PLAIN data to fuzzy search index

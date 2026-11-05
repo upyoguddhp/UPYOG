@@ -1685,3 +1685,13 @@ $l-radius: 18px;
 .LandingBrand__text strong {
   white-space: nowrap;
 }
+
+/* searchable city picker in the hero search */
+.LandingSearch__city {
+  .bkg-ss__btn { min-height: 40px; max-width: 170px; border: 0; background: transparent; font-size: 14.5px; font-weight: 700; padding: 0 4px; box-shadow: none; }
+  .bkg-ss__panel { left: auto; right: 0; width: min(280px, 86vw); }
+}
+@media (max-width: 767px) {
+  .LandingSearch__city .bkg-ss__btn { max-width: none; width: 100%; min-height: 44px; }
+  .LandingSearch__city .bkg-ss__panel { left: 0; right: 0; width: auto; }
+}

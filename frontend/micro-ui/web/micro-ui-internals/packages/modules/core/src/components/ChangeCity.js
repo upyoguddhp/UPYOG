@@ -2,6 +2,7 @@ import { Dropdown } from "@upyog/digit-ui-react-components";
 import React, { useState, useEffect } from "react";
 import { CustomButton, Menu } from "@upyog/digit-ui-react-components";
 import { useHistory } from "react-router-dom";
+import { allRoles, applyContext } from "./employeeContext";
 
 const stringReplaceAll = (str = "", searcher = "", replaceWith = "") => {
   if (searcher == "") return str;
@@ -9,6 +10,14 @@ const stringReplaceAll = (str = "", searcher = "", replaceWith = "") => {
     str = str?.replace(searcher, replaceWith);
   }
   return str;
+};
+
+// untranslated city keys fall back to readable words (hp.shimla -> Shimla) instead of the raw key
+const cityLabel = (t, code) => {
+  const key = `TENANT_TENANTS_${stringReplaceAll(code, ".", "_")?.toUpperCase()}`;
+  const v = t ? t(key) : key;
+  if (v && v !== key) return v;
+  return String(code || "").split(".").pop().split("_").map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w)).join(" ");
 };
 
 const ChangeCity = (prop) => {
@@ -20,35 +29,31 @@ const ChangeCity = (prop) => {
   let selectedCities = [];
 
   const handleChangeCity = (city) => {
-    const loggedInData = Digit.SessionStorage.get("citizen.userRequestObject");
-    const filteredRoles = Digit.SessionStorage.get("citizen.userRequestObject")?.info?.roles?.filter(role => role.tenantId === city.value);
-    if (filteredRoles?.length > 0) {
-      loggedInData.info.roles = filteredRoles;
-      loggedInData.info.tenantId = city?.value;
-    }
-    Digit.SessionStorage.set("Employee.tenantId", city?.value);
-    Digit.UserService.setUser(loggedInData);
     setDropDownData(city);
-    if (window.location.href.includes("/digit-ui/employee/")) {
-      const redirectPath = location.state?.from || "/digit-ui/employee";
-      history.replace(redirectPath);
-    }
-    window.location.reload();
+    applyContext({ tenantId: city.value, role: "" });
   };
 
   useEffect(() => {
-    const userloggedValues = Digit.SessionStorage.get("citizen.userRequestObject");
-    let teantsArray = [], filteredArray = [];
-    userloggedValues?.info?.roles?.forEach(role => teantsArray.push(role.tenantId));
-    let unique = teantsArray.filter((item, i, ar) => ar.indexOf(item) === i);
-    unique?.forEach(uniCode => {
-      filteredArray.push({
-        label: prop?.t(`TENANT_TENANTS_${stringReplaceAll(uniCode, ".", "_")?.toUpperCase()}`),
-        value: uniCode
-      })
-    });
-    selectedCities = filteredArray?.filter(select => select.value == Digit.SessionStorage.get("Employee.tenantId"));
-    setSelectCityData(filteredArray);
+    let live = true;
+    const tenants = (rs) => rs.map((role) => role.tenantId).filter((x) => x && x.indexOf(".") > 0);
+    const show = (codes) => {
+      const unique = codes.filter((item, i, ar) => ar.indexOf(item) === i);
+      if (live) setSelectCityData(unique.map((uniCode) => ({ label: cityLabel(prop?.t, uniCode), value: uniCode })));
+    };
+    const fromRoles = tenants(allRoles());
+    show(fromRoles);
+    // cities the employee is mapped to in HRMS (jurisdictions) are offered as well
+    const uuid = Digit.SessionStorage.get("citizen.userRequestObject")?.info?.uuid;
+    if (uuid && Digit.HRMSService && Digit.HRMSService.search) {
+      Digit.HRMSService.search(Digit.ULBService.getStateId(), {}, { uuids: uuid })
+        .then((res) => {
+          const e = (res && res.Employees && res.Employees[0]) || {};
+          const mapped = (e.jurisdictions || []).map((j) => j.tenantId || j.boundary).filter((x) => x && x.indexOf(".") > 0);
+          show(fromRoles.concat(mapped));
+        })
+        .catch(() => {});
+    }
+    return () => { live = false; };
   }, [dropDownData]);
 
   // if (isDropdown) {
@@ -60,7 +65,7 @@ const ChangeCity = (prop) => {
         optionKey={"label"}
         select={handleChangeCity}
         freeze={true}
-        customSelector={<label className="cp">{prop?.t(`TENANT_TENANTS_${stringReplaceAll(Digit.SessionStorage.get("Employee.tenantId"), ".", "_")?.toUpperCase()}`)}</label>}
+        customSelector={<label className="cp">{cityLabel(prop?.t, Digit.SessionStorage.get("Employee.tenantId"))}</label>}
       />
     </div>
   );

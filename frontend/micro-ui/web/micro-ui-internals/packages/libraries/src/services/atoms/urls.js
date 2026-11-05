@@ -19,6 +19,7 @@ const Urls = {
 
   OTP_Send: "/user-otp/v1/_send",
   Authenticate: "/user/oauth/token",
+  EmployeeLogin: "/user/_login",
   RegisterUser: "/user/citizen/_create",
   ChangePassword: "/user/password/nologin/_update",
   ChangePassword1: "/user/password/_update",
@@ -93,6 +94,7 @@ const Urls = {
     create:"/pet-services/pet-registration/_create",
     search:"/pet-services/pet-registration/_search",
     update:"/pet-services/pet-registration/_update",
+    renewal:"/pet-services/pet-registration/_renewal",
     fetch_payment_details: "/billing-service/bill/v2/_fetchbill",
     payment_search: "/collection-services/payments/pet-services/_search",
     
