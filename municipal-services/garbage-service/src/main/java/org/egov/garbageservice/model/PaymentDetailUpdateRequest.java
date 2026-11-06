@@ -13,4 +13,5 @@ import lombok.Setter;
 public class PaymentDetailUpdateRequest {
 
 	private String paymentMode;
+	private String billId;
 }

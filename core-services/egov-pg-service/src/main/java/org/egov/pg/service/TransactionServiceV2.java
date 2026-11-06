@@ -533,6 +533,7 @@ public class TransactionServiceV2 {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("AdditionalDetails", transaction.getAdditionalDetails());
 		payload.put("PaymentMode", transaction.getGatewayPaymentMode());
+		payload.put("billId", transaction.getBillId());
 		
 		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
 			producer.push(appProperties.getGrbgUpdateDetailsTopic(), payload);
