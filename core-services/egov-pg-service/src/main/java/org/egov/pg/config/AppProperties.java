@@ -127,6 +127,18 @@ public class AppProperties {
     @Value("${egov.grbg.payment.processing.topic}")
     private String grbgPaymentProcessingTopic;
 
+    @Value("${egov.pg.payment.register.topic}")
+    private String paymentRegisterTopic;
+
+    @Value("${egov.pg.payment.register.failed.topic}")
+    private String paymentRegisterFailedTopic;
+
+    @Value("${egov.pg.payment.register.max.attempts:3}")
+    private int paymentRegisterMaxAttempts;
+
+    @Value("${egov.pg.payment.register.retry.backoff.ms:2000}")
+    private long paymentRegisterRetryBackoffMs;
+
     @Autowired
     public AppProperties(Environment environment){
         this.earlyReconcileJobRunInterval = Integer.valueOf(environment.getRequiredProperty("pg.earlyReconcileJobRunInterval.mins"));
