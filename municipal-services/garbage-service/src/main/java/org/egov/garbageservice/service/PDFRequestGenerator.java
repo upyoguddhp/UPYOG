@@ -85,6 +85,7 @@ public class PDFRequestGenerator {
 		grbgObj.put("arrears", new ArrayList<>());
 		grbgObj.put("interest", new ArrayList<>());
 		grbgObj.put("paymentDates", new ArrayList<>());
+		grbgObj.put("paymentTxnModes", new ArrayList<>());
 		grbgObj.put("paymentStatuses", new ArrayList<>());
 		grbgObj.put("grbgTaxPlusArrear", new ArrayList<>());
 
@@ -149,6 +150,17 @@ public class PDFRequestGenerator {
 			}
 
 			grbgObj.get("paymentDates").add(paymentDate);
+			
+			String paymentTxnMode = "";
+
+			if (tracker != null && tracker.getAdditionaldetail() != null) {
+				JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
+				if (trackerAdditionalDetail != null && trackerAdditionalDetail.hasNonNull("paymentTxnMode")) {
+					paymentTxnMode = trackerAdditionalDetail.get("paymentTxnMode").asText();
+				}
+			}
+
+			grbgObj.get("paymentTxnModes").add(paymentTxnMode);
 			String paymentStatus;
 
 			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
@@ -197,6 +209,7 @@ public class PDFRequestGenerator {
 		List<String> allPaymentDates = grbgObj.get("paymentDates");
 		List<String> allPaymentStatuses = grbgObj.get("paymentStatuses");
 		List<String> allGrbgTaxPlusArrear = grbgObj.get("grbgTaxPlusArrear");
+		List<String> allPaymentTxnModes = grbgObj.get("paymentTxnModes");
 
 		gbDetailsTableRow.put("allSerialNo", allSerialNo);
 		gbDetailsTableRow.put("allGrbgAccounts", allGrbgAccounts);
@@ -210,6 +223,7 @@ public class PDFRequestGenerator {
 		gbDetailsTableRow.put("allPaymentDates", allPaymentDates);
 		gbDetailsTableRow.put("allPaymentStatuses", allPaymentStatuses);
 		gbDetailsTableRow.put("allGrbgTaxPlusArrear", allGrbgTaxPlusArrear);
+		gbDetailsTableRow.put("allPaymentTxnModes", allPaymentTxnModes);
 		
 		BigDecimal totalTax = allGrbgTaxPlusArrear.stream().map(BigDecimal::new).reduce(BigDecimal.ZERO,
 				BigDecimal::add);

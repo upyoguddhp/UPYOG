@@ -104,7 +104,7 @@ public class GarbageBillTrackerRepository {
 	        "        to_jsonb(CAST(:paymentTxnDate AS text)), " +
 	        "        true " +
 	        "    ) " +
-	        "WHERE bill_id = :billId";
+	        "WHERE bill_id IN (:billIds)";
 	
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
@@ -313,12 +313,12 @@ public class GarbageBillTrackerRepository {
 		namedParameterJdbcTemplate.update(query, params);
 	}
 	
-	public void updatePaymentDetailsInTracker(String paymentMode, String transactionDate, String billId) {
+	public void updatePaymentDetailsInTracker(String paymentMode, String transactionDate, List<String> billIds) {
 		String query = UPDATE_TRACKER_PAYMENT_DETAILS;
 		Map<String, Object> params = new HashMap<>();
 		params.put("paymentTxnMode", paymentMode);
 		params.put("paymentTxnDate", transactionDate);
-		params.put("billId", billId);
+		params.put("billIds", billIds);
 		namedParameterJdbcTemplate.update(query, params);
 	}
 	

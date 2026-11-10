@@ -45,6 +45,8 @@ public class GrbgPaymentProcessingConsumer {
 	    if (additionalDetails != null) {
 	        transactionDate = (String) additionalDetails.get("transactionDate");
 	    }
-		trackerRepository.updatePaymentDetailsInTracker(request.getPaymentMode(), transactionDate, request.getBillId());
+	    if (request.getBillIds() != null && !request.getBillIds().isEmpty()) {
+		trackerRepository.updatePaymentDetailsInTracker(request.getPaymentMode(), transactionDate, request.getBillIds());
+	    }
 	}
 }
