@@ -203,7 +203,7 @@ public class TransactionServiceV2 {
 			producer.push(appProperties.getSaveTxnWithDetailsTopic(),
 					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
 			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
-
+			updatePaymentDetails(transaction);
 			transactions.add(transaction);
 		});
 
@@ -534,7 +534,14 @@ public class TransactionServiceV2 {
 	private void updatePaymentDetails(Transaction transaction) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("AdditionalDetails", transaction.getAdditionalDetails());
-		payload.put("PaymentMode", transaction.getGatewayPaymentMode());
+		String paymentMode = transaction.getGatewayPaymentMode();
+		
+		if ("PAYTM-POS".equalsIgnoreCase(paymentMode) || 
+			"PAYTMPOS".equalsIgnoreCase(paymentMode)  || 
+			"RAZORPAY".equalsIgnoreCase(paymentMode)) {
+			paymentMode = "ONLINE";
+		}
+		payload.put("PaymentMode", paymentMode);
 		List<String> billIds = transaction.getTaxAndPayments().stream().map(TaxAndPayment::getBillId)
 				.filter(Objects::nonNull).distinct().collect(Collectors.toList());
 		
