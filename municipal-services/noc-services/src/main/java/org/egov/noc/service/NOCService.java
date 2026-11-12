@@ -1,7 +1,9 @@
 package org.egov.noc.service;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,6 @@ import org.egov.noc.validator.NOCValidator;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
-import org.egov.noc.web.model.PDFRequest;
 import org.egov.noc.web.model.RequestInfoWrapper;
 import org.egov.noc.web.model.workflow.BusinessService;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
@@ -27,14 +28,12 @@ import org.egov.noc.workflow.WorkflowIntegrator;
 import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.egov.noc.web.model.NocSearchCriteria;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -139,7 +138,7 @@ public class NOCService {
 		    
 		    //TODO: uncomment the approve check
 //		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
-		        saveCertificateTemplate(nocRequest);
+//		        saveCertificateTemplate(nocRequest);
 //		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
@@ -248,28 +247,28 @@ public class NOCService {
                 return nocRepository.getNocCount(criteria);
         }
         
-		private void saveCertificateTemplate(NocRequest nocRequest) {
-			String template = getMdmsCertificateTemplate(nocRequest);
-			String applicationNo = nocRequest.getNoc().getApplicationNo();
-			//TODO: need to fill in values to the template
-			nocRepository.saveCertificateTemplate(template, applicationNo);
-		}
+//		private void saveCertificateTemplate(NocRequest nocRequest) {
+//			String template = getMdmsCertificateTemplate(nocRequest);
+//			String applicationNo = nocRequest.getNoc().getApplicationNo();
+//			//TODO: need to fill in values to the template
+//			nocRepository.saveCertificateTemplate(template, applicationNo);
+//		}
 	
-		private String getMdmsCertificateTemplate(NocRequest noc) {
+		private String getMdmsCertificateTemplate(List<Noc> noc, RequestInfoWrapper requestInfoWrapper) {
 			
 		    Map<String, Object> mdmsCriteria = new HashMap<>();
-			String[] tenantParts = noc.getNoc().getTenantId().split("\\.");
-			String uniqueIdentifier = noc.getNoc().getNocType().replace("NOC", "_NOC");
+			String[] tenantParts = noc.get(0).getTenantId().split("\\.");
+			String uniqueIdentifier = noc.get(0).getNocType().replace("NOC", "_NOC");
 			
 			mdmsCriteria.put("tenantId", tenantParts[0]);
 			mdmsCriteria.put("schemaCode", "NOC.CERTIFICATE");
 			mdmsCriteria.put("uniqueIdentifiers",Collections.singletonList(uniqueIdentifier));
 		
 		    Map<String, Object> mdmsRequest = new HashMap<>();
-		    mdmsRequest.put("RequestInfo", noc.getRequestInfo());
+		    mdmsRequest.put("RequestInfo", requestInfoWrapper.getRequestInfo());
 		    mdmsRequest.put("MdmsCriteria", mdmsCriteria);
 		
-		    log.info("Fetching NOC certificate from MDMS for tenant {}", noc.getNoc().getTenantId());
+		    log.info("Fetching NOC certificate from MDMS for tenant {}", noc.get(0).getTenantId());
 		
 		    Object response = serviceRequestRepository.fetchResult(
 		            new StringBuilder(config.getMdmsV2Host())
@@ -285,16 +284,33 @@ public class NOCService {
 			return template;
 		}
 		
-		public ResponseEntity<Resource> generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
+		public String generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
 				String applicationNo, String tenantid ) {
 			NocSearchCriteria criteria = NocSearchCriteria.builder()
 					.tenantId(tenantid)
 					.applicationNo(applicationNo).build();
 			
 			List<Noc> nocList = nocService.search(criteria, requestInfoWrapper.getRequestInfo());
-			String template = nocList.get(0).getCertificateTemplate(); 
-			
-			PDFRequest pdfRequest = reportService.generatePdfRequestForNoc(template, requestInfoWrapper);
-			return reportService.createNoSavePDF(pdfRequest);
+			if (nocList == null || nocList.isEmpty()) {
+		        throw new CustomException("NOC_NOT_FOUND", "NOC application not found");
+		    }
+			String template = getMdmsCertificateTemplate(nocList, requestInfoWrapper);
+			Noc noc = nocList.get(0);
+			JsonNode propertyDetail = mapper.valueToTree(noc.getPropertyDetail());
+			JsonNode citizenDetail = mapper.valueToTree(noc.getCitizenDetail());
+			String certificateNo = noc.getNocNo() != null
+		            ? noc.getNocNo() : noc.getApplicationNo();
+			String issueDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+		    String applicantName = citizenDetail.path("applicantName").asText("");
+		    String address = propertyDetail.path("address").asText("");
+		    
+		    template = template.replace("{{certificateNo}}", certificateNo);
+		    template = template.replace("{{issueDate}}", issueDate);
+		    template = template.replace("{{applicantName}}", applicantName);
+		    template = template.replace("{{address}}", address);
+
+//			PDFRequest pdfRequest = reportService.generatePdfRequestForNoc(template, requestInfoWrapper);
+//			return reportService.createNoSavePDF(pdfRequest);
+			return template;
 		}
 }

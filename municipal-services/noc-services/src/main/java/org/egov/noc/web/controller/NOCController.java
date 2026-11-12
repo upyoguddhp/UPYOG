@@ -101,10 +101,10 @@ public class NOCController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping(value= "/_generateNocCertificate")
-	public ResponseEntity<?> generateNocCertificate(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, 
+	@PostMapping(value= "/_getNocTemplate")
+	public String generateNocTemplate(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, 
 			@RequestParam String applicationNo, @RequestParam String tenantId) {
-		ResponseEntity<Resource> response = nocService.generateGrbgTaxBillReceipt(requestInfoWrapper, applicationNo, tenantId);
+		String response = nocService.generateGrbgTaxBillReceipt(requestInfoWrapper, applicationNo, tenantId);
 		return response;
 	}
 }
