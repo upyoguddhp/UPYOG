@@ -1,6 +1,7 @@
 package org.egov.noc.service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -303,11 +304,23 @@ public class NOCService {
 			String issueDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
 		    String applicantName = citizenDetail.path("applicantName").asText("");
 		    String address = propertyDetail.path("address").asText("");
+		    String propertyId = propertyDetail.path("propertyId").asText("");
+		    String ulbName = propertyDetail.path("ulbName").asText("");
+		    String ulbType = propertyDetail.path("ulbType").asText("");
+		   
+			LocalDate today = LocalDate.now();
+			int year = today.getYear();
+			String finYear = today.getMonthValue() >= 4 ? year + "-" + String.valueOf(year + 1).substring(2)
+					: (year - 1) + "-" + String.valueOf(year).substring(2);
 		    
 		    template = template.replace("{{certificateNo}}", certificateNo);
 		    template = template.replace("{{issueDate}}", issueDate);
 		    template = template.replace("{{applicantName}}", applicantName);
 		    template = template.replace("{{address}}", address);
+		    template = template.replace("{{financialYear}}", finYear);
+		    template = template.replace("{{propertyId}}", propertyId);
+		    template = template.replace("{{ulbName}}", ulbName);
+		    template = template.replace("{{ulbType}}", ulbType);
 
 //			PDFRequest pdfRequest = reportService.generatePdfRequestForNoc(template, requestInfoWrapper);
 //			return reportService.createNoSavePDF(pdfRequest);
