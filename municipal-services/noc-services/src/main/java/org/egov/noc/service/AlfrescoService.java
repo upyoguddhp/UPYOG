@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.noc.config.NOCConfiguration;
+import org.egov.noc.web.model.DMSResponse;
 import org.egov.noc.web.model.DmsRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,9 @@ public class AlfrescoService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public String uploadAttachment(DmsRequest dmsRequest, RequestInfo requestInfo) throws IOException {
-
-		String documentReferenceId = upload(dmsRequest, requestInfo);
-
-//		Object result = serviceRequestRepository.fetchResult(new StringBuilder(config.getAlfrescoHost().concat(config.getAlfrescoUploadEndPoint())), dmsRequest);
-//		DMSResponse response = mapper.convertValue(result,DMSResponse.class);
-
-		return documentReferenceId;
+	public DMSResponse uploadAttachment(DmsRequest dmsRequest, RequestInfo requestInfo) throws IOException {
+		upload(dmsRequest, null);
+		return null;
 	}
 
 	public String upload(DmsRequest dmsRequest, RequestInfo requestInfo) {

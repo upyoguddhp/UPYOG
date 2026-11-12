@@ -104,7 +104,7 @@ public class NOCController {
 	@PostMapping(value= "/_getNocTemplate")
 	public String generateNocTemplate(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, 
 			@RequestParam String applicationNo, @RequestParam String tenantId) {
-		String response = nocService.generateGrbgTaxBillReceipt(requestInfoWrapper, applicationNo, tenantId);
+		String response = nocService.generateNocTemplate(requestInfoWrapper, applicationNo, tenantId);
 		return response;
 	}
 }

@@ -1,5 +1,6 @@
 package org.egov.noc.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -19,9 +20,12 @@ import org.egov.noc.repository.ServiceRequestRepository;
 import org.egov.noc.util.NOCConstants;
 import org.egov.noc.util.NOCUtil;
 import org.egov.noc.validator.NOCValidator;
+import org.egov.noc.web.model.DMSResponse;
+import org.egov.noc.web.model.DmsRequest;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
+import org.egov.noc.web.model.PDFRequest;
 import org.egov.noc.web.model.RequestInfoWrapper;
 import org.egov.noc.web.model.workflow.BusinessService;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
@@ -29,6 +33,7 @@ import org.egov.noc.workflow.WorkflowIntegrator;
 import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -137,10 +142,9 @@ public class NOCService {
 		    	 nocBillingService.generateBill(nocRequest);
 		    }
 		    
-		    //TODO: uncomment the approve check
-//		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
-//		        saveCertificateTemplate(nocRequest);
-//		    }
+		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+		    	createAndUploadPDF(nocRequest);
+		    }
 		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
@@ -247,13 +251,6 @@ public class NOCService {
                 criteria.setAccountId(uuids);*/
                 return nocRepository.getNocCount(criteria);
         }
-        
-//		private void saveCertificateTemplate(NocRequest nocRequest) {
-//			String template = getMdmsCertificateTemplate(nocRequest);
-//			String applicationNo = nocRequest.getNoc().getApplicationNo();
-//			//TODO: need to fill in values to the template
-//			nocRepository.saveCertificateTemplate(template, applicationNo);
-//		}
 	
 		private String getMdmsCertificateTemplate(List<Noc> noc, RequestInfoWrapper requestInfoWrapper) {
 			
@@ -285,7 +282,7 @@ public class NOCService {
 			return template;
 		}
 		
-		public String generateGrbgTaxBillReceipt(RequestInfoWrapper requestInfoWrapper,
+		public String generateNocTemplate(RequestInfoWrapper requestInfoWrapper,
 				String applicationNo, String tenantid ) {
 			NocSearchCriteria criteria = NocSearchCriteria.builder()
 					.tenantId(tenantid)
@@ -322,8 +319,44 @@ public class NOCService {
 		    template = template.replace("{{ulbName}}", ulbName);
 		    template = template.replace("{{ulbType}}", ulbType);
 
-//			PDFRequest pdfRequest = reportService.generatePdfRequestForNoc(template, requestInfoWrapper);
-//			return reportService.createNoSavePDF(pdfRequest);
 			return template;
+		}
+		
+		private void createAndUploadPDF(NocRequest nocRequest) {
+			 if (nocRequest.getNoc() != null && nocRequest.getNoc().getApplicationNo() != null) {
+				 
+				 // create pdf
+				 PDFRequest pdfRequest = PDFRequest.builder()
+					        .RequestInfo(nocRequest.getRequestInfo())
+					        .key("certificate")
+					        .tenantId(nocRequest.getNoc().getTenantId())
+					        .htmlTemplateContent(nocRequest.getNoc().getCertificateTemplate())
+					        .data(new HashMap<>())
+					        .build();
+				 
+				Resource resource = reportService.createNoSavePDF(pdfRequest);
+					
+					// upload pdf
+					DmsRequest dmsRequest = generateDmsRequestByNocApplication(resource, nocRequest.getNoc(), nocRequest.getRequestInfo());
+					try {
+						DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
+					} catch (IOException e) {
+						throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
+					}
+			}
+		}
+		
+		private DmsRequest generateDmsRequestByNocApplication(Resource resource,
+				Noc noc, RequestInfo requestInfo) {
+
+			DmsRequest dmsRequest = DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+					.objectId(noc.getId())
+					.description(config.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+					.id(config.ALFRESCO_COMMON_CERTIFICATE_ID).type(config.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+					.objectName(config.ALFRESCO_BUSINESS_SERVICE).comments(config.ALFRESCO_NOC_CERTIFICATE_COMMENT)
+					.status(config.STATUS_APPROVED).file(resource).servicetype(config.ALFRESCO_BUSINESS_SERVICE)
+					.documentType(config.ALFRESCO_DOCUMENT_TYPE).documentId(config.ALFRESCO_COMMON_DOCUMENT_ID).build();
+
+			return dmsRequest;
 		}
 }

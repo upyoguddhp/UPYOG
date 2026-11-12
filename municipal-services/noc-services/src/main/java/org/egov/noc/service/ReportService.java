@@ -3,7 +3,9 @@ package org.egov.noc.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.noc.config.NOCConfiguration;
+import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.PDFRequest;
 import org.egov.noc.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,14 @@ public class ReportService {
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	public ResponseEntity<Resource> createNoSavePDF(PDFRequest pdfRequest) {
+	public Resource createNoSavePDF(PDFRequest pdfRequest) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/json");
 		HttpEntity<PDFRequest> requestEntity = new HttpEntity<>(pdfRequest, headers);
-		return restTemplate.exchange(config.getReportHost().concat(config.getReportCreateEndPoint()), HttpMethod.POST,
-				requestEntity, Resource.class);
+		ResponseEntity<Resource> responseEntity = restTemplate.exchange(
+				config.getReportHost().concat(config.getReportCreateEndPoint()), HttpMethod.POST, requestEntity,
+				Resource.class);
+		return responseEntity.getBody();
 	}
 	
 	public PDFRequest generatePdfRequestForNoc(String template, RequestInfoWrapper requestInfoWrapper) {
