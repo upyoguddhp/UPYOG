@@ -19,7 +19,6 @@ import org.egov.pg.config.AppProperties;
 import org.egov.pg.constants.PgConstants;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.models.TransactionDetails;
-import org.egov.pg.models.TransactionDetailsWrapper;
 import org.egov.pg.models.TransactionDump;
 import org.egov.pg.models.TransactionDumpRequest;
 import org.egov.pg.producer.Producer;
@@ -187,20 +186,21 @@ public class TransactionServiceV2 {
 				dump.setTxnRequest(uri.toString());
 			}
 
-			// Persist transaction and transaction dump objects
-			producer.push(appProperties.getSaveTxnTopic(),
-					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
-			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
-
+			if (CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
+				transaction.setTransactionDetails(Collections.singletonList(TransactionDetails.builder()
+						.txnAmount(transaction.getTxnAmount()).billId(transaction.getBillId())
+						.consumerCode(transaction.getConsumerCode()).build()));
+			}
 			// Enrich transaction Details by generating uuid, txnid, audit details and
 			// additional details
 			if (!CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
 				enrichmentService.populateTransactionsDetails(transaction, requestInfo);
-				transaction.getTransactionDetails().forEach(transactionDetails -> {
-					producer.push(appProperties.getSaveTxnDetailsTopic(),
-							TransactionDetailsWrapper.builder().transactionDetails(transactionDetails).build());
-				});
 			}
+
+			// Persist the parent and its enriched details atomically from one message.
+			producer.push(appProperties.getSaveTxnWithDetailsTopic(),
+					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
+			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
 
 			transactions.add(transaction);
 		});
@@ -467,6 +467,11 @@ public class TransactionServiceV2 {
 			throw new CustomException("INVALID_TRANSACTION_STATUS", "Cheque transaction must be in PROCESSING state");
 		}
 
+		if ("GB".equalsIgnoreCase(txn.getProductInfo())) {
+			// The bill search only loads matching details; cheque actions apply to the whole transaction.
+			mapTransactionDetails(Collections.singletonList(txn));
+		}
+
 		if (Transaction.TxnStatusEnum.SUCCESS.equals(request.getAction())) {
 			txn.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 			txn.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
@@ -498,11 +503,23 @@ public class TransactionServiceV2 {
 	}
 	
 	private void updatePaymentProcessing(Transaction transaction, boolean isPaymentProcessing) {
+		if ("GB".equalsIgnoreCase(transaction.getProductInfo())
+				&& !CollectionUtils.isEmpty(transaction.getTransactionDetails())) {
+			for (TransactionDetails detail : transaction.getTransactionDetails()) {
+				pushPaymentProcessing(transaction, isPaymentProcessing, detail.getBillId(), detail.getTxnAmount());
+			}
+			return;
+		}
+		pushPaymentProcessing(transaction, isPaymentProcessing, transaction.getBillId(), transaction.getTxnAmount());
+	}
+
+	private void pushPaymentProcessing(Transaction transaction, boolean isPaymentProcessing, String billId,
+			String txnAmount) {
 		Map<String, Object> payload = new HashMap<>();
-		payload.put("billId", transaction.getBillId());
+		payload.put("billId", billId);
 		payload.put("txnId", transaction.getTxnId());
 		payload.put("isPaymentProcessing", isPaymentProcessing);
-		payload.put("txnAmount", transaction.getTxnAmount());
+		payload.put("txnAmount", txnAmount);
 		payload.put("AddiitonalDetails", transaction.getAdditionalDetails());
 
 		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {

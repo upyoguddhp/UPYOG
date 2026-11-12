@@ -60,6 +60,9 @@ public class BillV2 {
 
 	@JsonProperty("totalAmount")
 	private BigDecimal totalAmount;
+	
+	@JsonProperty("processingAmount")
+	private BigDecimal processingAmount;
 
 	@JsonProperty("businessService")
 	@Size(max = 256)
@@ -115,7 +118,9 @@ public class BillV2 {
 		PAID("PAID"),
 		
 		PARTIALLY_PAID ("PARTIALLY_PAID"),
-		
+
+		ADVANCE_PAID ("ADVANCE_PAID"),
+
 		ADVANCE_ADJUSTED("ADVANCE_ADJUSTED"),
 		
 		PAYMENT_CANCELLED ("PAYMENT_CANCELLED"),

@@ -79,6 +79,7 @@ import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 import org.egov.garbageservice.model.BillIdRequest;
 import org.egov.garbageservice.model.GenerateBillPreviewResponse;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.math.RoundingMode;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -144,7 +145,8 @@ public class GarbageAccountSchedulerService {
 	public GrbgBillTrackerResponse generateBill(GenerateBillRequest generateBillRequest) {
 
 		List<GrbgBillTracker> grbgBillTrackers = new ArrayList<>();
-		AtomicInteger skippedCount = new AtomicInteger(0);
+		AtomicInteger overlappingCount = new AtomicInteger(0);
+		AtomicInteger paymentProcessingCount = new AtomicInteger(0);
 		setFromDateToDate(generateBillRequest);
 		String message = null;
 		List<GarbageAccount> garbageAccounts = getGarbageAccounts(generateBillRequest);
@@ -190,7 +192,7 @@ public class GarbageAccountSchedulerService {
 					if (null != garbageAccount.getUserUuid()) {
 
 						if (validateExistingBillOverlap(generateBillRequest, garbageAccount, trackerMap)) {
-							skippedCount.incrementAndGet();
+							overlappingCount.incrementAndGet();
 							errorList.add("Bill already exists for application "
 									+ garbageAccount.getGrbgApplicationNumber() + " for the selected period");
 							if (applicationsWithExistingDemand.contains(garbageAccount.getGrbgApplicationNumber())) {
@@ -199,6 +201,21 @@ public class GarbageAccountSchedulerService {
 								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
 							}
 							return;
+						}
+						
+						List<GrbgBillTracker> existingApplicationTrackers = trackerMap.get(garbageAccount.getGrbgApplicationNumber());
+						if (!CollectionUtils.isEmpty(existingApplicationTrackers)) {
+							boolean paymentProcessing = existingApplicationTrackers.stream()
+									.anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+							if (paymentProcessing) {
+								log.info(
+										"Skipping bill generation for application {} because payment is being processed",
+										garbageAccount.getGrbgApplicationNumber());
+								errorList.add("Bill generation skipped because payment is currently being processed");
+								createFailureLog(garbageAccount, generateBillRequest, null, errorList);
+								paymentProcessingCount.incrementAndGet();
+								return;
+							}
 						}
 
 						Object mdmsResponse = mdmsFeeResponseByTenant.computeIfAbsent(garbageAccount.getTenantId(),
@@ -278,16 +295,16 @@ public class GarbageAccountSchedulerService {
 								return;
 							}
 
-							if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
-								GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
-										.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,
-												billResponse.getBill().get(0), calculationBreakdown);
-								grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
-								// add to garbage bill tracker
-								GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
-								tracker.setGarbageBillWithoutRebate(billAmount);
-								tracker.setRebateAmount(rebateAmount);
-								tracker.setGrbgBillAmount(finalBillAmount);
+						if (null != billResponse && !CollectionUtils.isEmpty(billResponse.getBill())) {
+							GrbgBillTrackerRequest grbgBillTrackerRequest = garbageAccountService
+									.enrichGrbgBillTrackerCreateRequest(garbageAccount, generateBillRequest, billAmount,
+											billResponse.getBill().get(0), calculationBreakdown);
+							grbgBillTrackerRequest.getGrbgBillTracker().setDemandId(demandId.get());
+							// add to garbage bill tracker
+							GrbgBillTracker tracker = grbgBillTrackerRequest.getGrbgBillTracker();
+							tracker.setGarbageBillWithoutRebate(billAmount != null ? billAmount.setScale(0, RoundingMode.HALF_UP) : null);
+							tracker.setRebateAmount(rebateAmount != null ? rebateAmount.setScale(0, RoundingMode.HALF_UP) : null);
+							tracker.setGrbgBillAmount(finalBillAmount != null ? finalBillAmount.setScale(0, RoundingMode.HALF_UP) : null);
 
 								GrbgBillTracker grbgBillTracker = garbageAccountService
 										.saveToGarbageBillTracker(grbgBillTrackerRequest);
@@ -397,15 +414,20 @@ public class GarbageAccountSchedulerService {
 			message = "Garbage Acc Not Found";
 		}
 		int generatedCount = grbgBillTrackers.size();
-		int skipped = skippedCount.get();
+		int overlapping = overlappingCount.get();
+		int processing = paymentProcessingCount.get();
+		StringBuilder messageBuilder = new StringBuilder();
 
-		if (generatedCount > 0 && skipped > 0) {
-			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + skipped
+		if (generatedCount > 0 && overlapping > 0) {
+			message = "Bills generated successfully for " + generatedCount + " Application Id(s). Failed for " + overlapping
 					+ " Application Id(s) due to overlapping bill periods.";
 		} else if (generatedCount > 0) {
 			message = "Bills generated successfully for " + generatedCount + " Application Id(s).";
-		} else if (skipped > 0) {
-			message = "No bills generated. " + skipped + " Application Id(s) failed due to overlapping bill periods.";
+		} else if (overlapping > 0) {
+			message = "No bills generated. " + overlapping + " Application Id(s) failed due to overlapping bill periods.";
+		} else if (processing > 0) {
+		    message = "Cheque clearance is pending. " + processing
+		            + " Application Id(s) skipped. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
 		}
 
 		sanatizeFailureLog(generateBillRequest);
@@ -700,7 +722,9 @@ public class GarbageAccountSchedulerService {
 				.searchCriteriaGarbageAccount(SearchCriteriaGarbageAccount.builder()
 						.applicationNumber(generateBillRequest.getGrbgApplicationNumbers())
 						.mobileNumber(generateBillRequest.getMobileNumbers())
-						.isMonthlyBilling(true)
+						// Keep the parent available for child discovery even when its billing is off.
+						.isMonthlyBilling(CollectionUtils.isEmpty(generateBillRequest.getGrbgApplicationNumbers())
+								? true : null)
 						.tenantId("hp." +ulbNames.get(0))
 						.wardNames(wardNumbers)
 						.status(Collections.singletonList("APPROVED")).isActiveAccount(true).isActiveSubAccount(true)
@@ -710,12 +734,24 @@ public class GarbageAccountSchedulerService {
 				.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,false);
 
 		if (null != garbageAccountResponse && !CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
-			garbageAccounts = garbageAccountResponse.getGarbageAccounts();
-			if(generateBillRequest.getGrbgApplicationNumbers() != null) {
-				if(!garbageAccountResponse.getGarbageAccounts().get(0).getChildGarbageAccounts().isEmpty())
-					garbageAccounts.addAll(garbageAccountResponse.getGarbageAccounts().get(0).getChildGarbageAccounts());
+			for (GarbageAccount account : garbageAccountResponse.getGarbageAccounts()) {
+				garbageAccounts.add(account);
+				if (!CollectionUtils.isEmpty(generateBillRequest.getGrbgApplicationNumbers())
+						&& !CollectionUtils.isEmpty(account.getChildGarbageAccounts())) {
+					garbageAccounts.addAll(account.getChildGarbageAccounts());
+				}
 			}
 		}
+
+		// Eligibility belongs to each account, independently of its parent's flag.
+		Set<String> selectedApplications = new HashSet<>();
+		garbageAccounts = garbageAccounts.stream()
+				.filter(Objects::nonNull)
+				.filter(account -> !CollectionUtils.isEmpty(account.getGrbgCollectionUnits())
+						&& account.getGrbgCollectionUnits().get(0) != null
+						&& Boolean.TRUE.equals(account.getGrbgCollectionUnits().get(0).getIsmonthlybilling()))
+				.filter(account -> selectedApplications.add(account.getGrbgApplicationNumber()))
+				.collect(Collectors.toList());
 		
 		if (!CollectionUtils.isEmpty(ulbNames)) {
 			garbageAccounts = garbageAccounts.stream()
@@ -751,8 +787,8 @@ public class GarbageAccountSchedulerService {
 	private BillResponse generateDemandAndBill(GenerateBillRequest generateBillRequest, GarbageAccount garbageAccount,
 			BigDecimal billAmount,String Type,AtomicReference<String> demandId, int numberOfMonths) {
 		try {
-			if(!checkUuidNumber(garbageAccount))
-				return null;
+//			if(!checkUuidNumber(garbageAccount))
+//				return null;
 			List<Demand> savedDemands = new ArrayList<>();
 			
 			// generate demand
@@ -978,7 +1014,7 @@ public class GarbageAccountSchedulerService {
 	                    .multiply(penaltyRate)
 	                    .divide(BigDecimal.valueOf(100))
 	                    .multiply(BigDecimal.valueOf(monthsOverdue))
-	                    .setScale(2, RoundingMode.HALF_UP);
+	                    .setScale(0, RoundingMode.HALF_UP);
 	            
 	            if (tracker.getGrbgBillWithoutPenalty() == null) {
 	                tracker.setGrbgBillWithoutPenalty(baseAmount);
@@ -1173,6 +1209,10 @@ public class GarbageAccountSchedulerService {
 	    
 	    if (Bill.StatusEnum.PARTIALLY_PAID.equals(bill.getStatus())) {
 	        throw new CustomException("INVALID_UPDATE", "Cannot update partially paid bill");
+	    }
+
+	    if (Bill.StatusEnum.ADVANCE_PAID.equals(bill.getStatus())) {
+	        throw new CustomException("INVALID_UPDATE", "Cannot update advance paid bill");
 	    }
 	    
 	    if (request.getBillId() == null || request.getBillId().trim().isEmpty()) {

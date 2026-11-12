@@ -311,7 +311,12 @@
 						</tr>
                         <tr>
                            <th>Amount Payable (INR)</th>
-                           <td><span class="highlight"><span th:text="${amountDue}"> NA </span></span></td>
+                           <td>
+							<span>
+								<span class="highlight" th:text="${amountDue}"> NA </span>
+								<span>(Round-off)</span>
+							</span>
+						  </td>
                         </tr>
 						<tr>
 						   <th>Amount Paid (INR)</th>
