@@ -395,6 +395,16 @@ public class PDFRequestGenerator {
 				.toLocalDateTime().plusDays(30).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		ptbr.put("paymentDate", paymentDate);
 		ptbr.put("advancePaid", advancePaid.toString());
+		List<String> paymentTxnModes = new ArrayList<>();
+
+		if (additionalDetailsNode != null && additionalDetailsNode.isArray()) {
+		    for (JsonNode node : additionalDetailsNode) {
+		        if (node.hasNonNull("paymentTxnMode")) {
+		            paymentTxnModes.add(node.get("paymentTxnMode").asText());
+		        }
+		    }
+		}
+		ptbr.put("paymentTxnModes", String.join(", ", paymentTxnModes));
 
 		dataObject.putAll(tableRowMap);
 		dataObject.put("ptbr", ptbr);

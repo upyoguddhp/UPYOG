@@ -203,6 +203,12 @@
             "value": {
               "path": "$.paymentDate"
             }
+          },
+          {
+            "variable": "paymentTxnModes",
+            "value": {
+              "path": "$.paymentTxnModes"
+            }
           }
         ]
       },

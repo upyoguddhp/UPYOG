@@ -199,6 +199,12 @@
 						}
 					},
 					{
+						"variable": "paymentTxnModes",
+						"value": {
+							"path": "$.paymentTxnModes"
+						}
+					},
+					{
 						"variable": "mobileNumber",
 						"value": {
 						"path": "$.mobileNumber"
