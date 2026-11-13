@@ -152,11 +152,13 @@ public class PDFRequestGenerator {
 			String paymentStatus;
 
 			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+				log.info("processign block entered");
 				BigDecimal chequeTxnAmount = BigDecimal.ZERO;
 				JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
 				if (trackerAdditionalDetail != null && trackerAdditionalDetail.has("chequeTxnAmount")
 						&& !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
 					chequeTxnAmount = trackerAdditionalDetail.get("chequeTxnAmount").decimalValue();
+					log.info("chequeTxnAmount {} :",chequeTxnAmount);
 				}
 				BigDecimal adjustedAmount = BigDecimal.ZERO;
 				for (BillDetail billDetail : billObj.getBillDetails()) {
@@ -164,20 +166,28 @@ public class PDFRequestGenerator {
 				        for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
 				            if (accDetail.getAdjustedAmount() != null) {
 				                adjustedAmount = adjustedAmount.add(accDetail.getAdjustedAmount());
+				                log.info("adjustedAmount {} :",adjustedAmount);
 				            }
 				        }
 				    }
 				}
 				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
+				 log.info("totalPaidAmount {} :",totalPaidAmount);
+				 log.info("bill's total amount {} :",billObj.getTotalAmount());
 				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
 					paymentStatus = "PARTIALLY_PAID";
+					log.info("Entered 1");
 				} else if (totalPaidAmount.compareTo(billObj.getTotalAmount()) > 0) {
 					paymentStatus = "ADVANCE_PAID";
+					log.info("Entered 2");
 				} else {
 					paymentStatus = "PAID";
+					log.info("Entered 3");
 				}
 			} else {
+				log.info("Entered 5");
 				paymentStatus = billObj.getStatus().toString();
+				log.info("paymentStatus {} :", paymentStatus);
 			}
 
 			grbgObj.get("paymentStatuses").add(paymentStatus);
