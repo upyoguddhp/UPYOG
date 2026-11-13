@@ -2,23 +2,26 @@ package org.egov.garbageservice.service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.egov.garbageservice.util.GrbgConstants;
-import org.egov.garbageservice.util.RequestInfoWrapper;
+import java.util.Objects;
+
+import org.egov.garbageservice.contract.bill.Bill;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
+import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgBillTracker;
 import org.egov.garbageservice.model.contract.PDFRequest;
-import org.egov.garbageservice.contract.bill.Bill;
+import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.egov.garbageservice.contract.bill.BillDetail;
-import org.egov.garbageservice.contract.bill.BillAccountDetail;
-import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -123,7 +126,8 @@ public class PDFRequestGenerator {
 			String paymentDate = "";
 
 			GrbgBillTracker tracker = grbgBillTracker.stream()
-			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()))
+			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()) 
+			        		&& Objects.equals(billObj.getId(), t.getBillId()))
 			        .findFirst()
 			        .orElse(null);
 
@@ -152,13 +156,11 @@ public class PDFRequestGenerator {
 			String paymentStatus;
 
 			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
-				log.info("processign block entered");
 				BigDecimal chequeTxnAmount = BigDecimal.ZERO;
 				JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
 				if (trackerAdditionalDetail != null && trackerAdditionalDetail.has("chequeTxnAmount")
 						&& !trackerAdditionalDetail.get("chequeTxnAmount").isNull()) {
 					chequeTxnAmount = trackerAdditionalDetail.get("chequeTxnAmount").decimalValue();
-					log.info("chequeTxnAmount {} :",chequeTxnAmount);
 				}
 				BigDecimal adjustedAmount = BigDecimal.ZERO;
 				for (BillDetail billDetail : billObj.getBillDetails()) {
@@ -166,28 +168,20 @@ public class PDFRequestGenerator {
 				        for (BillAccountDetail accDetail : billDetail.getBillAccountDetails()) {
 				            if (accDetail.getAdjustedAmount() != null) {
 				                adjustedAmount = adjustedAmount.add(accDetail.getAdjustedAmount());
-				                log.info("adjustedAmount {} :",adjustedAmount);
 				            }
 				        }
 				    }
 				}
 				BigDecimal totalPaidAmount = chequeTxnAmount.add(adjustedAmount);
-				 log.info("totalPaidAmount {} :",totalPaidAmount);
-				 log.info("bill's total amount {} :",billObj.getTotalAmount());
 				if (totalPaidAmount.compareTo(billObj.getTotalAmount()) < 0) {
 					paymentStatus = "PARTIALLY_PAID";
-					log.info("Entered 1");
 				} else if (totalPaidAmount.compareTo(billObj.getTotalAmount()) > 0) {
 					paymentStatus = "ADVANCE_PAID";
-					log.info("Entered 2");
 				} else {
 					paymentStatus = "PAID";
-					log.info("Entered 3");
 				}
 			} else {
-				log.info("Entered 5");
 				paymentStatus = billObj.getStatus().toString();
-				log.info("paymentStatus {} :", paymentStatus);
 			}
 
 			grbgObj.get("paymentStatuses").add(paymentStatus);
@@ -262,7 +256,8 @@ public class PDFRequestGenerator {
 
 		    GrbgBillTracker tracker = grbgBillTracker.stream()
 		            .filter(t -> billObj.getConsumerCode() != null
-		                    && billObj.getConsumerCode().equals(t.getGrbgApplicationId()))
+		            		&& billObj.getConsumerCode().equals(t.getGrbgApplicationId())
+		            	    && Objects.equals(billObj.getId(), t.getBillId()))
 		            .findFirst()
 		            .orElse(null);
 		    boolean paymentProcessing = tracker != null
