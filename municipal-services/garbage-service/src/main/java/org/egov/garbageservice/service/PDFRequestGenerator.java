@@ -128,7 +128,7 @@ public class PDFRequestGenerator {
 
 			GrbgBillTracker tracker = grbgBillTracker.stream()
 			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()) 
-						&& Objects.equals(billObj.getId(), t.getBillId()))
+			        		&& Objects.equals(billObj.getId(), t.getBillId()))
 			        .findFirst()
 			        .orElse(null);
 
@@ -270,8 +270,8 @@ public class PDFRequestGenerator {
 
 		    GrbgBillTracker tracker = grbgBillTracker.stream()
 		            .filter(t -> billObj.getConsumerCode() != null
-		                    && billObj.getConsumerCode().equals(t.getGrbgApplicationId())
-		                    && Objects.equals(billObj.getId(), t.getBillId()))
+		            		&& billObj.getConsumerCode().equals(t.getGrbgApplicationId())
+		            	    && Objects.equals(billObj.getId(), t.getBillId()))
 		            .findFirst()
 		            .orElse(null);
 		    boolean paymentProcessing = tracker != null
