@@ -106,27 +106,26 @@ public class PDFService {
 		String template = null;
 		
 		if (Boolean.TRUE.equals(pdfRequest.getIsHybrid()) && StringUtils.isNotEmpty(pdfRequest.getHtmlTemplateContent())) {
+			Map<String, Object> pdfContextData = new HashMap<>();
+			addLogoContext(pdfRequest, pdfContextData);
+			String approverName = pdfRequest.getRequestInfo().getUserInfo().getUserName();
+			
+			if (StringUtils.isNotEmpty(approverName)) {
+				String signature = addSignatureFromMdms(pdfRequest, approverName);
+				pdfContextData.put("signature", signature);
+			}
+			
+			template = pdfRequest.getHtmlTemplateContent();
 
-		    Map<String, Object> pdfContextData = new HashMap<>();
+			for (Map.Entry<String, Object> entry : pdfContextData.entrySet()) {
 
-		    // Fetch logos from MDMS
-		    addLogoContext(pdfRequest, pdfContextData);
+				if (entry.getValue() != null) {
+					template = template.replace("${" + entry.getKey() + "}", entry.getValue().toString());
+				}
+			}
 
-		    template = pdfRequest.getHtmlTemplateContent();
-
-		    // Replace Thymeleaf logo expressions
-		    for (Map.Entry<String, Object> entry : pdfContextData.entrySet()) {
-
-		        if (entry.getValue() != null) {
-		            template = template.replace(
-		                "${" + entry.getKey() + "}",
-		                entry.getValue().toString()
-		            );
-		        }
-		    }
-
-		    template = ReportUtils.htmlContentCleanUp(template);
-		    template = ReportUtils.addMissingClosingTags(template);
+			template = ReportUtils.htmlContentCleanUp(template);
+			template = ReportUtils.addMissingClosingTags(template);
 
 		} else if (StringUtils.isNotEmpty(pdfRequest.getHtmlTemplateContent())) {
 			// Replace all special characters in the HTML template content.

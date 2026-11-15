@@ -328,7 +328,6 @@ public class NOCService {
 		private void createAndUploadPDF(NocRequest nocRequest) {
 			 if (nocRequest.getNoc() != null && nocRequest.getNoc().getApplicationNo() != null) {
 				 
-				 // create pdf
 				 PDFRequest pdfRequest = PDFRequest.builder()
 					        .RequestInfo(nocRequest.getRequestInfo())
 					        .key("certificate")
@@ -340,22 +339,20 @@ public class NOCService {
 				 
 				Resource resource = reportService.createNoSavePDF(pdfRequest);
 				//try catch for testibg only
+//				try {
+//				    File file = new File("C:/demo/certificate.pdf");
+//				    FileUtils.copyInputStreamToFile(resource.getInputStream(), file);
+//				} catch (IOException e) {
+//				    e.printStackTrace();
+//				}
+				
+				DmsRequest dmsRequest = generateDmsRequestByNocApplication(resource, nocRequest.getNoc(),
+						nocRequest.getRequestInfo());
 				try {
-				    File file = new File("C:/demo/certificate.pdf");
-
-				    FileUtils.copyInputStreamToFile(resource.getInputStream(), file);
-
+					DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
 				} catch (IOException e) {
-				    e.printStackTrace();
+					throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
 				}
-					
-					// upload pdf
-					DmsRequest dmsRequest = generateDmsRequestByNocApplication(resource, nocRequest.getNoc(), nocRequest.getRequestInfo());
-					try {
-						DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
-					} catch (IOException e) {
-						throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
-					}
 			}
 		}
 		
