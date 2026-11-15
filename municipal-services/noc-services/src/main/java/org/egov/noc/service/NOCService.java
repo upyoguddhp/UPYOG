@@ -41,6 +41,9 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -332,9 +335,19 @@ public class NOCService {
 					        .tenantId(nocRequest.getNoc().getTenantId())
 					        .htmlTemplateContent(nocRequest.getNoc().getCertificateTemplate())
 					        .data(new HashMap<>())
+					        .isHybrid(true)
 					        .build();
 				 
 				Resource resource = reportService.createNoSavePDF(pdfRequest);
+				//try catch for testibg only
+				try {
+				    File file = new File("C:/demo/certificate.pdf");
+
+				    FileUtils.copyInputStreamToFile(resource.getInputStream(), file);
+
+				} catch (IOException e) {
+				    e.printStackTrace();
+				}
 					
 					// upload pdf
 					DmsRequest dmsRequest = generateDmsRequestByNocApplication(resource, nocRequest.getNoc(), nocRequest.getRequestInfo());

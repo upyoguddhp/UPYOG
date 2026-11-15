@@ -40,4 +40,7 @@ public class PDFRequest {
 
 	@Builder.Default
 	private Boolean isHeaderFooterSkip = false;
+	
+	@Builder.Default
+	private Boolean isHybrid = false;
 }
