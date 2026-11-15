@@ -17,6 +17,9 @@ public class AppProperties {
     private final Integer earlyReconcileJobRunInterval;
 
     private final String saveTxnTopic;
+
+    @Value("${persister.save.pg.txns.with.details:save-pg-txns-with-details}")
+    private String saveTxnWithDetailsTopic;
     
     private final String saveTxnDetailsTopic;
 
@@ -117,6 +120,12 @@ public class AppProperties {
     
     @Value("${egov.egf.master.bankaccount.search.endpoint}")
     private String egfMasterBankaccountSearchEndpoint;
+    
+    @Value("${egov.property.payment.processing.topic}")
+    private String propertyPaymentProcessingTopic;
+
+    @Value("${egov.grbg.payment.processing.topic}")
+    private String grbgPaymentProcessingTopic;
 
     @Autowired
     public AppProperties(Environment environment){

@@ -14,6 +14,7 @@ public class CalculateTaxPreviewResponse {
 
     private String propertyId;
     private String tenantId;
+    private String ownerOrOccupier;
     private String oldPropertyId;
     private Object address;  
     private BigDecimal totalAnnualTax;

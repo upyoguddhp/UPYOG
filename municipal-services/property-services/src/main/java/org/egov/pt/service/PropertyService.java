@@ -100,6 +100,7 @@ import org.egov.pt.models.AuditDetails;
 import org.egov.pt.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.egov.common.contract.response.ResponseInfo;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 
@@ -1019,7 +1020,7 @@ public class PropertyService {
 
 		Property property = properties.stream().findFirst().orElse(null);
 		if (null == property) {
-			return null;
+			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for propertyId: " + propertyId);
 		}
 
 		PtTaxCalculatorTrackerSearchCriteria ptTaxCalculatorTrackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria
@@ -1030,7 +1031,8 @@ public class PropertyService {
 
 		PtTaxCalculatorTracker ptTaxCalculatorTracker = ptTaxCalculatorTrackers.stream().findFirst().orElse(null);
 		if (null == ptTaxCalculatorTracker) {
-			return null;
+			throw new CustomException("BILL_TRACKER_NOT_FOUND",
+					"No tax calculator tracker found for propertyId: " + propertyId + " and billId: " + billId);
 		}
 
 		BillSearchCriteria.BillSearchCriteriaBuilder builder =
@@ -1051,12 +1053,13 @@ public class PropertyService {
 		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
 
 		if (null == billResponse || CollectionUtils.isEmpty(billResponse.getBill())) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND",
+					"No bill found for billId: " + ptTaxCalculatorTracker.getBillId() + " and status: " + status);
 		}
 
 		Bill bill = billResponse.getBill().stream().findFirst().orElse(null);
 		if (null == bill) {
-			return null;
+			throw new CustomException("BILL_NOT_FOUND", "No bill found for billId: " + ptTaxCalculatorTracker.getBillId());
 		}
 
 		MdmsResponse mdmsResponse = mdmsService.getPropertyReabateDaysMdmsData(requestInfoWrapper.getRequestInfo(),
@@ -1066,6 +1069,64 @@ public class PropertyService {
 
 		PDFRequest pdfRequest = pdfRequestGenerator.generatePdfRequest(requestInfoWrapper, property,
 				ptTaxCalculatorTracker, bill, tenantIdDaysMap);
+
+		return reportService.createNoSavePDF(pdfRequest);
+	}
+	
+	public ResponseEntity<Resource> generatePropertyNoticePdf(RequestInfoWrapper requestInfoWrapper,
+			@Valid String propertyId, @Valid String billId, String status, String tenantId) {
+
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder().isSchedulerCall(true)
+				.propertyIds(Collections.singleton(propertyId)).build();
+
+		List<Property> properties = searchProperty(propertyCriteria, requestInfoWrapper.getRequestInfo(), null);
+
+		Property property = properties.stream().findFirst().orElse(null);
+		if (property == null) {
+			return null;
+		}
+
+		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria = PtTaxCalculatorTrackerSearchCriteria.builder()
+				.billId(billId).propertyIds(Collections.singleton(propertyId)).limit(1).build();
+
+		List<PtTaxCalculatorTracker> trackers = getTaxCalculatedProperties(trackerSearchCriteria);
+
+		PtTaxCalculatorTracker ptTaxCalculatorTracker = trackers.stream().findFirst().orElse(null);
+
+		if (ptTaxCalculatorTracker == null) {
+			return null;
+		}
+
+		BillSearchCriteria.BillSearchCriteriaBuilder builder = BillSearchCriteria.builder()
+				.tenantId(ptTaxCalculatorTracker.getTenantId())
+				.billId(Collections.singleton(ptTaxCalculatorTracker.getBillId()));
+
+		if (status != null && !status.trim().isEmpty()) {
+			Demand.StatusEnum dynamicStatus = Demand.StatusEnum.valueOf(status.trim().toUpperCase());
+			builder.status(dynamicStatus);
+		}
+
+		BillSearchCriteria billSearchCriteria = builder.build();
+
+		BillResponse billResponse = billService.searchBill(billSearchCriteria, requestInfoWrapper.getRequestInfo());
+
+		if (billResponse == null || CollectionUtils.isEmpty(billResponse.getBill())) {
+			return null;
+		}
+
+		Bill bill = billResponse.getBill().stream().findFirst().orElse(null);
+
+		if (bill == null) {
+			return null;
+		}
+
+		MdmsResponse mdmsResponse = mdmsService.getPropertyReabateDaysMdmsData(requestInfoWrapper.getRequestInfo(),
+				null);
+
+		Map<String, Integer> tenantIdDaysMap = getUlbDaysMap(mdmsResponse);
+
+		PDFRequest pdfRequest = pdfRequestGenerator.generateNoticePdfRequest(requestInfoWrapper, property,
+				ptTaxCalculatorTracker, bill, tenantIdDaysMap, tenantId);
 
 		return reportService.createNoSavePDF(pdfRequest);
 	}
@@ -1081,7 +1142,7 @@ public class PropertyService {
 		PtTaxCalculatorTrackerSearchCriteria trackerSearchCriteria =
 		        PtTaxCalculatorTrackerSearchCriteria.builder()
 		        .demandIds(Collections.singleton(demandId))
-		        .billStatus(Collections.singleton(BillStatus.ACTIVE))
+				.billStatus(new HashSet<>(Arrays.asList(BillStatus.ACTIVE, BillStatus.ADVANCE_ADJUSTED)))
 				.build();
 
 		List<PtTaxCalculatorTracker> trackers = repository.getTaxCalculatedProperties(trackerSearchCriteria);
@@ -1094,6 +1155,13 @@ public class PropertyService {
 
 		if (trackers.size() > 1) {
 			throw new CustomException("MULTI_TRACKER", "Multiple trackers for demand id");
+		}
+		
+		if (Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
+		    throw new CustomException(
+		            "PAYMENT_PROCESSING",
+		            "Bill cannot be cancelled because payment processing is in progress"
+		    );
 		}
 		
 		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder()
@@ -1158,17 +1226,24 @@ public class PropertyService {
 					.tenantId(cancelRequest.getTenantId())
 					.status(StatusEnum.EXPIRED)
 					.build();
+			
+			boolean wasAdvanceAdjusted = previousTracker.getAdditionalDetails() != null
+					&& previousTracker.getAdditionalDetails().isArray() && previousTracker.getAdditionalDetails().size() > 0
+					&& previousTracker.getAdditionalDetails().get(0).path("advanceAdjusted").asBoolean(false);
+
+			Bill.StatusEnum billStatus = wasAdvanceAdjusted ? Bill.StatusEnum.ADVANCE_ADJUSTED : Bill.StatusEnum.ACTIVE;
+			
 			BillResponse prevBillResponse = billService.searchBill(prevBillSearch, cancelRequest.getRequestInfo());
 			if (!CollectionUtils.isEmpty(prevBillResponse.getBill())) {
 				Bill prevBill = prevBillResponse.getBill().get(0);
 
-				prevBill.setStatus(Bill.StatusEnum.ACTIVE);
+				prevBill.setStatus(billStatus);
 				billService.updateBill(cancelRequest.getRequestInfo(), Collections.singletonList(prevBill));
 
 				AuditDetails prevAudit = commonUtils.buildCreateAuditDetails(cancelRequest.getRequestInfo());
 				PtTaxCalculatorTracker prevTrackerToUpdate = PtTaxCalculatorTracker.builder()
 					    .uuid(previousTracker.getUuid())
-					    .billStatus(BillStatus.ACTIVE)
+					    .billStatus(BillStatus.valueOf(billStatus.name()))
 					    .auditDetails(prevAudit)
 					    .rebateAmount(previousTracker.getRebateAmount())           
 					    .penaltyAmount(previousTracker.getPenaltyAmount())         
@@ -1291,7 +1366,19 @@ public class PropertyService {
 		if (!CollectionUtils.isEmpty(properties)) {
 			
 			checkPropertyArears(genrateArrearRequest.getDemands(), properties.get(0));
+			
+			List<PtTaxCalculatorTracker> existingTrackers = propertyService.getTaxCalculatedProperties(
+			        PtTaxCalculatorTrackerSearchCriteria.builder()
+			                .propertyIds(Collections.singleton(properties.get(0).getPropertyId()))
+			                .build());
+
+			boolean paymentProcessing = !CollectionUtils.isEmpty(existingTrackers)
+			        && existingTrackers.stream()
+			                .anyMatch(tracker -> Boolean.TRUE.equals(tracker.getIsPaymentProcessing()));
+
 			AtomicBoolean arrearGenerated = new AtomicBoolean(false);
+			AtomicBoolean processingFound = new AtomicBoolean(false);
+			
 			genrateArrearRequest.getDemands().stream().forEach(demand -> {
 				
 				Map<String, Object> demandAdditionalDetail = null;
@@ -1301,6 +1388,13 @@ public class PropertyService {
 					log.warn("Skipping arrear generation for property {} due to overlapping bill period",
 							properties.get(0).getPropertyId());
 
+					return;
+				}
+				
+				if (paymentProcessing) {
+					log.info("Skipping arrear generation for property {} because payment is being processed",
+							properties.get(0).getPropertyId());
+					processingFound.set(true);
 					return;
 				}
 
@@ -1379,16 +1473,20 @@ public class PropertyService {
 					
 					PtTaxCalculatorTracker ptTaxCalculatorTracker = propertyService
 							.saveToPtTaxCalculatorTracker(ptTaxCalculatorTrackerRequest);
+					syncArrearTrackerWithBillStatus(ptTaxCalculatorTracker, genrateArrearRequest.getRequestInfo());
 					arrearGenerated.set(true);
 				} else {
 					throw new CustomException("INVALID_CONSUMERCODE", "Bill not generated");
 				}
 			});
 			if (arrearGenerated.get()) {
-			    message = "Arrear Generated Successfully";
+				message = "Arrear Generated Successfully";
+			} else if (processingFound.get()) {
+				message = "Cheque clearance is pending. Please wait for the cheque status to be updated (PAID/REJECTED) before generating a new bill.";
+				isSuccess = false;
 			} else {
-			    message = "No arrear generated. Bill already exists for overlapping period.";
-			    isSuccess = false;
+				message = "No arrear generated. Bill already exists for overlapping period.";
+				isSuccess = false;
 			}
 		} else {
 			message = "Invalid Property Details";
@@ -1716,6 +1814,56 @@ public class PropertyService {
 	    return ResponseEntity.ok(response);
 	}
 
+	public void UpdatePtTrackerStatus(PtTaxCalculatorTracker tracker) {
+		repository.updateStatus(tracker);
+	}
+	
+	private void syncArrearTrackerWithBillStatus(PtTaxCalculatorTracker tracker, RequestInfo requestInfo) {
+
+		if (tracker == null || tracker.getBillId() == null) {
+			return;
+		}
+
+		BillSearchCriteria billSearchCriteria = BillSearchCriteria.builder().tenantId(tracker.getTenantId())
+				.consumerCode(Collections.singleton(tracker.getPropertyId())).service("PROPERTY")
+				.billId(Collections.singleton(tracker.getBillId())).build();
+
+		List<Bill> bills = billService.searchBill(billSearchCriteria, requestInfo).getBill();
+
+		if (CollectionUtils.isEmpty(bills)) {
+			return;
+		}
+
+		Bill currentBill = bills.get(0);
+
+		if (Bill.StatusEnum.ADVANCE_ADJUSTED.equals(currentBill.getStatus())) {
+
+			ArrayNode additionalDetails;
+
+			if (tracker.getAdditionalDetails() != null && tracker.getAdditionalDetails().isArray()) {
+				additionalDetails = (ArrayNode) tracker.getAdditionalDetails();
+			} else {
+				additionalDetails = mapper.createArrayNode();
+			}
+
+			ObjectNode detailsObject;
+
+			if (additionalDetails.size() > 0) {
+				detailsObject = (ObjectNode) additionalDetails.get(0);
+			} else {
+				detailsObject = mapper.createObjectNode();
+				additionalDetails.add(detailsObject);
+			}
+
+			detailsObject.put("advanceAdjusted", true);
+
+			tracker.setAdditionalDetails(additionalDetails);
+			repository.updateTrackerAdditionalDetails(tracker);
+		}
+
+		tracker.setBillStatus(BillStatus.valueOf(currentBill.getStatus().name()));
+		propertyService.UpdatePtTrackerStatus(tracker);
+	}
 
 
 }

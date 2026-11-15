@@ -11,6 +11,9 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.garbageservice.model.DdpPrintingSearchResponse;
+import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
+import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
 import org.egov.garbageservice.model.GarbageAccountActionResponse;
 import org.egov.garbageservice.model.GarbageAccountRequest;
@@ -181,5 +184,30 @@ public class GarbageAccountController {
 	public ResponseEntity<Map<String, Object>> createArear(
 			@Valid @RequestBody GenrateArrearRequest genrateArrearRequest) {
 		return ResponseEntity.ok(service.generateArrear(genrateArrearRequest));
+	}
+
+	/**
+	 * Partially updates the DDP (door plate) workflow fields on one account by
+	 * uuid: vendor print verification, ULB verification, or installation +
+	 * lat/long. Called by digital-door-plate's role-specific verify/install
+	 * endpoints; only the field(s) relevant to the calling role need to be
+	 * set, the rest are left untouched.
+	 */
+	@PostMapping("/_updateDdpWorkflow")
+	public ResponseEntity<DdpWorkflowUpdateResponse> updateDdpWorkflow(
+			@RequestBody DdpWorkflowUpdateRequest ddpWorkflowUpdateRequest) {
+		return ResponseEntity.ok(service.updateDdpWorkflowFields(ddpWorkflowUpdateRequest));
+	}
+
+	/**
+	 * Searches garbage accounts ready for printing (isReadyForPrinting=true)
+	 * for the ULB/wards in the search criteria (tenantId + wardNames), and
+	 * enriches each with owner/property details from property-services
+	 * (looked up by systemPropertyId), in the door plate QR payload shape.
+	 */
+	@PostMapping("/_searchDdpPrintingData")
+	public ResponseEntity<DdpPrintingSearchResponse> searchDdpPrintingData(
+			@RequestBody SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
+		return ResponseEntity.ok(service.searchDdpPrintingData(searchCriteriaGarbageAccountRequest));
 	}
 }

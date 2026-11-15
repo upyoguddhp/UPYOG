@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.egov.demand.web.contract.CustomAmountUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +79,7 @@ public class BillRepositoryV2 {
 						ps.setString(4, tenantId);
 						ps.setString(5, consumerCode);
 						ps.setString(6, BillStatus.ACTIVE.name());
+						ps.setString(7, BillStatus.ADVANCE_ADJUSTED.name());
 					}
 
 					@Override
@@ -251,7 +253,8 @@ public class BillRepositoryV2 {
 			return 0;
 		List<Object> preparedStmtList = new ArrayList<>();
 		BillStatus status = bills.get(0).getStatus();
-		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID))) {
+		if (!(status.equals(BillStatus.ACTIVE) || status.equals(BillStatus.PARTIALLY_PAID)
+				|| status.equals(BillStatus.ADVANCE_ADJUSTED))) {
 			if (status.equals(BillStatus.PAID)) {
 				if ("ADVT".equalsIgnoreCase(updateBillCriteria.getBusinessService())
 						&& BillStatus.CANCELLED.equals(updateBillCriteria.getStatusToBeUpdated())) {
@@ -467,4 +470,21 @@ public class BillRepositoryV2 {
 		});
 	}
 	
+	public void updateCustomBillAmount(CustomAmountUpdateRequest request) {    
+
+	    String billId = request.getBillId();
+	    BigDecimal customAmount = request.getCustomAmount();
+	    String tenantId = request.getTenantId();
+	    String userId = request.getRequestInfo().getUserInfo().getUuid();
+	    Long currentTime = System.currentTimeMillis();
+	    String demandId = request.getDemandId();
+
+		jdbcTemplate.update(BillQueryBuilder.BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId,
+				currentTime, demandId, tenantId);
+
+		jdbcTemplate.update(BillQueryBuilder.BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY, customAmount, userId, currentTime,
+				billId, demandId, tenantId);
+	    
+		jdbcTemplate.update(BillQueryBuilder.BILL_UPDATE_AUDIT_QUERY, userId, currentTime, billId, tenantId);
+	}
 }

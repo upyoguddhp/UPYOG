@@ -54,7 +54,7 @@ public class DemandService {
 				.taxAmount(taxAmount).collectionAmount(BigDecimal.ZERO).build();
 		Calendar cal = Calendar.getInstance();
 
-		cal.add(Calendar.DAY_OF_MONTH, Integer.valueOf(grbgConfig.getGrbgBillExpiryAfter()));
+		cal.add(Calendar.YEAR, 1);
 		cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 23, 59, 59);
 		Map<String, Object> additionalDetail = (Map<String, Object>) generateBillRequest.getAdditionalDetail();
 
@@ -154,6 +154,19 @@ public class DemandService {
 		else
 			return response.getDemands();
 
+	}
+	
+	List<Demand> searchDemandbyDemandId(String tenantId, Set<String> demandIds, Set<String> consumerCodes,
+			RequestInfo requestInfo, String businessService) {
+
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		DemandResponse response = demandRepository.searchByDemandID(tenantId, demandIds, consumerCodes, requestInfoWrapper, businessService);
+
+		if (CollectionUtils.isEmpty(response.getDemands())) {
+			return null;
+		} else {
+			return response.getDemands();
+		}
 	}
 	
     public List<Demand> cancelDemand(String tenantId, Set<String> demandIds, RequestInfo requestInfo,

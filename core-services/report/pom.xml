@@ -142,6 +142,11 @@
 		</dependency>
     </dependencies>
     <repositories>
+        <!-- Central first: jitpack.io answers every path with an empty 200 response, which Maven would otherwise cache as a corrupt jar -->
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
         <repository>
             <id>repo.egovernments.org</id>
             <name>eGov ERP Releases Repository</name>

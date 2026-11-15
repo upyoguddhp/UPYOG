@@ -122,6 +122,12 @@ config:
       - work-dir: "core-services/egov-enc-service/src/main/resources/db"
         image-name: "egov-enc-service-db"
 
+  - name: "builds/upyog/core-services/gateway"
+    build:
+      - work-dir: "core-services/gateway"
+        image-name: "gateway"
+        dockerfile: "build/maven/Dockerfile"
+
   - name: "builds/upyog/core-services/egov-filestore"
     build:
       - work-dir: "core-services/egov-filestore"
@@ -632,7 +638,15 @@ config:
         image-name: "garbage-service"
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "municipal-services/garbage-service/src/main/resources/db"
-        image-name: "garbage-service-db" 
+        image-name: "garbage-service-db"
+
+  - name: "builds/municipal-services/digital-door-plate"
+    build:
+      - work-dir: "municipal-services/digital-door-plate"
+        image-name: "digital-door-plate"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "municipal-services/digital-door-plate/src/main/resources/db"
+        image-name: "digital-door-plate-db"
         
   - name: "builds/municipal-services/advertisement-canopy-service"
     build:

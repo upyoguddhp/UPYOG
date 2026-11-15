@@ -18,7 +18,14 @@ public class SearchCriteriaGarbageAccount {
     private List<Long> garbageId;
 
     private List<String> propertyId;
-    
+
+    /**
+     * Filters on acc.system_property_id, the property-services propertyId
+     * this garbage account is DDP-mapped to. Used by property-services to
+     * fetch isReadyForPrinting/installationDone for a set of properties.
+     */
+    private List<String> systemPropertyId;
+
     private List<String> uuid;
     
     private List<String> user_uuid;
@@ -66,9 +73,24 @@ public class SearchCriteriaGarbageAccount {
     private Boolean isUserUuidNull;
     
     private Boolean isDdpVerified;
-    
+
     private Boolean ddpPrintVerified;
-    
+
+    private Boolean isReadyForPrinting;
+
+    /**
+     * Filters on eg_grbg_account_ddp: "VERIFIED"/"REJECTED".
+     */
+    private List<String> vendorPrintVerified;
+
+    private Boolean ulbVerified;
+
+    private Boolean installationDone;
+
+    private Boolean ddpPrintingDone;
+
+    private Boolean ddpDispatched;
+
     private Boolean isMonthlyBilling;
     
 	@Builder.Default
@@ -98,6 +120,12 @@ public class SearchCriteriaGarbageAccount {
 				.isUserUuidNull(this.isUserUuidNull)
 				.isDdpVerified(this.isDdpVerified)
 				.ddpPrintVerified(this.ddpPrintVerified)
+				.isReadyForPrinting(this.isReadyForPrinting)
+				.vendorPrintVerified(copyList(this.vendorPrintVerified))
+				.ulbVerified(this.ulbVerified)
+				.installationDone(this.installationDone)
+				.ddpPrintingDone(this.ddpPrintingDone)
+				.ddpDispatched(this.ddpDispatched)
 				.build();
 	}
 

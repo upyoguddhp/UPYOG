@@ -12,10 +12,14 @@ import org.egov.garbageservice.model.GrbgBillFailure;
 import org.egov.garbageservice.model.GrbgBillTracker;
 import org.egov.garbageservice.model.GrbgBillTrackerSearchCriteria;
 import org.egov.garbageservice.repository.rowmapper.GrbgBillTrackerRowMapper;
+import org.egov.garbageservice.util.RequestInfoWrapper;
+import org.egov.garbageservice.util.RestCallRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.egov.garbageservice.model.CustomAmountUpdateRequest;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,6 +48,15 @@ public class GarbageBillTrackerRepository {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Value("${egov.bill.context.host}")
+	private String billHost;
+	
+	@Value("${egov.custom.update.endpoint}")
+	private String customUpdateEndpoint;
+	
+	@Autowired
+	private RestCallRepository restCallRepository;
+	
 	private static final String GRBG_BILL_TRACKER_SEARCH_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt";
 
 	private static final String INSERT_BILL_TRACKER = "INSERT INTO eg_grbg_bill_tracker (uuid, grbg_application_id, tenant_id, month, year, from_date, garbage_bill_without_rebate, rebate_amount, "
@@ -51,8 +64,32 @@ public class GarbageBillTrackerRepository {
 			+ "(:uuid, :grbgApplicationId, :tenantId, :month, :year, :fromDate, :garbageBillWithoutRebate, :rebateAmount, :toDate, :grbgBillAmount, :grbgBillWithoutPenalty, :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate,:ward,:billId,:demandId,:type,:additionaldetail::JSONB)";
 	
 	private static final String UPDATE_BILL_TRACKER_STATUS = "UPDATE eg_grbg_bill_tracker " +
-		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime ";
-
+		    "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime, advance_paid = :advancePaid ";
+	
+	private static final String UPDATE_TRACKER_ADDITIONAL_DETAIL = "UPDATE eg_grbg_bill_tracker "
+			+ "SET additionaldetail = CAST(:additionalDetail AS jsonb), " + "last_modified_by = :lastModifiedBy, "
+			+ "last_modified_time = :lastModifiedTime " + "WHERE bill_id = :billId";
+	
+	private static final String UPDATE_BILL_TRACKER_PAYMENT_STATUS =
+	        "UPDATE eg_grbg_bill_tracker " +
+	        "SET is_payment_processing = :status, " +
+	        "additionaldetail = CASE " +
+	        "    WHEN :status = true THEN " +
+	        "        jsonb_set( " +
+	        "            jsonb_set( " +
+	        "                COALESCE(additionaldetail, '{}'::jsonb), " +
+	        "                '{chequeTxnAmount}', " +
+	        "                to_jsonb(CAST(:txnAmount AS numeric)), " +
+	        "                true " +
+	        "            ), " +
+	        "            '{chequeTxnDate}', " +
+	        "            to_jsonb(CAST(:transactionDate AS text)), " +
+	        "            true " +
+	        "        ) " +
+	        "    ELSE additionaldetail " +
+	        "END " +
+	        "WHERE bill_id = :billId";
+	
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
 //			+ "(:id, :consumer_code,:module_name, :tenant_id, failure_reason,:month, :year, :from_date, :to_date, :request_payload, :response_payload, :status_code)";
@@ -99,6 +136,19 @@ public class GarbageBillTrackerRepository {
 		    "AND egbt.rebate_amount > 0 " +
 		    "AND egbt.bill_id IS NOT NULL";
 	
+	private static final String UPDATE_CUSTOM_TRACKER_AMOUNT = 
+			"UPDATE eg_grbg_bill_tracker " +
+		    "SET grbg_bill_amount = :amount, " +
+		    "last_modified_by = :modifiedBy, " +
+		    "last_modified_time = :modifiedTime, " +
+		    "additionaldetail = jsonb_set( " +
+		    "   COALESCE(additionaldetail, '{}'::jsonb), " +
+		    "   '{reason}', " +
+		    "   to_jsonb(:reason::text) " +
+		    ") " +
+		    "WHERE bill_id = :billId " +
+		    "AND tenant_id = :tenantId";
+	
 	private static final String ACTIVATE_PREVIOUS_TRACKER = "UPDATE eg_grbg_bill_tracker "
 			+ "SET status = :status, last_modified_by = :lastModifiedBy, last_modified_time = :lastModifiedTime "
 			+ "WHERE bill_id = :billId AND status = 'EXPIRED'";
@@ -108,7 +158,7 @@ public class GarbageBillTrackerRepository {
             "last_modified_by = :lastModifiedBy, " +
             "last_modified_time = :lastModifiedTime " +
             "WHERE grbg_application_id = :grbgApplicationId " +
-            "AND status = 'ACTIVE'";
+            "AND status IN ('ACTIVE', 'ADVANCE_ADJUSTED')";
 	
 	private static final String EXTRACT_TRACKER_QUERY = "SELECT * FROM eg_grbg_bill_tracker egbt WHERE 1=1";
 
@@ -210,7 +260,7 @@ public class GarbageBillTrackerRepository {
 
 	public int updateStatusBillTracker(GrbgBillTracker grbgBillTracker) {
 		StringBuilder builder = new StringBuilder(UPDATE_BILL_TRACKER_STATUS);
-		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID') ");
+		builder.append(" WHERE (status = 'ACTIVE' OR status = 'PARTIALLY_PAID' OR status = 'ADVANCE_ADJUSTED') ");
 
         Map<String, Object> updateTrackerStatus = new HashMap<>();
 
@@ -232,16 +282,39 @@ public class GarbageBillTrackerRepository {
         updateTrackerStatus.put("status",grbgBillTracker.getStatus());
         updateTrackerStatus.put("lastModifiedTime", grbgBillTracker.getAuditDetails().getLastModifiedDate());
         updateTrackerStatus.put("lastModifiedBy", grbgBillTracker.getAuditDetails().getLastModifiedBy());
+        updateTrackerStatus.put("advancePaid", grbgBillTracker.getAdvancePaid());
 		return namedParameterJdbcTemplate.update(builder.toString(), updateTrackerStatus);
 //		return builder.toString();
 	}
 	
-	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails) {
+	public void updatePaymentProcessing(String billId, boolean isPaymentProcessing, String txnAmount, String transactionDate) {
+		String query = UPDATE_BILL_TRACKER_PAYMENT_STATUS;
+		Map<String, Object> params = new HashMap<>();
+		params.put("billId", billId);
+		params.put("status", isPaymentProcessing);
+		params.put("txnAmount", txnAmount);
+		params.put("transactionDate", transactionDate);
+		namedParameterJdbcTemplate.update(query, params);
+	}
+	
+	public int updateTrackerAdditionalDetails(GrbgBillTracker tracker) {
+
+	    Map<String, Object> params = new HashMap<>();
+
+	    params.put("billId", tracker.getBillId());
+	    params.put("additionalDetail", tracker.getAdditionaldetail().toString());
+	    params.put("lastModifiedBy", tracker.getAuditDetails().getLastModifiedBy());
+	    params.put("lastModifiedTime", tracker.getAuditDetails().getLastModifiedDate());
+
+	    return namedParameterJdbcTemplate.update(UPDATE_TRACKER_ADDITIONAL_DETAIL,params);
+	}
+	
+	public int activatePreviousTrackerByBillId(String billId, AuditDetails auditDetails, String status) {
 
 		String query = ACTIVATE_PREVIOUS_TRACKER;
 
 		Map<String, Object> params = new HashMap<>();
-		params.put("status", "ACTIVE");
+		params.put("status", status);
 		params.put("billId", billId);
 		params.put("lastModifiedBy", auditDetails.getLastModifiedBy());
 		params.put("lastModifiedTime", auditDetails.getLastModifiedDate());
@@ -422,7 +495,46 @@ public class GarbageBillTrackerRepository {
 	        grbgBillTrackerRowMapper
 	    );
 	}
+		
+	public void updateCustomTrackerAmount(CustomAmountUpdateRequest request) {
+
+	    String query = UPDATE_CUSTOM_TRACKER_AMOUNT;
+
+	    Map<String, Object> paramMap = new HashMap<>();
+
+	    paramMap.put("amount", request.getCustomAmount());
+	    paramMap.put("modifiedBy", request.getRequestInfo().getUserInfo().getUuid());
+	    paramMap.put("modifiedTime", System.currentTimeMillis());
+	    paramMap.put("reason", request.getReason());
+	    paramMap.put("billId", request.getBillId());
+	    paramMap.put("tenantId", request.getTenantId());
+
+	    namedParameterJdbcTemplate.update(query, paramMap);
+	    log.info("Tracker updated with custom amount");
+	    updateCustomBillAmount(request);
+	}
 	
+	private void updateCustomBillAmount(CustomAmountUpdateRequest request) {
+
+	    StringBuilder uri = new StringBuilder();
+	    uri.append(billHost).append(customUpdateEndpoint); 
+
+	    Map<String, Object> body = new HashMap<>();
+	    body.put("RequestInfo", request.getRequestInfo());
+	    body.put("tenantId", request.getTenantId());
+	    body.put("billId", request.getBillId());
+	    body.put("demandId",request.getDemandId());
+	    body.put("customAmount", request.getCustomAmount());
+	    body.put("reason", request.getReason());
+
+	    try {
+	    	restCallRepository.fetchResult(uri, body);
+	    } catch (Exception e) {
+	        throw new CustomException("BILLING_UPDATE_FAILED",
+	                "Tracker updated but billing update failed: " + e.getMessage());
+	    }
+	}
+
 	public List<GrbgBillTracker> extractTrackers(GrbgBillTrackerSearchCriteria criteria) {
 
 		StringBuilder query = new StringBuilder(EXTRACT_TRACKER_QUERY);

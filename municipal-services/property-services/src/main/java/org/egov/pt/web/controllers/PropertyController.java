@@ -27,6 +27,7 @@ import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.oldProperty.OldPropertyCriteria;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchResponse;
+import org.egov.pt.service.EnrichmentService;
 import org.egov.pt.service.FuzzySearchService;
 import org.egov.pt.service.MigrationService;
 import org.egov.pt.service.PropertyEncryptionService;
@@ -85,6 +86,9 @@ public class PropertyController {
 
 	@Autowired
 	PropertyEncryptionService propertyEncryptionService;
+
+	@Autowired
+	private EnrichmentService enrichmentService;
 
 	@PostMapping("/_create")
 	public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
@@ -206,6 +210,8 @@ public class PropertyController {
 
 			properties = propertyService.searchProperty(propertyCriteria, requestInfoWrapper.getRequestInfo(),
 					propertyCriteriaMap);
+
+			enrichmentService.enrichGarbageDdpDetails(properties, requestInfoWrapper.getRequestInfo());
 		}
 
 		log.info("Property count after search" + properties.size());
@@ -383,6 +389,15 @@ public class PropertyController {
 
 		return response;
 	}
+	
+	@PostMapping("/_generatePropertyNoticePdf")
+	public ResponseEntity<Resource> generatePropertyNoticePdf(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@RequestParam String propertyId, @RequestParam(required = false) String billId,
+			@RequestParam(required = false) String status, @RequestParam String tenantId) {
+		ResponseEntity<Resource> response = propertyService.generatePropertyNoticePdf(requestInfoWrapper, propertyId,
+				billId, status, tenantId);
+		return response;
+	}
 
 	@PostMapping("/_checkMasters")
 	public ResponseEntity<Map<String, Object>> checkMasters(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
@@ -478,6 +493,8 @@ return ResponseEntity
 
 			properties = propertyService.searchProperty(propertyCriteria, requestInfoWrapper.getRequestInfo(),
 					propertyCriteriaMap);
+
+			enrichmentService.enrichGarbageDdpDetails(properties, requestInfoWrapper.getRequestInfo());
 		}
 
 		log.info("Property count after search" + properties.size());

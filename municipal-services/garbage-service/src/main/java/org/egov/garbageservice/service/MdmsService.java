@@ -1,6 +1,9 @@
 package org.egov.garbageservice.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.garbageservice.model.DdpPrintingUlbWard;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.util.GrbgConstants;
 import org.egov.garbageservice.util.RestCallRepository;
@@ -293,5 +297,83 @@ public class MdmsService {
 	    return rate;
 	}
 
+	/**
+	 * Fetches every active ULB/ward combination enabled for door plate
+	 * printing from the ULBS.DdpPrinting MDMS v2 master that was added
+	 * <b>today</b> (per the record's {@code auditDetails.createdTime}, in
+	 * the system default zone), paging through the full result set. The
+	 * request body is built as a plain map (rather than the
+	 * org.egov.mdms.model v1 client types used elsewhere in this class)
+	 * because the mdms-v2 search endpoint expects the schemaCode/filterMap-
+	 * based criteria shape, not the v1 moduleName/masterDetails shape.
+	 *
+	 * <p>The master's {@code data} JSON is expected to look like
+	 * {@code {"count": 1, "ulbName": "Arki", "wardName": "Jhinwar Muhalla"}};
+	 * {@code count} is not used by this method.
+	 */
+	public List<DdpPrintingUlbWard> fetchDdpPrintingUlbWards(RequestInfo requestInfo, String tenantId) {
+
+		List<DdpPrintingUlbWard> ulbWards = new ArrayList<>();
+		String url = config.getMdmsV2Host() + config.getMdmsV2SearchEndpoint();
+		int limit = 100;
+		int offset = 0;
+		LocalDate today = LocalDate.now(ZoneId.systemDefault());
+
+		while (true) {
+			Map<String, Object> filterMap = new LinkedHashMap<>();
+			filterMap.put("active", true);
+
+			Map<String, Object> mdmsCriteria = new LinkedHashMap<>();
+			mdmsCriteria.put("tenantId", tenantId);
+			mdmsCriteria.put("schemaCode", GrbgConstants.MDMS_SCHEMA_CODE_DDP_PRINTING);
+			mdmsCriteria.put("filterMap", filterMap);
+			mdmsCriteria.put("isActive", true);
+			mdmsCriteria.put("offset", offset);
+			mdmsCriteria.put("limit", limit);
+
+			Map<String, Object> request = new LinkedHashMap<>();
+			request.put("RequestInfo", requestInfo);
+			request.put("MdmsCriteria", mdmsCriteria);
+
+			log.info("[MDMS][DdpPrinting] Fetching ULB/ward list, offset={}, limit={}", offset, limit);
+
+			Object response = restTemplate.postForObject(url, request, Object.class);
+			JsonNode root = objectMapper.convertValue(response, JsonNode.class);
+			JsonNode mdmsArray = root.path("mdms");
+
+			if (!mdmsArray.isArray() || mdmsArray.isEmpty()) {
+				break;
+			}
+
+			for (JsonNode record : mdmsArray) {
+				long createdTime = record.path("auditDetails").path("createdTime").asLong(-1);
+				if (createdTime < 0) {
+					continue;
+				}
+				LocalDate createdDate = Instant.ofEpochMilli(createdTime).atZone(ZoneId.systemDefault())
+						.toLocalDate();
+				if (!today.equals(createdDate)) {
+					continue;
+				}
+
+				JsonNode data = record.path("data");
+				String ulbName = data.path("ulbName").asText(null);
+				String wardName = data.path("wardName").asText(null);
+				if (StringUtils.isNotEmpty(ulbName) && StringUtils.isNotEmpty(wardName)) {
+					ulbWards.add(DdpPrintingUlbWard.builder().ulbName(ulbName).wardName(wardName).build());
+				}
+			}
+
+			if (mdmsArray.size() < limit) {
+				break;
+			}
+			offset += limit;
+		}
+
+		log.info("[MDMS][DdpPrinting] Resolved {} ULB/ward combination(s) added today for tenantId={}",
+				ulbWards.size(), tenantId);
+
+		return ulbWards;
+	}
 
 }

@@ -12,6 +12,9 @@ import org.egov.demand.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Component
 public class BillQueryBuilder {
@@ -21,7 +24,7 @@ public class BillQueryBuilder {
 	
 	public static final String REPLACE_STRING = "{replace}";
 	
-	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID') AND tenantId = ? ";
+	public static final String BILL_STATUS_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN ('ACTIVE','PARTIALLY_PAID','ADVANCE_ADJUSTED') AND tenantId = ? ";
 	
 	public static final String BILL_CANCEL_UPDATE_BASE_QUERY = "UPDATE egbs_bill_v1 SET lastmodifieddate=?, status=? {replace} WHERE status IN('ACTIVE','EXPIRED') AND tenantId = ? ";
 
@@ -108,7 +111,30 @@ public class BillQueryBuilder {
 	        "status = ?, lastmodifiedby = ?, lastmodifieddate = ? " +
 	        "WHERE tenantid = ? " +
 	        "AND consumercode = ? " +
-	        "AND status = ?";
+	        "AND status IN (?, ?)";
+	
+	public static final String BILL_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY =
+		    "UPDATE egbs_billdetail_v1 " +
+		    "SET totalamount = ?, " +
+		    "    lastmodifiedby = ?, " +
+		    "    lastmodifieddate = ? " +
+		    "WHERE billid = ? " +
+		    "AND demandid = ? " +
+		    "AND tenantid = ?";
+
+	public static final String BILL_ACCOUNT_DETAIL_UPDATE_CUSTOM_AMOUNT_QUERY =
+		    "UPDATE egbs_billaccountdetail_v1 " +
+		    "SET amount = ?, " +
+		    "    lastmodifiedby = ?, " +
+		    "    lastmodifieddate = ? " +
+		    "WHERE demanddetailid IN ( " +
+		    "    SELECT id FROM egbs_demanddetail_v1 " +
+		    "    WHERE demandid = ? " +
+		    "    AND tenantid = ? " +
+		    ")";
+
+	public static final String BILL_UPDATE_AUDIT_QUERY = "UPDATE egbs_bill_v1 " + "SET lastmodifiedby = ?, "
+			+ "    lastmodifieddate = ? " + "WHERE id = ? AND tenantid = ?";
 
 	public String getBillQuery(BillSearchCriteria billSearchCriteria, List<Object> preparedStatementValues){
 		
@@ -217,6 +243,13 @@ public class BillQueryBuilder {
 		if (!CollectionUtils.isEmpty(searchBill.getConsumerCode())) {
 			selectQuery.append(" AND bd.consumercode IN (");
 			appendListToQuery(searchBill.getConsumerCode(), preparedStatementValues, selectQuery);
+		}
+		
+		if (Boolean.TRUE.equals(searchBill.getRetrieveDefaulters())) {
+			LocalDate cutoffDate = LocalDate.now().minusDays(30);
+			long thirtyDaysAgo = cutoffDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			selectQuery.append(" AND b.createddate <= ?" + " AND UPPER(b.status) NOT IN ('PAID', 'CANCELLED')");
+			preparedStatementValues.add(thirtyDaysAgo);
 		}
 	}
 	

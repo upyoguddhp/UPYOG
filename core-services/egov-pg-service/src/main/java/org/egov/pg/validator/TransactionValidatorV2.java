@@ -110,6 +110,12 @@ public class TransactionValidatorV2 {
 								+ (props.getEarlyReconcileJobRunInterval() * 2) + " mins");
 				return;
 			}
+			
+			if ("PROCESSING".equalsIgnoreCase(curr.getStatus())) {
+				errorMap.put("TXN_PAYMENT_PROCESSING",
+						"Payment for this bill is currently being processed against a cheque. A second payment attempt will be allowed once the current cheque status is marked as PAID or REJECTED in the system.");
+				return;
+			}
 
 			if ("SUCCESS".equalsIgnoreCase(curr.getStatus())) {
 

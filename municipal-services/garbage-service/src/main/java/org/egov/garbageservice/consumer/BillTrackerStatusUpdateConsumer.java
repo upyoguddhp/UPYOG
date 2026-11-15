@@ -70,6 +70,8 @@ public class BillTrackerStatusUpdateConsumer {
         String demandId = (String) record.get("demandId");
         String status = (String) record.get("status");
         String consumerCode = (String) record.get("consumerCode");
+        
+		BigDecimal advancePaid = objectMapper.convertValue(record.get("advancePaid"), BigDecimal.class);
 
         if (consumerCode != null) {
             GrbgBillTracker grbgBillTracker = GrbgBillTracker.builder()
@@ -77,6 +79,7 @@ public class BillTrackerStatusUpdateConsumer {
                     .grbgApplicationId(consumerCode)
                     .demandId(demandId)
                     .auditDetails(audit)
+                    .advancePaid(advancePaid)
                     .build();
 
             trackerRepository.updateStatusBillTracker(grbgBillTracker);
