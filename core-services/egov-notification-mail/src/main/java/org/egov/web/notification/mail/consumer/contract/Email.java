@@ -27,5 +27,8 @@ public class Email {
 	private String ulbName;
 	private byte[] attachment;
 	private String attachmentFileName;
+    private Attachments attachments;
+    // HP-specific: selects a per-ULB sender account - see ExternalEmailService.
+    private String ulbName;
 
 }
