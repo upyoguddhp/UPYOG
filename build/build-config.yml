@@ -814,7 +814,7 @@ config:
   - name: builds/upyog/frontend/micro-ui/digit-ui
     build:
       - work-dir: frontend/micro-ui/
-        dockerfile: frontend/micro-ui/web/docker/Dockerfile
+        dockerfile: frontend/micro-ui/web/docker/Dockerfile.prod
         image-name: digit-ui
         
   - name: builds/upyog/frontend/upyog-ui

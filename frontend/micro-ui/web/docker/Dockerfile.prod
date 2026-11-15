@@ -1,0 +1,37 @@
+# Production image for the UPYOG HP micro-ui (this repo's own workspace packages, per SETUP-NOTES.md).
+# Build from the repo root:
+#   docker buildx build --platform linux/amd64 -f web/docker/Dockerfile.prod -t upyoguddhp/digit-ui:upyog-5.0 --push .
+# (The older web/docker/Dockerfile installs @upyog/* packages from npm, which does not match this repo.)
+FROM node:20-bookworm AS build
+WORKDIR /app
+ENV NODE_OPTIONS=--max-old-space-size=6144 \
+    GENERATE_SOURCEMAP=false \
+    SKIP_PREFLIGHT_CHECK=true \
+    REACT_APP_STATE_LEVEL_TENANT_ID=hp
+
+COPY . .
+
+# 1) workspace packages (libraries, react-components, modules...) must be built first
+RUN cd web/micro-ui-internals \
+    && yarn install \
+    && NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=6144" yarn build
+# 2) @upyog-niua/upyog-css is a local workspace whose dist/index.css is not committed: compile it (styles task only; `gulp build` watches forever).
+#    HP custom modules are web workspaces with no committed dist/ and are not part of the internals build:
+#    build each one before the app bundles it
+# 3) the app itself
+RUN cd web \
+    && yarn install \
+    && (cd micro-ui-internals/packages/css && NODE_ENV=production npx gulp styles) \
+    && for m in grbg booking reqsvc grievance hpnoc payments hpwork ots feedback tl ptr; do \
+         (cd micro-ui-internals/packages/modules/$m \
+           && NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=6144" yarn build) || exit 1; \
+       done \
+    && NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=6144" yarn build
+
+FROM nginx:mainline-alpine
+ENV WORK_DIR=/var/web/digit-ui
+RUN mkdir -p ${WORK_DIR}
+COPY --from=build /app/web/build ${WORK_DIR}/
+# some source files are mode 640 (owner/group only) -> nginx worker gets 403; make everything world-readable
+RUN chmod -R a+rX ${WORK_DIR}
+COPY web/docker/nginx.conf /etc/nginx/conf.d/default.conf

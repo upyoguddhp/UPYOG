@@ -20,6 +20,9 @@
     "micro-ui-internals/packages/modules/payments",
     "micro-ui-internals/packages/modules/hpwork",
     "micro-ui-internals/packages/modules/ots",
+    "micro-ui-internals/packages/modules/feedback",
+    "micro-ui-internals/packages/modules/tl",
+    "micro-ui-internals/packages/modules/ptr",
     "micro-ui-internals/packages/modules/obps"
   ],
   "engines": {
