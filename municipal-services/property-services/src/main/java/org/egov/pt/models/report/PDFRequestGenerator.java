@@ -116,9 +116,10 @@ public class PDFRequestGenerator {
 		        : null;
 
 		ptbr.put("correspondenceAddress",
-		        correspondenceAddress != null && !correspondenceAddress.isNull()
-		                ? correspondenceAddress.asText()
-		                : "");
+				correspondenceAddress != null && !correspondenceAddress.isNull()
+						&& !correspondenceAddress.asText().trim().isEmpty() ? correspondenceAddress.asText()
+								: ptbr.get("address"));
+		
 		ptbr.put("ownerOrOccupier",
 			    property.getOwners().stream()
 			        .flatMap(owner -> {
