@@ -609,6 +609,26 @@ public class PropertyQueryBuilder {
 		  + ") "
 		  + "WHERE bill_id = :billId "
 		  + "AND tenantid = :tenantId";
+			
+			private static final String PT_UPDATE_PAYMENT_DETAILS_QUERY =
+					"UPDATE eg_pt_tax_calculator_tracker " +
+							"SET additionaldetails = " +
+							"    jsonb_set( " +
+							"        jsonb_set( " +
+							"            CASE " +
+							"                WHEN jsonb_typeof(COALESCE(additionaldetails, '{}'::jsonb)) = 'array' " +
+							"                    THEN additionaldetails " +
+							"                ELSE '[{}]'::jsonb " +
+							"            END, " +
+							"            '{0,paymentTxnMode}', " +
+							"            to_jsonb(CAST(? AS text)), " +
+							"            true " +
+							"        ), " +
+							"        '{0,paymentTxnDate}', " +
+							"        to_jsonb(CAST(? AS text)), " +
+							"        true " +
+							"    ) " +
+							"WHERE bill_id IN (:billIds)";
 
 	public String getPaymentChannelTypeQuery(long startEpoch, long endEpoch, String wardName,
 			List<Object> preparedStmtList) {
@@ -1438,6 +1458,14 @@ public String getActiveBillsQuery(String status, List<Object> preparedStmtList,S
 		preparedStmtList.add(transactionDate);
 		preparedStmtList.add(billId);
 		return PT_UPDATE_IS_PAYMENT_PROCESSING_QUERY;
+	}
+	
+	public String getUpdatePaymentDetailsQuery(List<Object> preparedStmtList, List<String> billIds, String paymentMode,String transactionDate) {
+		preparedStmtList.add(paymentMode);
+		preparedStmtList.add(transactionDate);
+		preparedStmtList.addAll(billIds);
+		String placeholders = String.join(",", Collections.nCopies(billIds.size(), "?"));
+		return PT_UPDATE_PAYMENT_DETAILS_QUERY.replace(":billIds", placeholders);
 	}
 
 }

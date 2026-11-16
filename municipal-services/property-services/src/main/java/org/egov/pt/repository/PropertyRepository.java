@@ -844,4 +844,13 @@ public List<String> getAllUsageCategory(long epochStart, long epochEnd, String w
 			String query = queryBuilder.getUpdateIsProcessingPaymentQuery(preparedStmtList, billId,isPaymentProcessing, txnAmount, transactionDate);
 			return jdbcTemplate.update(query, preparedStmtList.toArray());
 		}
+		
+		public int updatePaymentDetailsInTracker(String paymentMode, String transactionDate, List<String> billIds) {
+			if (billIds == null || billIds.isEmpty()) {
+				return 0;
+			}
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getUpdatePaymentDetailsQuery(preparedStmtList, billIds, paymentMode, transactionDate);
+			return jdbcTemplate.update(query, preparedStmtList.toArray());
+		}
 	}

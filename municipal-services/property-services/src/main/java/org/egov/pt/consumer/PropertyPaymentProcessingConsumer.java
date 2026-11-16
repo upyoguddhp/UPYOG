@@ -3,6 +3,7 @@ package org.egov.pt.consumer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.egov.pt.models.PaymentDetailUpdateRequest;
 import org.egov.pt.models.PaymentProcessingUpdateRequest;
 import org.egov.pt.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,19 @@ public class PropertyPaymentProcessingConsumer {
 	        transactionDate = (String) additionalDetails.get("transactionDate");
 	    }
 		propertyRepository.updatePaymentProcessing(request.getBillId(), request.isPaymentProcessing(), request.getTxnAmount(), transactionDate);
+	}
+	
+	@KafkaListener(topics = { "property-payment-details-update" })
+	public void paymentDetailsUpdate(HashMap<String, Object> record) {
+		PaymentDetailUpdateRequest request = objectMapper.convertValue(record,PaymentDetailUpdateRequest.class);
+		Map<String, Object> additionalDetails = (Map<String, Object>) record.get("AdditionalDetails");
+		String transactionDate = null;
+
+		if (additionalDetails != null) {
+			transactionDate = (String) additionalDetails.get("transactionDate");
+		}
+		if (request.getBillIds() != null && !request.getBillIds().isEmpty()) {
+			propertyRepository.updatePaymentDetailsInTracker(request.getPaymentMode(), transactionDate,request.getBillIds());
+		}
 	}
 }

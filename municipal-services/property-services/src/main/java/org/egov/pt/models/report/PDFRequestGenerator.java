@@ -89,7 +89,10 @@ public class PDFRequestGenerator {
 
 		ptbr.put("district", property.getAddress().getDistrict());
 		ptbr.put("wardNumber", addressAdditionalDetails.get("wardNumber").asText());
-
+		ptbr.put("wardNo",
+				addressAdditionalDetails.has("wardNo") && !addressAdditionalDetails.get("wardNo").isNull()
+						? addressAdditionalDetails.get("wardNo").asText()
+						: null);
 		ptbr.put("address",
 				Stream.of(addressAdditionalDetails.get("propertyAddress"), addressAdditionalDetails.get("wardNumber"),
 						addressAdditionalDetails.get("ulbType"), addressAdditionalDetails.get("ulbName"),
@@ -107,7 +110,16 @@ public class PDFRequestGenerator {
 		}).filter(name -> name != null && !name.isEmpty()).collect(Collectors.joining(", ")));
 
 		ptbr.put("propertyId", property.getPropertyId());
+		JsonNode correspondenceAddress = property.getOwners() != null && !property.getOwners().isEmpty()
+		        && property.getOwners().get(0).getAdditionalDetails() != null
+		        ? property.getOwners().get(0).getAdditionalDetails().get("correspondenceAddress")
+		        : null;
 
+		ptbr.put("correspondenceAddress",
+				correspondenceAddress != null && !correspondenceAddress.isNull()
+						&& !correspondenceAddress.asText().trim().isEmpty() ? correspondenceAddress.asText()
+								: ptbr.get("address"));
+		
 		ptbr.put("ownerOrOccupier",
 			    property.getOwners().stream()
 			        .flatMap(owner -> {
@@ -382,9 +394,27 @@ public class PDFRequestGenerator {
 				.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		ptbr.put("paymentDueDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
 				.toLocalDateTime().plusDays(30).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		ptbr.put("paymentDate", paymentDate);
 		ptbr.put("advancePaid", advancePaid.toString());
+		List<String> paymentTxnModes = new ArrayList<>();
 
+		if (additionalDetailsNode != null && additionalDetailsNode.isArray()) {
+		    for (JsonNode node : additionalDetailsNode) {
+		        if (node.hasNonNull("paymentTxnMode")) {
+		            paymentTxnModes.add(node.get("paymentTxnMode").asText());
+		        }
+		    }
+		}
+		
+		if (paymentTxnModes.contains("OFFLINE_NEFT") || paymentTxnModes.contains("OFFLINE_RTGS")) {
+		    for (JsonNode node : additionalDetailsNode) {
+		        if (node.hasNonNull("paymentTxnDate")) {
+		            paymentDate = node.get("paymentTxnDate").asText();
+		        }
+		    }
+		}
+		
+		ptbr.put("paymentTxnModes", String.join(", ", paymentTxnModes));
+		ptbr.put("paymentDate", paymentDate);
 		dataObject.putAll(tableRowMap);
 		dataObject.put("ptbr", ptbr);
 		

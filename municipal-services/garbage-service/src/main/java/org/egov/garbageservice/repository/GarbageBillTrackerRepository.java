@@ -90,6 +90,22 @@ public class GarbageBillTrackerRepository {
 	        "END " +
 	        "WHERE bill_id = :billId";
 	
+	private static final String UPDATE_TRACKER_PAYMENT_DETAILS =
+	        "UPDATE eg_grbg_bill_tracker " +
+	        "SET additionaldetail = " +
+	        "    jsonb_set( " +
+	        "        jsonb_set( " +
+	        "            COALESCE(additionaldetail, '{}'::jsonb), " +
+	        "            '{paymentTxnMode}', " +
+	        "            to_jsonb(CAST(:paymentTxnMode AS text)), " +
+	        "            true " +
+	        "        ), " +
+	        "        '{paymentTxnDate}', " +
+	        "        to_jsonb(CAST(:paymentTxnDate AS text)), " +
+	        "        true " +
+	        "    ) " +
+	        "WHERE bill_id IN (:billIds)";
+	
 //	private static final String INSERT_BILL_FAILURE = "INSERT INTO eg_bill_failure (id, consumer_code, module_name, tenant_id, failure_reason,month, year, from_date, "
 //			+ "to_date, request_payload, response_payload, status_code) VALUES "
 //			+ "(:id, :consumer_code,:module_name, :tenant_id, failure_reason,:month, :year, :from_date, :to_date, :request_payload, :response_payload, :status_code)";
@@ -294,6 +310,15 @@ public class GarbageBillTrackerRepository {
 		params.put("status", isPaymentProcessing);
 		params.put("txnAmount", txnAmount);
 		params.put("transactionDate", transactionDate);
+		namedParameterJdbcTemplate.update(query, params);
+	}
+	
+	public void updatePaymentDetailsInTracker(String paymentMode, String transactionDate, List<String> billIds) {
+		String query = UPDATE_TRACKER_PAYMENT_DETAILS;
+		Map<String, Object> params = new HashMap<>();
+		params.put("paymentTxnMode", paymentMode);
+		params.put("paymentTxnDate", transactionDate);
+		params.put("billIds", billIds);
 		namedParameterJdbcTemplate.update(query, params);
 	}
 	

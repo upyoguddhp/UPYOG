@@ -126,6 +126,12 @@ public class AppProperties {
 
     @Value("${egov.grbg.payment.processing.topic}")
     private String grbgPaymentProcessingTopic;
+    
+    @Value("${egov.grbg.update.details.topic}")
+    private String grbgUpdateDetailsTopic;
+    
+    @Value("${egov.property.update.details.topic}")
+    private String propertyUpdateDetailsTopic;
 
     @Autowired
     public AppProperties(Environment environment){

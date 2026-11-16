@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pg.config.AppProperties;
 import org.egov.pg.constants.PgConstants;
+import org.egov.pg.models.BankAccount;
+import org.egov.pg.models.BankAccountResponse;
+import org.egov.pg.models.BankAccountSearchCriteria;
+import org.egov.pg.models.Bill;
+import org.egov.pg.models.BillResponse;
+import org.egov.pg.models.Demand;
+import org.egov.pg.models.DemandAmountInfo;
+import org.egov.pg.models.DemandDetail;
+import org.egov.pg.models.DemandResponse;
+import org.egov.pg.models.TaxAndPayment;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.models.TransactionDetails;
 import org.egov.pg.models.TransactionDump;
@@ -24,14 +35,15 @@ import org.egov.pg.models.TransactionDumpRequest;
 import org.egov.pg.producer.Producer;
 import org.egov.pg.repository.TransactionDetailsRepository;
 import org.egov.pg.repository.TransactionRepository;
+import org.egov.pg.service.gateways.razorpay.RazorpayGateway;
 import org.egov.pg.validator.TransactionValidator;
 import org.egov.pg.validator.TransactionValidatorV2;
+import org.egov.pg.web.models.ChequeTransactionRequest;
 import org.egov.pg.web.models.ResponseInfo;
 import org.egov.pg.web.models.TransactionCriteriaV2;
 import org.egov.pg.web.models.TransactionDetailsCriteria;
 import org.egov.pg.web.models.TransactionRequest;
 import org.egov.pg.web.models.TransactionRequestV2;
-import org.egov.pg.service.gateways.paytm.PaymentStatusResponse;
 import org.egov.pg.web.models.TransactionResponseV2;
 import org.egov.pg.web.models.User;
 import org.egov.tracer.model.CustomException;
@@ -41,20 +53,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.egov.pg.models.DemandAmountInfo;
-import org.egov.pg.models.BankAccount;
-import org.egov.pg.models.BankAccountResponse;
-import org.egov.pg.models.BankAccountSearchCriteria;
-import org.egov.pg.models.Bill;
-import org.egov.pg.models.BillResponse;
-import org.egov.pg.models.Demand;import org.egov.pg.service.gateways.razorpay.models.PaymentResponse;
-import org.egov.pg.service.gateways.razorpay.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.egov.pg.web.models.ChequeTransactionRequest;
 
 import lombok.extern.slf4j.Slf4j;
-import org.egov.pg.models.DemandResponse;
-import org.egov.pg.models.DemandDetail;
 /**
  * Handles all transaction related requests
  */
@@ -145,8 +147,8 @@ public class TransactionServiceV2 {
 			else if (validator.skipGateway(transaction)) {
 				transaction.setTxnStatus(Transaction.TxnStatusEnum.SUCCESS);
 				transaction.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
-				paymentsService.registerPayment(
-						TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
+				paymentsService.registerPayment(TransactionRequest.builder().transaction(transaction).requestInfo(requestInfo).build());
+				updatePaymentDetails(transaction);
 			}
 			else if (transaction.getGateway().equalsIgnoreCase("OFFLINE")) {
 
@@ -201,7 +203,7 @@ public class TransactionServiceV2 {
 			producer.push(appProperties.getSaveTxnWithDetailsTopic(),
 					new org.egov.pg.models.TransactionRequest(requestInfo, transaction));
 			producer.push(appProperties.getSaveTxnDumpTopic(), new TransactionDumpRequest(requestInfo, dump));
-
+			updatePaymentDetails(transaction);
 			transactions.add(transaction);
 		});
 
@@ -526,6 +528,29 @@ public class TransactionServiceV2 {
 			producer.push(appProperties.getGrbgPaymentProcessingTopic(), payload);
 		} else if ("PROPERTY".equalsIgnoreCase(transaction.getProductInfo())) {
 			producer.push(appProperties.getPropertyPaymentProcessingTopic(), payload);
+		}
+	}
+	
+	private void updatePaymentDetails(Transaction transaction) {
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("AdditionalDetails", transaction.getAdditionalDetails());
+		String paymentMode = transaction.getGatewayPaymentMode();
+		
+		if ("PAYTM-POS".equalsIgnoreCase(paymentMode) || 
+			"PAYTMPOS".equalsIgnoreCase(paymentMode)  || 
+			"RAZORPAY".equalsIgnoreCase(paymentMode)) {
+			paymentMode = "ONLINE";
+		}
+		payload.put("PaymentMode", paymentMode);
+		List<String> billIds = transaction.getTaxAndPayments().stream().map(TaxAndPayment::getBillId)
+				.filter(Objects::nonNull).distinct().collect(Collectors.toList());
+		
+		payload.put("billIds", billIds);
+		
+		if ("GB".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getGrbgUpdateDetailsTopic(), payload);
+		} else if ("PROPERTY".equalsIgnoreCase(transaction.getProductInfo())) {
+			producer.push(appProperties.getPropertyUpdateDetailsTopic(), payload);
 		}
 	}
 

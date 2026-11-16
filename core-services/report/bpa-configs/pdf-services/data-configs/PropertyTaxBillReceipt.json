@@ -61,9 +61,21 @@
 						}
 					},
 					{
+						"variable": "wardNo",
+						"value": {
+							"path": "$.wardNo"
+						}
+					},
+					{
 						"variable": "address",
 						"value": {
 							"path": "$.address"
+						}
+					},
+					{
+						"variable": "correspondenceAddress",
+						"value": {
+							"path": "$.correspondenceAddress"
 						}
 					},
 					{
@@ -184,6 +196,12 @@
 						"variable": "paymentDate",
 						"value": {
 							"path": "$.paymentDate"
+						}
+					},
+					{
+						"variable": "paymentTxnModes",
+						"value": {
+							"path": "$.paymentTxnModes"
 						}
 					},
 					{
