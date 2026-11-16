@@ -393,7 +393,6 @@ public class PDFRequestGenerator {
 				.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		ptbr.put("paymentDueDate", Instant.ofEpochMilli(bill.getBillDate()).atZone(ZoneId.systemDefault())
 				.toLocalDateTime().plusDays(30).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		ptbr.put("paymentDate", paymentDate);
 		ptbr.put("advancePaid", advancePaid.toString());
 		List<String> paymentTxnModes = new ArrayList<>();
 
@@ -404,8 +403,17 @@ public class PDFRequestGenerator {
 		        }
 		    }
 		}
+		
+		if (paymentTxnModes.contains("OFFLINE_NEFT") || paymentTxnModes.contains("OFFLINE_RTGS")) {
+		    for (JsonNode node : additionalDetailsNode) {
+		        if (node.hasNonNull("paymentTxnDate")) {
+		            paymentDate = node.get("paymentTxnDate").asText();
+		        }
+		    }
+		}
+		
 		ptbr.put("paymentTxnModes", String.join(", ", paymentTxnModes));
-
+		ptbr.put("paymentDate", paymentDate);
 		dataObject.putAll(tableRowMap);
 		dataObject.put("ptbr", ptbr);
 		

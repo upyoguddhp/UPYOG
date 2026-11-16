@@ -152,8 +152,6 @@ public class PDFRequestGenerator {
 			            .toLocalDateTime()
 			            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 			}
-
-			grbgObj.get("paymentDates").add(paymentDate);
 			
 			String paymentTxnMode = "";
 
@@ -164,7 +162,15 @@ public class PDFRequestGenerator {
 				}
 			}
 
+			if ("OFFLINE_NEFT".equals(paymentTxnMode) || "OFFLINE_RTGS".equals(paymentTxnMode)) {
+				JsonNode trackerAdditionalDetail = objectMapper.valueToTree(tracker.getAdditionaldetail());
+				if (trackerAdditionalDetail != null && trackerAdditionalDetail.hasNonNull("paymentTxnDate")) {
+					paymentDate = trackerAdditionalDetail.get("paymentTxnDate").asText();
+				}
+			}
+
 			grbgObj.get("paymentTxnModes").add(paymentTxnMode);
+			grbgObj.get("paymentDates").add(paymentDate);
 			String paymentStatus;
 
 			if (tracker != null && Boolean.TRUE.equals(tracker.getIsPaymentProcessing())) {
