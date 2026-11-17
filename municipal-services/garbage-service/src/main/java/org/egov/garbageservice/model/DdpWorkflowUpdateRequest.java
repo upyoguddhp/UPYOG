@@ -62,4 +62,7 @@ public class DdpWorkflowUpdateRequest {
 	private String remarks;
 
 	private Boolean ddpPrintVerified;
+
+	/** Required for REJECTED: REPRINT or REVALIDATE. */
+	private String ddpRejectionAction;
 }
