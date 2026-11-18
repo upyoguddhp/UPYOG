@@ -64,4 +64,7 @@ public class DoorPlateDdpWorkflowRequest {
 	private Boolean ddpDispatched;
 	
 	private Boolean ddpPrintVerified;
+
+	/** Required for REJECTED: REPRINT or REVALIDATE. */
+	private String ddpRejectionAction;
 }
