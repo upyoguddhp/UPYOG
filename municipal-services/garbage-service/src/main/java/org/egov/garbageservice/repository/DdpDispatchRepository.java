@@ -27,6 +27,10 @@ import org.springframework.util.CollectionUtils;
 @Repository
 public class DdpDispatchRepository {
 
+	@Autowired
+	private DdpAuditRepository ddpAuditRepository;
+
+
 	private static final String SELECT_PLATE_LOOKUP_BY_UUID = "SELECT acc.uuid as garbage_account_uuid, "
 			+ "acc.garbage_id as garbage_id, acc.tenant_id as tenant_id, acc.name as owner_name, "
 			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id, addr.ulb_name as ulb, addr.ward_name as ward, "
@@ -172,6 +176,7 @@ public class DdpDispatchRepository {
 		Map<String, Object> plateParams = new HashMap<>();
 		plateParams.put("batchNo", batchNo);
 		plateParams.put("dispatchDate", dispatchDate);
+		ddpAuditRepository.recordDispatchedByBatch(batchNo, modifiedBy, dispatchDate);
 		namedParameterJdbcTemplate.update(MARK_PLATES_DISPATCHED_BY_BATCH_NO, plateParams);
 
 		return updatedBatches;
