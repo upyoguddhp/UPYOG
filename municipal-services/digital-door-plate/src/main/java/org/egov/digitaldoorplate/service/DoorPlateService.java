@@ -255,9 +255,8 @@ public class DoorPlateService {
 		}
 
 		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
-			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))
-					|| StringUtils.isBlank(request.getDdpRejectionReason())) {
-				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE and ddpRejectionReason.");
+			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
+				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE.");
 			}
 		} else if (request.getDdpRejectionAction() != null) {
 			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
