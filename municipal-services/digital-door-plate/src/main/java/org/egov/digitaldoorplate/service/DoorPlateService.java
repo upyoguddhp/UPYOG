@@ -368,4 +368,13 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
 		}
 	}
+
+	public org.egov.digitaldoorplate.model.DdpStatusCountResponse getDdpStatusCounts(
+			org.egov.digitaldoorplate.model.DdpStatusCountRequest request) {
+		validateUserInfo(request.getRequestInfo());
+		org.egov.digitaldoorplate.model.DdpStatusCountResponse response = doorPlateRepository.getDdpStatusCounts();
+		response.setResponseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true));
+		return response;
+	}
 }
