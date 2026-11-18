@@ -46,6 +46,16 @@ const NOC_CODES = DASHBOARD_SERVICES.filter((c) => /NOC$/.test(c));
 
 const post = (url, params, data = {}) => Digit.CustomService.getResponse({ url, params, data });
 
+/**
+ * chb / advertisement / garbage services authenticate from RequestInfo in the body (not only the gateway
+ * header) and want a tenantId param; without them they answer 401. `_` stops Digit's POST cache replaying.
+ */
+const postAuth = (url, data = {}, params = {}) =>
+  post(url, { tenantId: Digit.ULBService.getStateId(), ...params, _: Date.now() }, {
+    RequestInfo: { apiId: "Rainmaker", authToken: Digit.UserService.getUser()?.access_token },
+    ...data,
+  });
+
 const arr = (v) => (Array.isArray(v) ? v : []);
 
 export const APPLICATION_SOURCES = [
@@ -162,7 +172,7 @@ export const APPLICATION_SOURCES = [
     service: "Community hall booking",
     modules: ["chb-services"],
     // no filters: the service then returns the signed-in citizen's own bookings
-    fetch: () => post("/chb-services/booking/v1/_search", {}),
+    fetch: () => postAuth("/chb-services/booking/v1/_search"),
     list: (res) => arr(res?.hallsBookingApplication),
     map: (b) => ({
       id: b.bookingNo,
@@ -178,7 +188,7 @@ export const APPLICATION_SOURCES = [
     label: "Advertisement site bookings",
     service: "Advertisement site booking",
     modules: ["ADVT", "SITE"],
-    fetch: () => post("/adrvcanopy-services/site-booking/_search", {}, { SiteBookingSearchCriteria: {} }),
+    fetch: () => postAuth("/adrvcanopy-services/site-booking/_search", { SiteBookingSearchCriteria: {} }),
     list: (res) => arr(res?.SiteBookings || res?.siteBookings),
     map: (b) => ({
       id: b.applicationNo,
@@ -195,7 +205,7 @@ export const APPLICATION_SOURCES = [
     service: "Request services",
     modules: ["REQSVC", "REQSERV"],
     // echallan-services limits a citizen's search to their own requests
-    fetch: () => post("/echallan-services/eChallan/v1/_search", { businessService: "REQSERV" }),
+    fetch: () => postAuth("/echallan-services/eChallan/v1/_search", {}, { businessService: "REQSERV" }),
     list: (res) => arr(res?.challans),
     map: (c) => ({
       id: c.challanNo,
@@ -213,7 +223,7 @@ export const APPLICATION_SOURCES = [
     service: "One time settlement",
     modules: ["OTS"],
     fetch: ({ mobileNumber }) =>
-      mobileNumber ? post("/rdf-monitoring/msme/get-applications", {}, { pageSize: 50, filters: { mobile_no: Number(mobileNumber) } }) : Promise.resolve({ data: [] }),
+      mobileNumber ? postAuth("/rdf-monitoring/msme/get-applications", { pageSize: 50, filters: { mobile_no: Number(mobileNumber) } }) : Promise.resolve({ data: [] }),
     list: (res) => arr(res?.data),
     map: (o) => ({
       id: String(o.id),
@@ -230,7 +240,7 @@ export const APPLICATION_SOURCES = [
     service: "Garbage collection",
     modules: ["GB_CITIZEN", "GB"],
     fetch: ({ mobileNumber }) =>
-      post("/garbage-service/garbage-accounts/_search", {}, {
+      postAuth("/garbage-service/garbage-accounts/_search", {
         searchCriteriaGarbageAccount: {
           mobileNumber: mobileNumber ? [mobileNumber] : [],
           isActiveAccount: true,

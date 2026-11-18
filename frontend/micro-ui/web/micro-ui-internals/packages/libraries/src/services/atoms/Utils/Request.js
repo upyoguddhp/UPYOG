@@ -7,6 +7,20 @@ import Axios from "axios";
  *
  */
 
+/**
+ * Optional API origin (e.g. https://smlegf.hpupyog.hp.gov.in). Set from REACT_APP_API_BASE_URL in
+ * web/src/index.js for local development so the browser calls that server directly instead of the
+ * dev-server proxy. Empty (the default, and always in production) keeps calls same-origin.
+ * Absolute URLs are never touched.
+ */
+Axios.interceptors.request.use((config) => {
+  const base = window.__API_BASE_URL__;
+  if (base && config.url && !/^([a-z][a-z0-9+.-]*:)?\/\//i.test(config.url)) {
+    config.baseURL = base.replace(/\/+$/, "");
+  }
+  return config;
+});
+
 Axios.interceptors.response.use(
   (res) => res,
   (err) => {

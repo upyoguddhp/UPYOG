@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { useTranslation } from "react-i18next";
 import { ComplaintIcon, PTIcon, CaseIcon, WSICon, HomeIcon, Calender, DocumentIcon } from "@upyog/digit-ui-react-components";
 import Icon from "./Icons";
-import { serviceMeta } from "./config";
+import { OTHER_SERVICES, SERVICE_ROWS_COLLAPSED, serviceActions, serviceCategories, serviceMeta, sortByOrder } from "./config";
 
 const ICONS = {
   CITIZEN_SERVICE_PGR: <ComplaintIcon />,
@@ -12,12 +12,27 @@ const ICONS = {
   CITIZEN_INFO_FAQ: <HomeIcon />,
   CITIZEN_INFO_EVENTS: <Calender />,
 };
-const TONES = ["navy", "saffron", "green", "violet", "teal", "rose"];
 const metaFor = (it) => {
   const hay = `${it.label} ${it.url || ""}`;
   const hit = serviceMeta.find((m) => m.re.test(hay));
   return hit || null;
 };
+/** Columns the card grid shows at the current width (mirrors the CSS breakpoints), to cap the grid at N rows. */
+const useColumns = () => {
+  const calc = () => {
+    const w = typeof window === "undefined" ? 1200 : window.innerWidth;
+    // the category rail takes the left column from 900px, so the card grid is narrower than the page
+    return w >= 1500 ? 4 : w >= 1200 ? 3 : w >= 600 ? 2 : 1;
+  };
+  const [cols, setCols] = useState(calc);
+  useEffect(() => {
+    const on = () => setCols(calc());
+    window.addEventListener("resize", on);
+    return () => window.removeEventListener("resize", on);
+  }, []);
+  return cols;
+};
+
 const PIN_KEY = "landing.pinnedServices";
 
 /** Pinned services are a per-viewer convenience: storage may be blocked, so every access is guarded. */
@@ -41,24 +56,34 @@ const writePins = (pins) => {
  * Mobile first (one column, swipeable chips) -> 2 / 3 / 4 columns on wider screens.
  * Groups come from MDMS uiHomePage (citizenServicesCard / informationAndUpdatesCard) plus enabled modules.
  */
-const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, onViewAll, activeGroup, onGroupChange }) => {
+const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, onViewAll, activeGroup, onGroupChange, loggedIn = true }) => {
   const { t } = useTranslation();
   const tt = (key, text) => t(key, { defaultValue: text });
   const [pins, setPins] = useState(readPins);
   const [stamp, setStamp] = useState(0);
   const railRef = useRef(null);
+  const cols = useColumns();
+  const [expanded, setExpanded] = useState(false);
 
-  // "All" tab: every service of every group, de-duplicated by destination
+  // every service once (de-duplicated by destination), sorted into categories; empty categories are dropped
   const groups = useMemo(() => {
-    if (sourceGroups.length < 2) return sourceGroups;
     const seen = new Set();
-    const all = sourceGroups.flatMap((g) => g.items).filter((it) => {
-      const k = (it.url || it.label).toLowerCase();
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
+    const all = sortByOrder(
+      (sourceGroups || []).flatMap((g) => g.items).filter((it) => {
+        const k = (it.url || it.label).toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      })
+    ); // order comes from the backend (MDMS), see sortByOrder in config.js
+    const buckets = [...serviceCategories, OTHER_SERVICES].map((c) => ({ id: c.id, label: tt(c.key, c.label), re: c.re, items: [] }));
+    all.forEach((it) => {
+      const hay = `${it.label} ${it.url || ""}`;
+      const hit = buckets.find((c) => c.re && c.re.test(hay)) || buckets[buckets.length - 1];
+      hit.items.push(it);
     });
-    return [{ id: "__all", label: tt("LANDING_SERVICES_ALL", "All"), items: all }, ...sourceGroups];
+    const cats = buckets.filter((c) => c.items.length).map(({ re, ...c }) => c);
+    return [{ id: "__all", label: tt("LANDING_SERVICES_ALL", "All"), items: all }, ...cats];
   }, [sourceGroups, t]);
 
   const current = groups.find((g) => g.id === activeGroup) || groups[0];
@@ -72,7 +97,10 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
   }, [current, q, pins]);
 
   // re-run the entrance animation whenever the visible set changes
-  useEffect(() => setStamp((s) => s + 1), [current?.id, q]);
+  useEffect(() => {
+    setStamp((s) => s + 1);
+    setExpanded(false);
+  }, [current?.id, q]);
 
   const togglePin = (it) => {
     const k = pinKey(it);
@@ -82,14 +110,25 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
   };
 
   const onRailKey = (e) => {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+    e.preventDefault();
+    const fwd = e.key === "ArrowRight" || e.key === "ArrowDown";
     const i = groups.findIndex((g) => g.id === current?.id);
-    const n = groups[(i + (e.key === "ArrowRight" ? 1 : groups.length - 1)) % groups.length];
+    const n = groups[(i + (fwd ? 1 : groups.length - 1)) % groups.length];
     onGroupChange(n.id);
     const el = railRef.current && railRef.current.querySelector(`[data-id="${n.id}"]`);
     if (el) el.focus();
   };
 
+  const limit = cols * SERVICE_ROWS_COLLAPSED;
+  const shown = expanded || q ? items : items.slice(0, limit);
+  const hidden = items.length - shown.length;
+  // button wording follows the kind of service ("Pay now", "Book now"...); logged-out visitors see "Login to ..."
+  const actionLabel = (it) => {
+    const hit = serviceActions.find((a) => a.re.test(`${it.label} ${it.url || ""}`));
+    const text = hit ? tt(hit.key, hit.label) : tt("LANDING_APPLY_NOW", "Apply now");
+    return loggedIn ? text : `${tt("LANDING_LOGIN_TO", "Login to")} ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+  };
   const total = groups[0]?.id === "__all" ? groups[0].items.length : (sourceGroups || []).reduce((a, g) => a + g.items.length, 0);
 
   // which card is showing its checklist on tap, and which side the hover popover opens to
@@ -114,8 +153,9 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
         )}
       </header>
 
+      <div className="SvcCards__layout">
       {groups.length > 1 && (
-        <div className="SvcCards__tabs" role="tablist" ref={railRef} aria-label={tt("LANDING_SERVICES_BROWSE", "Browse services")} onKeyDown={onRailKey}>
+        <div className="SvcCards__tabs" role="tablist" aria-orientation="vertical" ref={railRef} aria-label={tt("LANDING_SERVICES_BROWSE", "Browse services")} onKeyDown={onRailKey}>
           {groups.map((g) => (
             <button
               key={g.id}
@@ -127,15 +167,17 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
               className={`SvcCards__tab${g.id === current?.id ? " is-active" : ""}`}
               onClick={() => onGroupChange(g.id)}
             >
-              {g.label}
+              <span className="SvcCards__tabLabel">{g.label}</span>
+              <span className="SvcCards__tabCount" aria-label={`${g.items.length} ${tt("LANDING_SERVICES_COUNT", "services")}`}>{g.items.length}</span>
             </button>
           ))}
         </div>
       )}
 
+      <div className="SvcCards__content">
       <ul className="SvcCards__grid" key={stamp}>
         {items.length === 0 && <li className="SvcCards__empty">{tt("LANDING_NO_RESULTS", "No matching service. Try “View all services”.")}</li>}
-        {items.map((it, idx) => {
+        {shown.map((it, idx) => {
           const key = pinKey(it);
           const pinned = pins.includes(key);
           const m = metaFor(it);
@@ -179,13 +221,14 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
                       aria-controls={`svc-pop-${idx}`}
                       onClick={() => setOpenDocs(open ? null : key)}
                     >
-                      {docs.length} {docs.length === 1 ? tt("LANDING_DOCUMENT", "document") : tt("LANDING_DOCUMENTS", "documents")}
+                      <Icon name="doc" size={16} />
+                      <span>
+                        <b className="SvcCards__docs__count">{docs.length}</b> {docs.length === 1 ? tt("LANDING_DOCUMENT_REQ", "document required") : tt("LANDING_DOCUMENTS_REQ", "documents required")}
+                      </span>
                     </button>
-                  ) : (
-                    <span className="SvcCards__docs SvcCards__docs--none">{tt("LANDING_ONLINE", "Online")}</span>
-                  )}
+                  ) : null}
                   <button type="button" className="SvcCards__apply" onClick={() => onOpen(it)}>
-                    {tt("LANDING_APPLY_NOW", "Apply now")} <Icon name="arrow" size={16} strokeWidth={2.6} />
+                    {actionLabel(it)} <Icon name="arrow" size={16} strokeWidth={2.6} />
                   </button>
                 </div>
               </article>
@@ -209,6 +252,16 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
         })}
       </ul>
 
+      {(hidden > 0 || (expanded && items.length > limit)) && (
+        <div className="SvcCards__more">
+          <button type="button" className="SvcCards__toggle" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>
+            {expanded
+              ? tt("LANDING_SHOW_FEWER", "Show fewer services")
+              : `${tt("LANDING_SHOW_MORE", "Show more services")} (+${hidden})`}
+          </button>
+        </div>
+      )}
+
       {onViewAll && (
         <div className="SvcCards__more">
           <button type="button" className="SvcCards__all" onClick={onViewAll}>
@@ -216,6 +269,8 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
           </button>
         </div>
       )}
+      </div>
+      </div>
     </section>
   );
 };

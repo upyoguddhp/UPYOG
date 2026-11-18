@@ -13,10 +13,13 @@ var globalConfigs = (function () {
     RAZOR_PAY_CURRENCY: "INR",
     RAZOR_PAY_LOGO: "",
     SSO_SERVICE_ID: "10000180",
+    // SSO_SERVICE_ID: "10000089",
     SSO_SCRIPT_URL: "https://sso.hp.gov.in/nodeapi/iframe/sso-iframe.js",
     OFFICIAL_SSO_URL: "https://himparivar.hp.gov.in/sso-admin/GovLogin?service_id=22&app_unique=ED003",
   };
   var getConfig = function (key) {
+    // when the dev build calls the backend directly (REACT_APP_API_BASE_URL), DMS goes to the same backend
+    if (key === "DMS_URL" && window.__API_BASE_URL__) return window.__API_BASE_URL__.replace(/\/+$/, "") + configMap[key];
     return configMap[key];
   };
   return { getConfig: getConfig };

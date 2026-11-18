@@ -1,5 +1,7 @@
 /** Shared helpers for the SSO / official login flows. */
 
+import { apiUrl } from "../../utils/apiUrl";
+
 const DEFAULT_SSO_SCRIPT = "https://sso.hp.gov.in/nodeapi/iframe/sso-iframe.js";
 
 const cfg = (key, fallback) => (window?.globalConfigs?.getConfig && window.globalConfigs.getConfig(key)) || fallback;
@@ -170,7 +172,7 @@ export const saveSession = (response, stateCode) => {
 /** Exchanges the token handed back by the SSO for a portal session (egov-user /_landingPage). */
 export const exchangeSsoToken = async (token) => {
   if (!token) throw new Error("NO_TOKEN");
-  const res = await fetch("/user/_landingPage", {
+  const res = await fetch(apiUrl("/user/_landingPage"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),

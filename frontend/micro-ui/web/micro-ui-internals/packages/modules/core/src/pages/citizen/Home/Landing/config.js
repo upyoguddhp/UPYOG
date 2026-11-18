@@ -146,3 +146,56 @@ export const ulbTierCounts = { mc: 5, council: 29, np: 26 };
  * split per ULB is not in the data yet, so the map marks only these and shows the rest as "other".
  */
 export const MUNICIPAL_CORPORATIONS = ["Shimla", "Dharamshala", "Mandi", "Solan", "Palampur"];
+
+/**
+ * Service categories for "Browse services" on the home page. A service goes to the FIRST category whose
+ * pattern matches its label or URL; anything unmatched lands in "Other services". The grouping is an
+ * editorial choice made from the service names (not from MDMS), so the Directorate should confirm it.
+ */
+export const serviceCategories = [
+  { id: "grievance", key: "LANDING_CAT_GRIEVANCE", label: "Grievances & feedback", re: /complaint|grievance|pgr|feedback|request/i },
+  { id: "property", key: "LANDING_CAT_PROPERTY", label: "Property, tax & payments", re: /property|\/pt(-|\/|$)|tax|dues|payment|mcollect|settlement|ots|bill/i },
+  { id: "licence", key: "LANDING_CAT_LICENCE", label: "Licences, permits & NOC", re: /trade|licen|noc|ptr|pet|registration|permit|advert|adrv|canopy|hoarding/i },
+  { id: "water", key: "LANDING_CAT_WATER", label: "Water, sanitation & waste", re: /water|sewer|ws|garbage|waste|sanit|swm|fsm|tanker/i },
+  { id: "booking", key: "LANDING_CAT_BOOKING", label: "Bookings & facilities", re: /booking|chb|hall|ground|park|facility/i },
+  { id: "info", key: "LANDING_CAT_INFO", label: "Information & updates", re: /faq|event|information|update|news/i },
+];
+export const OTHER_SERVICES = { id: "other", key: "LANDING_CAT_OTHER", label: "Other services" };
+/** Rows of service cards shown on the home page before "Show more services". */
+export const SERVICE_ROWS_COLLAPSED = 2;
+
+/**
+ * Tier of each non-corporation ULB, by pin name (see himachalGeo.js): "council" (Municipal Council) or
+ * "np" (Nagar Panchayat). NOT YET CONFIRMED by the department, so it is empty: until filled, hovering the
+ * Council / Panchayat rows can only highlight every non-corporation body. Expected: 29 council + 26 np.
+ */
+export const ULB_TIERS = {};
+
+/** Information pages that open without signing in; every other service link asks the visitor to log in first. */
+export const PUBLIC_SERVICE = /\/(faq|events)(\/|$|\?)/i;
+
+/**
+ * Wording of the card button by kind of service: first match on label / URL wins, anything else is "Apply now".
+ * Labels are editorial, chosen from the service names; confirm them with the department.
+ */
+export const serviceActions = [
+  { re: /dues|payment|bill|mcollect/i, key: "LANDING_ACT_PAY", label: "Pay now" },
+  { re: /complaint|grievance|pgr/i, key: "LANDING_ACT_COMPLAIN", label: "Raise a complaint" },
+  { re: /feedback/i, key: "LANDING_ACT_FEEDBACK", label: "Give feedback" },
+  { re: /booking|chb|hall|ground/i, key: "LANDING_ACT_BOOK", label: "Book now" },
+  { re: /request/i, key: "LANDING_ACT_REQUEST", label: "Request now" },
+];
+
+/**
+ * Backend-controlled service order. A service's position comes from MDMS:
+ *   - `order` on the uiHomePage card entry (common-masters.uiHomePage ... props[].order), else
+ *   - `orderNumber` of its module's service links in ACCESSCONTROL-ACTIONS-TEST (lowest wins).
+ * Lower numbers come first; services without a number keep their existing position after the numbered ones.
+ */
+export const orderValue = (n) => (Number.isFinite(Number(n)) && n !== null && n !== "" && n !== undefined ? Number(n) : Infinity);
+export const moduleOrder = (links = []) => Math.min(...links.map((l) => orderValue(l.orderNumber)), Infinity);
+export const sortByOrder = (list) =>
+  list
+    .map((it, i) => ({ it, i }))
+    .sort((a, b) => orderValue(a.it.order) - orderValue(b.it.order) || a.i - b.i)
+    .map((x) => x.it);

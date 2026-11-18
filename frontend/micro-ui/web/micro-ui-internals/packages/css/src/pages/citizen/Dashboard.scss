@@ -449,6 +449,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* long lists scroll inside the card instead of stretching the whole page */
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 .DashApp {
   display: grid;
@@ -820,7 +826,13 @@
   }
   .DashMain {
     width: 100%;
-    padding: 24px 100px 48px 28px; /* right gutter keeps the floating dock off the content */
+    max-width: none; /* use the full content area, no centred 1240px column */
+    margin: 0;
+    padding: 24px 88px 32px 24px; /* right gutter keeps the floating dock off the content */
+  }
+  .DashApps {
+    max-height: calc(100vh - 420px);
+    min-height: 320px;
   }
   .DashKpis {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1084,3 +1096,280 @@
     transition: none;
   }
 }
+
+/* ---------- Profile page (Dashboard/Profile.js) ---------- */
+.ProfilePage {
+  &__head {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid $l-line;
+    border-radius: 999px;
+    background: #fff;
+    color: $l-navy;
+    font-weight: 600;
+    &:hover {
+      background: $l-sky;
+    }
+    &:focus-visible {
+      outline: 3px solid #ffb066;
+      outline-offset: 2px;
+    }
+  }
+  &__grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.ProfileCard {
+  text-align: center;
+  padding: 22px 16px 16px;
+  h2 {
+    margin: 12px 0 6px;
+    font-size: 20px;
+    color: $l-navy;
+    overflow-wrap: anywhere;
+  }
+  &__avatarWrap {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    margin: 0 auto;
+  }
+  &__photo,
+  &__initials {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 22px rgba(20, 34, 77, 0.18);
+  }
+  &__initials {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, $l-navy, #2f6bff);
+    color: #fff;
+    font-size: 34px;
+    font-weight: 800;
+  }
+  &__camera {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: $l-saffron;
+    color: #fff;
+    cursor: pointer;
+    &:hover {
+      filter: brightness(1.08);
+    }
+    &:focus-visible {
+      outline: 3px solid #ffb066;
+      outline-offset: 2px;
+    }
+  }
+  &__facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+    color: $l-muted;
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      overflow-wrap: anywhere;
+    }
+  }
+  &__tri {
+    display: block;
+    height: 4px;
+    margin: 16px auto;
+    max-width: 120px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff9933 33%, #fff 33% 66%, #138808 66%);
+    box-shadow: inset 0 0 0 1px rgba(20, 34, 77, 0.08);
+  }
+  &__links {
+    display: grid;
+    gap: 8px;
+    button {
+      min-height: 44px;
+      border: 1px solid $l-line;
+      border-radius: 12px;
+      background: #fbfcff;
+      color: $l-navy;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover {
+        background: $l-sky;
+      }
+      &:focus-visible {
+        outline: 3px solid #ffb066;
+        outline-offset: 2px;
+      }
+    }
+  }
+}
+
+.ProfileForm {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: $l-navy;
+      span {
+        color: #c0392b;
+      }
+    }
+    input,
+    select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid #c9d4ea;
+      border-radius: 12px;
+      background: #fff;
+      color: $l-ink;
+      font-size: 16px; /* 16px stops iOS zooming on focus */
+      &:focus-visible {
+        outline: 3px solid #ffb066;
+        outline-offset: 1px;
+        border-color: $l-navy;
+      }
+      &[readonly] {
+        background: #f1f4fb;
+        color: $l-muted;
+      }
+      &[aria-invalid="true"] {
+        border-color: #c0392b;
+        background: #fff8f7;
+      }
+    }
+  }
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    color: $l-muted;
+  }
+  &__err {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b3261e;
+  }
+  &__status {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    &.is-success {
+      background: #e8f6ea;
+      color: #0e5a14;
+      border: 1px solid #b7e0bc;
+    }
+    &.is-error {
+      background: #fdecea;
+      color: #8a1c14;
+      border: 1px solid #f3b9b3;
+    }
+  }
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  &__save,
+  &__ghost {
+    min-height: 46px;
+    padding: 0 22px;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    &:focus-visible {
+      outline: 3px solid #ffb066;
+      outline-offset: 2px;
+    }
+  }
+  &__save {
+    border: 0;
+    background: $l-navy;
+    color: #fff;
+    &:hover:not(:disabled) {
+      filter: brightness(1.15);
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+  }
+  &__ghost {
+    border: 1px solid $l-line;
+    background: #fff;
+    color: $l-navy;
+  }
+}
+
+@media (min-width: 600px) {
+  .ProfileForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    &__field--wide,
+    &__actions {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .ProfilePage__grid {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+}
+
+/* All services: one colour, categories in a left rail (same categories as the home page) */
+.AllSvc__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.AllSvc__content { min-width: 0; }
+.AllSvc__rail { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+.AllSvc__rail button { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid #e3eaf6; border-radius: 999px; background: #fff; color: #14224d; font: inherit; font-size: 14px; font-weight: 700; scroll-snap-align: start; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.AllSvc__rail button b { min-width: 24px; padding: 2px 7px; border-radius: 999px; background: #eef2fb; color: #1f3a8a; font-size: 12px; text-align: center; }
+.AllSvc__rail button.is-on { background: #1f3a8a; border-color: #1f3a8a; color: #fff; }
+.AllSvc__rail button.is-on b { background: rgba(255, 255, 255, .2); color: #fff; }
+.AllSvc__rail button:focus-visible { outline: 3px solid #ffb066; outline-offset: 2px; }
+@media (hover: hover) { .AllSvc__rail button:not(.is-on):hover { border-color: #1f3a8a; } }
+@media (min-width: 900px) {
+  .AllSvc__layout { grid-template-columns: 250px minmax(0, 1fr); gap: 20px; }
+  .AllSvc__rail { flex-direction: column; overflow: visible; padding: 10px; background: #fff; border: 1px solid #e3eaf6; border-radius: 20px; box-shadow: 0 10px 26px rgba(20, 34, 77, .06); }
+  .AllSvc__rail button { justify-content: space-between; width: 100%; border-color: transparent; border-radius: 14px; text-align: left; }
+}
+.AllSvc__card { --tone: #1f3a8a; --tone-l: #eaf0ff; border-top-width: 1px; }
+.AllSvc__bar { margin-bottom: 14px; }
+@media (min-width: 1100px) { .AllSvc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1500px) { .AllSvc__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

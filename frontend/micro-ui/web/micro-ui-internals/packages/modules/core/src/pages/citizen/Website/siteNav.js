@@ -104,4 +104,5 @@ export const buildLegalLinks = ({ t, go }) => {
   ];
 };
 
-export const documentUrl = (file) => `${DOCUMENT_BASE}${file}`;
+/** A document is either a full URL or a path under the portal document base. */
+export const documentUrl = (file) => (/^https?:\/\//i.test(file || "") ? file : `${DOCUMENT_BASE}${file}`);

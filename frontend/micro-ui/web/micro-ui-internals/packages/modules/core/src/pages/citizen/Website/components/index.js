@@ -236,6 +236,68 @@ export const PgDoc = ({ index, title, description, meta, actions, icon = "doc", 
   </article>
 );
 
+/** Responsive data table (stacks into labelled rows on phones). columns: [{ key, label, className, render(row, index) }] */
+export const PgTable = ({ caption, columns, rows, getKey }) => (
+  <div className="PgTable__wrap">
+    <table className="PgTable">
+      {caption ? <caption className="PgTable__caption">{caption}</caption> : null}
+      <thead>
+        <tr>
+          {columns.map((c) => (
+            <th key={c.key} scope="col" className={c.className}>{c.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={getKey ? getKey(row, i) : i}>
+            {columns.map((c) => (
+              <td key={c.key} data-label={c.label} className={c.className}>{c.render ? c.render(row, i) : row[c.key]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+/** Pagination bar: "Showing x–y of n", rows-per-page select, prev / numbered pages / next. `page` is 1-based. */
+export const PgPagination = ({ page, pageSize, total, onPage, onPageSize, sizes = [5, 10, 20], label = "Pagination" }) => {
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  const cur = Math.min(page, pages);
+  const from = total === 0 ? 0 : (cur - 1) * pageSize + 1;
+  const to = Math.min(total, cur * pageSize);
+  const nums = [];
+  for (let i = 1; i <= pages; i += 1) {
+    if (i === 1 || i === pages || Math.abs(i - cur) <= 1) nums.push(i);
+    else if (nums[nums.length - 1] !== "…") nums.push("…");
+  }
+  return (
+    <nav className="PgPager" aria-label={label}>
+      <span className="PgPager__info" aria-live="polite">Showing {from}–{to} of {total}</span>
+      {onPageSize ? (
+        <label className="PgPager__size">
+          <span>Rows per page</span>
+          <select value={pageSize} onChange={(e) => onPageSize(Number(e.target.value))}>
+            {sizes.map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </label>
+      ) : null}
+      <div className="PgPager__btns">
+        <button type="button" onClick={() => onPage(cur - 1)} disabled={cur <= 1} aria-label="Previous page">‹</button>
+        {nums.map((n, i) =>
+          n === "…" ? (
+            <span key={`e${i}`} className="PgPager__gap" aria-hidden="true">…</span>
+          ) : (
+            <button key={n} type="button" className={n === cur ? "is-active" : ""} aria-current={n === cur ? "page" : undefined} onClick={() => onPage(n)}>{n}</button>
+          )
+        )}
+        <button type="button" onClick={() => onPage(cur + 1)} disabled={cur >= pages} aria-label="Next page">›</button>
+      </div>
+    </nav>
+  );
+};
+
 /** Primary / ghost download action (button when it needs a fetch, link when it is a URL). */
 export const PgAction = ({ onClick, href, label, ghost, icon = "download" }) => {
   const cls = `PgAction${ghost ? " PgAction--ghost" : ""}`;

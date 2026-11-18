@@ -164,7 +164,11 @@ const Login = ({ config: propsConfig, t, isDisabled }) => {
 
   const tenantLabel = (code) => {
     const c = (cities || []).find((x) => x.code === code);
-    return (c && (t(c.i18nKey) || c.name)) || code;
+    // t() returns the key itself when a translation is missing, so compare against it to fall back
+    // to the tenant's own name instead of showing a raw TENANT_TENANTS_* key.
+    const translated = c?.i18nKey ? t(c.i18nKey) : "";
+    const hasTranslation = translated && translated !== c.i18nKey;
+    return hasTranslation ? translated : c?.name || code.substring(code.indexOf(".") + 1);
   };
 
   const onForgotPassword = () => {

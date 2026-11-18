@@ -133,7 +133,8 @@ const Home = () => {
   sessionStorage.removeItem("landmark"); 
   sessionStorage.removeItem("propertyid");
 
-  const whatsNew = conditionsToDisableNotificationCountTrigger() ? (
+  // Shown only when there is an event to show and the section is configured; otherwise the whole band is left out.
+  const whatsNew = conditionsToDisableNotificationCountTrigger() && (EventsDataLoading || (EventsData?.[0] && whatsNewSectionObj?.headerLabel)) ? (
     EventsDataLoading ? (
       <Loader />
     ) : (

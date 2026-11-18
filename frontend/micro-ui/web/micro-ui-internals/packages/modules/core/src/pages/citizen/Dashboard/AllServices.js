@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import Icon from "../Home/Landing/Icons";
 import SevaLoader from "../../../components/SevaLoader";
 import { DASH_BASE } from "./helpers";
+import { serviceCategories, OTHER_SERVICES, moduleOrder, sortByOrder } from "../Home/Landing/config";
 
 /* How each MDMS menu parent (module) is presented: i18n key suffix, icon, group, colour tone */
 const SERVICE_META = {
@@ -25,11 +26,12 @@ const SERVICE_META = {
   "chb-services": { title: "Community Hall Booking", desc: "Check availability and book a community hall.", icon: "calendar", group: "civic", tone: "blue" },
 };
 const FALLBACK_META = { desc: "", icon: "list", group: "civic", tone: "blue" };
-const GROUPS = [
-  { id: "tax", title: "Property & payments" },
-  { id: "licence", title: "Licences & permits" },
-  { id: "civic", title: "Civic services" },
-];
+/** Same categories as the home page: the first one whose pattern matches the service wins. */
+const categoryOf = (s) => {
+  const hay = `${s.code} ${s.name} ${s.about} ${s.links.map((l) => `${l.label} ${l.navigationURL || ""}`).join(" ")}`;
+  const hit = serviceCategories.find((c) => c.re.test(hay));
+  return hit || OTHER_SERVICES;
+};
 
 /**
  * Signed-in "All services" page: every enabled service from the citizen menu (MDMS actions-test,
@@ -45,7 +47,7 @@ const AllServices = ({ linkData, isLoading }) => {
 
   const services = useMemo(
     () =>
-      Object.keys(linkData || {})
+      sortByOrder(Object.keys(linkData || {})
         .map((code) => {
           const meta = SERVICE_META[code] || { ...FALLBACK_META, title: code };
           const links = [...linkData[code]].sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0));
@@ -57,15 +59,28 @@ const AllServices = ({ linkData, isLoading }) => {
             links: links.map((l) => ({ ...l, label: tt(l.name, l.displayName || l.name) })),
           };
         })
-        .filter((s) => s.links.length),
+        .filter((s) => s.links.length)
+        .map((s) => ({ ...s, cat: categoryOf(s), order: moduleOrder(s.links) }))),
     [linkData, t]
   );
 
   const q = query.trim().toLowerCase();
   const shown = services.filter(
-    (s) => (group === "all" || s.group === group) && (!q || [s.name, s.about, ...s.links.map((l) => l.label)].join(" ").toLowerCase().includes(q))
+    (s) => (group === "all" || s.cat.id === group) && (!q || [s.name, s.about, ...s.links.map((l) => l.label)].join(" ").toLowerCase().includes(q))
   );
-  const groups = GROUPS.filter((g) => services.some((s) => s.group === g.id));
+  const groups = [...serviceCategories, OTHER_SERVICES]
+    .map((c) => ({ ...c, count: services.filter((s) => s.cat.id === c.id).length }))
+    .filter((c) => c.count > 0);
+  const tabs = [{ id: "all", label: tt("ALLSVC_ALL", "All"), count: services.length }, ...groups.map((c) => ({ id: c.id, label: tt(c.key, c.label), count: c.count }))];
+  const onTabKey = (e, i) => {
+    const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const next = tabs[(i + step + tabs.length) % tabs.length];
+    setGroup(next.id);
+    const el = e.currentTarget.parentElement.querySelectorAll("button")[(i + step + tabs.length) % tabs.length];
+    el && el.focus();
+  };
   const open = (url) => url && history.push(url);
 
   if (isLoading) return <SevaLoader message={tt("ALLSVC_LOADING", "Loading services...")} />;
@@ -91,15 +106,20 @@ const AllServices = ({ linkData, isLoading }) => {
             aria-label={tt("ALLSVC_SEARCH", "Search a service, e.g. trade licence")}
           />
         </label>
-        <div className="AllSvc__chips" role="tablist">
-          {[{ id: "all", title: "All" }, ...groups].map((g) => (
-            <button key={g.id} type="button" role="tab" aria-selected={group === g.id} className={group === g.id ? "is-on" : ""} onClick={() => setGroup(g.id)}>
-              {g.id === "all" ? tt("ALLSVC_ALL", "All") : tt(`ALLSVC_G_${g.id}`, g.title)}
-            </button>
-          ))}
-        </div>
       </div>
 
+      <div className="AllSvc__layout">
+        {services.length > 0 && (
+          <div className="AllSvc__rail" role="tablist" aria-orientation="vertical" aria-label={tt("ALLSVC_CATEGORIES", "Service categories")}>
+            {tabs.map((g, i) => (
+              <button key={g.id} type="button" role="tab" aria-selected={group === g.id} tabIndex={group === g.id ? 0 : -1} className={group === g.id ? "is-on" : ""} onClick={() => setGroup(g.id)} onKeyDown={(e) => onTabKey(e, i)}>
+                <span>{g.label}</span>
+                <b>{g.count}</b>
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="AllSvc__content" role="tabpanel">
       {services.length === 0 ? (
         <div className="AllSvc__empty" role="alert">
           <Icon name="info" size={28} />
@@ -118,7 +138,7 @@ const AllServices = ({ linkData, isLoading }) => {
           {shown.map((s) => {
             const [primary, ...rest] = s.links;
             return (
-              <article key={s.code} className={`AllSvc__card AllSvc__card--${s.tone}`}>
+              <article key={s.code} className="AllSvc__card">
                 <div className="AllSvc__top">
                   <span className="AllSvc__icon" aria-hidden="true"><Icon name={s.icon} size={26} /></span>
                   <h2>{s.name}</h2>
@@ -138,6 +158,8 @@ const AllServices = ({ linkData, isLoading }) => {
           })}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

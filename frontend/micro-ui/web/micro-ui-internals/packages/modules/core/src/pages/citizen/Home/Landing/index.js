@@ -12,7 +12,7 @@ import NewsTicker from "./NewsTicker";
 import BackToTop from "./BackToTop";
 import { UtilityBar, SiteHeader, SiteFooter, StatsBand, NewsUpdates } from "./SiteChrome";
 import { getHelpLinks, openLink } from "../../../../components/ActionDock/helpLinks";
-import { ALL_SERVICES_URL, LOGIN_URL, popularSearches, siteDefaults } from "./config";
+import { ALL_SERVICES_URL, LOGIN_URL, PUBLIC_SERVICE, moduleOrder, popularSearches, siteDefaults } from "./config";
 import { buildFooterColumns, buildLegalLinks, buildSiteNav } from "../../Website/siteNav";
 
 /** Module codes that can actually be opened for this tenant. */
@@ -22,7 +22,7 @@ const enabledModuleCodes = (modules = []) =>
     .filter((c) => c && (Digit.ComponentRegistryService.getComponent(`${c}Module`) || Digit.ComponentRegistryService.getComponent(`${c}Links`)));
 
 /** Turns an MDMS uiHomePage card into explorer items, dropping links to modules that are not enabled. */
-const toItems = (card, t, codes) => {
+const toItems = (card, t, codes, linkData) => {
   const lower = codes.map((c) => c.toLowerCase());
   return (card?.props || [])
     .filter((p) => p?.enabled !== false && p?.navigationUrl)
@@ -39,7 +39,13 @@ const toItems = (card, t, codes) => {
       );
       return !registered || lower.includes(seg.toLowerCase());
     })
-    .map((p) => ({ code: p.code, label: t(p.label, { defaultValue: p.name }), url: p.navigationUrl }));
+    .map((p) => {
+      // order: explicit `order` on the MDMS card entry, else the module's lowest orderNumber in the service links
+      const seg = (/\/citizen\/([a-z0-9]+)(?:-home)?(?:\/|$)/i.exec(p.navigationUrl) || [])[1];
+      const key = seg && Object.keys(linkData || {}).find((k) => k.toLowerCase() === seg.toLowerCase());
+      const order = p.order !== undefined && p.order !== null && p.order !== "" ? p.order : key ? moduleOrder(linkData[key]) : undefined;
+      return { code: p.code, label: t(p.label, { defaultValue: p.name }), url: p.navigationUrl, order };
+    });
 };
 
 /**
@@ -82,8 +88,8 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
   const groups = useMemo(() => {
     const out = [];
     const used = new Set();
-    const citizen = toItems(uiHomePage?.citizenServicesCard, t, codes);
-    const info = toItems(uiHomePage?.informationAndUpdatesCard, t, codes);
+    const citizen = toItems(uiHomePage?.citizenServicesCard, t, codes, linkData);
+    const info = toItems(uiHomePage?.informationAndUpdatesCard, t, codes, linkData);
     citizen.concat(info).forEach((i) => used.add((i.url || "").toLowerCase()));
 
     // services of every module enabled for this tenant (what "All services" would list)
@@ -92,6 +98,7 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
         code: `MODULE_${c}`,
         label: t(Digit.Utils.locale.getTransformedLocale(`ACTION_TEST_${c}`), { defaultValue: c }),
         url: `/digit-ui/citizen/${c.toLowerCase()}-home`,
+        order: moduleOrder(linkData?.[c]),
       }))
       .filter((i) => !used.has(i.url.toLowerCase()));
 
@@ -102,13 +109,18 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
     if (info.length)
       out.push({ id: "info", label: t(uiHomePage?.informationAndUpdatesCard?.headerLabel, { defaultValue: "Information & updates" }), items: info });
     return out;
-  }, [uiHomePage, codes, t]);
+  }, [uiHomePage, codes, linkData, t]);
 
   const user = Digit.UserService?.getUser();
   const isLoggedIn = !!user?.access_token;
 
   const links = getHelpLinks({ uiHomePage, modules });
   const go = (url) => openLink(history, url);
+  // a service needs a signed-in citizen: send visitors to login and bring them back to the service afterwards
+  const openService = (url) => {
+    if (!isLoggedIn && url && !/^https?:/i.test(url) && !PUBLIC_SERVICE.test(url)) return history.push(LOGIN_URL, { from: url });
+    return go(url);
+  };
   const openGrievance = links.grievance ? () => go(links.grievance) : null;
   const openTicket = links.ticket ? () => go(links.ticket) : null;
   const openChat = links.chat ? () => go(links.chat) : null;
@@ -121,7 +133,7 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
   const onSearchSubmit = () => {
     const q = query.trim().toLowerCase();
     const hit = q && findService(q);
-    if (hit) return go(hit.url);
+    if (hit) return openService(hit.url);
     scrollToServices();
   };
 
@@ -134,7 +146,7 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
   const popular = popularSearches.filter((p) => !!findPopular(p));
   const onPopular = (p) => {
     const hit = findPopular(p);
-    if (hit) go(hit.url);
+    if (hit) openService(hit.url);
   };
 
   // Application tracking currently needs a signed-in citizen: route accordingly.
@@ -257,8 +269,8 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
               onQueryChange={setQuery}
               activeGroup={activeGroup || "__all"}
               onGroupChange={setActiveGroup}
-              onOpen={(it) => go(it.url)}
-              onViewAll={() => history.push(ALL_SERVICES_URL)}
+              onOpen={(it) => openService(it.url)}
+              loggedIn={isLoggedIn}
             />
           </div>
           </div>
@@ -266,13 +278,15 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
 
         <StatsBand stats={uiHomePage?.statistics} />
 
-        <div className="LandingBand LandingBand--mint">
-        <div className="LandingWrap">
-          <NewsUpdates items={uiHomePage?.newsAndNotifications} onOpen={go}>
-            {whatsNew}
-          </NewsUpdates>
-        </div>
-        </div>
+        {(uiHomePage?.newsAndNotifications?.length > 0 || whatsNew) && (
+          <div className="LandingBand LandingBand--mint">
+          <div className="LandingWrap">
+            <NewsUpdates items={uiHomePage?.newsAndNotifications} onOpen={go}>
+              {whatsNew}
+            </NewsUpdates>
+          </div>
+          </div>
+        )}
       </main>
 
       <BackToTop />

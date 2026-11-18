@@ -7,6 +7,9 @@ import App from './App';
 import { TLCustomisations } from './Customisations/tl/TLCustomisation';
 
 
+// dev only: call this backend directly instead of through the dev-server proxy (see .env.development)
+window.__API_BASE_URL__ = process.env.REACT_APP_API_BASE_URL || "";
+
 initLibraries();
 
 

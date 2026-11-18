@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HP_MAP } from "./himachalGeo";
+import { ULB_TIERS } from "./config";
 
 /** Himachal Pradesh outline with a pin for every urban local body; Shimla (state HQ) is the star. */
 const HimachalMap = ({ active }) => {
   const { t } = useTranslation();
   const [hover, setHover] = useState(null);
-  const { width, height, path, pins } = HP_MAP;
+  const { width, height, path } = HP_MAP;
+  // a pin's tier: Corporations come from the geo data, councils / panchayats from the confirmed list in config
+  const pins = HP_MAP.pins.map((p) => ({ ...p, tier: p.tier === "mc" ? "mc" : ULB_TIERS[p.name] || "other" }));
   const capital = pins.find((p) => p.capital);
   const others = pins.filter((p) => !p.capital);
   const idle = t("LANDING_MAP_HINT", { defaultValue: "Hover a pin to see the urban local body" });

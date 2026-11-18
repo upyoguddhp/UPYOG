@@ -11,6 +11,7 @@ export const ROUTES = {
   notifications: `${BASE}/notification-order`,
   acts: `${BASE}/acts-rules`,
   byelaws: `${BASE}/byelaws`,
+  actsRules: "/rdf-monitoring/notifications/search-acts-rules-tree", // POST { type: "Acts" | "Rules" }
   userManual: `${BASE}/user-manual`,
   sop: `${BASE}/sop-manual`,
   rti: `${BASE}/rti-documents`,
@@ -33,7 +34,7 @@ export const QUICK_PAY_URL = (type) => `https://citizenseva.hp.gov.in/hp-udd/bil
 /** Document services (served through the gateway: rdf-monitoring and hpud-dms-service) */
 export const API = {
   notifications: "/rdf-monitoring/notifications/search-notification", // POST { notification_type }
-  userManual: "/rdf-monitoring/notifications/search-user-manual", // GET
+  userManual: "/rdf-monitoring/notifications/search-user-manual", // POST {}
   fetchDocument: "/hpud-dms-service/dms/fetchServicebyDocID", // POST { serviceName, objectId, documentId, documentType }
 };
 

@@ -24,6 +24,7 @@ import ActionDock from "../../components/ActionDock";
 import { getWebsitePage } from "./Website";
 import CitizenShell from "./Dashboard/CitizenShell";
 import AllServices from "./Dashboard/AllServices";
+import Profile from "./Dashboard/Profile";
 import { applyStoredAccessibility } from "../../components/AccessibilityTools/settings";
 const sidebarHiddenFor = [
   "/digit-ui/citizen/accessibility-statement",
@@ -171,6 +172,18 @@ const Home = ({
       <div className={`${classname || ""} CitizenLandingShell`}>
         <CitizenShell active="svc">
           <AllServices linkData={linkData} isLoading={islinkDataLoading} />
+        </CitizenShell>
+        <ActionDock />
+      </div>
+    );
+  }
+
+  // the profile page uses the dashboard chrome too
+  if (new RegExp(`^${path}/user/profile/?$`).test(pathname || "")) {
+    return (
+      <div className={`${classname || ""} CitizenLandingShell`}>
+        <CitizenShell active="me">
+          <Profile stateCode={stateCode} />
         </CitizenShell>
         <ActionDock />
       </div>

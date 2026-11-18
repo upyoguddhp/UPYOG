@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Icon from "./Icons";
 import { QUICK_PAY_URL } from "../../Website/config";
+import { apiUrl } from "../../../../utils/apiUrl";
 
 const TABS = ["property", "garbage", "track"];
 
 /** Open (no-login) bill search used by the existing portal's Quick Pay. */
 const searchBills = async (type, { id, mobile }) => {
   if (type === "garbage") {
-    const res = await fetch("/garbage-service/garbage-accounts/open/_search", {
+    const res = await fetch(apiUrl("/garbage-service/garbage-accounts/open/_search"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -28,7 +29,7 @@ const searchBills = async (type, { id, mobile }) => {
       bills: (a.bills || []).map((b) => ({ amount: Number(b.totalAmount || 0), status: b.status })),
     }));
   }
-  const res = await fetch("/property-services/property/open/property-bills-search", {
+  const res = await fetch(apiUrl("/property-services/property/open/property-bills-search"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ propertyId: id || "", mobileNumber: mobile || "" }),
