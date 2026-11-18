@@ -39,4 +39,10 @@ public class DdpWorkflowUpdateResponse {
 	private String ddpRejectionReason;
 
 	private String remarks;
+	private String ddpRejectionAction;
+	private Integer reprintCount;
+	private Integer revalidateCount;
+	private Boolean ddpPrintVerified;
+	private Boolean isDdpVerified;
+	private Boolean isReadyForPrinting;
 }
