@@ -2,23 +2,26 @@ package org.egov.garbageservice.service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.egov.garbageservice.util.GrbgConstants;
-import org.egov.garbageservice.util.RequestInfoWrapper;
+import java.util.Objects;
+
+import org.egov.garbageservice.contract.bill.Bill;
+import org.egov.garbageservice.contract.bill.BillAccountDetail;
+import org.egov.garbageservice.contract.bill.BillDetail;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgBillTracker;
 import org.egov.garbageservice.model.contract.PDFRequest;
-import org.egov.garbageservice.contract.bill.Bill;
+import org.egov.garbageservice.util.GrbgConstants;
+import org.egov.garbageservice.util.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.egov.garbageservice.contract.bill.BillDetail;
-import org.egov.garbageservice.contract.bill.BillAccountDetail;
-import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -123,7 +126,8 @@ public class PDFRequestGenerator {
 			String paymentDate = "";
 
 			GrbgBillTracker tracker = grbgBillTracker.stream()
-			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()))
+			        .filter(t -> consumerCode.equals(t.getGrbgApplicationId()) 
+			        		&& Objects.equals(billObj.getId(), t.getBillId()))
 			        .findFirst()
 			        .orElse(null);
 
@@ -252,7 +256,8 @@ public class PDFRequestGenerator {
 
 		    GrbgBillTracker tracker = grbgBillTracker.stream()
 		            .filter(t -> billObj.getConsumerCode() != null
-		                    && billObj.getConsumerCode().equals(t.getGrbgApplicationId()))
+		            		&& billObj.getConsumerCode().equals(t.getGrbgApplicationId())
+		            	    && Objects.equals(billObj.getId(), t.getBillId()))
 		            .findFirst()
 		            .orElse(null);
 		    boolean paymentProcessing = tracker != null

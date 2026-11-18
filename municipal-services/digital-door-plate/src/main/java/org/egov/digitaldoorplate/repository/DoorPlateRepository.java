@@ -92,4 +92,26 @@ public class DoorPlateRepository {
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
 		return jdbcTemplate.query(query, preparedStatementValues.toArray(), rowMapper);
 	}
+
+	private static final String DDP_STATUS_COUNT_QUERY = "SELECT "
+			+ "COUNT(*) FILTER (WHERE is_ready_for_printing = true) AS is_ready_for_printing, "
+			+ "COUNT(*) FILTER (WHERE ddp_print_verified = true) AS ddp_print_verified, "
+			+ "COUNT(*) FILTER (WHERE ddp_dispatched = true) AS ddp_dispatched, "
+			+ "COUNT(*) FILTER (WHERE UPPER(vendor_print_verified) = 'REJECTED') AS vendor_print_verified_rejected, "
+			+ "COUNT(*) FILTER (WHERE installation_done = true) AS installation_done "
+			+ "FROM public.eg_grbg_account_ddp";
+
+	/**
+	 * Counts eg_grbg_account_ddp rows for each DDP workflow status.
+	 */
+	public org.egov.digitaldoorplate.model.DdpStatusCountResponse getDdpStatusCounts() {
+		return jdbcTemplate.queryForObject(DDP_STATUS_COUNT_QUERY,
+				(rs, rowNum) -> org.egov.digitaldoorplate.model.DdpStatusCountResponse.builder()
+						.isReadyForPrinting(rs.getLong("is_ready_for_printing"))
+						.ddpPrintVerified(rs.getLong("ddp_print_verified"))
+						.ddpDispatched(rs.getLong("ddp_dispatched"))
+						.vendorPrintVerifiedRejected(rs.getLong("vendor_print_verified_rejected"))
+						.installationDone(rs.getLong("installation_done"))
+						.build());
+	}
 }

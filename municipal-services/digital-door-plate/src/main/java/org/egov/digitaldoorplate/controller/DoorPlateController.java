@@ -70,4 +70,14 @@ public class DoorPlateController {
 			@RequestBody DoorPlateDdpWorkflowRequest doorPlateDdpWorkflowRequest) {
 		return ResponseEntity.ok(doorPlateService.updateDdpWorkflow(doorPlateDdpWorkflowRequest));
 	}
+
+	/**
+	 * Counts of DDP plates per workflow status (ready for printing, print
+	 * verified, dispatched, vendor-rejected, installed) from eg_grbg_account_ddp.
+	 */
+	@PostMapping("/_ddpStatusCount")
+	public ResponseEntity<org.egov.digitaldoorplate.model.DdpStatusCountResponse> ddpStatusCount(
+			@RequestBody org.egov.digitaldoorplate.model.DdpStatusCountRequest request) {
+		return ResponseEntity.ok(doorPlateService.getDdpStatusCounts(request));
+	}
 }

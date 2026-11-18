@@ -58,4 +58,7 @@ public class RemoteGarbageAccount {
 	private List<RemoteGrbgAddress> addresses;
 
 	private List<RemoteGarbageAccount> childGarbageAccounts;
+	private String ddpRejectionAction;
+	private Integer reprintCount;
+	private Integer revalidateCount;
 }

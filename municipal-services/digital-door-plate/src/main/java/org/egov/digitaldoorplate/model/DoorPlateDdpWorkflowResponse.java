@@ -35,4 +35,11 @@ public class DoorPlateDdpWorkflowResponse {
 	private Boolean ddpPrintingDone;
 
 	private Boolean ddpDispatched;
+	private String ddpRejectionAction;
+	private Integer reprintCount;
+	private Integer revalidateCount;
+	private Boolean ddpPrintVerified;
+	private Boolean isDdpVerified;
+	private Boolean isReadyForPrinting;
+	private String ddpRejectionReason;
 }
