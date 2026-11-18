@@ -280,6 +280,69 @@ public class TransactionServiceV2 {
 
 		for (Transaction currentTxnStatus : currentTxnStatuses) {
 
+			// Idempotency: a transaction already finalised as SUCCESS must not hit the
+			// gateway / collection-service again (duplicate callbacks, retries, double clicks).
+			if (isAlreadyProcessed(currentTxnStatus)) {
+				log.info("Transaction {} already processed, skipping duplicate update", currentTxnStatus.getTxnId());
+				newTxns.add(currentTxnStatus);
+				continue;
+			}
+
+			// Serialise concurrent updates of the same txn within this instance and
+			// re-check inside the lock.
+			synchronized (txnLocks.computeIfAbsent(currentTxnStatus.getTxnId(), k -> new Object())) {
+				try {
+					if (isAlreadyProcessed(currentTxnStatus)) {
+						newTxns.add(currentTxnStatus);
+						continue;
+					}
+					Transaction processed = processTransactionUpdate(requestInfo, requestParams, currentTxnStatus);
+					if (Transaction.TxnStatusEnum.SUCCESS.equals(processed.getTxnStatus())) {
+						long now = System.currentTimeMillis();
+						processedSuccessTxns.put(currentTxnStatus.getTxnId(), now);
+						if (processedSuccessTxns.size() > 5000) {
+							processedSuccessTxns.values().removeIf(t -> now - t > PROCESSED_TTL_MS);
+						}
+					}
+					newTxns.add(processed);
+				} finally {
+					txnLocks.remove(currentTxnStatus.getTxnId());
+				}
+			}
+		}
+		if (CollectionUtils.isEmpty(newTxns)) {
+			return null;
+		}
+
+		mapTransactionDetails(newTxns);
+
+		return newTxns;
+	}
+
+	private static final long PROCESSED_TTL_MS = 10 * 60 * 1000L;
+	private final Map<String, Object> txnLocks = new java.util.concurrent.ConcurrentHashMap<>();
+	// Kafka persistence of the SUCCESS status is async, so remember recent successes in memory too
+	private final Map<String, Long> processedSuccessTxns = new java.util.concurrent.ConcurrentHashMap<>();
+
+	private boolean isAlreadyProcessed(Transaction txn) {
+		if (Transaction.TxnStatusEnum.SUCCESS.equals(txn.getTxnStatus())) {
+			return true;
+		}
+		Long at = processedSuccessTxns.get(txn.getTxnId());
+		if (at == null) {
+			return false;
+		}
+		if (System.currentTimeMillis() - at > PROCESSED_TTL_MS) {
+			processedSuccessTxns.remove(txn.getTxnId());
+			return false;
+		}
+		return true;
+	}
+
+	private Transaction processTransactionUpdate(RequestInfo requestInfo, Map<String, String> requestParams,
+			Transaction currentTxnStatus) {
+		{
+
 			Transaction newTxn = null;
 
 			if (validator.skipGateway(currentTxnStatus)) {
@@ -300,19 +363,13 @@ public class TransactionServiceV2 {
 
 			}
 			
-			String tenantId = currentTxnStatus.getTenantId();
-			String BillId = currentTxnStatus.getBillId();
-			try {
-				DemandAmountInfo demandAmountInfo = fetchDemandAmountsForBill(requestInfo, tenantId, BillId);
-			} catch (Exception e) {
-			    log.error("Unable to fetch demand amounts for bill {}", BillId, e);
-			}
-
 			// Check if transaction is successful, amount matches etc
 						if (validator.shouldGenerateReceipt(currentTxnStatus, newTxn)) {
 							TransactionRequest request = TransactionRequest.builder().requestInfo(requestInfo).transaction(newTxn)
 									.build();
-							paymentsService.registerPayment(request);
+							// Registered asynchronously (PaymentRegistrationConsumer) so this API
+							// does not wait on collection-service during peak load.
+							producer.push(appProperties.getPaymentRegisterTopic(), request);
 						}
 
 			TransactionDump dump = TransactionDump.builder().txnId(currentTxnStatus.getTxnId())
@@ -325,15 +382,8 @@ public class TransactionServiceV2 {
 			// update demands and bill
 			updateDemandsAndBillByTransactionDetails(newTxn, requestInfo);
 
-			newTxns.add(newTxn);
+			return newTxn;
 		}
-		if (CollectionUtils.isEmpty(newTxns)) {
-			return null;
-		}
-
-		mapTransactionDetails(newTxns);
-
-		return newTxns;
 	}
 
 	private void mapTransactionDetails(List<Transaction> transactions) {
