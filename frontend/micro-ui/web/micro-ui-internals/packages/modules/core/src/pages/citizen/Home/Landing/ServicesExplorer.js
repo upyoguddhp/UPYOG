@@ -79,7 +79,8 @@ const ServicesExplorer = ({ groups: sourceGroups, query, onQueryChange, onOpen, 
     const buckets = [...serviceCategories, OTHER_SERVICES].map((c) => ({ id: c.id, label: tt(c.key, c.label), re: c.re, items: [] }));
     all.forEach((it) => {
       const hay = `${it.label} ${it.url || ""}`;
-      const hit = buckets.find((c) => c.re && c.re.test(hay)) || buckets[buckets.length - 1];
+      // category set in MDMS (tenant.citymodule) wins; otherwise match on the name / link
+      const hit = buckets.find((c) => it.category && c.id === it.category) || buckets.find((c) => c.re && c.re.test(hay)) || buckets[buckets.length - 1];
       hit.items.push(it);
     });
     const cats = buckets.filter((c) => c.items.length).map(({ re, ...c }) => c);

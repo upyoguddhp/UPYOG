@@ -688,25 +688,6 @@ public class GarbageAccountService {
 		}
 	}
 
-	/**
-	 * One property can be mapped to only one garbage id. Rejects a DDP mapping whose
-	 * property is already mapped to a different main garbage account.
-	 */
-	private void validatePropertyNotMappedToOtherGarbageId(List<GarbageAccount> accounts) {
-		for (GarbageAccount account : accounts) {
-			if (StringUtils.isBlank(account.getSystemPropertyId()) || null == account.getGarbageId()) {
-				continue;
-			}
-			List<Long> otherGarbageIds = garbageAccountRepository.findOtherMappedGarbageIds(
-					account.getSystemPropertyId(), account.getTenantId(), account.getGarbageId());
-			if (!CollectionUtils.isEmpty(otherGarbageIds)) {
-				throw new CustomException("PROPERTY_ALREADY_MAPPED", "Property " + account.getSystemPropertyId()
-						+ " is already mapped to Garbage ID " + otherGarbageIds.get(0)
-						+ ". One property can be mapped to only one Garbage ID.");
-			}
-		}
-	}
-
 	public GarbageAccountResponse update(GarbageAccountRequest updateGarbageRequest) {
 		
 		Boolean isDdpUpdateCall = updateGarbageRequest.getGarbageAccounts().get(0).getIsDdpUpdateCall();
@@ -3110,6 +3091,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 	 * only sets the field(s) relevant to its own role, leaving the others
 	 * null so they're left untouched.
 	 */
+	@org.springframework.transaction.annotation.Transactional
 	public DdpWorkflowUpdateResponse updateDdpWorkflowFields(DdpWorkflowUpdateRequest request) {
 
 		if (null == request.getRequestInfo() || null == request.getRequestInfo().getUserInfo()
@@ -3128,6 +3110,17 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
 		}
 
+
+		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
+			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
+				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE and ddpRejectionReason.");
+			}
+		} else if (request.getDdpRejectionAction() != null) {
+			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
+		}
+		if (request.getVendorPrintVerified() != null) {
+			request.setVendorPrintVerified(request.getVendorPrintVerified().toUpperCase(java.util.Locale.ROOT));
+		}
 		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
 		Long now = System.currentTimeMillis();
 
@@ -3137,18 +3130,25 @@ public GarbageAccountActionResponse openSearchPayPreview(
 					"No garbage account found for uuid: " + request.getUuid());
 		}
 
+		Map<String, Object> saved = garbageAccountRepository.getDdpWorkflowState(request.getUuid(), request.getTenantId());
 		return DdpWorkflowUpdateResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.uuid(request.getUuid())
-				.vendorPrintVerified(request.getVendorPrintVerified())
-				.ulbVerified(request.getUlbVerified())
-				.installationDone(request.getInstallationDone())
-				.ddpLatitude(request.getDdpLatitude())
-				.ddpLongitude(request.getDdpLongitude())
-				.ddpPrintingDone(request.getDdpPrintingDone())
-				.ddpDispatched(request.getDdpDispatched())
-				.ddpRejectionReason(request.getDdpRejectionReason())
-				.remarks(request.getRemarks())
+				.vendorPrintVerified((String) saved.get("vendor_print_verified"))
+				.ulbVerified((Boolean) saved.get("ulb_verified"))
+				.installationDone((Boolean) saved.get("installation_done"))
+				.ddpLatitude((String) saved.get("ddp_latitude"))
+				.ddpLongitude((String) saved.get("ddp_longitude"))
+				.ddpPrintingDone((Boolean) saved.get("ddp_printing_done"))
+				.ddpDispatched((Boolean) saved.get("ddp_dispatched"))
+				.ddpRejectionReason((String) saved.get("ddp_rejection_reason"))
+				.remarks((String) saved.get("remarks"))
+				.ddpRejectionAction((String) saved.get("ddp_rejection_action"))
+				.ddpPrintVerified((Boolean) saved.get("ddp_print_verified"))
+				.isDdpVerified((Boolean) saved.get("ddp_verified"))
+				.isReadyForPrinting((Boolean) saved.get("is_ready_for_printing"))
+				.reprintCount((Integer) saved.get("reprint_count"))
+				.revalidateCount((Integer) saved.get("revalidate_count"))
 				.build();
 	}
 

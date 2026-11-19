@@ -12,7 +12,7 @@ import NewsTicker from "./NewsTicker";
 import BackToTop from "./BackToTop";
 import { UtilityBar, SiteHeader, SiteFooter, StatsBand, NewsUpdates } from "./SiteChrome";
 import { getHelpLinks, openLink } from "../../../../components/ActionDock/helpLinks";
-import { ALL_SERVICES_URL, LOGIN_URL, PUBLIC_SERVICE, moduleOrder, popularSearches, siteDefaults } from "./config";
+import { ALL_SERVICES_URL, LOGIN_URL, PUBLIC_SERVICE, moduleOrder, moduleSettings, popularSearches, siteDefaults } from "./config";
 import { buildFooterColumns, buildLegalLinks, buildSiteNav } from "../../Website/siteNav";
 
 /** Module codes that can actually be opened for this tenant. */
@@ -22,7 +22,7 @@ const enabledModuleCodes = (modules = []) =>
     .filter((c) => c && (Digit.ComponentRegistryService.getComponent(`${c}Module`) || Digit.ComponentRegistryService.getComponent(`${c}Links`)));
 
 /** Turns an MDMS uiHomePage card into explorer items, dropping links to modules that are not enabled. */
-const toItems = (card, t, codes, linkData) => {
+const toItems = (card, t, codes, linkData, settings = {}) => {
   const lower = codes.map((c) => c.toLowerCase());
   return (card?.props || [])
     .filter((p) => p?.enabled !== false && p?.navigationUrl)
@@ -40,12 +40,14 @@ const toItems = (card, t, codes, linkData) => {
       return !registered || lower.includes(seg.toLowerCase());
     })
     .map((p) => {
-      // order: explicit `order` on the MDMS card entry, else the module's lowest orderNumber in the service links
       const seg = (/\/citizen\/([a-z0-9]+)(?:-home)?(?:\/|$)/i.exec(p.navigationUrl) || [])[1];
+      const cfg = (seg && settings[seg.toLowerCase()]) || {};
       const key = seg && Object.keys(linkData || {}).find((k) => k.toLowerCase() === seg.toLowerCase());
-      const order = p.order !== undefined && p.order !== null && p.order !== "" ? p.order : key ? moduleOrder(linkData[key]) : undefined;
-      return { code: p.code, label: t(p.label, { defaultValue: p.name }), url: p.navigationUrl, order };
-    });
+      // order: `order` on the MDMS card entry, else the citymodule order, else the lowest orderNumber of the service links
+      const order = [p.order, cfg.order, key ? moduleOrder(linkData[key]) : undefined].find((v) => v !== undefined && v !== null && v !== "" && v !== Infinity);
+      return { code: p.code, label: cfg.label ? t(cfg.label, { defaultValue: cfg.label }) : t(p.label, { defaultValue: p.name }), url: p.navigationUrl, order, category: cfg.category, hidden: cfg.showOnLanding === false };
+    })
+    .filter((i) => !i.hidden);
 };
 
 /**
@@ -85,20 +87,26 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
   // modules that are enabled, registered and actually have service links
   const codes = useMemo(() => enabledModuleCodes(modules).filter((c) => linkData?.[c]?.length > 0), [modules, linkData]);
 
+  const settings = useMemo(() => moduleSettings(modules), [modules]);
+
   const groups = useMemo(() => {
     const out = [];
     const used = new Set();
-    const citizen = toItems(uiHomePage?.citizenServicesCard, t, codes, linkData);
-    const info = toItems(uiHomePage?.informationAndUpdatesCard, t, codes, linkData);
+    const citizen = toItems(uiHomePage?.citizenServicesCard, t, codes, linkData, settings);
+    const info = toItems(uiHomePage?.informationAndUpdatesCard, t, codes, linkData, settings);
     citizen.concat(info).forEach((i) => used.add((i.url || "").toLowerCase()));
 
     // services of every module enabled for this tenant (what "All services" would list)
     const moduleItems = codes
+      .filter((c) => settings[c.toLowerCase()]?.showOnLanding !== false)
       .map((c) => ({
         code: `MODULE_${c}`,
-        label: t(Digit.Utils.locale.getTransformedLocale(`ACTION_TEST_${c}`), { defaultValue: c }),
+        label: settings[c.toLowerCase()]?.label
+          ? t(settings[c.toLowerCase()].label, { defaultValue: settings[c.toLowerCase()].label })
+          : t(Digit.Utils.locale.getTransformedLocale(`ACTION_TEST_${c}`), { defaultValue: c }),
         url: `/digit-ui/citizen/${c.toLowerCase()}-home`,
-        order: moduleOrder(linkData?.[c]),
+        order: [settings[c.toLowerCase()]?.order, moduleOrder(linkData?.[c])].find((v) => v !== undefined && v !== null && v !== "" && v !== Infinity),
+        category: settings[c.toLowerCase()]?.category,
       }))
       .filter((i) => !used.has(i.url.toLowerCase()));
 
@@ -109,7 +117,7 @@ const LandingPage = ({ uiHomePage, modules, stateInfo, languages, tenants, whats
     if (info.length)
       out.push({ id: "info", label: t(uiHomePage?.informationAndUpdatesCard?.headerLabel, { defaultValue: "Information & updates" }), items: info });
     return out;
-  }, [uiHomePage, codes, linkData, t]);
+  }, [uiHomePage, codes, linkData, settings, t]);
 
   const user = Digit.UserService?.getUser();
   const isLoggedIn = !!user?.access_token;

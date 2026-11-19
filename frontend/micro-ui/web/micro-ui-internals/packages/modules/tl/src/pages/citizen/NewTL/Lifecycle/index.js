@@ -24,7 +24,7 @@ const LifecycleApp = () => {
   const { mode, applicationNumber: raw } = match.params;
   const cfg = NTL_LIFECYCLE[mode];
   const appNo = decodeURIComponent(raw || "");
-  const root = match.url.replace(/\/(renew|modify|close)\/[^/]+\/?$/, "");
+  const root = match.url.replace(/\/(renew|modify|close|continue)\/[^/]+\/?$/, "");
   const [params, setParams, clearParams] = Digit.Hooks.useSessionStorage(`TL_LC_${mode}_${appNo}`, {});
   const tenantId = new URLSearchParams(search).get("tenantId") || params._tenantId || Digit.ULBService.getStateId();
   const [busy, setBusy] = useState(false);

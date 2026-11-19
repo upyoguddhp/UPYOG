@@ -171,6 +171,7 @@ export const NTL_PROHIBITED_TRADE = "prohibited substances (tobacco & tobacco pr
 export const NTL_LIFECYCLE = {
   renew: { type: "RENEWAL", title: "NTL_LC_RENEW", pageKeys: ["details", "documents"], editable: ["licensePeriod"] },
   modify: { type: "MODIFICATION", title: "NTL_LC_MODIFY", pageKeys: ["details", "people", "documents"], editable: null },
+  continue: { type: "NEW", title: "NTL_LC_CONTINUE_DRAFT", pageKeys: ["documents"], editable: [] },
   close: { type: "CLOSURE", title: "NTL_LC_CLOSE", pageKeys: [], editable: [] },
 };
 

@@ -15,6 +15,7 @@ export const lifecycleActions = (row, rows = []) => {
     return [{ mode: "renew" }, { mode: "modify" }, { mode: "close" }];
   }
   if (row.status === "PENDINGFORMODIFICATION" && row.applicationType === "RENEWAL") return [{ mode: "renew", resume: true }];
+  if (row.status === "INITIATED" && row.applicationType === "NEW") return [{ mode: "continue", resume: true }];
   if (row.status === "INITIATED" && row.applicationType === "RENEWAL") return [{ mode: "renew", resume: true }];
   if (row.status === "PENDINGFORMODIFICATION" && row.applicationType === "MODIFICATION") return [{ mode: "modify", resume: true }];
   return [];

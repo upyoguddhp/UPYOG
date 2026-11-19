@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import Icon from "../Home/Landing/Icons";
 import SevaLoader from "../../../components/SevaLoader";
 import { DASH_BASE } from "./helpers";
-import { serviceCategories, OTHER_SERVICES, moduleOrder, sortByOrder } from "../Home/Landing/config";
+import { serviceCategories, OTHER_SERVICES, moduleOrder, moduleSettings, sortByOrder } from "../Home/Landing/config";
 
 /* How each MDMS menu parent (module) is presented: i18n key suffix, icon, group, colour tone */
 const SERVICE_META = {
@@ -27,7 +27,9 @@ const SERVICE_META = {
 };
 const FALLBACK_META = { desc: "", icon: "list", group: "civic", tone: "blue" };
 /** Same categories as the home page: the first one whose pattern matches the service wins. */
-const categoryOf = (s) => {
+const categoryOf = (s, cfg = {}) => {
+  const set = [...serviceCategories, OTHER_SERVICES].find((c) => c.id === cfg.category);
+  if (set) return set; // set in MDMS (tenant.citymodule)
   const hay = `${s.code} ${s.name} ${s.about} ${s.links.map((l) => `${l.label} ${l.navigationURL || ""}`).join(" ")}`;
   const hit = serviceCategories.find((c) => c.re.test(hay));
   return hit || OTHER_SERVICES;
@@ -38,30 +40,37 @@ const categoryOf = (s) => {
  * url "digit-ui-card") as a card with its quick links. Rendered inside CitizenShell.
  * `linkData` = { [parentModule]: [{ name, displayName, navigationURL, orderNumber }] }
  */
-const AllServices = ({ linkData, isLoading }) => {
+const AllServices = ({ linkData, isLoading, modules }) => {
   const { t } = useTranslation();
   const tt = (k, d, o) => t(k, { defaultValue: d, ...(o || {}) });
   const history = useHistory();
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState("all");
 
+  const settings = useMemo(() => moduleSettings(modules), [modules]);
   const services = useMemo(
     () =>
       sortByOrder(Object.keys(linkData || {})
         .map((code) => {
           const meta = SERVICE_META[code] || { ...FALLBACK_META, title: code };
-          const links = [...linkData[code]].sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0));
+          // a link registered twice (an old route and its migrated replacement) shows once: keep the newest entry
+          const newest = {};
+          linkData[code].forEach((l) => {
+            const k = String(l.displayName || l.name).trim().toLowerCase();
+            if (!newest[k] || (Number(l.id) || 0) > (Number(newest[k].id) || 0)) newest[k] = l;
+          });
+          const links = Object.values(newest).sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0));
           return {
             code,
             ...meta,
-            name: tt(`ALLSVC_M_${code}`, meta.title),
+            name: settings[code.toLowerCase()]?.label ? tt(settings[code.toLowerCase()].label, settings[code.toLowerCase()].label) : tt(`ALLSVC_M_${code}`, meta.title),
             about: meta.desc ? tt(`ALLSVC_D_${code}`, meta.desc) : "",
             links: links.map((l) => ({ ...l, label: tt(l.name, l.displayName || l.name) })),
           };
         })
         .filter((s) => s.links.length)
-        .map((s) => ({ ...s, cat: categoryOf(s), order: moduleOrder(s.links) }))),
-    [linkData, t]
+        .map((s) => ({ ...s, cat: categoryOf(s, settings[s.code.toLowerCase()]), order: [settings[s.code.toLowerCase()]?.order, moduleOrder(s.links)].find((v) => v !== undefined && v !== null && v !== "" && v !== Infinity) }))),
+    [linkData, settings, t]
   );
 
   const q = query.trim().toLowerCase();

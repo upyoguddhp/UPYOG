@@ -722,7 +722,9 @@ public class GarbageAccountSchedulerService {
 				.searchCriteriaGarbageAccount(SearchCriteriaGarbageAccount.builder()
 						.applicationNumber(generateBillRequest.getGrbgApplicationNumbers())
 						.mobileNumber(generateBillRequest.getMobileNumbers())
-						.isMonthlyBilling(true)
+						// Keep the parent available for child discovery even when its billing is off.
+						.isMonthlyBilling(CollectionUtils.isEmpty(generateBillRequest.getGrbgApplicationNumbers())
+								? true : null)
 						.tenantId("hp." +ulbNames.get(0))
 						.wardNames(wardNumbers)
 						.status(Collections.singletonList("APPROVED")).isActiveAccount(true).isActiveSubAccount(true)
@@ -732,12 +734,24 @@ public class GarbageAccountSchedulerService {
 				.searchGarbageAccounts(searchCriteriaGarbageAccountRequest,false);
 
 		if (null != garbageAccountResponse && !CollectionUtils.isEmpty(garbageAccountResponse.getGarbageAccounts())) {
-			garbageAccounts = garbageAccountResponse.getGarbageAccounts();
-			if(generateBillRequest.getGrbgApplicationNumbers() != null) {
-				if(!garbageAccountResponse.getGarbageAccounts().get(0).getChildGarbageAccounts().isEmpty())
-					garbageAccounts.addAll(garbageAccountResponse.getGarbageAccounts().get(0).getChildGarbageAccounts());
+			for (GarbageAccount account : garbageAccountResponse.getGarbageAccounts()) {
+				garbageAccounts.add(account);
+				if (!CollectionUtils.isEmpty(generateBillRequest.getGrbgApplicationNumbers())
+						&& !CollectionUtils.isEmpty(account.getChildGarbageAccounts())) {
+					garbageAccounts.addAll(account.getChildGarbageAccounts());
+				}
 			}
 		}
+
+		// Eligibility belongs to each account, independently of its parent's flag.
+		Set<String> selectedApplications = new HashSet<>();
+		garbageAccounts = garbageAccounts.stream()
+				.filter(Objects::nonNull)
+				.filter(account -> !CollectionUtils.isEmpty(account.getGrbgCollectionUnits())
+						&& account.getGrbgCollectionUnits().get(0) != null
+						&& Boolean.TRUE.equals(account.getGrbgCollectionUnits().get(0).getIsmonthlybilling()))
+				.filter(account -> selectedApplications.add(account.getGrbgApplicationNumber()))
+				.collect(Collectors.toList());
 		
 		if (!CollectionUtils.isEmpty(ulbNames)) {
 			garbageAccounts = garbageAccounts.stream()
