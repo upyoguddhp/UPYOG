@@ -144,4 +144,7 @@ public class GarbageAccount {
 	private String channel;
 
 	
+	private String ddpRejectionAction;
+	private Integer reprintCount;
+	private Integer revalidateCount;
 }

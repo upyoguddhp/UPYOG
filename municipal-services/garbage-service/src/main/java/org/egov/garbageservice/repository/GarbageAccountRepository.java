@@ -68,6 +68,7 @@ public class GarbageAccountRepository {
 			+ ", ddp_dtl.ddp_printing_done as ddp_dtl_ddp_printing_done"
 			+ ", ddp_dtl.ddp_dispatched as ddp_dtl_ddp_dispatched"
 			+ ", ddp_dtl.ddp_rejection_reason as ddp_dtl_ddp_rejection_reason"
+			+ ", ddp_dtl.ddp_rejection_action, COALESCE(ddp_dtl.reprint_count, 0) as reprint_count, COALESCE(ddp_dtl.revalidate_count, 0) as revalidate_count"
 			+ ", ddp_dtl.remarks as ddp_dtl_remarks ";
 
 	private static final String DDP_DETAIL_JOIN = " LEFT OUTER JOIN eg_grbg_account_ddp as ddp_dtl ON ddp_dtl.garbage_account_uuid = acc.uuid";
@@ -239,23 +240,27 @@ public class GarbageAccountRepository {
 
 	private static final String UPSERT_DDP_WORKFLOW_BY_UUID ="INSERT INTO eg_grbg_account_ddp "
 	        + "(garbage_account_uuid, garbage_id, vendor_print_verified, ddp_print_verified, ulb_verified, installation_done, "
-	        + "ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, ddp_rejection_reason, remarks) "
-	        + "SELECT acc.uuid, acc.garbage_id, CAST(:vendorPrintVerified AS VARCHAR), CAST(:ddpPrintVerified AS BOOLEAN), COALESCE(:ulbVerified, false), "
+	        + "ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, ddp_rejection_reason, remarks, ddp_rejection_action, reprint_count, revalidate_count, is_ready_for_printing) "
+	        + "SELECT acc.uuid, acc.garbage_id, CAST(:vendorPrintVerified AS VARCHAR), CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN false ELSE CAST(:ddpPrintVerified AS BOOLEAN) END, COALESCE(:ulbVerified, false), "
 	        + "COALESCE(:installationDone, false), CAST(:ddpLatitude AS VARCHAR), CAST(:ddpLongitude AS VARCHAR), "
-	        + "COALESCE(:ddpPrintingDone, false), COALESCE(:ddpDispatched, false), "
-	        + "CAST(:ddpRejectionReason AS VARCHAR), CAST(:remarks AS VARCHAR) "
+	        + "CASE WHEN CAST(:ddpRejectionAction AS VARCHAR) IS NOT NULL THEN false ELSE COALESCE(:ddpPrintingDone, false) END, COALESCE(:ddpDispatched, false), "
+	        + "CAST(:ddpRejectionReason AS VARCHAR), CAST(:remarks AS VARCHAR), CAST(:ddpRejectionAction AS VARCHAR), CASE WHEN :ddpRejectionAction = 'REPRINT' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REPRINT' THEN true ELSE false END "
 	        + "FROM eg_grbg_account acc WHERE acc.uuid = :uuid AND acc.tenant_id = :tenantId "
 	        + "ON CONFLICT (garbage_account_uuid) DO UPDATE SET "
 	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, eg_grbg_account_ddp.vendor_print_verified), "
-	        + "ddp_print_verified = COALESCE(:ddpPrintVerified, eg_grbg_account_ddp.ddp_print_verified), "
+	        + "ddp_print_verified = CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN false ELSE COALESCE(:ddpPrintVerified, eg_grbg_account_ddp.ddp_print_verified) END, "
 	        + "ulb_verified = COALESCE(:ulbVerified, eg_grbg_account_ddp.ulb_verified), "
 	        + "installation_done = COALESCE(:installationDone, eg_grbg_account_ddp.installation_done), "
 	        + "ddp_latitude = COALESCE(:ddpLatitude, eg_grbg_account_ddp.ddp_latitude), "
 	        + "ddp_longitude = COALESCE(:ddpLongitude, eg_grbg_account_ddp.ddp_longitude), "
-	        + "ddp_printing_done = COALESCE(:ddpPrintingDone, eg_grbg_account_ddp.ddp_printing_done), "
+	        + "ddp_printing_done = CASE WHEN CAST(:ddpRejectionAction AS VARCHAR) IS NOT NULL THEN false ELSE COALESCE(:ddpPrintingDone, eg_grbg_account_ddp.ddp_printing_done) END, "
 	        + "ddp_dispatched = COALESCE(:ddpDispatched, eg_grbg_account_ddp.ddp_dispatched), "
 	        + "ddp_rejection_reason = COALESCE(:ddpRejectionReason, eg_grbg_account_ddp.ddp_rejection_reason), "
-	        + "remarks = COALESCE(:remarks, eg_grbg_account_ddp.remarks)";
+	        + "remarks = COALESCE(:remarks, eg_grbg_account_ddp.remarks), "
+            + "is_ready_for_printing = CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN false WHEN :ddpRejectionAction = 'REPRINT' THEN true ELSE eg_grbg_account_ddp.is_ready_for_printing END, "
+            + "reprint_count = eg_grbg_account_ddp.reprint_count + CASE WHEN :ddpRejectionAction = 'REPRINT' AND (eg_grbg_account_ddp.vendor_print_verified IS DISTINCT FROM 'REJECTED' OR eg_grbg_account_ddp.ddp_rejection_action IS DISTINCT FROM :ddpRejectionAction) THEN 1 ELSE 0 END, "
+            + "revalidate_count = eg_grbg_account_ddp.revalidate_count + CASE WHEN :ddpRejectionAction = 'REVALIDATE' AND (eg_grbg_account_ddp.vendor_print_verified IS DISTINCT FROM 'REJECTED' OR eg_grbg_account_ddp.ddp_rejection_action IS DISTINCT FROM :ddpRejectionAction) THEN 1 ELSE 0 END, "
+            + "ddp_rejection_action = CASE WHEN :vendorPrintVerified = 'VERIFIED' THEN NULL ELSE COALESCE(:ddpRejectionAction, eg_grbg_account_ddp.ddp_rejection_action) END";
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
@@ -991,13 +996,24 @@ public class GarbageAccountRepository {
 		namedParameterJdbcTemplate.update(UPSERT_DDP_DETAILS, params);
 	}
 
+	public Map<String, Object> getDdpWorkflowState(String uuid, String tenantId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", uuid);
+		params.put("tenantId", tenantId);
+		return namedParameterJdbcTemplate.queryForMap("SELECT d.*, a.ddp_verified FROM eg_grbg_account_ddp d "
+				+ "JOIN eg_grbg_account a ON a.uuid = d.garbage_account_uuid WHERE a.uuid = :uuid AND a.tenant_id = :tenantId", params);
+	}
+
 	/**
 	 * Partially updates the DDP workflow fields for one account, identified by
 	 * uuid: all of these fields (including ddp_print_verified) live in
 	 * eg_grbg_account_ddp (created on first write). Any field left null on
 	 * the request keeps its existing value (see the COALESCEs in
 	 * {@link #UPSERT_DDP_WORKFLOW_BY_UUID}), so each role-specific caller only
-	 * needs to send the field(s) it owns.
+	 * needs to send the field(s) it owns. Rejection actions additionally reset
+	 * printing flags; REVALIDATE also resets DDP print verification. Counters
+	 * increment on a change of rejection action or a new rejection after VERIFIED.
+	 * The account update locks the row before changing DDP details.
 	 *
 	 * @return the number of accounts updated (0 if no account matched the
 	 *         uuid/tenantId).
@@ -1005,6 +1021,7 @@ public class GarbageAccountRepository {
 	@Transactional
 	public int updateDdpWorkflowFields(DdpWorkflowUpdateRequest request, String userUuid, Long now) {
 		Map<String, Object> params = new HashMap<>();
+		params.put("ddpRejectionAction", request.getDdpRejectionAction());
 		params.put("uuid", request.getUuid());
 		params.put("tenantId", request.getTenantId());
 		params.put("vendorPrintVerified", request.getVendorPrintVerified());
@@ -1042,6 +1059,18 @@ public class GarbageAccountRepository {
 						+ " AND acc.is_active = true AND acc.parent_account IS NULL AND acc.garbage_id <> ?"
 						+ " AND acc.status != 'REJECTED'",
 				String.class, systemPropertyId, tenantId, garbageId);
+	}
+
+	/**
+	 * Returns the garbage ids of other active main accounts (child accounts are
+	 * excluded, they share their parent's property) already mapped to the given
+	 * property-services propertyId.
+	 */
+	public List<Long> findOtherMappedGarbageIds(String systemPropertyId, String tenantId, Long garbageId) {
+		return jdbcTemplate.queryForList(
+				"SELECT garbage_id FROM eg_grbg_account WHERE system_property_id = ? AND tenant_id = ?"
+						+ " AND is_active = true AND parent_account IS NULL AND garbage_id <> ?",
+				Long.class, systemPropertyId, tenantId, garbageId);
 	}
 
 	/**

@@ -253,28 +253,43 @@ public class DoorPlateService {
 								.equalsIgnoreCase(request.getVendorPrintVerified()))) {
 			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
 		}
+
+		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
+			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
+				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE.");
+			}
+		} else if (request.getDdpRejectionAction() != null) {
+			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
+		}
 		if (null != request.getInstallationDone()
 				&& (StringUtils.isEmpty(request.getDdpLatitude()) || StringUtils.isEmpty(request.getDdpLongitude()))) {
 			throw new CustomException("INVALID_REQUEST",
 					"ddpLatitude and ddpLongitude are mandatory to record installation.");
 		}
 
-		garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
+		java.util.Map<String, Object> saved = garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
 				request.getGarbageAccountUuid(), request.getVendorPrintVerified(), request.getUlbVerified(),
 				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
 				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified(),
-				request.getDdpRejectionReason());
+				request.getDdpRejectionReason(), request.getDdpRejectionAction());
 		
 		return DoorPlateDdpWorkflowResponse.builder()
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.garbageAccountUuid(request.getGarbageAccountUuid())
-				.vendorPrintVerified(request.getVendorPrintVerified())
-				.ulbVerified(request.getUlbVerified())
-				.installationDone(request.getInstallationDone())
-				.ddpLatitude(request.getDdpLatitude())
-				.ddpLongitude(request.getDdpLongitude())
-				.ddpPrintingDone(request.getDdpPrintingDone())
-				.ddpDispatched(request.getDdpDispatched())
+				.vendorPrintVerified((String) saved.get("vendorPrintVerified"))
+				.ulbVerified((Boolean) saved.get("ulbVerified"))
+				.installationDone((Boolean) saved.get("installationDone"))
+				.ddpLatitude((String) saved.get("ddpLatitude"))
+				.ddpLongitude((String) saved.get("ddpLongitude"))
+				.ddpPrintingDone((Boolean) saved.get("ddpPrintingDone"))
+				.ddpDispatched((Boolean) saved.get("ddpDispatched"))
+				.ddpRejectionAction((String) saved.get("ddpRejectionAction"))
+				.ddpPrintVerified((Boolean) saved.get("ddpPrintVerified"))
+				.isDdpVerified((Boolean) saved.get("isDdpVerified"))
+				.isReadyForPrinting((Boolean) saved.get("isReadyForPrinting"))
+				.reprintCount((Integer) saved.get("reprintCount"))
+				.revalidateCount((Integer) saved.get("revalidateCount"))
+				.ddpRejectionReason((String) saved.get("ddpRejectionReason"))
 				.build();
 	}
 
@@ -367,5 +382,14 @@ public class DoorPlateService {
 				|| StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
 			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
 		}
+	}
+
+	public org.egov.digitaldoorplate.model.DdpStatusCountResponse getDdpStatusCounts(
+			org.egov.digitaldoorplate.model.DdpStatusCountRequest request) {
+		validateUserInfo(request.getRequestInfo());
+		org.egov.digitaldoorplate.model.DdpStatusCountResponse response = doorPlateRepository.getDdpStatusCounts();
+		response.setResponseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true));
+		return response;
 	}
 }
