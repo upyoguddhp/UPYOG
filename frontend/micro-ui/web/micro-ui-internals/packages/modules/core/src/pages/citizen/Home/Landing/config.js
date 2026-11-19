@@ -199,3 +199,24 @@ export const sortByOrder = (list) =>
     .map((it, i) => ({ it, i }))
     .sort((a, b) => orderValue(a.it.order) - orderValue(b.it.order) || a.i - b.i)
     .map((x) => x.it);
+
+/**
+ * Per-module presentation settings read from the tenant citymodule master (MDMS tenant.citymodule):
+ *   order          lower first
+ *   label          display name (plain text or a localisation key); missing = the name used before
+ *   showOnLanding  false hides the service from the home page (default true)
+ *   category       one of the ids in serviceCategories ("grievance", "property", "licence", "water", "booking", "info");
+ *                  anything else, or missing, falls back to matching on the service name
+ * Returns { [code lower-case]: { order, showOnLanding, category } }.
+ */
+export const moduleSettings = (modules = []) =>
+  (modules || []).reduce((acc, m) => {
+    if (!m || !m.code) return acc;
+    acc[String(m.code).toLowerCase()] = {
+      order: m.order,
+      showOnLanding: !(m.showOnLanding === false || String(m.showOnLanding).toLowerCase() === "false"),
+      label: m.label ? String(m.label) : undefined,
+      category: [...serviceCategories, OTHER_SERVICES].some((c) => c.id === m.category) ? m.category : undefined,
+    };
+    return acc;
+  }, {});

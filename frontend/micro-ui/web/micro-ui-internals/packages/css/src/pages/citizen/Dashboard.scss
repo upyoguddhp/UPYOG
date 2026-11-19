@@ -1373,3 +1373,12 @@
 .AllSvc__bar { margin-bottom: 14px; }
 @media (min-width: 1100px) { .AllSvc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1500px) { .AllSvc__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* All services: categories as a top row at every width (wraps on desktop, scrolls sideways on phones) */
+.AllSvc__layout { grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important; }
+.AllSvc__rail { flex-direction: row !important; flex-wrap: nowrap; overflow-x: auto !important; padding: 0 0 4px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
+.AllSvc__rail button { width: auto !important; justify-content: flex-start !important; border-color: #e3eaf6 !important; border-radius: 999px !important; }
+.AllSvc__rail button.is-on { border-color: #1f3a8a !important; }
+@media (min-width: 900px) { .AllSvc__rail { flex-wrap: wrap; overflow: visible !important; } }
+@media (min-width: 1100px) { .AllSvc__grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (min-width: 1500px) { .AllSvc__grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }

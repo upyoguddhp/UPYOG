@@ -171,7 +171,7 @@ const Home = ({
     return (
       <div className={`${classname || ""} CitizenLandingShell`}>
         <CitizenShell active="svc">
-          <AllServices linkData={linkData} isLoading={islinkDataLoading} />
+          <AllServices linkData={linkData} isLoading={islinkDataLoading} modules={modules} />
         </CitizenShell>
         <ActionDock />
       </div>

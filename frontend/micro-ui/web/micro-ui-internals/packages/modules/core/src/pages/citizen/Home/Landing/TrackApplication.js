@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import Icon from "./Icons";
 import { QUICK_PAY_URL } from "../../Website/config";
@@ -58,6 +58,8 @@ const TrackApplication = ({ onTrack }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
+  const [searched, setSearched] = useState(null);
+  const resultRef = useRef(null);
 
   const labels = {
     property: { tab: tt("LANDING_TAB_PROPERTY", "Property Bill"), id: tt("LANDING_PROP_ID", "Property ID"), ph: "PID/1234", title: tt("LANDING_PROP_TITLE", "Property bill") },
@@ -69,6 +71,7 @@ const TrackApplication = ({ onTrack }) => {
     setTab(k);
     setError("");
     setResults(null);
+    setSearched(null);
   };
 
   const submitBill = async (e) => {
@@ -77,12 +80,15 @@ const TrackApplication = ({ onTrack }) => {
     if (!id && !form.mobile) return setError(tt("LANDING_BILL_ERR_ANY", `Enter the ${labels[tab].id} or a mobile number`));
     if (form.mobile && !/^[0-9]{10}$/.test(form.mobile)) return setError(tt("LANDING_BILL_ERR_MOBILE", "Enter a 10 digit mobile number"));
     setError("");
+    setResults(null);
     setLoading(true);
     try {
       const list = await searchBills(tab, { id, mobile: form.mobile });
       const want = (b) => (form.status === "PAID" ? b.status === "PAID" : ["ACTIVE", "PARTIALLY_PAID"].includes(b.status));
       const rows = list.map((r) => ({ ...r, bills: r.bills.filter(want) })).filter((r) => r.bills.length);
+      setSearched({ id, mobile: form.mobile, paid: form.status === "PAID" });
       setResults(rows);
+      setTimeout(() => resultRef.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }), 50);
     } catch (err) {
       setResults(null);
       setError(err.message || tt("LANDING_BILL_ERR_FETCH", "Could not fetch bills right now. Please try again."));
@@ -154,10 +160,34 @@ const TrackApplication = ({ onTrack }) => {
             <Icon name="search" size={18} /> {loading ? tt("LANDING_BILL_SEARCHING", "Searching...") : tt("LANDING_BILL_SEARCH", "Search Bill")}
           </button>
 
-          {results && (
-            <div className="LandingTrack__results" aria-live="polite">
+          {loading && (
+            <div className="LandingTrack__results LandingTrack__results--busy" role="status" aria-live="polite">
+              <span className="LandingTrack__spin" aria-hidden="true" />
+              <span>{tt("LANDING_BILL_SEARCHING_MSG", "Searching your bills, please wait...")}</span>
+            </div>
+          )}
+
+          {results && !loading && (
+            <div ref={resultRef} className={`LandingTrack__results ${results.length === 0 ? "LandingTrack__results--none" : "LandingTrack__results--found"}`} role="status" aria-live="polite">
               {results.length === 0 ? (
-                <p>{tt("LANDING_BILL_NONE", "No bills found for these details.")}</p>
+                <div className="LandingTrack__empty">
+                  <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3M8.5 11h5" />
+                  </svg>
+                  <div>
+                    <strong>{tt("LANDING_BILL_NONE_TITLE", "No bills found")}</strong>
+                    <p>
+                      {tt("LANDING_BILL_NONE_SEARCHED", "We searched for")}{" "}
+                      {[searched?.id && `${labels[tab].id}: ${searched.id}`, searched?.mobile && `${tt("LANDING_BILL_MOBILE_SHORT", "Mobile")}: ${searched.mobile}`].filter(Boolean).join(", ")}{" "}
+                      ({searched?.paid ? tt("LANDING_BILL_PAID", "Paid") : tt("LANDING_BILL_PENDING", "Pending")}) {tt("LANDING_BILL_NONE_END", "and found no matching bills.")}
+                    </p>
+                    <p className="LandingTrack__hint">
+                      {searched?.paid
+                        ? tt("LANDING_BILL_NONE_HINT_PAID", "Check the ID, or switch to Pending to see unpaid bills.")
+                        : tt("LANDING_BILL_NONE_HINT", "Check the ID, or switch to Paid if the bill is already settled.")}
+                    </p>
+                  </div>
+                </div>
               ) : (
                 results.map((r) => {
                   const total = r.bills.reduce((s, b) => s + b.amount, 0);

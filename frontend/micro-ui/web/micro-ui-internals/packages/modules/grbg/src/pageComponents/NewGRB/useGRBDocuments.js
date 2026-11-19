@@ -7,7 +7,7 @@ export const GRB_DMS_SERVICE = "GB";
 const dmsBase = () => (window?.globalConfigs?.getConfig?.("DMS_URL") || "/hpud-dms-service").replace(/\/$/, "");
 
 const fetchDocs = async () => {
-  const res = await fetch(`${dmsBase()}/dms/fetchServiceDocMapping`, {
+  const res = await fetch(`${dmsBase()}/dms/fetchServiceDocMapping?tenantId=${Digit.ULBService.getStateId()}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

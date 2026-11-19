@@ -6,7 +6,7 @@ import { BKG_SERVICES } from "../config/bookingConfig";
 const dmsBase = () => (window?.globalConfigs?.getConfig?.("DMS_URL") || "/hpud-dms-service").replace(/\/$/, "");
 
 const fetchDocs = async (serviceName) => {
-  const res = await fetch(`${dmsBase()}/dms/fetchServiceDocMapping`, {
+  const res = await fetch(`${dmsBase()}/dms/fetchServiceDocMapping?tenantId=${Digit.ULBService.getStateId()}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

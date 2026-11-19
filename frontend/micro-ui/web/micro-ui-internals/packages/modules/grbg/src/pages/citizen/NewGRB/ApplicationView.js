@@ -45,7 +45,7 @@ const ApplicationView = () => {
     setFetching(x.id);
     setViewError(null);
     try {
-      const res = await fetch(`${dms}/dms/downloadFile`, {
+      const res = await fetch(`${dms}/dms/downloadFile?tenantId=${Digit.ULBService.getStateId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${(Digit.UserService.getUser() || {}).access_token}` },
         body: JSON.stringify({ RequestInfo: { apiId: "Rainmaker" }, id: x.attachment.url }),

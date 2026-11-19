@@ -19,7 +19,7 @@ const NewTLApp = () => {
           <PrivateRoute path={`${path}/new-registration`} component={NewTradeRegistration} />
           <PrivateRoute path={`${path}/my-registrations`} component={MyRegistrations} />
           <PrivateRoute path={`${path}/application/:applicationNumber`} component={ApplicationView} />
-          <PrivateRoute path={`${path}/:mode(renew|modify|close)/:applicationNumber`} component={LifecycleApp} />
+          <PrivateRoute path={`${path}/:mode(renew|modify|close|continue)/:applicationNumber`} component={LifecycleApp} />
         </Switch>
       </span>
     );
@@ -32,7 +32,7 @@ const NewTLApp = () => {
           <PrivateRoute path={`${path}/new-registration`} component={NewTradeRegistration} />
           <PrivateRoute path={`${path}/my-registrations`} component={MyRegistrations} />
           <PrivateRoute path={`${path}/application/:applicationNumber`} component={ApplicationView} />
-          <PrivateRoute path={`${path}/:mode(renew|modify|close)/:applicationNumber`} component={LifecycleApp} />
+          <PrivateRoute path={`${path}/:mode(renew|modify|close|continue)/:applicationNumber`} component={LifecycleApp} />
         </AppContainer>
       </Switch>
     </span>

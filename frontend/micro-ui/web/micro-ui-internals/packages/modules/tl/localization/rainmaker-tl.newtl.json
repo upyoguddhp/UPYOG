@@ -3447,6 +3447,90 @@
       "message": "उत्पाद बेचते हैं तो वस्तुएँ चुनें, अन्यथा सेवाएँ।",
       "module": "rainmaker-tl",
       "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_DRAFT",
+      "message": "Resume trade licence application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_DRAFT",
+      "message": "व्यापार लाइसेंस आवेदन जारी रखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_CONTINUE",
+      "message": "Resume application",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_BTN_CONTINUE_CONTINUE",
+      "message": "आवेदन जारी रखें",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_SUB",
+      "message": "This application was saved but not submitted. Upload the documents and submit it.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_SUB",
+      "message": "यह आवेदन सहेजा गया था पर जमा नहीं हुआ। दस्तावेज़ अपलोड करके इसे जमा करें।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P1",
+      "message": "Your details are already saved under this application number.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P1",
+      "message": "आपका विवरण इसी आवेदन संख्या के अंतर्गत पहले से सहेजा हुआ है।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P2",
+      "message": "Upload the required documents again; files from the earlier attempt may not have reached the server.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P2",
+      "message": "आवश्यक दस्तावेज़ फिर से अपलोड करें; पिछले प्रयास की फ़ाइलें सर्वर तक नहीं पहुँची हो सकती हैं।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P3",
+      "message": "Review and submit to send it to the ULB for verification.",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_CONTINUE_P3",
+      "message": "समीक्षा करके जमा करें ताकि यह सत्यापन के लिए नगर निकाय को भेजा जाए।",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_CONTINUE",
+      "message": "Application submitted",
+      "module": "rainmaker-tl",
+      "locale": "en_IN"
+    },
+    {
+      "code": "NTL_LC_ACK_CONTINUE",
+      "message": "आवेदन जमा हो गया",
+      "module": "rainmaker-tl",
+      "locale": "hi_IN"
     }
   ]
 }

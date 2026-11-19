@@ -21,7 +21,7 @@ const SitePhoto = ({ uuid, alt, fallback, className = "bkg-photo" }) => {
       const list = await fetchServiceDocumentList("SITE", uuid);
       const doc = list.find((d) => d.attachment && d.attachment.url);
       if (!doc) return null;
-      const res = await fetch(`${dmsBase()}/dms/downloadFile`, {
+      const res = await fetch(`${dmsBase()}/dms/downloadFile?tenantId=${Digit.ULBService.getStateId()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${(Digit.UserService.getUser() || {}).access_token}` },
         body: JSON.stringify({ RequestInfo: { apiId: "Rainmaker" }, id: doc.attachment.url }),
