@@ -117,3 +117,48 @@ $et-bg: #f5f7fc;
 .emp-logout__hint { margin: 0; font-size: 14px; color: #5b6573; }
 .emp-logout .npt-modal__foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; .npt-btn { flex: 1 1 140px; justify-content: center; } }
 .emp-logout__yes { background: #c62828; border-color: #c62828; color: #fff; &:hover, &:focus-visible { background: #a91f1f; } }
+
+/* ---- employee shell: header + left bar fixed, only the centre scrolls (desktop); nothing may push the page sideways ---- */
+.DashShell--employee { overflow-x: clip; max-width: 100vw; }
+.DashShell--employee .DashMain { min-width: 0; overflow-x: clip; }
+.DashShell--employee .ground-container, .DashShell--employee .bkg-citizen { min-width: 0; max-width: 100%; box-sizing: border-box; }
+@media (min-width: 1024px) {
+  .DashShell--employee { height: 100vh; overflow: hidden; grid-template-rows: auto minmax(0, 1fr); }
+  .DashShell--employee .DashTop { position: relative; top: auto; }
+  .DashShell--employee .DashSide { position: static; top: auto; height: auto; min-height: 0; overflow-y: auto; align-self: stretch; }
+  .DashShell--employee .DashMain { min-height: 0; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; padding-bottom: 0; }
+}
+/* breadcrumb row: plain inline  <- Back arrow  Home > Page  (no boxes) */
+.DashShell--employee .npt-crumbs { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 8px; min-height: 44px; margin: 0 0 6px; padding: 0; background: none; border: 0; border-radius: 0; overflow: hidden; white-space: nowrap;
+  > a, > strong, > span { flex: 0 0 auto; font-size: 13px; }
+  > strong { overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
+  > span { color: #8b97b3; } }
+.DashShell--employee .npt-crumbs .erp-back { display: inline-grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; margin: 0 2px 0 -12px; padding: 0; border: 0; border-radius: 50%; background: none; color: #1f3a8a; cursor: pointer; transition: color .15s, transform .15s;
+  &:focus-visible { outline: 3px solid #ffb066; outline-offset: -4px; } &:active { transform: translateX(-2px); } }
+@media (hover: hover) { .DashShell--employee .npt-crumbs .erp-back:hover { color: #e8730c; } }
+
+/* ---- employee header: one row, vertically centred, no boxes ---- */
+.DashShell--employee .DashTop { padding-top: 8px; padding-bottom: 8px; }
+.DashShell--employee .DashTop__tools { display: flex; align-items: center; gap: 14px; margin-right: 4px; }
+.DashShell--employee .DashTop__tools .ctxChip { display: grid; align-content: center; height: 44px; min-height: 44px; padding: 0 4px; border: 0; border-radius: 0; background: none; text-align: left; box-shadow: none; line-height: 1.15;
+  &__role { font-size: 14px; font-weight: 800; color: #14224d; } &__city { font-size: 12px; color: #5b6b8c; }
+  &:focus-visible { outline: 3px solid #ffb066; outline-offset: 2px; } }
+.DashShell--employee .DashTop__tools .A11yTools { display: flex; align-items: center; height: 44px; }
+.DashShell--employee .DashTop__tools .A11yTools__btn { width: 44px; height: 44px; min-height: 44px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: #1f3a8a; box-shadow: none;
+  svg { stroke: currentColor; } &:focus-visible { outline: 3px solid #ffb066; outline-offset: 2px; } }
+.DashShell--employee .DashTop__tools > div:last-child:not(.ctxModal) { display: flex; align-items: center; height: 44px; position: relative; }
+.DashShell--employee .DashTop__tools .employee-select-wrap { display: flex; align-items: center; height: 44px; margin: 0; padding: 0 4px; border: 0; background: none; cursor: pointer;
+  .cp { display: flex; align-items: center; gap: 6px; height: 100%; margin: 0; }
+  label { margin: 0; font-size: 14px; font-weight: 700; color: #14224d; cursor: pointer; line-height: 1; }
+  svg { width: 16px; height: 16px; fill: #14224d; } }
+.DashShell--employee .DashTop__avatar { width: 34px; height: 34px; font-size: 14px; }
+.DashShell--employee .DashTop__name { font-size: 14px; font-weight: 700; }
+@media (max-width: 767px) { .DashShell--employee .DashTop__tools .ctxChip { display: none; } }
+.DashShell--employee .DashTop__tools .employee-select-wrap .cp label { height: auto !important; min-height: 0 !important; align-self: center; display: inline-block; }
+/* the header owns the role-switch popup: keep it above the fixed action bar and tab bar */
+.DashShell--employee .DashTop { z-index: 80; }
+/* language dropdown: compact list under the control, right-aligned */
+.DashShell--employee .DashTop__tools .employee-select-wrap { position: relative; }
+.DashShell--employee .DashTop__tools .options-card { position: absolute !important; top: calc(100% + 4px) !important; right: 0 !important; left: auto !important; bottom: auto !important; margin: 0 !important; min-width: 150px; padding: 4px; display: grid; gap: 2px; background: #fff; border: 1px solid #cfd6e4; border-radius: 6px; box-shadow: 0 10px 24px rgba(20, 34, 77, .16); z-index: 100;
+  .profile-dropdown--item { display: flex !important; align-items: center; height: 44px; min-height: 44px; padding: 0 12px; margin: 0; border-radius: 4px; font-size: 14px; font-weight: 600; color: #14224d; cursor: pointer; white-space: nowrap; span { line-height: 1; }
+    &:hover, &:focus-visible { background: #eef2fb; outline: 0; } } }

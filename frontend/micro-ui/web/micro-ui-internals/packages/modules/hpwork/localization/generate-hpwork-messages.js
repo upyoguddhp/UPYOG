@@ -12,7 +12,7 @@ vm.runInNewContext(src + "\nthis.WRK_MESSAGES = WRK_MESSAGES;", ctx);
 const locales = { en: "en_IN", hi: "hi_IN" };
 const messages = [];
 Object.entries(ctx.WRK_MESSAGES).forEach(([code, texts]) =>
-  Object.entries(locales).forEach(([lang, locale]) => messages.push({ code, message: texts[lang], module: /^(ACTION_TEST_|WRK_MENU_)/.test(code) ? "rainmaker-common" : "rainmaker-hpwork", locale }))
+  Object.entries(locales).forEach(([lang, locale]) => messages.push({ code, message: texts[lang], module: /^(ACTION_TEST_|WRK_MENU_|WRK_BILL_NAV|WRK_MST_NAV)/.test(code) ? "rainmaker-common" : "rainmaker-hpwork", locale }))
 );
 const out = { RequestInfo: { apiId: "Rainmaker" }, tenantId: "hp", messages };
 fs.writeFileSync(path.join(__dirname, "rainmaker-hpwork.json"), JSON.stringify(out, null, 2) + "\n");

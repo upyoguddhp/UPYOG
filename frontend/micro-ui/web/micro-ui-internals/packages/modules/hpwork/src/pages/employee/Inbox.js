@@ -6,6 +6,8 @@ import { Link, useRouteMatch } from "react-router-dom";
 import { ADAPTERS, adapterByCode } from "../../adapters";
 import { wrkText } from "../../config/hpworkMessages";
 import SearchSelect from "../../pageComponents/SearchSelect";
+import { canManageMasters } from "../../utils/masters";
+import { BILL_SERVICES, billServicesFor } from "../../utils/bills";
 import { WRKCrumbs, WRKIcon, WRKPageHead } from "../../pageComponents/WorkLayout";
 import { actionableStatuses, allStatuses, apiErrorMessage, canWork, defaultTenant, fetchWfDef, fmtDate, isDraft, stageOf, statusText, ulbName, workTenants } from "../../utils/work";
 
@@ -91,6 +93,24 @@ const Inbox = () => {
     <div className="npt-wrap wrk-inbox">
       <WRKCrumbs t={t} />
       <WRKPageHead title={tt("WRK_TITLE")} sub={tt("WRK_SUB")} />
+
+      {canManageMasters() ? (
+        <div className="wrk-billstrip">
+          <strong>{tt("WRK_MST_TITLE")}</strong>
+          <Link className="npt-btn npt-btn--ghost" to={`${root}/masters`}><WRKIcon name="list" size={18} /><span>{tt("WRK_MST_TITLE")}</span></Link>
+        </div>
+      ) : null}
+
+      {billServicesFor().length ? (
+        <div className="wrk-billstrip">
+          <strong>{tt("WRK_BILL_TITLE")}</strong>
+          {billServicesFor().map((k) => (
+            <Link key={k} className="npt-btn npt-btn--ghost" to={`${root}/bills/generate/${k}`}><WRKIcon name={BILL_SERVICES[k].icon} size={18} /><span>{tt(BILL_SERVICES[k].labelKey)}</span></Link>
+          ))}
+          <Link className="npt-btn npt-btn--ghost" to={`${root}/bills/search/${billServicesFor()[0]}`}><WRKIcon name="search" size={18} /><span>{tt("WRK_BILLS_NAV")}</span></Link>
+          <Link className="npt-btn npt-btn--ghost" to={`${root}/bills/arrears/${billServicesFor()[0]}`}><WRKIcon name="clock" size={18} /><span>{tt("WRK_ARR_NAV")}</span></Link>
+        </div>
+      ) : null}
 
       {ov.isError ? (
         <div className="npt-lookup-error" role="alert">

@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Link, useHistory } from "react-router-dom";
 import { wrkText } from "../config/hpworkMessages";
 
 const Ico = ({ d, size = 20 }) => (
@@ -19,11 +20,30 @@ export const WRK_ICONS = {
   close: "M6 6l12 12M18 6L6 18",
   file: "M6 3h8l4 4v14H6zM14 3v4h4",
   clock: "M12 4a8 8 0 100 16 8 8 0 000-16zM12 8v4l3 2",
+  rupee: "M7 5h11M7 10h11M7 5c6 0 6 7 0 7H6l9 8",
+  eye: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z",
+  history: "M3 12a9 9 0 109-9 9 9 0 00-7 3.5M3 4v4h4M12 8v4l3 2",
+  sms: "M4 5h16v11H10l-5 4v-4H4zM8 10h8M8 13h5",
+  ban: "M12 3a9 9 0 100 18 9 9 0 000-18zM5.6 5.6l12.8 12.8",
 };
 export const WRKIcon = ({ name, size }) => <Ico d={WRK_ICONS[name] || WRK_ICONS.file} size={size} />;
 
+// Back control that sits at the start of every breadcrumb row.
+export const WRKBack = () => {
+  const history = useHistory();
+  const { t } = useTranslation();
+  const txt = wrkText(t, "WRK_BACKBTN");
+  const label = txt && txt !== "WRK_BACKBTN" ? txt : "Back"; // icon-only control: never show a raw key
+  return (
+    <button type="button" className="erp-back" aria-label={label} title={label} onClick={() => (history.length > 1 ? history.goBack() : history.push("/digit-ui/employee/hpwork/inbox"))}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+    </button>
+  );
+};
+
 export const WRKCrumbs = ({ t, current }) => (
   <nav className="npt-crumbs" aria-label="Breadcrumb">
+    <WRKBack />
     <Link to="/digit-ui/employee">{wrkText(t, "WRK_CRUMB_HOME")}</Link>
     <span>›</span>
     {current ? <Link to="/digit-ui/employee/hpwork/inbox">{wrkText(t, "WRK_CRUMB_INBOX")}</Link> : <strong aria-current="page">{wrkText(t, "WRK_CRUMB_INBOX")}</strong>}

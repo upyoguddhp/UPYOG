@@ -1767,6 +1767,3090 @@
       "message": "विवरण",
       "module": "rainmaker-hpwork",
       "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CANCEL",
+      "message": "Cancel",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CANCEL",
+      "message": "रद्द करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_TITLE",
+      "message": "Generate bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_TITLE",
+      "message": "बिल बनाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_SUB",
+      "message": "Generate garbage and property tax bills for your urban local body.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_SUB",
+      "message": "अपने शहरी स्थानीय निकाय के लिए कूड़ा और संपत्ति कर बिल बनाएँ।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_GRBG",
+      "message": "Garbage bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_GRBG",
+      "message": "कूड़ा बिल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PPT",
+      "message": "Property bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PPT",
+      "message": "संपत्ति कर बिल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NAV",
+      "message": "Generate bills",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NAV",
+      "message": "बिल बनाएँ",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_TYPE",
+      "message": "Billing type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_TYPE",
+      "message": "बिलिंग प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_INDIVIDUAL",
+      "message": "Individual",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_INDIVIDUAL",
+      "message": "व्यक्तिगत",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_MULTIPLE",
+      "message": "Ward-wise",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_MULTIPLE",
+      "message": "वार्ड अनुसार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_MULTIPLE_LOCKED",
+      "message": "Ward-wise generation is heavy on the server and opens daily from {{hour}}:00.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_MULTIPLE_LOCKED",
+      "message": "वार्ड अनुसार बिल बनाना सर्वर पर भारी है और प्रतिदिन {{hour}}:00 बजे से खुलता है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_SEARCH_BY",
+      "message": "Find the account by",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_SEARCH_BY",
+      "message": "खाता खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_GBID",
+      "message": "Garbage ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_GBID",
+      "message": "कूड़ा आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_PTID",
+      "message": "Property ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_PTID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_MOBILE",
+      "message": "Mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_BY_MOBILE",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_GBID",
+      "message": "Garbage account ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_GBID",
+      "message": "कूड़ा खाता आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PTID",
+      "message": "Property ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PTID",
+      "message": "संपत्ति आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_MOBILE",
+      "message": "Mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_MOBILE",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_WARDS",
+      "message": "Wards",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_WARDS",
+      "message": "वार्ड",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_ALL_WARDS",
+      "message": "Select all",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_ALL_WARDS",
+      "message": "सभी चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NONE_WARDS",
+      "message": "Clear all",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NONE_WARDS",
+      "message": "सभी हटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_WARDS_FAILED",
+      "message": "Could not load the wards of this ULB.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_WARDS_FAILED",
+      "message": "इस निकाय के वार्ड लोड नहीं हो सके।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_FOR",
+      "message": "Bill for",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_FOR",
+      "message": "बिल की अवधि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_MONTHLY",
+      "message": "One month",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_MONTHLY",
+      "message": "एक माह",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_YEARLY",
+      "message": "Financial year",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_YEARLY",
+      "message": "वित्तीय वर्ष",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PERIOD",
+      "message": "Period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PERIOD",
+      "message": "अवधि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_MONTH",
+      "message": "Month",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_MONTH",
+      "message": "माह",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_FY",
+      "message": "Financial year",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_FY",
+      "message": "वित्तीय वर्ष",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PICK",
+      "message": "Select",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PICK",
+      "message": "चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_FROM",
+      "message": "From",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_FROM",
+      "message": "से",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_TO",
+      "message": "To",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_TO",
+      "message": "तक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_REBATE",
+      "message": "Apply rebate",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_REBATE",
+      "message": "छूट लागू करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PREVIEW",
+      "message": "Preview bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PREVIEW",
+      "message": "बिल पूर्वावलोकन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_GENERATE",
+      "message": "Generate bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_GENERATE",
+      "message": "बिल बनाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM",
+      "message": "Generate",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM",
+      "message": "बनाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM_TITLE",
+      "message": "Confirm bill generation",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM_TITLE",
+      "message": "बिल बनाने की पुष्टि करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM_MANY",
+      "message": "Bills will be generated for {{n}} ward(s) of {{ulb}}. This can take a while.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_CONFIRM_MANY",
+      "message": "{{ulb}} के {{n}} वार्ड के बिल बनाए जाएँगे। इसमें समय लग सकता है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_BILL_N",
+      "message": "Bill {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_BILL_N",
+      "message": "बिल {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_P_MONTHLY",
+      "message": "Monthly amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_P_MONTHLY",
+      "message": "मासिक राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_P_GROSS",
+      "message": "Bill before rebate",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_P_GROSS",
+      "message": "छूट से पहले बिल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_P_REBATE",
+      "message": "Rebate",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_P_REBATE",
+      "message": "छूट",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_P_FINAL",
+      "message": "Final amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_P_FINAL",
+      "message": "अंतिम राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NONE",
+      "message": "No bill could be calculated for these details. Check the ID, period and that billing is active.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NONE",
+      "message": "इन विवरणों के लिए कोई बिल नहीं बन सका। आईडी, अवधि और बिलिंग सक्रिय होने की जाँच करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PREVIEW_FAILED",
+      "message": "Could not preview the bill. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PREVIEW_FAILED",
+      "message": "बिल पूर्वावलोकन नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_DONE",
+      "message": "{{n}} bill batch(es) generated.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_DONE",
+      "message": "{{n}} बिल बैच बन गए।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NOT_GENERATED",
+      "message": "No bills were generated. Please check the master/factor values or that billing is active.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NOT_GENERATED",
+      "message": "कोई बिल नहीं बना। कृपया मास्टर/फैक्टर मान या बिलिंग सक्रिय होने की जाँच करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_FAILED",
+      "message": "Bill generation failed. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_FAILED",
+      "message": "बिल बनाना विफल रहा। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_WORKING",
+      "message": "Generating bills...",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_WORKING",
+      "message": "बिल बन रहे हैं...",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_ULB",
+      "message": "Select the urban local body",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_ULB",
+      "message": "शहरी स्थानीय निकाय चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_SELECT_FIRST",
+      "message": "Complete the selection to continue",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_SELECT_FIRST",
+      "message": "आगे बढ़ने के लिए चयन पूरा करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_P_NOAMOUNT",
+      "message": "A bill cannot be calculated for this account. The owner may not be linked to a user, or no garbage fee is configured for this category.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_P_NOAMOUNT",
+      "message": "इस खाते का बिल नहीं बन सकता। मालिक किसी उपयोगकर्ता से जुड़ा नहीं हो सकता, या इस श्रेणी का कचरा शुल्क तय नहीं है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_TITLE",
+      "message": "Preview garbage bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_TITLE",
+      "message": "कचरा बिल का पूर्वावलोकन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_SUB",
+      "message": "Check the details before you generate the bill.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_SUB",
+      "message": "बिल बनाने से पहले विवरण जाँच लें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_PAYABLE",
+      "message": "Payable amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_PAYABLE",
+      "message": "देय राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_APPNO",
+      "message": "Application no.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_APPNO",
+      "message": "आवेदन संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_OWNER",
+      "message": "Owner",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_OWNER",
+      "message": "मालिक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_MOBILE",
+      "message": "Mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_MOBILE",
+      "message": "मोबाइल नंबर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_ULB",
+      "message": "Urban local body",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_ULB",
+      "message": "शहरी स्थानीय निकाय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CATEGORY",
+      "message": "Category",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CATEGORY",
+      "message": "श्रेणी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_PERIOD",
+      "message": "Billing period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_PERIOD",
+      "message": "बिलिंग अवधि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CALC",
+      "message": "How the amount is worked out",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CALC",
+      "message": "राशि की गणना",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_FEE",
+      "message": "Monthly fee",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_FEE",
+      "message": "मासिक शुल्क",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_MONTHS",
+      "message": "Number of months",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_MONTHS",
+      "message": "महीनों की संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_BASE",
+      "message": "Bill amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_BASE",
+      "message": "बिल राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_REBATE",
+      "message": "Rebate ({{p}}%)",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_REBATE",
+      "message": "छूट ({{p}}%)",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CONFIRM",
+      "message": "Confirm and generate",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_CONFIRM",
+      "message": "पुष्टि करें और बनाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_N",
+      "message": "Bill {{i}} of {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_PV_N",
+      "message": "बिल {{i}} / {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_VIEW",
+      "message": "View generated bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_VIEW",
+      "message": "बनाया गया बिल देखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_FIND",
+      "message": "Find a bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_FIND",
+      "message": "बिल खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_NAME",
+      "message": "Owner",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_NAME",
+      "message": "मालिक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_PERIOD",
+      "message": "Period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_PERIOD",
+      "message": "अवधि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_ACTIONS",
+      "message": "Actions",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_COL_ACTIONS",
+      "message": "कार्रवाई",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NOTE_LABEL",
+      "message": "Note:",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NOTE_LABEL",
+      "message": "नोट:",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_NOTE_BULK",
+      "message": "Bulk bill generation (Multiple) will be enabled after {{hour}}:00 on a daily basis to reduce the server load.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_NOTE_BULK",
+      "message": "सर्वर का भार कम करने के लिए थोक बिल निर्माण (एकाधिक) प्रतिदिन {{hour}}:00 बजे के बाद चालू होगा।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_TITLE",
+      "message": "Bill generation and payment instructions",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_TITLE",
+      "message": "बिल निर्माण और भुगतान के निर्देश",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_1",
+      "message": "Please wait while multiple/ward-wise bills are being generated. The process may take some time depending on the number of bills.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_1",
+      "message": "एकाधिक/वार्डवार बिल बनने तक प्रतीक्षा करें। बिलों की संख्या के अनुसार इसमें कुछ समय लग सकता है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_2",
+      "message": "Please do not refresh or close this page until the bill generation process is complete.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_2",
+      "message": "बिल निर्माण पूरा होने तक इस पृष्ठ को रीफ्रेश या बंद न करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_3",
+      "message": "Before making payment, please ensure that the required bill has been generated successfully and verify the bill details carefully.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_INS_3",
+      "message": "भुगतान करने से पहले सुनिश्चित करें कि आवश्यक बिल सफलतापूर्वक बन गया है और बिल का विवरण ध्यान से जाँच लें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_VIEW",
+      "message": "View bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_VIEW",
+      "message": "बिल देखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_TITLE",
+      "message": "Bill preview",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_TITLE",
+      "message": "बिल पूर्वावलोकन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_PREPARING",
+      "message": "Preparing the bill…",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_PREPARING",
+      "message": "बिल तैयार हो रहा है…",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_ERROR",
+      "message": "The bill could not be displayed here. Please use Download.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_ERROR",
+      "message": "बिल यहाँ नहीं दिखाया जा सका। कृपया डाउनलोड करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_DOWNLOAD",
+      "message": "Download",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_DOWNLOAD",
+      "message": "डाउनलोड",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_PRINT",
+      "message": "Print",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_PRINT",
+      "message": "प्रिंट",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE",
+      "message": "Share",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE",
+      "message": "साझा करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE_NA",
+      "message": "Sharing is not supported on this browser. The file was downloaded instead.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE_NA",
+      "message": "इस ब्राउज़र में साझा करना समर्थित नहीं है। फ़ाइल डाउनलोड कर दी गई।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE_FAIL",
+      "message": "Could not share the file. Please use Download.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PDF_SHARE_FAIL",
+      "message": "फ़ाइल साझा नहीं हो सकी। कृपया डाउनलोड करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_HISTORY_FAILED",
+      "message": "Could not load the bill history. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_HISTORY_FAILED",
+      "message": "बिल इतिहास लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_BTN",
+      "message": "Collect payment",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_BTN",
+      "message": "भुगतान लें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_TITLE",
+      "message": "Collect payment",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_TITLE",
+      "message": "भुगतान संग्रह",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_FULL",
+      "message": "Full amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_FULL",
+      "message": "पूरी राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_PARTIAL",
+      "message": "Partial",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_PARTIAL",
+      "message": "आंशिक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_ADVANCE",
+      "message": "Advance",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_ADVANCE",
+      "message": "अग्रिम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_TYPE",
+      "message": "Payment type",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_TYPE",
+      "message": "भुगतान का प्रकार",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_AMOUNT",
+      "message": "Amount (₹)",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_AMOUNT",
+      "message": "राशि (₹)",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_MODE",
+      "message": "Pay by",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_MODE",
+      "message": "भुगतान माध्यम",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_CASH",
+      "message": "Cash",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_CASH",
+      "message": "नकद",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_DD",
+      "message": "Demand draft",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_DD",
+      "message": "डिमांड ड्राफ्ट",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_CHEQUE",
+      "message": "Cheque",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_CHEQUE",
+      "message": "चेक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_NEFT",
+      "message": "NEFT",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_NEFT",
+      "message": "NEFT",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_RTGS",
+      "message": "RTGS",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_RTGS",
+      "message": "RTGS",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_RECEIPT",
+      "message": "Cheque / DD / transaction number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_RECEIPT",
+      "message": "चेक / डीडी / लेनदेन संख्या",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_DATE",
+      "message": "Instrument date",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_DATE",
+      "message": "तिथि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_BANK",
+      "message": "Bank",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_BANK",
+      "message": "बैंक",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_NOW",
+      "message": "Pay {{amount}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_NOW",
+      "message": "{{amount}} जमा करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_AMOUNT",
+      "message": "Enter a valid amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_AMOUNT",
+      "message": "सही राशि दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_MAX",
+      "message": "Amount cannot exceed the due amount ({{due}})",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_MAX",
+      "message": "राशि देय राशि ({{due}}) से अधिक नहीं हो सकती",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_ADV",
+      "message": "An advance must be more than the due amount ({{due}})",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_ADV",
+      "message": "अग्रिम राशि देय राशि ({{due}}) से अधिक होनी चाहिए",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_RECEIPT",
+      "message": "Enter the cheque / DD / transaction number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_RECEIPT",
+      "message": "चेक / डीडी / लेनदेन संख्या दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_DATE",
+      "message": "Select the date",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_DATE",
+      "message": "तिथि चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_E_BANK",
+      "message": "Select the bank",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_E_BANK",
+      "message": "बैंक चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_BANKS_FAILED",
+      "message": "Could not load the banks. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_BANKS_FAILED",
+      "message": "बैंक सूची लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_FAILED",
+      "message": "The payment could not be recorded. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_FAILED",
+      "message": "भुगतान दर्ज नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_DONE",
+      "message": "Payment recorded. The receipt is available under View bill.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_DONE",
+      "message": "भुगतान दर्ज हो गया। रसीद 'बिल देखें' में उपलब्ध है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_DONE_CHEQUE",
+      "message": "Payment recorded. It is pending bank clearance; settle it under Cheque settlement.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_DONE_CHEQUE",
+      "message": "भुगतान दर्ज हो गया। यह बैंक क्लियरेंस के लिए लंबित है; इसे चेक निपटान में निपटाएँ।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_CHEQUE_NOTE",
+      "message": "A cheque payment stays pending until you mark it cleared or bounced under Cheque settlement.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_CHEQUE_NOTE",
+      "message": "चेक भुगतान तब तक लंबित रहता है जब तक आप चेक निपटान में इसे क्लियर या बाउंस चिह्नित नहीं करते।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_TITLE",
+      "message": "Cheque settlement",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_TITLE",
+      "message": "चेक निपटान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_SUB",
+      "message": "Mark cheque and DD payments as cleared or bounced.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_SUB",
+      "message": "चेक और डीडी भुगतान को क्लियर या बाउंस चिह्नित करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_FIND",
+      "message": "Find pending cheques",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_FIND",
+      "message": "लंबित चेक खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_EMPTY",
+      "message": "No payments are waiting for clearance",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_EMPTY",
+      "message": "क्लियरेंस के लिए कोई भुगतान लंबित नहीं",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_EMPTY_SUB",
+      "message": "Cheque and DD payments appear here until they are settled.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_EMPTY_SUB",
+      "message": "चेक और डीडी भुगतान निपटाए जाने तक यहाँ दिखते हैं।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_AMOUNT",
+      "message": "Pending amount",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_AMOUNT",
+      "message": "लंबित राशि",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_SETTLE",
+      "message": "Settle cheque",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_SETTLE",
+      "message": "चेक निपटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_ASK",
+      "message": "Did the payment of {{amount}} for {{code}} clear at the bank?",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_ASK",
+      "message": "क्या {{code}} के {{amount}} का भुगतान बैंक में क्लियर हुआ?",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_PASS",
+      "message": "Cleared",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_PASS",
+      "message": "क्लियर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_FAIL",
+      "message": "Bounced",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_FAIL",
+      "message": "बाउंस",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_OK",
+      "message": "Cheque marked as cleared.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_OK",
+      "message": "चेक क्लियर चिह्नित हो गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_BOUNCED",
+      "message": "Cheque marked as bounced.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_BOUNCED",
+      "message": "चेक बाउंस चिह्नित हो गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CHQ_FAILED",
+      "message": "The cheque could not be updated. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CHQ_FAILED",
+      "message": "चेक अपडेट नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_IDS",
+      "message": "Accounts billed",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_IDS",
+      "message": "बिल बने खाते",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_IDS_MORE",
+      "message": "+{{n}} more",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_IDS_MORE",
+      "message": "+{{n}} और",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SMS_BTN",
+      "message": "Resend SMS",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SMS_BTN",
+      "message": "SMS दोबारा भेजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SMS_SENT",
+      "message": "SMS sent.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SMS_SENT",
+      "message": "SMS भेज दिया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SMS_LIMIT",
+      "message": "The SMS can be sent at most 2 times after the bill is generated.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SMS_LIMIT",
+      "message": "बिल बनने के बाद SMS अधिकतम 2 बार भेजा जा सकता है।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_SMS_FAILED",
+      "message": "The SMS could not be sent. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_SMS_FAILED",
+      "message": "SMS नहीं भेजा जा सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_WITH",
+      "message": "Pay with",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_WITH",
+      "message": "भुगतान का तरीका",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_OFFLINE",
+      "message": "Offline",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_OFFLINE",
+      "message": "ऑफ़लाइन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_ONLINE",
+      "message": "Online",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_ONLINE",
+      "message": "ऑनलाइन",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_POS",
+      "message": "Paytm POS",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_POS",
+      "message": "Paytm POS",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_RAZORPAY",
+      "message": "Razorpay",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_RAZORPAY",
+      "message": "Razorpay",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_NO_KEY",
+      "message": "Razorpay is not configured for this portal (RAZORPAY_KEY).",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_NO_KEY",
+      "message": "इस पोर्टल पर Razorpay कॉन्फ़िगर नहीं है (RAZORPAY_KEY)।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_GATEWAY_DOWN",
+      "message": "The payment gateway could not be loaded. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_GATEWAY_DOWN",
+      "message": "पेमेंट गेटवे लोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_CANCELLED",
+      "message": "The payment was not completed.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_CANCELLED",
+      "message": "भुगतान पूरा नहीं हुआ।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_POS_WAIT",
+      "message": "Please complete the payment on the Paytm POS terminal. This can take up to two minutes.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_POS_WAIT",
+      "message": "कृपया Paytm POS टर्मिनल पर भुगतान पूरा करें। इसमें दो मिनट तक लग सकते हैं।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_PAY_POS_PENDING",
+      "message": "The terminal has not confirmed the payment yet. Check the bill status again in a few minutes.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_PAY_POS_PENDING",
+      "message": "टर्मिनल ने अभी भुगतान की पुष्टि नहीं की। कुछ मिनट बाद बिल की स्थिति फिर देखें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_WARD",
+      "message": "Select at least one ward",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_WARD",
+      "message": "कम से कम एक वार्ड चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_MOBILE",
+      "message": "Enter a 10 digit mobile number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_MOBILE",
+      "message": "10 अंकों का मोबाइल नंबर दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_GBID",
+      "message": "Enter the garbage account ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_GBID",
+      "message": "कूड़ा खाता आईडी दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_PTID",
+      "message": "Enter the property ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_PTID",
+      "message": "संपत्ति आईडी दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_MONTH",
+      "message": "Select the month",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_MONTH",
+      "message": "माह चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_FY",
+      "message": "Select the financial year",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_FY",
+      "message": "वित्तीय वर्ष चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_FROM",
+      "message": "Select the start of the period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_FROM",
+      "message": "अवधि की शुरुआत चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_TO",
+      "message": "Select the end of the period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_TO",
+      "message": "अवधि का अंत चुनें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_E_RANGE",
+      "message": "End cannot be before the start",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_E_RANGE",
+      "message": "अंत शुरुआत से पहले नहीं हो सकता",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_CLOSE",
+      "message": "Close",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_CLOSE",
+      "message": "बंद करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_TITLE",
+      "message": "Search and cancel bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_TITLE",
+      "message": "बिल खोजें और रद्द करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_SUB",
+      "message": "Find a bill by account ID or mobile number, download it, or cancel an active bill.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_SUB",
+      "message": "खाता आईडी या मोबाइल नंबर से बिल खोजें, डाउनलोड करें या सक्रिय बिल रद्द करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_ANY_STATUS",
+      "message": "Any status",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_ANY_STATUS",
+      "message": "कोई भी स्थिति",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ACTIVE",
+      "message": "Active",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ACTIVE",
+      "message": "सक्रिय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_PAID",
+      "message": "Paid",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_PAID",
+      "message": "भुगतान किया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_PARTIALLY_PAID",
+      "message": "Partly paid",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_PARTIALLY_PAID",
+      "message": "आंशिक भुगतान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ADVANCE_PAID",
+      "message": "Advance paid",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ADVANCE_PAID",
+      "message": "अग्रिम भुगतान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ADVANCE_ADJUSTED",
+      "message": "Advance adjusted",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_ADVANCE_ADJUSTED",
+      "message": "अग्रिम समायोजित",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_EXPIRED",
+      "message": "Expired",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_EXPIRED",
+      "message": "समाप्त",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_CANCELLED",
+      "message": "Cancelled",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_S_CANCELLED",
+      "message": "रद्द",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CLEARANCE",
+      "message": "clearance pending",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CLEARANCE",
+      "message": "क्लियरेंस लंबित",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_TOTAL",
+      "message": "Total",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_TOTAL",
+      "message": "कुल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_PAID",
+      "message": "Paid",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_PAID",
+      "message": "भुगतान",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_DUE",
+      "message": "Due",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_DUE",
+      "message": "बकाया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_PDF",
+      "message": "Download PDF",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_PDF",
+      "message": "पीडीएफ डाउनलोड",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_HISTORY",
+      "message": "Bill history",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_HISTORY",
+      "message": "बिल इतिहास",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL",
+      "message": "Cancel bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL",
+      "message": "बिल रद्द करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_TITLE",
+      "message": "Cancel this bill?",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_TITLE",
+      "message": "यह बिल रद्द करें?",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_WARN",
+      "message": "The bill of {{code}} ({{period}}) will be cancelled. This cannot be undone.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_WARN",
+      "message": "{{code}} ({{period}}) का बिल रद्द हो जाएगा। इसे वापस नहीं किया जा सकता।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_REASON",
+      "message": "Reason for cancelling",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_REASON",
+      "message": "रद्द करने का कारण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CONFIRM_CANCEL",
+      "message": "Yes, cancel bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CONFIRM_CANCEL",
+      "message": "हाँ, बिल रद्द करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_KEEP",
+      "message": "Keep bill",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_KEEP",
+      "message": "बिल रखें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCELLED",
+      "message": "The bill was cancelled.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCELLED",
+      "message": "बिल रद्द कर दिया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_FAILED",
+      "message": "The bill could not be cancelled. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_CANCEL_FAILED",
+      "message": "बिल रद्द नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_SEARCH_FAILED",
+      "message": "Could not search bills. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_SEARCH_FAILED",
+      "message": "बिल खोजे नहीं जा सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_DOWNLOAD_FAILED",
+      "message": "Could not download the bill PDF. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_DOWNLOAD_FAILED",
+      "message": "बिल पीडीएफ डाउनलोड नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_EMPTY",
+      "message": "No bills found",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_EMPTY",
+      "message": "कोई बिल नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_EMPTY_SUB",
+      "message": "Check the ID or mobile number, the ULB and the status filter.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_EMPTY_SUB",
+      "message": "आईडी या मोबाइल नंबर, निकाय और स्थिति फ़िल्टर जाँचें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_PAGE",
+      "message": "Page {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_PAGE",
+      "message": "पृष्ठ {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILLS_NAV",
+      "message": "Search bills",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILLS_NAV",
+      "message": "बिल खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_TITLE",
+      "message": "Arrears",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_TITLE",
+      "message": "बकाया (एरियर)",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_SUB",
+      "message": "Add past dues (arrears) to a property or garbage account.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_SUB",
+      "message": "संपत्ति या कूड़ा खाते में पिछला बकाया जोड़ें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_NAV",
+      "message": "Arrears",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_NAV",
+      "message": "बकाया (एरियर)",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_FIND",
+      "message": "Find the account",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_FIND",
+      "message": "खाता खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_BY_OLDID",
+      "message": "Old property ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_BY_OLDID",
+      "message": "पुरानी संपत्ति आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_BY_OLDCUST",
+      "message": "Old customer ID",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_BY_OLDCUST",
+      "message": "पुरानी ग्राहक आईडी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_E_VALUE",
+      "message": "Enter a value to search",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_E_VALUE",
+      "message": "खोजने के लिए मान दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_SEARCH_FAILED",
+      "message": "Could not search accounts. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_SEARCH_FAILED",
+      "message": "खाते खोजे नहीं जा सके। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_EMPTY",
+      "message": "No account found",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_EMPTY",
+      "message": "कोई खाता नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_EMPTY_SUB",
+      "message": "Check the ID or mobile number and the ULB.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_EMPTY_SUB",
+      "message": "आईडी या मोबाइल नंबर और निकाय जाँचें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_ADD",
+      "message": "Add arrear",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_ADD",
+      "message": "बकाया जोड़ें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_INFO",
+      "message": "Arrear details",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_INFO",
+      "message": "बकाया विवरण",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_ROW",
+      "message": "Arrear {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_ROW",
+      "message": "बकाया {{n}}",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_TAX",
+      "message": "Property tax",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_TAX",
+      "message": "संपत्ति कर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_FEE",
+      "message": "Garbage fee",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_FEE",
+      "message": "कूड़ा शुल्क",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_ARREAR",
+      "message": "Arrear",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_ARREAR",
+      "message": "बकाया",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_PENALTY",
+      "message": "Penalty",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_PENALTY",
+      "message": "जुर्माना",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_INTEREST",
+      "message": "Interest",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_INTEREST",
+      "message": "ब्याज",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_CONSERVANCY",
+      "message": "2022-2023 Conservancy Tax Before 04-08-2022",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_CONSERVANCY",
+      "message": "2022-2023 संरक्षण कर 04-08-2022 से पहले",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_E_AMOUNT",
+      "message": "Enter at least one amount greater than zero",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_E_AMOUNT",
+      "message": "शून्य से अधिक कम से कम एक राशि दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_REMOVE",
+      "message": "Remove",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_REMOVE",
+      "message": "हटाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_MORE",
+      "message": "Add another period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_MORE",
+      "message": "एक और अवधि जोड़ें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_GRAND",
+      "message": "Grand total",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_GRAND",
+      "message": "कुल योग",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_SAVE",
+      "message": "Create arrear",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_SAVE",
+      "message": "बकाया बनाएँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_DONE",
+      "message": "Arrear created for {{code}}.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_DONE",
+      "message": "{{code}} के लिए बकाया बन गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_FAILED",
+      "message": "The arrear could not be created. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_FAILED",
+      "message": "बकाया नहीं बन सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_ARR_FY_FAILED",
+      "message": "Could not load the financial years.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_ARR_FY_FAILED",
+      "message": "वित्तीय वर्ष लोड नहीं हो सके।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_TITLE",
+      "message": "Masters",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_TITLE",
+      "message": "मास्टर",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SUB",
+      "message": "View, add and update state-level master data (MDMS) such as modules, services and document lists.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SUB",
+      "message": "राज्य स्तरीय मास्टर डेटा (MDMS) जैसे मॉड्यूल, सेवाएँ और दस्तावेज़ सूची देखें, जोड़ें और बदलें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_NAV",
+      "message": "Masters",
+      "module": "rainmaker-common",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_NAV",
+      "message": "मास्टर",
+      "module": "rainmaker-common",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SEARCH",
+      "message": "Search masters",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SEARCH",
+      "message": "मास्टर खोजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_COUNT",
+      "message": "Showing {{n}} of {{total}} masters",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_COUNT",
+      "message": "{{total}} में से {{n}} मास्टर दिख रहे हैं",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_OTHER",
+      "message": "Other",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_OTHER",
+      "message": "अन्य",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_NONE",
+      "message": "No master matches your search",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_NONE",
+      "message": "आपकी खोज से कोई मास्टर नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SCHEMAS_FAILED",
+      "message": "Could not load the list of masters.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SCHEMAS_FAILED",
+      "message": "मास्टर की सूची लोड नहीं हो सकी।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SCHEMA_MISSING",
+      "message": "This master was not found.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SCHEMA_MISSING",
+      "message": "यह मास्टर नहीं मिला।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_FILTER",
+      "message": "Filter the records below",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_FILTER",
+      "message": "नीचे के रिकॉर्ड फ़िल्टर करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ACTIVE",
+      "message": "Active",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ACTIVE",
+      "message": "सक्रिय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_INACTIVE",
+      "message": "Inactive",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_INACTIVE",
+      "message": "निष्क्रिय",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ALL",
+      "message": "All",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ALL",
+      "message": "सभी",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ADD",
+      "message": "Add record",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ADD",
+      "message": "रिकॉर्ड जोड़ें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_EDIT",
+      "message": "Edit",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_EDIT",
+      "message": "संपादित करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ADD_TITLE",
+      "message": "Add record",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ADD_TITLE",
+      "message": "रिकॉर्ड जोड़ें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_EDIT_TITLE",
+      "message": "Edit record",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_EDIT_TITLE",
+      "message": "रिकॉर्ड संपादित करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE",
+      "message": "Disable",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE",
+      "message": "अक्षम करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE",
+      "message": "Enable",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE",
+      "message": "सक्षम करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE_TITLE",
+      "message": "Disable this record?",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE_TITLE",
+      "message": "यह रिकॉर्ड अक्षम करें?",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE_TITLE",
+      "message": "Enable this record?",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE_TITLE",
+      "message": "यह रिकॉर्ड सक्षम करें?",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE_WARN",
+      "message": "{{id}} will stop appearing wherever this master is used. You can enable it again later.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLE_WARN",
+      "message": "{{id}} जहाँ भी यह मास्टर उपयोग होता है वहाँ दिखना बंद हो जाएगा। आप इसे बाद में फिर सक्षम कर सकते हैं।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE_WARN",
+      "message": "{{id}} will appear again wherever this master is used.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLE_WARN",
+      "message": "{{id}} जहाँ भी यह मास्टर उपयोग होता है वहाँ फिर दिखेगा।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_CONFIRM",
+      "message": "Yes, continue",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_CONFIRM",
+      "message": "हाँ, आगे बढ़ें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SAVE",
+      "message": "Save",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SAVE",
+      "message": "सहेजें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ADVANCED",
+      "message": "Edit as JSON",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ADVANCED",
+      "message": "JSON के रूप में संपादित करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_JSON",
+      "message": "Record data (JSON)",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_JSON",
+      "message": "रिकॉर्ड डेटा (JSON)",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_LOCKED",
+      "message": "cannot change",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_LOCKED",
+      "message": "बदला नहीं जा सकता",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_LIST_HINT",
+      "message": "Separate values with commas",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_LIST_HINT",
+      "message": "मानों को अल्पविराम से अलग करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_EMPTY",
+      "message": "No records found",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_EMPTY",
+      "message": "कोई रिकॉर्ड नहीं मिला",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_LIST_FAILED",
+      "message": "Could not load the records.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_LIST_FAILED",
+      "message": "रिकॉर्ड लोड नहीं हो सके।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_SAVE_FAILED",
+      "message": "Could not save the record. Please try again.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_SAVE_FAILED",
+      "message": "रिकॉर्ड सहेजा नहीं जा सका। कृपया पुनः प्रयास करें।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_CREATED",
+      "message": "Record added.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_CREATED",
+      "message": "रिकॉर्ड जोड़ दिया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_UPDATED",
+      "message": "Record updated.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_UPDATED",
+      "message": "रिकॉर्ड अपडेट हो गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLED",
+      "message": "Record disabled.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_DISABLED",
+      "message": "रिकॉर्ड अक्षम कर दिया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLED",
+      "message": "Record enabled.",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ENABLED",
+      "message": "रिकॉर्ड सक्षम कर दिया गया।",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_E_REQUIRED",
+      "message": "This field is required",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_E_REQUIRED",
+      "message": "यह फ़ील्ड आवश्यक है",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_E_NUMBER",
+      "message": "Enter a valid number",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_E_NUMBER",
+      "message": "मान्य संख्या दर्ज करें",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_E_JSON",
+      "message": "This is not valid JSON",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_E_JSON",
+      "message": "यह मान्य JSON नहीं है",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_MODULES",
+      "message": "Modules",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_MODULES",
+      "message": "मॉड्यूल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_MST_ALLMOD",
+      "message": "All modules",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_MST_ALLMOD",
+      "message": "सभी मॉड्यूल",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_1",
+      "message": "Where",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_1",
+      "message": "कहाँ",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_2",
+      "message": "Which account",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_2",
+      "message": "कौन सा खाता",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_3",
+      "message": "For which period",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_STEP_3",
+      "message": "किस अवधि के लिए",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BILL_SUMMARY",
+      "message": "Summary",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BILL_SUMMARY",
+      "message": "सारांश",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
+    },
+    {
+      "code": "WRK_BACKBTN",
+      "message": "Back",
+      "module": "rainmaker-hpwork",
+      "locale": "en_IN"
+    },
+    {
+      "code": "WRK_BACKBTN",
+      "message": "वापस",
+      "module": "rainmaker-hpwork",
+      "locale": "hi_IN"
     }
   ]
 }

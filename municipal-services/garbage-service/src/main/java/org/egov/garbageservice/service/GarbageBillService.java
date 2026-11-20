@@ -274,16 +274,12 @@ public class GarbageBillService {
 
 		demandService.cancelDemand(bill.getTenantId(), Collections.singleton(tracker.getDemandId()), cancleBillRequest.getRequestInfo(), bill.getBusinessService());
 
-		Map<String, Object> additionalDetails = null;
-		if (bill.getAdditionalDetails() != null && !bill.getAdditionalDetails().isNull() && !bill.getAdditionalDetails().isEmpty()) {
-			additionalDetails = (Map<String, Object>) bill.getAdditionalDetails();
-		}
-		if (additionalDetails == null) {
-			additionalDetails = new HashMap<>();
-		}
-		additionalDetails.put("reasonMessage", cancleBillRequest.getReason());
-		additionalDetails.put("reason", "BILL_GRBG_CANCEL");
-		JsonNode additionalDetailsNode = objectMapper.valueToTree(additionalDetails);
+		com.fasterxml.jackson.databind.node.ObjectNode additionalDetailsNode =
+				(bill.getAdditionalDetails() != null && bill.getAdditionalDetails().isObject())
+						? ((com.fasterxml.jackson.databind.node.ObjectNode) bill.getAdditionalDetails()).deepCopy()
+						: objectMapper.createObjectNode();
+		additionalDetailsNode.put("reasonMessage", cancleBillRequest.getReason());
+		additionalDetailsNode.put("reason", "BILL_GRBG_CANCEL");
 
 		UpdateBillCriteria updateBillCriteria = UpdateBillCriteria.builder().tenantId(bill.getTenantId())
 				.statusToBeUpdated(StatusEnum.CANCELLED)

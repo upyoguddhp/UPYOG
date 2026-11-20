@@ -32,10 +32,18 @@ const EmployeeShell = ({ children }) => {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  const inInbox = pathname.indexOf("/hpwork") >= 0;
+  const inInbox = pathname.indexOf("/hpwork") >= 0 && pathname.indexOf("/hpwork/bills") < 0 && pathname.indexOf("/hpwork/masters") < 0;
   const inProfile = pathname.indexOf("/user/profile") >= 0;
+  // verifier / approver roles of Garbage and Property can generate bills
+  const roleCodes = ((info.roles) || []).map((r) => r.code);
+  const billsSvc = [["grbg", ["GB_VERIFIER", "GB_APPROVER"]], ["ppt", ["PROPERTY_VERIFIER", "PROPERTY_APPROVER"]]].find(([, rs]) => rs.some((r) => roleCodes.indexOf(r) >= 0));
+  const isAdmin = ["UD_ADMIN", "UD-ADMIN", "SUPERUSER", "MDMS_ADMIN"].some((r) => roleCodes.indexOf(r) >= 0);
+  const inMasters = pathname.indexOf("/hpwork/masters") >= 0;
+  const inBills = pathname.indexOf("/hpwork/bills") >= 0;
   const nav = [
     { id: "inbox", icon: "list", label: tt("EMP_NAV_INBOX"), on: () => go(`${BASE}/hpwork/inbox`), active: inInbox },
+    ...(billsSvc ? [{ id: "bills", icon: "doc", label: tt("WRK_BILL_NAV"), on: () => go(`${BASE}/hpwork/bills/generate/${billsSvc[0]}`), active: inBills }] : []),
+    ...(isAdmin ? [{ id: "masters", icon: "list", label: tt("WRK_MST_NAV"), on: () => go(`${BASE}/hpwork/masters`), active: inMasters }] : []),
     { id: "modules", icon: "building", label: tt("EMP_NAV_MODULES"), on: () => go(`${BASE}?home=1`), active: !inInbox && !inProfile && /home=1/.test(search) },
     { id: "me", icon: "user", label: tt("DASH_NAV_PROFILE"), on: () => go(`${BASE}/user/profile`), active: inProfile },
   ];
