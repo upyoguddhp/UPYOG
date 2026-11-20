@@ -12,8 +12,8 @@ var globalConfigs = (function () {
     RAZOR_PAY_KEY: "",
     RAZOR_PAY_CURRENCY: "INR",
     RAZOR_PAY_LOGO: "",
-    SSO_SERVICE_ID: "10000180",
-    // SSO_SERVICE_ID: "10000089",
+    // SSO_SERVICE_ID: "10000180",
+    SSO_SERVICE_ID: "10000089",
     SSO_SCRIPT_URL: "https://sso.hp.gov.in/nodeapi/iframe/sso-iframe.js",
     OFFICIAL_SSO_URL: "https://himparivar.hp.gov.in/sso-admin/GovLogin?service_id=22&app_unique=ED003",
   };
