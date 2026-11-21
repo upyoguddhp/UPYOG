@@ -43,6 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @Slf4j
 public class GarbageAccountRepository {
+
+	@Autowired
+	private DdpAuditRepository ddpAuditRepository;
+
 	
 	@Autowired
 	GarbageAccountRowMapper garbageAccountRowMapper;
@@ -970,6 +974,7 @@ public class GarbageAccountRepository {
 		accountParams.addAll(ids);
 		jdbcTemplate.update(String.format(UPDATE_ACCOUNT_LAST_MODIFIED_BY_IDS, placeholders), accountParams.toArray());
 
+		ddpAuditRepository.recordReadyForPrinting(ids, userUuid, lastModifiedDate);
 		return jdbcTemplate.update(String.format(UPSERT_READY_FOR_PRINTING, placeholders), ids.toArray());
 	}
 
@@ -1042,7 +1047,9 @@ public class GarbageAccountRepository {
 			return 0;
 		}
 
+		String previousStage = ddpAuditRepository.currentStage(request.getUuid());
 		namedParameterJdbcTemplate.update(UPSERT_DDP_WORKFLOW_BY_UUID, params);
+		ddpAuditRepository.recordWorkflow(request, userUuid, now, previousStage);
 		return updatedAccounts;
 	}
 	

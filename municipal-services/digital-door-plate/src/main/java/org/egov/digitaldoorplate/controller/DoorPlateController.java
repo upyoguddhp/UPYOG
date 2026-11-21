@@ -80,4 +80,17 @@ public class DoorPlateController {
 			@RequestBody org.egov.digitaldoorplate.model.DdpStatusCountRequest request) {
 		return ResponseEntity.ok(doorPlateService.getDdpStatusCounts(request));
 	}
+
+	@org.springframework.beans.factory.annotation.Autowired
+	private org.egov.digitaldoorplate.service.DdpDashboardService ddpDashboardService;
+
+	/**
+	 * Role-scoped DDP dashboard data (vendor / ULB official / state admin):
+	 * lifecycle stage cards plus the panels of that role's dashboard.
+	 */
+	@PostMapping("/dashboard/_search")
+	public ResponseEntity<org.egov.digitaldoorplate.model.DdpDashboardResponse> dashboardSearch(
+			@RequestBody org.egov.digitaldoorplate.model.DdpDashboardRequest request) {
+		return ResponseEntity.ok(ddpDashboardService.search(request));
+	}
 }
