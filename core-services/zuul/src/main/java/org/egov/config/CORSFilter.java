@@ -58,7 +58,8 @@ public class CORSFilter implements Filter {
 		response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 		response.setHeader("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
 		response.setHeader("X-Permitted-Cross-Domain-Policies", "none");
-		response.setHeader("Cache-Control", "public, max-age=3600"); // Customize the Cache-Control header
+		response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+		response.setHeader("Pragma", "no-cache");
 
 		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
 			// CORS preflight is answered only for allow-listed origins; plain OPTIONS probes are rejected.
