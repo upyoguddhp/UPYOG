@@ -31,6 +31,22 @@ public class CORSFilter implements Filter {
 				.collect(Collectors.toSet());
 	}
 
+	/** Exact match, or a wildcard entry like "https://*.example.gov.in" matching any (sub)domain of it over the same scheme. */
+	private boolean isAllowed(String origin) {
+		if (allowedOrigins.contains(origin)) return true;
+		for (String allowed : allowedOrigins) {
+			int star = allowed.indexOf("://*.");
+			if (star < 0) continue;
+			String scheme = allowed.substring(0, star + 3);          // "https://"
+			String suffix = allowed.substring(star + 4);             // ".example.gov.in"
+			if (origin.startsWith(scheme) && origin.endsWith(suffix)) {
+				String host = origin.substring(scheme.length(), origin.length() - suffix.length());
+				if (!host.isEmpty() && host.matches("[a-zA-Z0-9.-]+") && !host.startsWith(".") && !host.endsWith(".")) return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
@@ -39,7 +55,7 @@ public class CORSFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) res;
 
 		String origin = request.getHeader("Origin");
-		boolean originAllowed = origin != null && allowedOrigins.contains(origin);
+		boolean originAllowed = origin != null && isAllowed(origin);
 
 		// Only echo back origins that are explicitly allow-listed (never reflect arbitrary Origin
 		// together with Allow-Credentials: true).
