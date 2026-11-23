@@ -83,6 +83,7 @@ public class SupersetController {
             user = null;
         }
         if (user == null || !"EMPLOYEE".equalsIgnoreCase(user.path("type").asText())) {
+            log.warn("Superset guest-token denied: x-user-info {} / type='{}'", user == null ? "missing or unparsable" : "present", user == null ? "" : user.path("type").asText());
             return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
         }
 
@@ -103,6 +104,7 @@ public class SupersetController {
             String ulb = requestedTenant.contains(".") ? requestedTenant.substring(requestedTenant.indexOf('.') + 1) : requestedTenant;
             ulb = ulb.toLowerCase();
             if (!TENANT.matcher(ulb).matches() || !(stateLevel && !ulb.equals(stateTenant) || ulbs.contains(ulb))) {
+                log.warn("Superset guest-token denied: requested ulb='{}' not in user's ulbs={} stateLevel={}", ulb, ulbs, stateLevel);
                 return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
             }
             rls.add(Collections.singletonMap("clause", "tenantid = '" + ulb + "'"));
