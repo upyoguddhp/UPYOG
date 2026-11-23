@@ -104,8 +104,30 @@ public class PDFService {
 	public ResponseEntity<Resource> generatePdf(PDFRequest pdfRequest) {
 
 		String template = null;
+		
+		if (Boolean.TRUE.equals(pdfRequest.getIsHybrid()) && StringUtils.isNotEmpty(pdfRequest.getHtmlTemplateContent())) {
+			Map<String, Object> pdfContextData = new HashMap<>();
+			addLogoContext(pdfRequest, pdfContextData);
+			String approverName = pdfRequest.getRequestInfo().getUserInfo().getUserName();
+			
+			if (StringUtils.isNotEmpty(approverName)) {
+				String signature = addSignatureFromMdms(pdfRequest, approverName);
+				pdfContextData.put("signature", signature);
+			}
+			
+			template = pdfRequest.getHtmlTemplateContent();
 
-		if (StringUtils.isNotEmpty(pdfRequest.getHtmlTemplateContent())) {
+			for (Map.Entry<String, Object> entry : pdfContextData.entrySet()) {
+
+				if (entry.getValue() != null) {
+					template = template.replace("${" + entry.getKey() + "}", entry.getValue().toString());
+				}
+			}
+
+			template = ReportUtils.htmlContentCleanUp(template);
+			template = ReportUtils.addMissingClosingTags(template);
+
+		} else if (StringUtils.isNotEmpty(pdfRequest.getHtmlTemplateContent())) {
 			// Replace all special characters in the HTML template content.
 			template = ReportUtils.htmlContentCleanUp(pdfRequest.getHtmlTemplateContent());
 			template = ReportUtils.addMissingClosingTags(template);
