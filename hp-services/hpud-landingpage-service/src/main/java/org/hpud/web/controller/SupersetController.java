@@ -67,6 +67,7 @@ public class SupersetController {
     public ResponseEntity<?> guestToken(@RequestParam("id") String dashboardId,
                                         @RequestParam(value = "tenantId", required = false) String requestedTenant,
                                         @RequestHeader(value = "x-user-info", required = false) String userInfoHeader) {
+        log.info("Superset guest-token request: dashboard={} requestedTenant={} x-user-info={}", dashboardId, requestedTenant, userInfoHeader == null ? "absent" : "present");
         if (supersetUrl.isEmpty() || supersetUsername.isEmpty() || supersetPassword.isEmpty()) {
             log.error("Superset is not configured (superset.url / superset.username / superset.password)");
             return error(HttpStatus.SERVICE_UNAVAILABLE, "Dashboards are not available");
@@ -109,6 +110,7 @@ public class SupersetController {
             }
             rls.add(Collections.singletonMap("clause", "tenantid = '" + ulb + "'"));
         } else if (!stateLevel) {
+            if (ulbs.isEmpty()) log.warn("Superset guest-token denied: user has no ULB roles");
             if (ulbs.isEmpty()) return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
             List<String> quoted = new ArrayList<>();
             for (String u : ulbs) if (TENANT.matcher(u).matches()) quoted.add("'" + u + "'");
