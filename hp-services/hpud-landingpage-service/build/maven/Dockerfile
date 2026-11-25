@@ -24,4 +24,14 @@ COPY --from=build /app/target/*.jar /app/start.sh /opt/egov/
 
 RUN chmod +x /opt/egov/start.sh
 
+# Trust the eMudhra CA chain that signs *.citizenseva.hp.gov.in (absent from the JDK 8 base image's cacerts);
+# needed for HTTPS calls to Superset. Public CA certificates only.
+COPY build/maven/certs /tmp/certs
+RUN CACERTS="$(find /usr /opt -name cacerts -path '*security*' 2>/dev/null | head -1)" \
+ && echo "Importing CA certs into $CACERTS" \
+ && for f in /tmp/certs/*.pem; do \
+      keytool -importcert -noprompt -trustcacerts -keystore "$CACERTS" -storepass changeit -alias "$(basename "$f" .pem)" -file "$f"; \
+    done \
+ && rm -rf /tmp/certs
+
 CMD ["/opt/egov/start.sh"]

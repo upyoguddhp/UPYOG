@@ -59,7 +59,7 @@ public class ZuulGatewayApplication {
 
     // Endpoints that must ALWAYS be authenticated by the gateway (token validated, x-user-info attached), whatever the
     // environment-supplied open/mixed whitelists say. Guards against an env override accidentally opening them.
-    @Value("#{'${egov.auth-required-endpoints:/hpud-landing-service/superset/guest-token}'.split(',')}")
+    @Value("#{'${egov.auth-required-endpoints:/hpud-landing-service/superset/guest-token,/rdf-monitoring/superset/guest-token}'.split(',')}")
     private String[] authRequiredEndpoints;
 
     @Value("${egov.auth-service-host}")
