@@ -45,4 +45,7 @@ public class DdpWorkflowUpdateResponse {
 	private Boolean ddpPrintVerified;
 	private Boolean isDdpVerified;
 	private Boolean isReadyForPrinting;
+	private String ulbVerificationStatus;
+	private String ulbRejectionReason;
+	private String ulbRejectionAction;
 }

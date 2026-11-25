@@ -63,12 +63,16 @@ public class GarbageAccountService {
 	 * {@code /garbage-accounts/_updateDdpWorkflow}. Fields left null are not
 	 * sent as "clear this column" but simply omitted from the update (see
 	 * garbage-service's COALESCE-based partial update), so each role-specific
-	 * caller only needs to pass the field(s) it owns.
+	 * caller only needs to pass the field(s) it owns. {@code ulbVerified} is
+	 * not sent at all - garbage-service derives it server-side from
+	 * {@code actorRole}.
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> updateDdpWorkflowFields(RequestInfo requestInfo, String tenantId,
-			String garbageAccountUuid, String vendorPrintVerified, Boolean ulbVerified, Boolean installationDone,
-			String ddpLatitude, String ddpLongitude, Boolean ddpPrintingDone, Boolean ddpDispatched, Boolean ddpPrintVerified, String ddpRejectionReason, String ddpRejectionAction) {
+			String garbageAccountUuid, String actorRole, String vendorPrintVerified, Boolean installationDone,
+			String ddpLatitude, String ddpLongitude, Boolean ddpPrintingDone, Boolean ddpDispatched,
+			Boolean ddpPrintVerified, String ddpRejectionReason, String ddpRejectionAction,
+			String ulbVerificationStatus, String ulbRejectionReason, String ulbRejectionAction) {
 
 		StringBuilder uri = new StringBuilder(ddpConfig.getGarbageServiceHostUrl())
 				.append(ddpConfig.getGarbageAccountUpdateDdpWorkflowEndpoint());
@@ -77,8 +81,8 @@ public class GarbageAccountService {
 		request.put("RequestInfo", requestInfo);
 		request.put("tenantId", tenantId);
 		request.put("uuid", garbageAccountUuid);
+		request.put("actorRole", actorRole);
 		request.put("vendorPrintVerified", vendorPrintVerified);
-		request.put("ulbVerified", ulbVerified);
 		request.put("installationDone", installationDone);
 		request.put("ddpLatitude", ddpLatitude);
 		request.put("ddpLongitude", ddpLongitude);
@@ -87,6 +91,9 @@ public class GarbageAccountService {
 		request.put("ddpPrintVerified", ddpPrintVerified);
 		request.put("ddpRejectionReason", ddpRejectionReason);
 		request.put("ddpRejectionAction", ddpRejectionAction);
+		request.put("ulbVerificationStatus", ulbVerificationStatus);
+		request.put("ulbRejectionReason", ulbRejectionReason);
+		request.put("ulbRejectionAction", ulbRejectionAction);
 
 		Optional<Object> response = serviceRequestRepository.fetchResult(uri, request);
 
