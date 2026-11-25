@@ -24,7 +24,7 @@ public class NocQueryBuilder {
 
 	private static final String QUERY = "SELECT noc.*,nocdoc.*,noc.id as noc_id,noc.tenantid as noc_tenantId,noc.lastModifiedTime as "
 			+ "noc_lastModifiedTime,noc.createdBy as noc_createdBy,noc.lastModifiedBy as noc_lastModifiedBy,noc.createdTime as "
-			+ "noc_createdTime,noc.additionalDetails,noc.landId as noc_landId, nocdoc.id as noc_doc_id, nocdoc.additionalDetails as doc_details, "
+			+ "noc_createdTime,noc.certificatetemplate,noc.additionalDetails,noc.landId as noc_landId, nocdoc.id as noc_doc_id, nocdoc.additionalDetails as doc_details, "
 			+ "nocdoc.documenttype as noc_doc_documenttype,nocdoc.filestoreid as noc_doc_filestore"
 			+ " FROM eg_noc noc  LEFT OUTER JOIN "
 			+ "eg_noc_document nocdoc ON nocdoc.nocid = noc.id WHERE 1=1 ";
@@ -34,6 +34,8 @@ public class NocQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 	
 	private final String countWrapper = "SELECT COUNT(DISTINCT(noc_id)) FROM ({INTERNAL_QUERY}) as noc_count";
+	
+	private final String TEMPLATE_INSERTION_QUERY = "UPDATE eg_noc SET certificatetemplate = ? WHERE applicationno = ?";
 
 	/**
 	 * To give the Search query based on the requirements.
@@ -152,6 +154,10 @@ public class NocQueryBuilder {
 		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
+	}
+	
+	public String getNocTemplateInsertQuery(String template, String applicationNo) {
+	    return TEMPLATE_INSERTION_QUERY;
 	}
 
 	/**

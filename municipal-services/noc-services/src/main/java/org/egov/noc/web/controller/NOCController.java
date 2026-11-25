@@ -51,12 +51,14 @@ import org.egov.noc.web.model.NocResponse;
 import org.egov.noc.web.model.NocSearchCriteria;
 import org.egov.noc.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 	
 @RestController
@@ -97,5 +99,12 @@ public class NOCController {
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).count(count)
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value= "/_getNocTemplate")
+	public String generateNocTemplate(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, 
+			@RequestParam String applicationNo, @RequestParam String tenantId) {
+		String response = nocService.generateNocTemplate(requestInfoWrapper, applicationNo, tenantId);
+		return response;
 	}
 }
