@@ -67,6 +67,7 @@ public class SupersetController {
     public ResponseEntity<?> guestToken(@RequestParam("id") String dashboardId,
                                         @RequestParam(value = "tenantId", required = false) String requestedTenant,
                                         @RequestHeader(value = "x-user-info", required = false) String userInfoHeader) {
+        log.info("Superset guest-token request: dashboard={} requestedTenant={} x-user-info={}", dashboardId, requestedTenant, userInfoHeader == null ? "absent" : "present");
         if (supersetUrl.isEmpty() || supersetUsername.isEmpty() || supersetPassword.isEmpty()) {
             log.error("Superset is not configured (superset.url / superset.username / superset.password)");
             return error(HttpStatus.SERVICE_UNAVAILABLE, "Dashboards are not available");
@@ -83,6 +84,7 @@ public class SupersetController {
             user = null;
         }
         if (user == null || !"EMPLOYEE".equalsIgnoreCase(user.path("type").asText())) {
+            log.warn("Superset guest-token denied: x-user-info {} / type='{}'", user == null ? "missing or unparsable" : "present", user == null ? "" : user.path("type").asText());
             return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
         }
 
@@ -103,10 +105,12 @@ public class SupersetController {
             String ulb = requestedTenant.contains(".") ? requestedTenant.substring(requestedTenant.indexOf('.') + 1) : requestedTenant;
             ulb = ulb.toLowerCase();
             if (!TENANT.matcher(ulb).matches() || !(stateLevel && !ulb.equals(stateTenant) || ulbs.contains(ulb))) {
+                log.warn("Superset guest-token denied: requested ulb='{}' not in user's ulbs={} stateLevel={}", ulb, ulbs, stateLevel);
                 return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
             }
             rls.add(Collections.singletonMap("clause", "tenantid = '" + ulb + "'"));
         } else if (!stateLevel) {
+            if (ulbs.isEmpty()) log.warn("Superset guest-token denied: user has no ULB roles");
             if (ulbs.isEmpty()) return error(HttpStatus.FORBIDDEN, "You are not authorized to access this resource");
             List<String> quoted = new ArrayList<>();
             for (String u : ulbs) if (TENANT.matcher(u).matches()) quoted.add("'" + u + "'");

@@ -57,6 +57,11 @@ public class ZuulGatewayApplication {
     @Value("#{'${egov.mixed-mode-endpoints-whitelist}'.split(',')}")
     private String[] mixedModeEndpointsWhitelist;
 
+    // Endpoints that must ALWAYS be authenticated by the gateway (token validated, x-user-info attached), whatever the
+    // environment-supplied open/mixed whitelists say. Guards against an env override accidentally opening them.
+    @Value("#{'${egov.auth-required-endpoints:/hpud-landing-service/superset/guest-token}'.split(',')}")
+    private String[] authRequiredEndpoints;
+
     @Value("${egov.auth-service-host}")
     private String authServiceHost;
 
@@ -78,10 +83,21 @@ public class ZuulGatewayApplication {
     @Autowired
     private CustomRateLimitUtils customRateLimitUtils;
 
+    private HashSet<String> effectiveOpenEndpoints() {
+        HashSet<String> open = new HashSet<>(Arrays.asList(openEndpointsWhitelist));
+        open.removeAll(Arrays.asList(authRequiredEndpoints));
+        return open;
+    }
+
+    private HashSet<String> effectiveMixedEndpoints() {
+        HashSet<String> mixed = new HashSet<>(Arrays.asList(mixedModeEndpointsWhitelist));
+        mixed.addAll(Arrays.asList(authRequiredEndpoints));
+        return mixed;
+    }
+
     @Bean
     public AuthPreCheckFilter authCheckFilter() {
-        return new AuthPreCheckFilter(new HashSet<>(Arrays.asList(openEndpointsWhitelist)),
-            new HashSet<>(Arrays.asList(mixedModeEndpointsWhitelist)),userUtils);
+        return new AuthPreCheckFilter(effectiveOpenEndpoints(), effectiveMixedEndpoints(), userUtils);
     }
 
     @Bean
@@ -97,9 +113,7 @@ public class ZuulGatewayApplication {
 
     @Bean
     public RbacPreCheckFilter rbacCheckFilter() {
-        return new RbacPreCheckFilter(new HashSet<>(Arrays.asList(openEndpointsWhitelist)),
-            new HashSet<>(Arrays.asList(mixedModeEndpointsWhitelist))
-        );
+        return new RbacPreCheckFilter(effectiveOpenEndpoints(), effectiveMixedEndpoints());
     }
 
     @Configuration
