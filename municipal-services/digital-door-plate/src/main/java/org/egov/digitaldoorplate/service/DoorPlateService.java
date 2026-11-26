@@ -248,6 +248,8 @@ public class DoorPlateService {
 	}
 
 	/**
+	 * 
+	 * 
 	 * Single entry point for every DDP workflow role update on the garbage
 	 * account identified by {@code garbageAccountUuid} (the "id" resolved
 	 * from {@code /_verifyQr}): vendor print verification, vendor
