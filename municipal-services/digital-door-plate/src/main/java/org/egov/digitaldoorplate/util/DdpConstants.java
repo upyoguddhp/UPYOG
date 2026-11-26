@@ -103,6 +103,7 @@ public class DdpConstants {
 	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
 
 	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_VENDOR";
+	public static final String ROLE_DDP_PRINT_VENDOR = "DDP_PRINT_VENDOR";
 
 	public static final String ACTOR_ROLE_DDP_VERIFIER = "DDP_VERIFIER";
 }

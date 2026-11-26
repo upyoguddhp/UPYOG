@@ -33,7 +33,7 @@ public class DoorPlateDdpWorkflowRequest {
 
 	private String garbageAccountUuid;
 
-	/** Mandatory: "DDP_VENDOR" or "DDP_VERIFIER". */
+	/** Workflow actor. "DDP_PRINT_VENDOR" is accepted as a vendor alias. Authorized vendors may omit it. */
 	private String actorRole;
 
 	/**
