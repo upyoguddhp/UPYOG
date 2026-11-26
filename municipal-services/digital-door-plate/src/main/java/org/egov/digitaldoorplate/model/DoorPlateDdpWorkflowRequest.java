@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
  * Request shape for {@code DoorPlateController._updateDdpWorkflow}, the
  * single endpoint covering every DDP workflow role update (vendor print
  * verification, vendor printing-done, vendor dispatched, ULB verification,
- * installation). {@link #actorRole} (DDP_VENDOR or DDP_VERIFIER) determines
+ * installation). {@link #actorRole} (DDP_PRINT_VENDOR or DDP_VERIFIER) determines
  * which of the fields below the caller may set; the server rejects a
  * request that sets a field outside its role. They're forwarded to
  * garbage-service's eg_grbg_account record identified by
@@ -33,15 +33,15 @@ public class DoorPlateDdpWorkflowRequest {
 
 	private String garbageAccountUuid;
 
-	/** Workflow actor. "DDP_PRINT_VENDOR" is accepted as a vendor alias. Authorized vendors may omit it. */
+	/** Mandatory: "DDP_PRINT_VENDOR" or "DDP_VERIFIER". */
 	private String actorRole;
 
 	/**
-	 * DDP_VENDOR only: "VERIFIED" or "REJECTED".
+	 * DDP_PRINT_VENDOR only: "VERIFIED" or "REJECTED".
 	 */
 	private String vendorPrintVerified;
 
-	/** DDP_VENDOR only. */
+	/** DDP_PRINT_VENDOR only. */
 	private String ddpRejectionReason;
 
 	/**
@@ -62,19 +62,19 @@ public class DoorPlateDdpWorkflowRequest {
 	private String ddpLongitude;
 
 	/**
-	 * DDP_VENDOR only: physical plate has been printed.
+	 * DDP_PRINT_VENDOR only: physical plate has been printed.
 	 */
 	private Boolean ddpPrintingDone;
 
 	/**
-	 * DDP_VENDOR only: printed plate has been dispatched to the ULB/installer.
+	 * DDP_PRINT_VENDOR only: printed plate has been dispatched to the ULB/installer.
 	 */
 	private Boolean ddpDispatched;
 
-	/** DDP_VERIFIER only. */
+	/** DDP_PRINT_VENDOR only. */
 	private Boolean ddpPrintVerified;
 
-	/** DDP_VENDOR only. Required for REJECTED: REPRINT or REVALIDATE. */
+	/** DDP_PRINT_VENDOR only. Required for REJECTED: REPRINT or REVALIDATE. */
 	private String ddpRejectionAction;
 
 	/**
