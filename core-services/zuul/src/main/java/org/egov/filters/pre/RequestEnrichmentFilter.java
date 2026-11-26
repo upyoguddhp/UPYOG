@@ -79,6 +79,11 @@ public class RequestEnrichmentFilter extends ZuulFilter {
     }
 
     private void addUserInfoHeader(RequestContext ctx) {
+        // x-user-info is trusted by downstream services: never let a client-supplied value through. It is overwritten
+        // below when the gateway authenticated the user, and blanked otherwise (open / anonymous / body-enriched paths).
+        if (ctx.getRequest().getHeader(USER_INFO_HEADER_NAME) != null) {
+            ctx.addZuulRequestHeader(USER_INFO_HEADER_NAME, "");
+        }
         if (isUserInfoPresent() && !isRequestBodyCompatible(ctx.getRequest())) {
             User user = getUser();
             try {

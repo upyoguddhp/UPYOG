@@ -43,6 +43,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Autowired
     private TokenStore tokenStore;
 
+    @Value("${single.session.enabled:true}")
+    private boolean singleSessionEnabled;
+
+    @Value("${single.session.exempt.usernames:}")
+    private String singleSessionExemptUsernames;
+
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         final int accessTokenValidityInSeconds = accessTokenValidityInMinutes * 60;
@@ -68,7 +74,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Bean
     public DefaultTokenServices customTokenServices() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        DefaultTokenServices tokenServices = new SingleSessionTokenServices(tokenStore, singleSessionEnabled, singleSessionExemptUsernames);
         tokenServices.setTokenEnhancer(customTokenEnhancer);
         tokenServices.setTokenStore(tokenStore);
         tokenServices.setSupportRefreshToken(true);
