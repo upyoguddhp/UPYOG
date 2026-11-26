@@ -102,6 +102,12 @@ public class DdpConstants {
 	/** eg_grbg_ddp_dispatch.status once the ULB has received the batch. */
 	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
 
+	/** MDMS role code for the DDP print vendor, as it appears in UserInfo.roles. */
+	public static final String ROLE_DDP_PRINT_VENDOR = "DDP_PRINT_VENDOR";
+
+	/** MDMS role code for the ULB DDP verifier, as it appears in UserInfo.roles. */
+	public static final String ROLE_DDP_VERIFIER = "DDP_VERIFIER";
+
 	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_PRINT_VENDOR";
 
 	public static final String ACTOR_ROLE_DDP_VERIFIER = "DDP_VERIFIER";

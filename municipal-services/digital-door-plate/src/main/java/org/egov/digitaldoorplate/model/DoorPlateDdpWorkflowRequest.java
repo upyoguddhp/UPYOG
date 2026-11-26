@@ -13,10 +13,12 @@ import lombok.NoArgsConstructor;
  * Request shape for {@code DoorPlateController._updateDdpWorkflow}, the
  * single endpoint covering every DDP workflow role update (vendor print
  * verification, vendor printing-done, vendor dispatched, ULB verification,
- * installation). {@link #actorRole} (DDP_PRINT_VENDOR or DDP_VERIFIER) determines
- * which of the fields below the caller may set; the server rejects a
- * request that sets a field outside its role. They're forwarded to
- * garbage-service's eg_grbg_account record identified by
+ * installation). The acting role (DDP_PRINT_VENDOR or DDP_VERIFIER) is never
+ * taken from this request - it is derived server-side from the logged-in
+ * user's roles (RequestInfo.userInfo.roles) for {@link #tenantId}, which
+ * also determines which of the fields below the caller may set; the server
+ * rejects a request that sets a field outside its role. They're forwarded
+ * to garbage-service's eg_grbg_account record identified by
  * {@link #garbageAccountUuid} (the "id" scanned from the door plate QR /
  * returned by {@code /door-plate/_verifyQr}).
  */
@@ -32,9 +34,6 @@ public class DoorPlateDdpWorkflowRequest {
 	private String tenantId;
 
 	private String garbageAccountUuid;
-
-	/** Mandatory: "DDP_PRINT_VENDOR" or "DDP_VERIFIER". */
-	private String actorRole;
 
 	/**
 	 * DDP_PRINT_VENDOR only: "VERIFIED" or "REJECTED".
