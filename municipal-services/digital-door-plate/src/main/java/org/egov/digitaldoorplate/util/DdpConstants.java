@@ -102,7 +102,7 @@ public class DdpConstants {
 	/** eg_grbg_ddp_dispatch.status once the ULB has received the batch. */
 	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
 
-	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_VENDOR";
+	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_PRINT_VENDOR";
 
 	public static final String ACTOR_ROLE_DDP_VERIFIER = "DDP_VERIFIER";
 }

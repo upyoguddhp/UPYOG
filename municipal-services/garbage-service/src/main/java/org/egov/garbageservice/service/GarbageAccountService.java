@@ -3080,27 +3080,27 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		}
 		if (!(GrbgConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole())
 				|| GrbgConstants.ACTOR_ROLE_DDP_VERIFIER.equals(request.getActorRole()))) {
-			throw new CustomException("INVALID_REQUEST", "actorRole must be DDP_VENDOR or DDP_VERIFIER.");
+			throw new CustomException("INVALID_REQUEST", "actorRole must be DDP_PRINT_VENDOR or DDP_VERIFIER.");
 		}
 		boolean isVendor = GrbgConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole());
 		if (isVendor) {
 			if (null != request.getInstallationDone() || StringUtils.isNotEmpty(request.getDdpLatitude())
-					|| StringUtils.isNotEmpty(request.getDdpLongitude()) || null != request.getDdpPrintVerified()
+					|| StringUtils.isNotEmpty(request.getDdpLongitude())
 					|| StringUtils.isNotEmpty(request.getUlbVerificationStatus())
 					|| StringUtils.isNotEmpty(request.getUlbRejectionReason())
 					|| StringUtils.isNotEmpty(request.getUlbRejectionAction())) {
 				throw new CustomException("INVALID_FIELD_FOR_ROLE",
-						"DDP_VENDOR may not set installationDone, ddpLatitude, ddpLongitude, ddpPrintVerified, "
+						"DDP_PRINT_VENDOR may not set installationDone, ddpLatitude, ddpLongitude, "
 								+ "ulbVerificationStatus, ulbRejectionReason or ulbRejectionAction.");
 			}
 		} else {
 			if (StringUtils.isNotEmpty(request.getVendorPrintVerified())
 					|| StringUtils.isNotEmpty(request.getDdpRejectionReason())
 					|| StringUtils.isNotEmpty(request.getDdpRejectionAction()) || null != request.getDdpPrintingDone()
-					|| null != request.getDdpDispatched()) {
+					|| null != request.getDdpDispatched() || null != request.getDdpPrintVerified()) {
 				throw new CustomException("INVALID_FIELD_FOR_ROLE",
 						"DDP_VERIFIER may not set vendorPrintVerified, ddpRejectionReason, ddpRejectionAction, "
-								+ "ddpPrintingDone or ddpDispatched.");
+								+ "ddpPrintingDone, ddpDispatched or ddpPrintVerified.");
 			}
 			// ulb_verified reflects that the ULB acted on this plate, regardless of
 			// whether that action was an approval or a rejection.
@@ -3186,6 +3186,7 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			details.put("ddpRejectionAction", request.getDdpRejectionAction());
 			details.put("ddpPrintingDone", request.getDdpPrintingDone());
 			details.put("ddpDispatched", request.getDdpDispatched());
+			details.put("ddpPrintVerified", request.getDdpPrintVerified());
 		} else {
 			details.put("ulbVerificationStatus", request.getUlbVerificationStatus());
 			details.put("ulbRejectionReason", request.getUlbRejectionReason());
@@ -3193,7 +3194,6 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			details.put("installationDone", request.getInstallationDone());
 			details.put("ddpLatitude", request.getDdpLatitude());
 			details.put("ddpLongitude", request.getDdpLongitude());
-			details.put("ddpPrintVerified", request.getDdpPrintVerified());
 		}
 		try {
 			return objectMapper.writeValueAsString(details);

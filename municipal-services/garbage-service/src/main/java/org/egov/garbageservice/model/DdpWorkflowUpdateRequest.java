@@ -30,7 +30,7 @@ public class DdpWorkflowUpdateRequest {
 	private String uuid;
 
 	/**
-	 * Who is making this call: "DDP_VENDOR" or "DDP_VERIFIER". Determines
+	 * Who is making this call: "DDP_PRINT_VENDOR" or "DDP_VERIFIER". Determines
 	 * which of the fields below may be set.
 	 */
 	private String actorRole;
