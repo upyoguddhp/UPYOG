@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.digitaldoorplate.model.DoorPlate;
 import org.egov.digitaldoorplate.model.DoorPlateActionRequest;
 import org.egov.digitaldoorplate.model.DoorPlateDdpWorkflowRequest;
@@ -210,12 +212,16 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_QR", "Scanned QR data does not contain the garbage account id.");
 		}
 
-		String batchStatus = doorPlateRepository.findDispatchBatchStatusForPlate(qrSnapshot.getId());
-		if (null == batchStatus) {
-			throw new CustomException("PLATE_NOT_DISPATCHED", "This plate has not been dispatched yet.");
-		}
-		if (!DdpConstants.DDP_DISPATCH_STATUS_RECEIVED.equals(batchStatus)) {
-			throw new CustomException("BATCH_NOT_RECEIVED", "Please receive the batch first before verifying this plate.");
+		// Vendors compare the printed QR before dispatch. The receiving workflow
+		// requires the batch to have been received before comparing the QR.
+		if (!isVendorForTenant(request.getRequestInfo(), request.getTenantId())) {
+			String batchStatus = doorPlateRepository.findDispatchBatchStatusForPlate(qrSnapshot.getId());
+			if (null == batchStatus) {
+				throw new CustomException("PLATE_NOT_DISPATCHED", "This plate has not been dispatched yet.");
+			}
+			if (!DdpConstants.DDP_DISPATCH_STATUS_RECEIVED.equals(batchStatus)) {
+				throw new CustomException("BATCH_NOT_RECEIVED", "Please receive the batch first before verifying this plate.");
+			}
 		}
 
 		DoorPlateQrSnapshot dbSnapshot = propertyService.buildQrSnapshot(request.getRequestInfo(),
@@ -230,6 +236,15 @@ public class DoorPlateService {
 				.isMatching(mismatchedFields.isEmpty())
 				.mismatchedFields(mismatchedFields)
 				.build();
+	}
+
+	private boolean isVendorForTenant(RequestInfo requestInfo, String tenantId) {
+		List<Role> roles = requestInfo.getUserInfo().getRoles();
+		String stateTenantId = StringUtils.substringBefore(tenantId, ".");
+		return !CollectionUtils.isEmpty(roles) && roles.stream()
+				.anyMatch(role -> role != null && (DdpConstants.ROLE_DDP_PRINT_VENDOR.equals(role.getCode())
+						|| DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(role.getCode()))
+						&& (tenantId.equals(role.getTenantId()) || stateTenantId.equals(role.getTenantId())));
 	}
 
 	/**
@@ -254,7 +269,11 @@ public class DoorPlateService {
 				|| DdpConstants.ACTOR_ROLE_DDP_VERIFIER.equals(request.getActorRole()))) {
 			throw new CustomException("INVALID_REQUEST", "actorRole must be DDP_PRINT_VENDOR or DDP_VERIFIER.");
 		}
-		boolean isVendor = DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole());
+		boolean isVendor = DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(actorRole);
+		// Older vendor clients can include unrelated fields in a successful verification.
+		boolean legacyVendorVerification = inferredVendor && DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_VERIFIED
+				.equalsIgnoreCase(request.getVendorPrintVerified());
+		Boolean ddpPrintVerified = legacyVendorVerification ? null : request.getDdpPrintVerified();
 		if (isVendor) {
 			if (null != request.getInstallationDone() || StringUtils.isNotEmpty(request.getDdpLatitude())
 					|| StringUtils.isNotEmpty(request.getDdpLongitude())
@@ -277,7 +296,7 @@ public class DoorPlateService {
 		}
 		if (StringUtils.isEmpty(request.getVendorPrintVerified()) && null == request.getInstallationDone()
 				&& null == request.getDdpPrintingDone() && null == request.getDdpDispatched()
-				&& null == request.getDdpPrintVerified() && StringUtils.isEmpty(request.getUlbVerificationStatus())) {
+				&& null == ddpPrintVerified && StringUtils.isEmpty(request.getUlbVerificationStatus())) {
 			throw new CustomException("INVALID_REQUEST",
 					"Provide at least one of vendorPrintVerified, installationDone, ddpPrintingDone, "
 							+ "ddpPrintVerified, ddpDispatched or ulbVerificationStatus to update.");
@@ -297,11 +316,13 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_REQUEST", "ulbVerificationStatus must be VERIFIED or REJECTED.");
 		}
 
+		String rejectionAction = legacyVendorVerification ? null : request.getDdpRejectionAction();
+		String rejectionReason = legacyVendorVerification ? null : request.getDdpRejectionReason();
 		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
-			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
+			if (!("REPRINT".equals(rejectionAction) || "REVALIDATE".equals(rejectionAction))) {
 				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE.");
 			}
-		} else if (request.getDdpRejectionAction() != null) {
+		} else if (rejectionAction != null) {
 			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
 		}
 		if ("REJECTED".equalsIgnoreCase(request.getUlbVerificationStatus())) {
@@ -318,10 +339,10 @@ public class DoorPlateService {
 		}
 
 		java.util.Map<String, Object> saved = garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
-				request.getGarbageAccountUuid(), request.getActorRole(), request.getVendorPrintVerified(),
+				request.getGarbageAccountUuid(), actorRole, request.getVendorPrintVerified(),
 				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
-				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified(),
-				request.getDdpRejectionReason(), request.getDdpRejectionAction(), request.getUlbVerificationStatus(),
+				request.getDdpPrintingDone(), request.getDdpDispatched(), ddpPrintVerified,
+				rejectionReason, rejectionAction, request.getUlbVerificationStatus(),
 				request.getUlbRejectionReason(), request.getUlbRejectionAction());
 
 		return DoorPlateDdpWorkflowResponse.builder()
