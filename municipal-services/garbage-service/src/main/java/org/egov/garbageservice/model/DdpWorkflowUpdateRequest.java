@@ -30,6 +30,12 @@ public class DdpWorkflowUpdateRequest {
 	private String uuid;
 
 	/**
+	 * Who is making this call: "DDP_VENDOR" or "DDP_VERIFIER". Determines
+	 * which of the fields below may be set.
+	 */
+	private String actorRole;
+
+	/**
 	 * Vendor's print-verification outcome: "VERIFIED" or "REJECTED".
 	 */
 	private String vendorPrintVerified;
@@ -65,4 +71,20 @@ public class DdpWorkflowUpdateRequest {
 
 	/** Required for REJECTED: REPRINT or REVALIDATE. */
 	private String ddpRejectionAction;
+
+	/**
+	 * Verifier's own verification outcome: "VERIFIED" or "REJECTED". Separate
+	 * from {@link #vendorPrintVerified} so neither role's action clobbers the
+	 * other's.
+	 */
+	private String ulbVerificationStatus;
+
+	/**
+	 * Reason given when the verifier rejects (ulbVerificationStatus =
+	 * "REJECTED").
+	 */
+	private String ulbRejectionReason;
+
+	/** Required for REJECTED: REPRINT or REVALIDATE. */
+	private String ulbRejectionAction;
 }

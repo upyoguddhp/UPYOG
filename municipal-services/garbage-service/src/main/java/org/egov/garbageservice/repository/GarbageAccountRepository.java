@@ -240,11 +240,13 @@ public class GarbageAccountRepository {
 
 	private static final String UPSERT_DDP_WORKFLOW_BY_UUID ="INSERT INTO eg_grbg_account_ddp "
 	        + "(garbage_account_uuid, garbage_id, vendor_print_verified, ddp_print_verified, ulb_verified, installation_done, "
-	        + "ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, ddp_rejection_reason, remarks, ddp_rejection_action, reprint_count, revalidate_count, is_ready_for_printing) "
+	        + "ddp_latitude, ddp_longitude, ddp_printing_done, ddp_dispatched, ddp_rejection_reason, remarks, ddp_rejection_action, reprint_count, revalidate_count, is_ready_for_printing, "
+	        + "ulb_verification_status, ulb_rejection_reason, ulb_rejection_action) "
 	        + "SELECT acc.uuid, acc.garbage_id, CAST(:vendorPrintVerified AS VARCHAR), CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN false ELSE CAST(:ddpPrintVerified AS BOOLEAN) END, COALESCE(:ulbVerified, false), "
 	        + "COALESCE(:installationDone, false), CAST(:ddpLatitude AS VARCHAR), CAST(:ddpLongitude AS VARCHAR), "
 	        + "CASE WHEN CAST(:ddpRejectionAction AS VARCHAR) IS NOT NULL THEN false ELSE COALESCE(:ddpPrintingDone, false) END, COALESCE(:ddpDispatched, false), "
-	        + "CAST(:ddpRejectionReason AS VARCHAR), CAST(:remarks AS VARCHAR), CAST(:ddpRejectionAction AS VARCHAR), CASE WHEN :ddpRejectionAction = 'REPRINT' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REPRINT' THEN true ELSE false END "
+	        + "CAST(:ddpRejectionReason AS VARCHAR), CAST(:remarks AS VARCHAR), CAST(:ddpRejectionAction AS VARCHAR), CASE WHEN :ddpRejectionAction = 'REPRINT' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN 1 ELSE 0 END, CASE WHEN :ddpRejectionAction = 'REPRINT' THEN true ELSE false END, "
+	        + "CAST(:ulbVerificationStatus AS VARCHAR), CAST(:ulbRejectionReason AS VARCHAR), CAST(:ulbRejectionAction AS VARCHAR) "
 	        + "FROM eg_grbg_account acc WHERE acc.uuid = :uuid AND acc.tenant_id = :tenantId "
 	        + "ON CONFLICT (garbage_account_uuid) DO UPDATE SET "
 	        + "vendor_print_verified = COALESCE(:vendorPrintVerified, eg_grbg_account_ddp.vendor_print_verified), "
@@ -260,7 +262,14 @@ public class GarbageAccountRepository {
             + "is_ready_for_printing = CASE WHEN :ddpRejectionAction = 'REVALIDATE' THEN false WHEN :ddpRejectionAction = 'REPRINT' THEN true ELSE eg_grbg_account_ddp.is_ready_for_printing END, "
             + "reprint_count = eg_grbg_account_ddp.reprint_count + CASE WHEN :ddpRejectionAction = 'REPRINT' AND (eg_grbg_account_ddp.vendor_print_verified IS DISTINCT FROM 'REJECTED' OR eg_grbg_account_ddp.ddp_rejection_action IS DISTINCT FROM :ddpRejectionAction) THEN 1 ELSE 0 END, "
             + "revalidate_count = eg_grbg_account_ddp.revalidate_count + CASE WHEN :ddpRejectionAction = 'REVALIDATE' AND (eg_grbg_account_ddp.vendor_print_verified IS DISTINCT FROM 'REJECTED' OR eg_grbg_account_ddp.ddp_rejection_action IS DISTINCT FROM :ddpRejectionAction) THEN 1 ELSE 0 END, "
-            + "ddp_rejection_action = CASE WHEN :vendorPrintVerified = 'VERIFIED' THEN NULL ELSE COALESCE(:ddpRejectionAction, eg_grbg_account_ddp.ddp_rejection_action) END";
+            + "ddp_rejection_action = CASE WHEN :vendorPrintVerified = 'VERIFIED' THEN NULL ELSE COALESCE(:ddpRejectionAction, eg_grbg_account_ddp.ddp_rejection_action) END, "
+            + "ulb_verification_status = COALESCE(:ulbVerificationStatus, eg_grbg_account_ddp.ulb_verification_status), "
+            + "ulb_rejection_reason = COALESCE(:ulbRejectionReason, eg_grbg_account_ddp.ulb_rejection_reason), "
+            + "ulb_rejection_action = CASE WHEN :ulbVerificationStatus = 'VERIFIED' THEN NULL ELSE COALESCE(:ulbRejectionAction, eg_grbg_account_ddp.ulb_rejection_action) END";
+
+	private static final String INSERT_DDP_ACTION_HISTORY = "INSERT INTO eg_grbg_ddp_action_history "
+	        + "(id, garbage_account_uuid, tenant_id, actor_role, action_details, performed_by, performed_time) "
+	        + "VALUES (:id, :uuid, :tenantId, :actorRole, CAST(:actionDetails AS JSONB), :performedBy, :performedTime)";
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private JdbcTemplate jdbcTemplate;
@@ -1036,6 +1045,9 @@ public class GarbageAccountRepository {
 		params.put("lastModifiedBy", userUuid);
 		params.put("lastModifiedDate", now);
 		params.put("ddpPrintVerified", request.getDdpPrintVerified());
+		params.put("ulbVerificationStatus", request.getUlbVerificationStatus());
+		params.put("ulbRejectionReason", request.getUlbRejectionReason());
+		params.put("ulbRejectionAction", request.getUlbRejectionAction());
 
 		int updatedAccounts = namedParameterJdbcTemplate.update(TOUCH_ACCOUNT_LAST_MODIFIED_BY_UUID, params);
 		if (updatedAccounts == 0) {
@@ -1044,6 +1056,24 @@ public class GarbageAccountRepository {
 
 		namedParameterJdbcTemplate.update(UPSERT_DDP_WORKFLOW_BY_UUID, params);
 		return updatedAccounts;
+	}
+
+	/**
+	 * Appends one row to eg_grbg_ddp_action_history recording a single
+	 * DDP_VENDOR or DDP_VERIFIER action, independent of the latest-state
+	 * columns on eg_grbg_account_ddp.
+	 */
+	public void insertDdpActionHistory(String uuid, String tenantId, String actorRole, String actionDetailsJson,
+			String performedBy, Long performedTime) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", java.util.UUID.randomUUID().toString());
+		params.put("uuid", uuid);
+		params.put("tenantId", tenantId);
+		params.put("actorRole", actorRole);
+		params.put("actionDetails", actionDetailsJson);
+		params.put("performedBy", performedBy);
+		params.put("performedTime", performedTime);
+		namedParameterJdbcTemplate.update(INSERT_DDP_ACTION_HISTORY, params);
 	}
 	
 	/**

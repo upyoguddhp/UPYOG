@@ -101,17 +101,52 @@ public class DoorPlateRepository {
 			+ "COUNT(*) FILTER (WHERE installation_done = true) AS installation_done "
 			+ "FROM public.eg_grbg_account_ddp";
 
+	private static final String DISPATCH_BATCH_STATUS_COUNT_QUERY = "SELECT "
+			+ "COUNT(*) FILTER (WHERE status = 'INITIATED') AS dispatch_initiated, "
+			+ "COUNT(*) FILTER (WHERE status = 'SUBMITTED') AS dispatch_submitted, "
+			+ "COUNT(*) FILTER (WHERE status = 'RECEIVED') AS dispatch_received "
+			+ "FROM public.eg_grbg_ddp_dispatch WHERE 1=1 ";
+
 	/**
-	 * Counts eg_grbg_account_ddp rows for each DDP workflow status.
+	 * Returns the eg_grbg_ddp_dispatch.status of the batch the given plate's
+	 * eg_grbg_account_ddp.batch_no points to, or null if the plate has no
+	 * eg_grbg_account_ddp row at all, or has one but was never scanned into a
+	 * batch (batch_no is null).
 	 */
-	public org.egov.digitaldoorplate.model.DdpStatusCountResponse getDdpStatusCounts() {
-		return jdbcTemplate.queryForObject(DDP_STATUS_COUNT_QUERY,
-				(rs, rowNum) -> org.egov.digitaldoorplate.model.DdpStatusCountResponse.builder()
-						.isReadyForPrinting(rs.getLong("is_ready_for_printing"))
-						.ddpPrintVerified(rs.getLong("ddp_print_verified"))
-						.ddpDispatched(rs.getLong("ddp_dispatched"))
-						.vendorPrintVerifiedRejected(rs.getLong("vendor_print_verified_rejected"))
-						.installationDone(rs.getLong("installation_done"))
-						.build());
+	public String findDispatchBatchStatusForPlate(String garbageAccountUuid) {
+		List<String> statuses = jdbcTemplate.queryForList(
+				"SELECT d.status FROM public.eg_grbg_account_ddp p "
+						+ "LEFT JOIN public.eg_grbg_ddp_dispatch d ON p.batch_no = d.batch_no "
+						+ "WHERE p.garbage_account_uuid = ?",
+				String.class, garbageAccountUuid);
+		return statuses.isEmpty() ? null : statuses.get(0);
+	}
+
+	/**
+	 * Counts eg_grbg_account_ddp rows for each DDP workflow status, plus
+	 * eg_grbg_ddp_dispatch batch counts per status (INITIATED/SUBMITTED/
+	 * RECEIVED), optionally restricted to one ULB.
+	 */
+	public org.egov.digitaldoorplate.model.DdpStatusCountResponse getDdpStatusCounts(String ulb) {
+		org.egov.digitaldoorplate.model.DdpStatusCountResponse.DdpStatusCountResponseBuilder builder = jdbcTemplate
+				.queryForObject(DDP_STATUS_COUNT_QUERY,
+						(rs, rowNum) -> org.egov.digitaldoorplate.model.DdpStatusCountResponse.builder()
+								.isReadyForPrinting(rs.getLong("is_ready_for_printing"))
+								.ddpPrintVerified(rs.getLong("ddp_print_verified"))
+								.ddpDispatched(rs.getLong("ddp_dispatched"))
+								.vendorPrintVerifiedRejected(rs.getLong("vendor_print_verified_rejected"))
+								.installationDone(rs.getLong("installation_done")));
+
+		StringBuilder query = new StringBuilder(DISPATCH_BATCH_STATUS_COUNT_QUERY);
+		List<Object> params = new ArrayList<>();
+		if (org.apache.commons.lang3.StringUtils.isNotEmpty(ulb)) {
+			query.append(" AND ulb = ?");
+			params.add(ulb);
+		}
+
+		return jdbcTemplate.queryForObject(query.toString(), params.toArray(),
+				(rs, rowNum) -> builder.dispatchBatchesInitiated(rs.getLong("dispatch_initiated"))
+						.dispatchBatchesSubmitted(rs.getLong("dispatch_submitted"))
+						.dispatchBatchesReceived(rs.getLong("dispatch_received")).build());
 	}
 }

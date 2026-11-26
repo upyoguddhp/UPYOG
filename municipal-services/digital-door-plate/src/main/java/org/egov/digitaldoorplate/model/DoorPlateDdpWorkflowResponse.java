@@ -42,4 +42,7 @@ public class DoorPlateDdpWorkflowResponse {
 	private Boolean isDdpVerified;
 	private Boolean isReadyForPrinting;
 	private String ddpRejectionReason;
+	private String ulbVerificationStatus;
+	private String ulbRejectionReason;
+	private String ulbRejectionAction;
 }

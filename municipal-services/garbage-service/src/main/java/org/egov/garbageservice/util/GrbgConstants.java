@@ -30,6 +30,10 @@ public class GrbgConstants {
 
 	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
 
+	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_VENDOR";
+
+	public static final String ACTOR_ROLE_DDP_VERIFIER = "DDP_VERIFIER";
+
 	public static final String STATUS_PENDINGFORMODIFICATION = "PENDINGFORMODIFICATION";
 
 	public static final String STATUS_PENDINGFORVERIFICATION = "PENDINGFORVERIFICATION";

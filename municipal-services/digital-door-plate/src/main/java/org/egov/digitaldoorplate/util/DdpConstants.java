@@ -98,4 +98,11 @@ public class DdpConstants {
 	public static final String VENDOR_PRINT_VERIFIED_STATUS_VERIFIED = "VERIFIED";
 
 	public static final String VENDOR_PRINT_VERIFIED_STATUS_REJECTED = "REJECTED";
+
+	/** eg_grbg_ddp_dispatch.status once the ULB has received the batch. */
+	public static final String DDP_DISPATCH_STATUS_RECEIVED = "RECEIVED";
+
+	public static final String ACTOR_ROLE_DDP_VENDOR = "DDP_VENDOR";
+
+	public static final String ACTOR_ROLE_DDP_VERIFIER = "DDP_VERIFIER";
 }
