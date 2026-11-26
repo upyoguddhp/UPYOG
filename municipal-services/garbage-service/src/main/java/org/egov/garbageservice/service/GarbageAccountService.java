@@ -3106,6 +3106,11 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			// whether that action was an approval or a rejection.
 			request.setUlbVerified(true);
 		}
+		if (StringUtils.isNotEmpty(request.getVendorPrintVerified())) {
+			// ddp_print_verified reflects that the vendor acted on this plate,
+			// regardless of whether that action was VERIFIED or REJECTED.
+			request.setDdpPrintVerified(true);
+		}
 		if (null != request.getVendorPrintVerified()
 				&& !("VERIFIED".equalsIgnoreCase(request.getVendorPrintVerified())
 						|| "REJECTED".equalsIgnoreCase(request.getVendorPrintVerified()))) {
