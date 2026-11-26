@@ -3142,6 +3142,14 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		if (request.getUlbVerificationStatus() != null) {
 			request.setUlbVerificationStatus(request.getUlbVerificationStatus().toUpperCase(java.util.Locale.ROOT));
 		}
+		if (Boolean.TRUE.equals(request.getInstallationDone())) {
+			String effectiveUlbVerificationStatus = StringUtils.isNotEmpty(request.getUlbVerificationStatus())
+					? request.getUlbVerificationStatus()
+					: garbageAccountRepository.findUlbVerificationStatus(request.getUuid(), request.getTenantId());
+			if ("REJECTED".equalsIgnoreCase(effectiveUlbVerificationStatus)) {
+				throw new CustomException("PLATE_REJECTED", "Rejected plates cannot be installed.");
+			}
+		}
 		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
 		Long now = System.currentTimeMillis();
 

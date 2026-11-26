@@ -1022,6 +1022,23 @@ public class GarbageAccountRepository {
 	}
 
 	/**
+	 * Current eg_grbg_account_ddp.ulb_verification_status for this account, or
+	 * null if no DDP workflow row exists yet. Used to block installation of a
+	 * plate the ULB has already rejected.
+	 */
+	public String findUlbVerificationStatus(String uuid, String tenantId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uuid", uuid);
+		params.put("tenantId", tenantId);
+		List<String> statuses = namedParameterJdbcTemplate.queryForList(
+				"SELECT d.ulb_verification_status FROM eg_grbg_account_ddp d "
+						+ "JOIN eg_grbg_account a ON a.uuid = d.garbage_account_uuid "
+						+ "WHERE a.uuid = :uuid AND a.tenant_id = :tenantId",
+				params, String.class);
+		return statuses.isEmpty() ? null : statuses.get(0);
+	}
+
+	/**
 	 * Partially updates the DDP workflow fields for one account, identified by
 	 * uuid: all of these fields (including ddp_print_verified) live in
 	 * eg_grbg_account_ddp (created on first write). Any field left null on
