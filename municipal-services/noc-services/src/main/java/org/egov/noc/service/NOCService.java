@@ -1,47 +1,49 @@
 package org.egov.noc.service;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Set;
-import java.util.HashSet;
-
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.NOCRepository;
 import org.egov.noc.repository.ServiceRequestRepository;
 import org.egov.noc.util.NOCConstants;
 import org.egov.noc.util.NOCUtil;
 import org.egov.noc.validator.NOCValidator;
+import org.egov.noc.web.model.DMSResponse;
+import org.egov.noc.web.model.DmsRequest;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
+import org.egov.noc.web.model.PDFRequest;
 import org.egov.noc.web.model.RequestInfoWrapper;
-import org.egov.noc.web.model.bpa.BPA;
-import org.egov.noc.web.model.bpa.BPAResponse;
-import org.egov.noc.web.model.bpa.BPASearchCriteria;
 import org.egov.noc.web.model.workflow.BusinessService;
-import org.egov.noc.web.model.workflow.ProcessInstance;
 import org.egov.noc.web.model.workflow.ProcessInstanceResponse;
 import org.egov.noc.workflow.WorkflowIntegrator;
 import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +80,15 @@ public class NOCService {
 	
 	@Autowired
 	private NOCBillingService nocBillingService;
+	
+	@Autowired
+	private ReportService reportService;
+	
+	@Autowired
+	private AlfrescoService alfrescoService;
+	
+	@Autowired
+	private NOCService nocService;
 
 	/**
 	 * entry point from controller, takes care of next level logic from controller to create NOC application
@@ -134,6 +145,10 @@ public class NOCService {
 		    	 nocBillingService.generateBill(nocRequest);
 		    }
 		    
+		    if (NOCConstants.ACTION_APPROVE.equalsIgnoreCase(action)) {
+		    	createAndUploadPDF(nocRequest);
+		    }
+		    
 		   BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(),
 				   nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		   if(businessService == null)
@@ -161,51 +176,16 @@ public class NOCService {
 			if (isTenantScoped) {
 				criteria.setStatus(null);
 			}
-		} 
-		else if ("EMPLOYEE".equalsIgnoreCase(userType)) {
+		} else if ("EMPLOYEE".equalsIgnoreCase(userType)) {
 			if (isTenantScoped) {
-				List<Role> tenantRoles = user.getRoles().stream()
-						.filter(role -> criteria.getTenantId().equals(role.getTenantId())).collect(Collectors.toList());
+				boolean hasTenantAccess = user.getRoles().stream()
+						.anyMatch(role -> criteria.getTenantId().equals(role.getTenantId()));
 
-				if (tenantRoles.isEmpty()) {
+				if (!hasTenantAccess) {
 					throw new CustomException("UNAUTHORIZED", "Employee not authorized for this tenant");
 				}
-				Set<String> statuses = new HashSet<>();
-
-				if (tenantRoles.stream().anyMatch(r -> "NOC_NODAL".equals(r.getCode()))) {
-					statuses.add("PENDINGFORVERIFICATION");
-					statuses.add("PENDINGFORMODIFICATION");
-				}
-
-				if (tenantRoles.stream().anyMatch(r -> "NOC_APPROVER".equals(r.getCode()))) {
-					statuses.add("PENDINGFORAPPROVAL");
-					statuses.add("APPROVED");
-				}
-
-				if (statuses.isEmpty()) {
-					throw new CustomException("UNAUTHORIZED", "Employee not authorized to search NOCs");
-				}
-
-				criteria.setStatus(new ArrayList<>(statuses));
-			} else {
-				Set<String> statuses = new HashSet<>();
-
-				if (roleCodes.contains("NOC_NODAL")) {
-					statuses.add("PENDINGFORVERIFICATION");
-					statuses.add("PENDINGFORMODIFICATION");
-				}
-
-				if (roleCodes.contains("NOC_APPROVER")) {
-					statuses.add("PENDINGFORAPPROVAL");
-					statuses.add("APPROVED");
-				}
-
-				if (!statuses.isEmpty()) {
-					criteria.setStatus(new ArrayList<>(statuses));
-				}
 			}
-		}
-		else {
+		} else {
 			throw new CustomException("UNAUTHORIZED", "User not authorized to search NOCs");
 		}
 		List<Noc> nocs = nocRepository.getNocData(criteria);
@@ -275,4 +255,118 @@ public class NOCService {
                 return nocRepository.getNocCount(criteria);
         }
 	
+		private String getMdmsCertificateTemplate(List<Noc> noc, RequestInfoWrapper requestInfoWrapper) {
+			
+		    Map<String, Object> mdmsCriteria = new HashMap<>();
+			String[] tenantParts = noc.get(0).getTenantId().split("\\.");
+			String uniqueIdentifier = noc.get(0).getNocType().replace("NOC", "_NOC");
+			
+			mdmsCriteria.put("tenantId", tenantParts[0]);
+			mdmsCriteria.put("schemaCode", "NOC.CERTIFICATE");
+			mdmsCriteria.put("uniqueIdentifiers",Collections.singletonList(uniqueIdentifier));
+		
+		    Map<String, Object> mdmsRequest = new HashMap<>();
+		    mdmsRequest.put("RequestInfo", requestInfoWrapper.getRequestInfo());
+		    mdmsRequest.put("MdmsCriteria", mdmsCriteria);
+		
+		    log.info("Fetching NOC certificate from MDMS for tenant {}", noc.get(0).getTenantId());
+		
+		    Object response = serviceRequestRepository.fetchResult(
+		            new StringBuilder(config.getMdmsV2Host())
+		                    .append(config.getMdmsV2SearchEndpoint()),
+		            mdmsRequest
+		    );
+		
+			Map<String, Object> responseMap = (Map<String, Object>) response;
+			List<Map<String, Object>> mdmsList = (List<Map<String, Object>>) responseMap.get("mdms");
+			Map<String, Object> mdmsData = (Map<String, Object>) mdmsList.get(0).get("data");
+			String template = (String) mdmsData.get("data");
+			
+			return template;
+		}
+		
+		public String generateNocTemplate(RequestInfoWrapper requestInfoWrapper,
+				String applicationNo, String tenantid ) {
+			NocSearchCriteria criteria = NocSearchCriteria.builder()
+					.tenantId(tenantid)
+					.applicationNo(applicationNo).build();
+			
+			List<Noc> nocList = nocService.search(criteria, requestInfoWrapper.getRequestInfo());
+			if (nocList == null || nocList.isEmpty()) {
+		        throw new CustomException("NOC_NOT_FOUND", "NOC application not found");
+		    }
+			String template = getMdmsCertificateTemplate(nocList, requestInfoWrapper);
+			Noc noc = nocList.get(0);
+			JsonNode propertyDetail = mapper.valueToTree(noc.getPropertyDetail());
+			JsonNode citizenDetail = mapper.valueToTree(noc.getCitizenDetail());
+			String certificateNo = noc.getNocNo() != null
+		            ? noc.getNocNo() : noc.getApplicationNo();
+			String issueDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+		    String applicantName = citizenDetail.path("applicantName").asText("");
+		    String address = propertyDetail.path("address").asText("");
+		    String propertyId = propertyDetail.path("propertyId").asText("");
+		    String ulbName = propertyDetail.path("ulbName").asText("");
+		    String ulbType = propertyDetail.path("ulbType").asText("");
+		   
+			LocalDate today = LocalDate.now();
+			int year = today.getYear();
+			String finYear = today.getMonthValue() >= 4 ? year + "-" + String.valueOf(year + 1).substring(2)
+					: (year - 1) + "-" + String.valueOf(year).substring(2);
+		    
+		    template = template.replace("{{certificateNo}}", certificateNo);
+		    template = template.replace("{{issueDate}}", issueDate);
+		    template = template.replace("{{applicantName}}", applicantName);
+		    template = template.replace("{{address}}", address);
+		    template = template.replace("{{financialYear}}", finYear);
+		    template = template.replace("{{propertyId}}", propertyId);
+		    template = template.replace("{{ulbName}}", ulbName);
+		    template = template.replace("{{ulbType}}", ulbType);
+
+			return template;
+		}
+		
+		private void createAndUploadPDF(NocRequest nocRequest) {
+			 if (nocRequest.getNoc() != null && nocRequest.getNoc().getApplicationNo() != null) {
+				 
+				 PDFRequest pdfRequest = PDFRequest.builder()
+					        .RequestInfo(nocRequest.getRequestInfo())
+					        .key("certificate")
+					        .tenantId(nocRequest.getNoc().getTenantId())
+					        .htmlTemplateContent(nocRequest.getNoc().getCertificateTemplate())
+					        .data(new HashMap<>())
+					        .isHybrid(true)
+					        .build();
+				 
+				Resource resource = reportService.createNoSavePDF(pdfRequest);
+				//try catch for testibg only
+//				try {
+//				    File file = new File("C:/demo/certificate.pdf");
+//				    FileUtils.copyInputStreamToFile(resource.getInputStream(), file);
+//				} catch (IOException e) {
+//				    e.printStackTrace();
+//				}
+				
+				DmsRequest dmsRequest = generateDmsRequestByNocApplication(resource, nocRequest.getNoc(),
+						nocRequest.getRequestInfo());
+				try {
+					DMSResponse dmsResponse = alfrescoService.uploadAttachment(dmsRequest, nocRequest.getRequestInfo());
+				} catch (IOException e) {
+					throw new CustomException("UPLOAD_ATTACHMENT_FAILED", "Upload Attachment failed." + e.getMessage());
+				}
+			}
+		}
+		
+		private DmsRequest generateDmsRequestByNocApplication(Resource resource,
+				Noc noc, RequestInfo requestInfo) {
+
+			DmsRequest dmsRequest = DmsRequest.builder().userId(requestInfo.getUserInfo().getId().toString())
+					.objectId(noc.getId())
+					.description(config.ALFRESCO_COMMON_CERTIFICATE_DESCRIPTION)
+					.id(config.ALFRESCO_COMMON_CERTIFICATE_ID).type(config.ALFRESCO_COMMON_CERTIFICATE_TYPE)
+					.objectName(config.ALFRESCO_BUSINESS_SERVICE).comments(config.ALFRESCO_NOC_CERTIFICATE_COMMENT)
+					.status(config.STATUS_APPROVED).file(resource).servicetype(config.ALFRESCO_BUSINESS_SERVICE)
+					.documentType(config.ALFRESCO_DOCUMENT_TYPE).documentId(config.ALFRESCO_COMMON_DOCUMENT_ID).build();
+
+			return dmsRequest;
+		}
 }
