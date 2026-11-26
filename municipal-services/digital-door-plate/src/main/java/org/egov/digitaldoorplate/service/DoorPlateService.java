@@ -239,11 +239,18 @@ public class DoorPlateService {
 	}
 
 	private boolean isVendorForTenant(RequestInfo requestInfo, String tenantId) {
+		return hasRoleForTenant(requestInfo, tenantId, DdpConstants.ROLE_DDP_PRINT_VENDOR);
+	}
+
+	private boolean isVerifierForTenant(RequestInfo requestInfo, String tenantId) {
+		return hasRoleForTenant(requestInfo, tenantId, DdpConstants.ROLE_DDP_VERIFIER);
+	}
+
+	private boolean hasRoleForTenant(RequestInfo requestInfo, String tenantId, String roleCode) {
 		List<Role> roles = requestInfo.getUserInfo().getRoles();
 		String stateTenantId = StringUtils.substringBefore(tenantId, ".");
 		return !CollectionUtils.isEmpty(roles) && roles.stream()
-				.anyMatch(role -> role != null && (DdpConstants.ROLE_DDP_PRINT_VENDOR.equals(role.getCode())
-						|| DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(role.getCode()))
+				.anyMatch(role -> role != null && roleCode.equals(role.getCode())
 						&& (tenantId.equals(role.getTenantId()) || stateTenantId.equals(role.getTenantId())));
 	}
 
@@ -267,15 +274,13 @@ public class DoorPlateService {
 		if (StringUtils.isEmpty(request.getGarbageAccountUuid())) {
 			throw new CustomException("INVALID_REQUEST", "GarbageAccountUuid is mandatory.");
 		}
-		if (!(DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole())
-				|| DdpConstants.ACTOR_ROLE_DDP_VERIFIER.equals(request.getActorRole()))) {
-			throw new CustomException("INVALID_REQUEST", "actorRole must be DDP_PRINT_VENDOR or DDP_VERIFIER.");
+		boolean isVendor = isVendorForTenant(request.getRequestInfo(), request.getTenantId());
+		boolean isVerifier = isVerifierForTenant(request.getRequestInfo(), request.getTenantId());
+		if (isVendor == isVerifier) {
+			throw new CustomException("FORBIDDEN",
+					"Logged-in user must have exactly one of the DDP_PRINT_VENDOR or DDP_VERIFIER roles for this tenant.");
 		}
-		boolean isVendor = DdpConstants.ACTOR_ROLE_DDP_VENDOR.equals(actorRole);
-		// Older vendor clients can include unrelated fields in a successful verification.
-		boolean legacyVendorVerification = inferredVendor && DdpConstants.VENDOR_PRINT_VERIFIED_STATUS_VERIFIED
-				.equalsIgnoreCase(request.getVendorPrintVerified());
-		Boolean ddpPrintVerified = legacyVendorVerification ? null : request.getDdpPrintVerified();
+		String actorRole = isVendor ? DdpConstants.ACTOR_ROLE_DDP_VENDOR : DdpConstants.ACTOR_ROLE_DDP_VERIFIER;
 		if (isVendor) {
 			if (null != request.getInstallationDone() || StringUtils.isNotEmpty(request.getDdpLatitude())
 					|| StringUtils.isNotEmpty(request.getDdpLongitude())
@@ -298,7 +303,7 @@ public class DoorPlateService {
 		}
 		if (StringUtils.isEmpty(request.getVendorPrintVerified()) && null == request.getInstallationDone()
 				&& null == request.getDdpPrintingDone() && null == request.getDdpDispatched()
-				&& null == ddpPrintVerified && StringUtils.isEmpty(request.getUlbVerificationStatus())) {
+				&& null == request.getDdpPrintVerified() && StringUtils.isEmpty(request.getUlbVerificationStatus())) {
 			throw new CustomException("INVALID_REQUEST",
 					"Provide at least one of vendorPrintVerified, installationDone, ddpPrintingDone, "
 							+ "ddpPrintVerified, ddpDispatched or ulbVerificationStatus to update.");
@@ -318,13 +323,11 @@ public class DoorPlateService {
 			throw new CustomException("INVALID_REQUEST", "ulbVerificationStatus must be VERIFIED or REJECTED.");
 		}
 
-		String rejectionAction = legacyVendorVerification ? null : request.getDdpRejectionAction();
-		String rejectionReason = legacyVendorVerification ? null : request.getDdpRejectionReason();
 		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
-			if (!("REPRINT".equals(rejectionAction) || "REVALIDATE".equals(rejectionAction))) {
+			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
 				throw new CustomException("INVALID_REQUEST", "REJECTED requires ddpRejectionAction REPRINT or REVALIDATE.");
 			}
-		} else if (rejectionAction != null) {
+		} else if (request.getDdpRejectionAction() != null) {
 			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
 		}
 		if ("REJECTED".equalsIgnoreCase(request.getUlbVerificationStatus())) {
@@ -343,8 +346,8 @@ public class DoorPlateService {
 		java.util.Map<String, Object> saved = garbageAccountService.updateDdpWorkflowFields(request.getRequestInfo(), request.getTenantId(),
 				request.getGarbageAccountUuid(), actorRole, request.getVendorPrintVerified(),
 				request.getInstallationDone(), request.getDdpLatitude(), request.getDdpLongitude(),
-				request.getDdpPrintingDone(), request.getDdpDispatched(), ddpPrintVerified,
-				rejectionReason, rejectionAction, request.getUlbVerificationStatus(),
+				request.getDdpPrintingDone(), request.getDdpDispatched(), request.getDdpPrintVerified(),
+				request.getDdpRejectionReason(), request.getDdpRejectionAction(), request.getUlbVerificationStatus(),
 				request.getUlbRejectionReason(), request.getUlbRejectionAction());
 
 		return DoorPlateDdpWorkflowResponse.builder()
