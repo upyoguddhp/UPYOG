@@ -35,6 +35,10 @@ public class DdpDispatch {
 
 	private Long ulbReceivingDate;
 
+	private Integer receivedCount;
+
+	private String receivingRemarks;
+
 	private String status;
 
 	private AuditDetails auditDetails;

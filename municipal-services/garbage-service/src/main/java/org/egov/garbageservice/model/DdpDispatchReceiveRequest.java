@@ -31,4 +31,15 @@ public class DdpDispatchReceiveRequest {
 	 * Name/identifier of the person at the ULB who received the batch.
 	 */
 	private String receivedBy;
+
+	/**
+	 * Number of plates actually counted by the ULB at receipt time.
+	 */
+	private Integer receivedCount;
+
+	/**
+	 * Any remarks from the ULB staff receiving the batch, e.g. noting a
+	 * count mismatch or damaged plates.
+	 */
+	private String receivingRemarks;
 }

@@ -35,6 +35,10 @@ public class DdpDispatchReceiveResponse {
 
 	private Long ulbReceivingDate;
 
+	private Integer receivedCount;
+
+	private String receivingRemarks;
+
 	private Integer totalScanCount;
 
 	private List<ScannedPlateInfo> scannedPlates;

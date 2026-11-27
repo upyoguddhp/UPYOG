@@ -298,7 +298,8 @@ public class DdpDispatchService {
 		long now = System.currentTimeMillis();
 
 		int updated = ddpDispatchRepository.receiveBatch(batch.getBatchNo(), GrbgConstants.DDP_DISPATCH_STATUS_SUBMITTED,
-				GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED, request.getReceivedBy(), now, userUuid, now);
+				GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED, request.getReceivedBy(), now, request.getReceivedCount(),
+				request.getReceivingRemarks(), userUuid, now);
 		if (updated == 0) {
 			throw new CustomException("BATCH_ALREADY_RECEIVED",
 					"Batch " + batch.getBatchNo() + " was already received by another request.");
@@ -310,6 +311,7 @@ public class DdpDispatchService {
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true))
 				.batchNo(batch.getBatchNo()).status(GrbgConstants.DDP_DISPATCH_STATUS_RECEIVED).ulb(batch.getUlb())
 				.dispatchDate(batch.getDispatchDate()).receivedBy(request.getReceivedBy()).ulbReceivingDate(now)
+				.receivedCount(request.getReceivedCount()).receivingRemarks(request.getReceivingRemarks())
 				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates).build();
 	}
 
@@ -337,7 +339,8 @@ public class DdpDispatchService {
 		return DdpDispatchDetail.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb()).ward(batch.getWard())
 				.district(batch.getDistrict())
 				.dispatchDate(batch.getDispatchDate()).receivedBy(batch.getReceivedBy())
-				.ulbReceivingDate(batch.getUlbReceivingDate()).status(batch.getStatus())
+				.ulbReceivingDate(batch.getUlbReceivingDate()).receivedCount(batch.getReceivedCount())
+				.receivingRemarks(batch.getReceivingRemarks()).status(batch.getStatus())
 				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates)
 				.auditDetails(batch.getAuditDetails()).build();
 	}

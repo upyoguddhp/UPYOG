@@ -48,7 +48,8 @@ public class DdpDispatchRepository {
 			+ "VALUES (:uuid, :batchNo, :ulb, :ward, :district, :status, :createdBy, :lastModifiedBy, :createdTime, :lastModifiedTime)";
 
 	private static final String SELECT_BATCH_BY_BATCH_NO = "SELECT uuid, batch_no, ulb, ward, district, dispatch_date, "
-			+ "received_by, ulb_receiving_date, status, createdby, modifiedby, createdtime, modifiedtime "
+			+ "received_by, ulb_receiving_date, received_count, receiving_remarks, status, createdby, modifiedby, "
+			+ "createdtime, modifiedtime "
 			+ "FROM eg_grbg_ddp_dispatch WHERE batch_no = ?";
 
 	private static final String ASSIGN_PLATE_TO_BATCH = "UPDATE eg_grbg_account_ddp SET batch_no = ? "
@@ -78,6 +79,7 @@ public class DdpDispatchRepository {
 
 	private static final String RECEIVE_BATCH = "UPDATE eg_grbg_ddp_dispatch SET status = :status, "
 			+ "received_by = :receivedBy, ulb_receiving_date = :ulbReceivingDate, "
+			+ "received_count = :receivedCount, receiving_remarks = :receivingRemarks, "
 			+ "modifiedby = :modifiedBy, modifiedtime = :modifiedTime "
 			+ "WHERE batch_no = :batchNo AND status = :currentStatus";
 
@@ -187,13 +189,16 @@ public class DdpDispatchRepository {
 	 * confirmation).
 	 */
 	public int receiveBatch(String batchNo, String currentStatus, String newStatus, String receivedBy,
-			long ulbReceivingDate, String modifiedBy, long modifiedTime) {
+			long ulbReceivingDate, Integer receivedCount, String receivingRemarks, String modifiedBy,
+			long modifiedTime) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("batchNo", batchNo);
 		params.put("currentStatus", currentStatus);
 		params.put("status", newStatus);
 		params.put("receivedBy", receivedBy);
 		params.put("ulbReceivingDate", ulbReceivingDate);
+		params.put("receivedCount", receivedCount);
+		params.put("receivingRemarks", receivingRemarks);
 		params.put("modifiedBy", modifiedBy);
 		params.put("modifiedTime", modifiedTime);
 
@@ -203,7 +208,8 @@ public class DdpDispatchRepository {
 	public List<DdpDispatch> searchBatches(SearchCriteriaDdpDispatch criteria) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		StringBuilder query = new StringBuilder("SELECT uuid, batch_no, ulb, ward, district, dispatch_date, received_by, "
-				+ "ulb_receiving_date, status, createdby, modifiedby, createdtime, modifiedtime "
+				+ "ulb_receiving_date, received_count, receiving_remarks, status, createdby, modifiedby, createdtime, "
+				+ "modifiedtime "
 				+ "FROM eg_grbg_ddp_dispatch WHERE 1=1 ");
 
 		appendWhereClause(query, criteria, preparedStatementValues);
@@ -274,7 +280,9 @@ public class DdpDispatchRepository {
 		return DdpDispatch.builder().uuid(rs.getString("uuid")).batchNo(rs.getString("batch_no"))
 				.ulb(rs.getString("ulb")).ward(rs.getString("ward")).district(rs.getString("district"))
 				.dispatchDate((Long) rs.getObject("dispatch_date")).receivedBy(rs.getString("received_by"))
-				.ulbReceivingDate((Long) rs.getObject("ulb_receiving_date")).status(rs.getString("status"))
+				.ulbReceivingDate((Long) rs.getObject("ulb_receiving_date"))
+				.receivedCount((Integer) rs.getObject("received_count"))
+				.receivingRemarks(rs.getString("receiving_remarks")).status(rs.getString("status"))
 				.auditDetails(auditDetails).build();
 	}
 }
