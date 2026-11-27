@@ -54,6 +54,8 @@ import org.egov.garbageservice.contract.workflow.WorkflowService;
 import org.egov.garbageservice.model.AuditDetails;
 import org.egov.garbageservice.model.DdpPrintingRecord;
 import org.egov.garbageservice.model.DdpPrintingSearchResponse;
+import org.egov.garbageservice.model.RejectedPlateRecord;
+import org.egov.garbageservice.model.RejectedPlatesSearchResponse;
 import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
 import org.egov.garbageservice.model.DdpVerificationCount;
@@ -3264,6 +3266,40 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(), true))
 				.ddpPrintingRecords(records).build();
+	}
+
+	private static final long DEFAULT_REJECTED_PLATES_LIMIT = 100L;
+
+	/**
+	 * Searches plates rejected at the vendor print-verification stage, the
+	 * ULB verification stage, or both (see RejectedPlateRecord#rejectedBy),
+	 * for the given ULB (tenantId) and optionally specific wards. ulb/ward
+	 * are read straight from eg_grbg_address - no property-services
+	 * enrichment needed for this one.
+	 */
+	public RejectedPlatesSearchResponse searchRejectedPlates(SearchCriteriaGarbageAccountRequest searchRequest) {
+
+		if (null == searchRequest.getRequestInfo() || null == searchRequest.getRequestInfo().getUserInfo()) {
+			throw new CustomException("INVALID_REQUEST", "UserInfo is missing in the RequestInfo.");
+		}
+		if (null == searchRequest.getSearchCriteriaGarbageAccount()
+				|| StringUtils.isEmpty(searchRequest.getSearchCriteriaGarbageAccount().getTenantId())) {
+			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to search rejected plates.");
+		}
+
+		SearchCriteriaGarbageAccount criteria = searchRequest.getSearchCriteriaGarbageAccount();
+		long limit = null == criteria.getLimit() ? DEFAULT_REJECTED_PLATES_LIMIT : criteria.getLimit();
+		long offset = null == criteria.getOffset() ? 0L : criteria.getOffset();
+
+		List<RejectedPlateRecord> rejectedPlates = garbageAccountRepository.searchRejectedPlates(
+				criteria.getTenantId(), criteria.getWardNames(), limit, offset);
+		long totalCount = garbageAccountRepository.countRejectedPlates(criteria.getTenantId(),
+				criteria.getWardNames());
+
+		return RejectedPlatesSearchResponse.builder()
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(searchRequest.getRequestInfo(), true))
+				.totalCount(totalCount).rejectedPlates(rejectedPlates).build();
 	}
 
 	/**

@@ -18,6 +18,7 @@ import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.GarbageAccount;
 import org.egov.garbageservice.model.GrbgCollectionUnit;
 import org.egov.garbageservice.model.ApplicationBillDTO;
+import org.egov.garbageservice.model.RejectedPlateRecord;
 import org.egov.garbageservice.model.SearchCriteriaGarbageAccount;
 import org.egov.garbageservice.model.TotalCountRequest;
 import org.egov.garbageservice.repository.rowmapper.GarbageAccountRowMapper;
@@ -905,6 +906,83 @@ public class GarbageAccountRepository {
 
 	public void delete(GarbageAccount garbageAccount) {
 		jdbcTemplate.update(DELETE_QUERY, garbageAccount.getGarbageId());
+	}
+
+	/**
+	 * Self-contained query for the "Rejected Plates" feature (kept separate
+	 * from addWhereClause/getSearchQueryByCriteria, the same way
+	 * DdpDispatchRepository stays independent of this class, so this doesn't
+	 * risk the already-complex generic account search). Plates are not
+	 * enriched via property-services here: ulb/ward are read straight off
+	 * eg_grbg_address, which is all this feature needs.
+	 */
+	private static final String SELECT_REJECTED_PLATES_BASE = "SELECT acc.uuid as garbage_account_uuid, "
+			+ "acc.garbage_id as garbage_id, acc.name as owner_name, acc.mobile_number as mobile_number, "
+			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id, "
+			+ "addr.ulb_name as ulb, addr.ward_name as ward, "
+			+ "ddp.vendor_print_verified as vendor_print_verified, "
+			+ "ddp.ddp_rejection_reason as vendor_rejection_reason, ddp.ddp_rejection_action as vendor_rejection_action, "
+			+ "ddp.ulb_verification_status as ulb_verification_status, "
+			+ "ddp.ulb_rejection_reason as ulb_rejection_reason, ddp.ulb_rejection_action as ulb_rejection_action "
+			+ "FROM eg_grbg_account acc "
+			+ "JOIN eg_grbg_account_ddp ddp ON ddp.garbage_account_uuid = acc.uuid "
+			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
+			+ "WHERE acc.tenant_id = ? AND acc.is_active = true "
+			+ "AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ";
+
+	public List<RejectedPlateRecord> searchRejectedPlates(String tenantId, List<String> wardNames, long limit,
+			long offset) {
+		List<Object> preparedStatementValues = new ArrayList<>();
+		preparedStatementValues.add(tenantId);
+
+		StringBuilder query = new StringBuilder(SELECT_REJECTED_PLATES_BASE);
+		appendWardFilter(query, wardNames, preparedStatementValues);
+
+		query.append(" ORDER BY acc.id DESC LIMIT ? OFFSET ? ");
+		preparedStatementValues.add(limit);
+		preparedStatementValues.add(offset);
+
+		return jdbcTemplate.query(query.toString(), preparedStatementValues.toArray(), this::mapRejectedPlateRecord);
+	}
+
+	public long countRejectedPlates(String tenantId, List<String> wardNames) {
+		List<Object> preparedStatementValues = new ArrayList<>();
+		preparedStatementValues.add(tenantId);
+
+		StringBuilder query = new StringBuilder(
+				"SELECT COUNT(*) FROM eg_grbg_account acc "
+						+ "JOIN eg_grbg_account_ddp ddp ON ddp.garbage_account_uuid = acc.uuid "
+						+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
+						+ "WHERE acc.tenant_id = ? AND acc.is_active = true "
+						+ "AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ");
+		appendWardFilter(query, wardNames, preparedStatementValues);
+
+		Long count = jdbcTemplate.queryForObject(query.toString(), preparedStatementValues.toArray(), Long.class);
+		return null == count ? 0L : count;
+	}
+
+	private void appendWardFilter(StringBuilder query, List<String> wardNames, List<Object> preparedStatementValues) {
+		if (!CollectionUtils.isEmpty(wardNames)) {
+			query.append(" AND addr.ward_name IN ( ")
+					.append(getQueryForCollection(wardNames, preparedStatementValues)).append(" )");
+		}
+	}
+
+	private RejectedPlateRecord mapRejectedPlateRecord(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+		boolean vendorRejected = GrbgConstants.STATUS_REJECTED.equals(rs.getString("vendor_print_verified"));
+		boolean ulbRejected = GrbgConstants.STATUS_REJECTED.equals(rs.getString("ulb_verification_status"));
+		String rejectedBy = vendorRejected && ulbRejected ? "BOTH" : vendorRejected ? "VENDOR" : "ULB";
+
+		return RejectedPlateRecord.builder().id(rs.getString("garbage_account_uuid"))
+				.garbageId(rs.getString("garbage_id")).ownerName(rs.getString("owner_name"))
+				.mobileNo(rs.getString("mobile_number")).propertyId(rs.getString("property_id"))
+				.ulb(rs.getString("ulb")).ward(rs.getString("ward")).rejectedBy(rejectedBy)
+				.vendorPrintVerified(rs.getString("vendor_print_verified"))
+				.vendorRejectionReason(rs.getString("vendor_rejection_reason"))
+				.vendorRejectionAction(rs.getString("vendor_rejection_action"))
+				.ulbVerificationStatus(rs.getString("ulb_verification_status"))
+				.ulbRejectionReason(rs.getString("ulb_rejection_reason"))
+				.ulbRejectionAction(rs.getString("ulb_rejection_action")).build();
 	}
 	
 	public List<Map<String, Object>> getStatusCounts(TotalCountRequest totalCountRequest) {

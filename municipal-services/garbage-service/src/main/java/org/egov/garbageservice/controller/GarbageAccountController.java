@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.garbageservice.model.DdpPrintingSearchResponse;
+import org.egov.garbageservice.model.RejectedPlatesSearchResponse;
 import org.egov.garbageservice.model.DdpWorkflowUpdateRequest;
 import org.egov.garbageservice.model.DdpWorkflowUpdateResponse;
 import org.egov.garbageservice.model.GarbageAccountActionRequest;
@@ -209,5 +210,18 @@ public class GarbageAccountController {
 	public ResponseEntity<DdpPrintingSearchResponse> searchDdpPrintingData(
 			@RequestBody SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
 		return ResponseEntity.ok(service.searchDdpPrintingData(searchCriteriaGarbageAccountRequest));
+	}
+
+	/**
+	 * Searches plates rejected at the vendor print-verification stage, the
+	 * ULB verification stage, or both, for the ULB/wards in the search
+	 * criteria (tenantId + wardNames). Each record's rejectedBy key
+	 * ("VENDOR"/"ULB"/"BOTH") lets callers segregate the two rejection
+	 * sources.
+	 */
+	@PostMapping("/_searchRejectedPlates")
+	public ResponseEntity<RejectedPlatesSearchResponse> searchRejectedPlates(
+			@RequestBody SearchCriteriaGarbageAccountRequest searchCriteriaGarbageAccountRequest) {
+		return ResponseEntity.ok(service.searchRejectedPlates(searchCriteriaGarbageAccountRequest));
 	}
 }
