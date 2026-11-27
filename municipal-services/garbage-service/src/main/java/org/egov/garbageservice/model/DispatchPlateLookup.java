@@ -27,6 +27,8 @@ public class DispatchPlateLookup {
 
 	private String propertyId;
 
+	private String systemPropertyId;
+
 	private String ulb;
 
 	private String ward;

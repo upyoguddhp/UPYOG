@@ -22,5 +22,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PtAddress {
 
+	private String district;
+
 	private JsonNode additionalDetails;
 }

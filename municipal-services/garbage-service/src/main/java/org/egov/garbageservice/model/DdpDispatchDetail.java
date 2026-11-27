@@ -27,6 +27,8 @@ public class DdpDispatchDetail {
 
 	private String ward;
 
+	private String district;
+
 	private Long dispatchDate;
 
 	private String receivedBy;

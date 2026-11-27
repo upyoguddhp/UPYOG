@@ -29,6 +29,7 @@ public class DdpDispatchRepository {
 
 	private static final String SELECT_PLATE_LOOKUP_BY_UUID = "SELECT acc.uuid as garbage_account_uuid, "
 			+ "acc.garbage_id as garbage_id, acc.tenant_id as tenant_id, acc.name as owner_name, "
+			+ "acc.system_property_id as system_property_id, "
 			+ "COALESCE(acc.property_id, acc.system_property_id) as property_id, addr.ulb_name as ulb, addr.ward_name as ward, "
 			+ "ddp.batch_no as existing_batch_no, COALESCE(ddp.ddp_dispatched, false) as ddp_dispatched "
 			+ "FROM eg_grbg_account acc "
@@ -43,10 +44,10 @@ public class DdpDispatchRepository {
 			+ "RETURNING last_seq";
 
 	private static final String INSERT_BATCH = "INSERT INTO eg_grbg_ddp_dispatch "
-			+ "(uuid, batch_no, ulb, ward, status, createdby, modifiedby, createdtime, modifiedtime) "
-			+ "VALUES (:uuid, :batchNo, :ulb, :ward, :status, :createdBy, :lastModifiedBy, :createdTime, :lastModifiedTime)";
+			+ "(uuid, batch_no, ulb, ward, district, status, createdby, modifiedby, createdtime, modifiedtime) "
+			+ "VALUES (:uuid, :batchNo, :ulb, :ward, :district, :status, :createdBy, :lastModifiedBy, :createdTime, :lastModifiedTime)";
 
-	private static final String SELECT_BATCH_BY_BATCH_NO = "SELECT uuid, batch_no, ulb, ward, dispatch_date, "
+	private static final String SELECT_BATCH_BY_BATCH_NO = "SELECT uuid, batch_no, ulb, ward, district, dispatch_date, "
 			+ "received_by, ulb_receiving_date, status, createdby, modifiedby, createdtime, modifiedtime "
 			+ "FROM eg_grbg_ddp_dispatch WHERE batch_no = ?";
 
@@ -91,6 +92,7 @@ public class DdpDispatchRepository {
 				(rs, rowNum) -> DispatchPlateLookup.builder().garbageAccountUuid(rs.getString("garbage_account_uuid"))
 						.garbageId(rs.getLong("garbage_id")).tenantId(rs.getString("tenant_id"))
 						.ownerName(rs.getString("owner_name")).propertyId(rs.getString("property_id"))
+						.systemPropertyId(rs.getString("system_property_id"))
 						.ulb(rs.getString("ulb")).ward(rs.getString("ward"))
 						.existingBatchNo(rs.getString("existing_batch_no"))
 						.ddpDispatched(rs.getBoolean("ddp_dispatched")).build(),
@@ -114,6 +116,7 @@ public class DdpDispatchRepository {
 		params.put("batchNo", batch.getBatchNo());
 		params.put("ulb", batch.getUlb());
 		params.put("ward", batch.getWard());
+		params.put("district", batch.getDistrict());
 		params.put("status", batch.getStatus());
 		params.put("createdBy", batch.getAuditDetails().getCreatedBy());
 		params.put("lastModifiedBy", batch.getAuditDetails().getLastModifiedBy());
@@ -199,7 +202,7 @@ public class DdpDispatchRepository {
 
 	public List<DdpDispatch> searchBatches(SearchCriteriaDdpDispatch criteria) {
 		List<Object> preparedStatementValues = new ArrayList<>();
-		StringBuilder query = new StringBuilder("SELECT uuid, batch_no, ulb, ward, dispatch_date, received_by, "
+		StringBuilder query = new StringBuilder("SELECT uuid, batch_no, ulb, ward, district, dispatch_date, received_by, "
 				+ "ulb_receiving_date, status, createdby, modifiedby, createdtime, modifiedtime "
 				+ "FROM eg_grbg_ddp_dispatch WHERE 1=1 ");
 
@@ -269,7 +272,7 @@ public class DdpDispatchRepository {
 				.lastModifiedTime((Long) rs.getObject("modifiedtime")).build();
 
 		return DdpDispatch.builder().uuid(rs.getString("uuid")).batchNo(rs.getString("batch_no"))
-				.ulb(rs.getString("ulb")).ward(rs.getString("ward"))
+				.ulb(rs.getString("ulb")).ward(rs.getString("ward")).district(rs.getString("district"))
 				.dispatchDate((Long) rs.getObject("dispatch_date")).receivedBy(rs.getString("received_by"))
 				.ulbReceivingDate((Long) rs.getObject("ulb_receiving_date")).status(rs.getString("status"))
 				.auditDetails(auditDetails).build();

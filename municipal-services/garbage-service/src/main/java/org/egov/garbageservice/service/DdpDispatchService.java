@@ -115,7 +115,8 @@ public class DdpDispatchService {
 
 		DdpDispatch batch;
 		if (StringUtils.isEmpty(request.getBatchNo())) {
-			batch = createBatch(plate.getUlb(), plate.getWard(), userUuid, now);
+			String district = getDistrictForSystemPropertyId(plate, request.getRequestInfo());
+			batch = createBatch(plate.getUlb(), plate.getWard(), district, userUuid, now);
 		} else {
 			batch = ddpDispatchRepository.findBatchByBatchNo(request.getBatchNo());
 			if (null == batch) {
@@ -141,7 +142,7 @@ public class DdpDispatchService {
 				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates).build();
 	}
 
-	private DdpDispatch createBatch(String ulb, String ward, String userUuid, long now) {
+	private DdpDispatch createBatch(String ulb, String ward, String district, String userUuid, long now) {
 		String ulbForBatchNo = ulb.toUpperCase();
 		String batchDate = new SimpleDateFormat(BATCH_DATE_FORMAT).format(new Date(now));
 
@@ -152,7 +153,8 @@ public class DdpDispatchService {
 				.createdTime(now).lastModifiedTime(now).build();
 
 		DdpDispatch batch = DdpDispatch.builder().uuid(UUID.randomUUID().toString()).batchNo(batchNo)
-				.ulb(ulbForBatchNo).ward(ward).status(GrbgConstants.DDP_DISPATCH_STATUS_INITIATED)
+				.ulb(ulbForBatchNo).ward(ward).district(district)
+				.status(GrbgConstants.DDP_DISPATCH_STATUS_INITIATED)
 				.auditDetails(auditDetails).build();
 
 		ddpDispatchRepository.insertBatch(batch);
@@ -333,6 +335,7 @@ public class DdpDispatchService {
 	private DdpDispatchDetail toDispatchDetail(DdpDispatch batch, RequestInfo requestInfo) {
 		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), requestInfo);
 		return DdpDispatchDetail.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb()).ward(batch.getWard())
+				.district(batch.getDistrict())
 				.dispatchDate(batch.getDispatchDate()).receivedBy(batch.getReceivedBy())
 				.ulbReceivingDate(batch.getUlbReceivingDate()).status(batch.getStatus())
 				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates)
@@ -442,6 +445,16 @@ public class DdpDispatchService {
 		}
 
 		return propertyMap;
+	}
+
+	private String getDistrictForSystemPropertyId(DispatchPlateLookup plate, RequestInfo requestInfo) {
+		if (StringUtils.isEmpty(plate.getSystemPropertyId())) {
+			return null;
+		}
+
+		PtProperty property = fetchPropertiesBySystemPropertyId(requestInfo, plate.getTenantId(),
+				Collections.singletonList(plate.getSystemPropertyId())).get(plate.getSystemPropertyId());
+		return null != property && null != property.getAddress() ? property.getAddress().getDistrict() : null;
 	}
 
 	private void validateRequestInfo(RequestInfo requestInfo) {
