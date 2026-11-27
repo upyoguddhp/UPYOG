@@ -936,20 +936,22 @@ public class GarbageAccountRepository {
 			+ "WHERE acc.tenant_id = ? AND acc.is_active = true "
 			+ "AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ";
 
-	public List<RejectedPlateRecord> searchRejectedPlates(String tenantId, List<String> wardNames, long limit,
-			long offset) {
+	public List<RejectedPlateRecord> searchRejectedPlates(String tenantId, List<String> wardNames,
+			List<String> vendorPrintVerified, List<String> ulbVerificationStatus, long limit, long offset) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		preparedStatementValues.add(tenantId);
 
 		StringBuilder query = new StringBuilder(SELECT_REJECTED_PLATES_BASE);
 		appendWardFilter(query, wardNames, preparedStatementValues);
-
+		appendVendorPrintVerifiedFilter(query, vendorPrintVerified, preparedStatementValues);
+		appendUlbVerificationStatusFilter(query, ulbVerificationStatus, preparedStatementValues);
 		query.append(" ORDER BY acc.id DESC LIMIT ? OFFSET ? ");
 		preparedStatementValues.add(limit);
 		preparedStatementValues.add(offset);
 
 		return jdbcTemplate.query(query.toString(), preparedStatementValues.toArray(), this::mapRejectedPlateRecord);
 	}
+	
 
 	public long countRejectedPlates(String tenantId, List<String> wardNames) {
 		List<Object> preparedStatementValues = new ArrayList<>();
@@ -972,6 +974,34 @@ public class GarbageAccountRepository {
 			query.append(" AND addr.ward_name IN ( ")
 					.append(getQueryForCollection(wardNames, preparedStatementValues)).append(" )");
 		}
+	}
+	
+	private void appendVendorPrintVerifiedFilter(
+	        StringBuilder query,
+	        List<String> vendorPrintVerified,
+	        List<Object> values) {
+
+	    if (vendorPrintVerified != null && !vendorPrintVerified.isEmpty()) {
+	        query.append(" AND ddp.vendor_print_verified IN (")
+	             .append(String.join(",", Collections.nCopies(vendorPrintVerified.size(), "?")))
+	             .append(") ");
+
+	        values.addAll(vendorPrintVerified);
+	    }
+	}
+	
+	private void appendUlbVerificationStatusFilter(
+	        StringBuilder query,
+	        List<String> ulbVerificationStatus,
+	        List<Object> values) {
+
+	    if (ulbVerificationStatus != null && !ulbVerificationStatus.isEmpty()) {
+	        query.append(" AND ddp.ulb_verification_status IN (")
+	             .append(String.join(",", Collections.nCopies(ulbVerificationStatus.size(), "?")))
+	             .append(") ");
+
+	        values.addAll(ulbVerificationStatus);
+	    }
 	}
 
 	private RejectedPlateRecord mapRejectedPlateRecord(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
