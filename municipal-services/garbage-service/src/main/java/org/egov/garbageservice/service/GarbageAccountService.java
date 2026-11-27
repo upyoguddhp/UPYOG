@@ -3078,12 +3078,49 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		if (StringUtils.isEmpty(request.getTenantId())) {
 			throw new CustomException("INVALID_REQUEST", "TenantId is mandatory to update DDP workflow details.");
 		}
+		if (!(GrbgConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole())
+				|| GrbgConstants.ACTOR_ROLE_DDP_VERIFIER.equals(request.getActorRole()))) {
+			throw new CustomException("INVALID_REQUEST", "actorRole must be DDP_PRINT_VENDOR or DDP_VERIFIER.");
+		}
+		boolean isVendor = GrbgConstants.ACTOR_ROLE_DDP_VENDOR.equals(request.getActorRole());
+		if (isVendor) {
+			if (null != request.getInstallationDone() || StringUtils.isNotEmpty(request.getDdpLatitude())
+					|| StringUtils.isNotEmpty(request.getDdpLongitude())
+					|| StringUtils.isNotEmpty(request.getUlbVerificationStatus())
+					|| StringUtils.isNotEmpty(request.getUlbRejectionReason())
+					|| StringUtils.isNotEmpty(request.getUlbRejectionAction())) {
+				throw new CustomException("INVALID_FIELD_FOR_ROLE",
+						"DDP_PRINT_VENDOR may not set installationDone, ddpLatitude, ddpLongitude, "
+								+ "ulbVerificationStatus, ulbRejectionReason or ulbRejectionAction.");
+			}
+		} else {
+			if (StringUtils.isNotEmpty(request.getVendorPrintVerified())
+					|| StringUtils.isNotEmpty(request.getDdpRejectionReason())
+					|| StringUtils.isNotEmpty(request.getDdpRejectionAction()) || null != request.getDdpPrintingDone()
+					|| null != request.getDdpDispatched() || null != request.getDdpPrintVerified()) {
+				throw new CustomException("INVALID_FIELD_FOR_ROLE",
+						"DDP_VERIFIER may not set vendorPrintVerified, ddpRejectionReason, ddpRejectionAction, "
+								+ "ddpPrintingDone, ddpDispatched or ddpPrintVerified.");
+			}
+			// ulb_verified reflects that the ULB acted on this plate, regardless of
+			// whether that action was an approval or a rejection.
+			request.setUlbVerified(true);
+		}
+		if (StringUtils.isNotEmpty(request.getVendorPrintVerified())) {
+			// ddp_print_verified reflects that the vendor acted on this plate,
+			// regardless of whether that action was VERIFIED or REJECTED.
+			request.setDdpPrintVerified(true);
+		}
 		if (null != request.getVendorPrintVerified()
 				&& !("VERIFIED".equalsIgnoreCase(request.getVendorPrintVerified())
 						|| "REJECTED".equalsIgnoreCase(request.getVendorPrintVerified()))) {
 			throw new CustomException("INVALID_REQUEST", "vendorPrintVerified must be VERIFIED or REJECTED.");
 		}
-
+		if (null != request.getUlbVerificationStatus()
+				&& !("VERIFIED".equalsIgnoreCase(request.getUlbVerificationStatus())
+						|| "REJECTED".equalsIgnoreCase(request.getUlbVerificationStatus()))) {
+			throw new CustomException("INVALID_REQUEST", "ulbVerificationStatus must be VERIFIED or REJECTED.");
+		}
 
 		if ("REJECTED".equalsIgnoreCase(request.getVendorPrintVerified())) {
 			if (!("REPRINT".equals(request.getDdpRejectionAction()) || "REVALIDATE".equals(request.getDdpRejectionAction()))) {
@@ -3092,8 +3129,26 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		} else if (request.getDdpRejectionAction() != null) {
 			throw new CustomException("INVALID_REQUEST", "ddpRejectionAction requires vendorPrintVerified REJECTED.");
 		}
+		if ("REJECTED".equalsIgnoreCase(request.getUlbVerificationStatus())) {
+			if (!("REPRINT".equals(request.getUlbRejectionAction()) || "REVALIDATE".equals(request.getUlbRejectionAction()))) {
+				throw new CustomException("INVALID_REQUEST", "REJECTED requires ulbRejectionAction REPRINT or REVALIDATE and ulbRejectionReason.");
+			}
+		} else if (request.getUlbRejectionAction() != null) {
+			throw new CustomException("INVALID_REQUEST", "ulbRejectionAction requires ulbVerificationStatus REJECTED.");
+		}
 		if (request.getVendorPrintVerified() != null) {
 			request.setVendorPrintVerified(request.getVendorPrintVerified().toUpperCase(java.util.Locale.ROOT));
+		}
+		if (request.getUlbVerificationStatus() != null) {
+			request.setUlbVerificationStatus(request.getUlbVerificationStatus().toUpperCase(java.util.Locale.ROOT));
+		}
+		if (Boolean.TRUE.equals(request.getInstallationDone())) {
+			String effectiveUlbVerificationStatus = StringUtils.isNotEmpty(request.getUlbVerificationStatus())
+					? request.getUlbVerificationStatus()
+					: garbageAccountRepository.findUlbVerificationStatus(request.getUuid(), request.getTenantId());
+			if ("REJECTED".equalsIgnoreCase(effectiveUlbVerificationStatus)) {
+				throw new CustomException("PLATE_REJECTED", "Rejected plates cannot be installed.");
+			}
 		}
 		String userUuid = request.getRequestInfo().getUserInfo().getUuid();
 		Long now = System.currentTimeMillis();
@@ -3103,6 +3158,9 @@ public GarbageAccountActionResponse openSearchPayPreview(
 			throw new CustomException("GARBAGE_ACCOUNT_NOT_FOUND",
 					"No garbage account found for uuid: " + request.getUuid());
 		}
+
+		garbageAccountRepository.insertDdpActionHistory(request.getUuid(), request.getTenantId(),
+				request.getActorRole(), buildDdpActionDetailsJson(request, isVendor), userUuid, now);
 
 		Map<String, Object> saved = garbageAccountRepository.getDdpWorkflowState(request.getUuid(), request.getTenantId());
 		return DdpWorkflowUpdateResponse.builder()
@@ -3123,7 +3181,39 @@ public GarbageAccountActionResponse openSearchPayPreview(
 				.isReadyForPrinting((Boolean) saved.get("is_ready_for_printing"))
 				.reprintCount((Integer) saved.get("reprint_count"))
 				.revalidateCount((Integer) saved.get("revalidate_count"))
+				.ulbVerificationStatus((String) saved.get("ulb_verification_status"))
+				.ulbRejectionReason((String) saved.get("ulb_rejection_reason"))
+				.ulbRejectionAction((String) saved.get("ulb_rejection_action"))
 				.build();
+	}
+
+	/**
+	 * JSON snapshot of only the fields {@code actorRole} is allowed to set on
+	 * this call, for the eg_grbg_ddp_action_history audit row.
+	 */
+	private String buildDdpActionDetailsJson(DdpWorkflowUpdateRequest request, boolean isVendor) {
+		Map<String, Object> details = new HashMap<>();
+		if (isVendor) {
+			details.put("vendorPrintVerified", request.getVendorPrintVerified());
+			details.put("ddpRejectionReason", request.getDdpRejectionReason());
+			details.put("ddpRejectionAction", request.getDdpRejectionAction());
+			details.put("ddpPrintingDone", request.getDdpPrintingDone());
+			details.put("ddpDispatched", request.getDdpDispatched());
+			details.put("ddpPrintVerified", request.getDdpPrintVerified());
+		} else {
+			details.put("ulbVerificationStatus", request.getUlbVerificationStatus());
+			details.put("ulbRejectionReason", request.getUlbRejectionReason());
+			details.put("ulbRejectionAction", request.getUlbRejectionAction());
+			details.put("installationDone", request.getInstallationDone());
+			details.put("ddpLatitude", request.getDdpLatitude());
+			details.put("ddpLongitude", request.getDdpLongitude());
+		}
+		try {
+			return objectMapper.writeValueAsString(details);
+		} catch (Exception e) {
+			throw new CustomException("DDP_HISTORY_SERIALIZATION_FAILED",
+					"Failed to serialize DDP action details for history.");
+		}
 	}
 
 	/**

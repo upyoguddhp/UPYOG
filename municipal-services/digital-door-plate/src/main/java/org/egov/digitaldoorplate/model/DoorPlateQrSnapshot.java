@@ -1,6 +1,7 @@
 package org.egov.digitaldoorplate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -42,4 +43,13 @@ public class DoorPlateQrSnapshot {
 
 	@JsonProperty("Address")
 	private String address;
+
+	/**
+	 * eg_pt_address.additional_details -&gt; propertyAddress; only populated for
+	 * the dataInDatabase snapshot when the caller has the DDP_VERIFIER role
+	 * (see DoorPlateService#verifyQrData), never for the dataInQr snapshot.
+	 */
+	@JsonProperty("propertyFullAdress")
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String propertyFullAdress;
 }

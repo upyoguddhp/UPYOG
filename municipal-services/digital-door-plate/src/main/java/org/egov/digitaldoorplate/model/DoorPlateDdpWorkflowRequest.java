@@ -13,10 +13,14 @@ import lombok.NoArgsConstructor;
  * Request shape for {@code DoorPlateController._updateDdpWorkflow}, the
  * single endpoint covering every DDP workflow role update (vendor print
  * verification, vendor printing-done, vendor dispatched, ULB verification,
- * installation); each caller only sets the field(s) relevant to its own
- * role, and they're forwarded to garbage-service's eg_grbg_account record
- * identified by {@link #garbageAccountUuid} (the "id" scanned from the door
- * plate QR / returned by {@code /door-plate/_verifyQr}).
+ * installation). The acting role (DDP_PRINT_VENDOR or DDP_VERIFIER) is never
+ * taken from this request - it is derived server-side from the logged-in
+ * user's roles (RequestInfo.userInfo.roles) for {@link #tenantId}, which
+ * also determines which of the fields below the caller may set; the server
+ * rejects a request that sets a field outside its role. They're forwarded
+ * to garbage-service's eg_grbg_account record identified by
+ * {@link #garbageAccountUuid} (the "id" scanned from the door plate QR /
+ * returned by {@code /door-plate/_verifyQr}).
  */
 @AllArgsConstructor
 @Data
@@ -32,39 +36,56 @@ public class DoorPlateDdpWorkflowRequest {
 	private String garbageAccountUuid;
 
 	/**
-	 * Used only by {@code /door-plate/_vendorPrintVerify}: "VERIFIED" or
-	 * "REJECTED".
+	 * DDP_PRINT_VENDOR only: "VERIFIED" or "REJECTED".
 	 */
 	private String vendorPrintVerified;
-	
+
+	/** DDP_PRINT_VENDOR only. */
 	private String ddpRejectionReason;
 
 	/**
-	 * Used only by {@code /door-plate/_ulbVerify}.
+	 * Ignored as input - always derived server-side as true for any
+	 * DDP_VERIFIER action, regardless of whether it approves or rejects.
 	 */
 	private Boolean ulbVerified;
 
 	/**
-	 * Along with {@link #ddpLatitude}/{@link #ddpLongitude}.
+	 * DDP_VERIFIER only, along with {@link #ddpLatitude}/{@link #ddpLongitude}.
 	 */
 	private Boolean installationDone;
 
+	/** DDP_VERIFIER only. */
 	private String ddpLatitude;
 
+	/** DDP_VERIFIER only. */
 	private String ddpLongitude;
 
 	/**
-	 * Vendor step: physical plate has been printed.
+	 * DDP_PRINT_VENDOR only: physical plate has been printed.
 	 */
 	private Boolean ddpPrintingDone;
 
 	/**
-	 * Vendor step: printed plate has been dispatched to the ULB/installer.
+	 * DDP_PRINT_VENDOR only: printed plate has been dispatched to the ULB/installer.
 	 */
 	private Boolean ddpDispatched;
-	
+
+	/** DDP_PRINT_VENDOR only. */
 	private Boolean ddpPrintVerified;
 
-	/** Required for REJECTED: REPRINT or REVALIDATE. */
+	/** DDP_PRINT_VENDOR only. Required for REJECTED: REPRINT or REVALIDATE. */
 	private String ddpRejectionAction;
+
+	/**
+	 * DDP_VERIFIER's own verification outcome: "VERIFIED" or "REJECTED".
+	 * Separate from {@link #vendorPrintVerified} so neither role's action
+	 * clobbers the other's.
+	 */
+	private String ulbVerificationStatus;
+
+	/** DDP_VERIFIER only. */
+	private String ulbRejectionReason;
+
+	/** DDP_VERIFIER only. Required for REJECTED: REPRINT or REVALIDATE. */
+	private String ulbRejectionAction;
 }

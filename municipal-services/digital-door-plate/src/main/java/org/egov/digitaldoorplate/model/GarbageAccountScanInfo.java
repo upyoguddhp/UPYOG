@@ -73,5 +73,17 @@ public class GarbageAccountScanInfo {
 
 	private Long nextRetryTime;
 
+	private String batchNo;
+
+	private String ulbVerificationStatus;
+
+	private String ulbRejectionReason;
+
+	private String ulbRejectionAction;
+
+	private Long readyForPrintingDate;
+
+	private Long ddpDispatchDate;
+
 	private List<ChildAccountScanInfo> childAccounts;
 }

@@ -86,6 +86,17 @@ public class PropertyService {
 	 * propertyId.
 	 */
 	public DoorPlateQrSnapshot buildQrSnapshot(RequestInfo requestInfo, String tenantId, String propertyId, String id) {
+		return buildQrSnapshot(requestInfo, tenantId, propertyId, id, false);
+	}
+
+	/**
+	 * @param includePropertyFullAddress when true, also sets propertyFullAdress
+	 *        from eg_pt_address's additionalDetails -&gt; propertyAddress key.
+	 *        Used for the DDP_VERIFIER's dataInDatabase snapshot in
+	 *        {@code /_verifyQr}; left false elsewhere so the field stays absent.
+	 */
+	public DoorPlateQrSnapshot buildQrSnapshot(RequestInfo requestInfo, String tenantId, String propertyId, String id,
+			boolean includePropertyFullAddress) {
 
 		RemoteProperty property = searchPropertyByPropertyId(requestInfo, tenantId, propertyId);
 
@@ -107,15 +118,20 @@ public class PropertyService {
 		String wardAddress = "Ward No. " + (wardNo.isEmpty() ? wardNumber
 				: wardNumber.isEmpty() || wardNo.equalsIgnoreCase(wardNumber) ? wardNo : wardNo + ", " + wardNumber);
 
-		return DoorPlateQrSnapshot.builder()
+		DoorPlateQrSnapshot.DoorPlateQrSnapshotBuilder snapshot = DoorPlateQrSnapshot.builder()
 				.ownerName(null == owner ? null : owner.getPropertyOwnerName())
 				.mobileNo(mobileNo)
 				.propertyId(property.getPropertyId())
 				.id(id)
 				.ulbName(readText(addressDetails, "ulbName"))
 				.ward(readText(addressDetails, "wardNumber"))
-				.address(wardAddress)
-				.build();
+				.address(wardAddress);
+
+		if (includePropertyFullAddress) {
+			snapshot.propertyFullAdress(readText(addressDetails, "propertyAddress"));
+		}
+
+		return snapshot.build();
 	}
 
 	/**

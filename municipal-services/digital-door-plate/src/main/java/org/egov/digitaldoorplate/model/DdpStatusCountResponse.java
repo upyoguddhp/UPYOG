@@ -37,4 +37,13 @@ public class DdpStatusCountResponse {
 
 	/** installation_done = true */
 	private Long installationDone;
+
+	/** eg_grbg_ddp_dispatch rows with status = 'INITIATED', optionally filtered by ulb. */
+	private Long dispatchBatchesInitiated;
+
+	/** eg_grbg_ddp_dispatch rows with status = 'SUBMITTED', optionally filtered by ulb. */
+	private Long dispatchBatchesSubmitted;
+
+	/** eg_grbg_ddp_dispatch rows with status = 'RECEIVED', optionally filtered by ulb. */
+	private Long dispatchBatchesReceived;
 }

@@ -147,4 +147,16 @@ public class GarbageAccount {
 	private String ddpRejectionAction;
 	private Integer reprintCount;
 	private Integer revalidateCount;
+
+	private String batchNo;
+
+	private String ulbVerificationStatus;
+
+	private String ulbRejectionReason;
+
+	private String ulbRejectionAction;
+
+	private Long readyForPrintingDate;
+
+	private Long ddpDispatchDate;
 }

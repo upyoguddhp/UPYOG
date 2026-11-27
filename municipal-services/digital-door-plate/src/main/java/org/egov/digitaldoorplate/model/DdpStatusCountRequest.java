@@ -17,4 +17,10 @@ public class DdpStatusCountRequest {
 
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo;
+
+	/**
+	 * Optional: when set, the dispatch-batch counts are restricted to
+	 * eg_grbg_ddp_dispatch rows for this ULB.
+	 */
+	private String ulb;
 }
