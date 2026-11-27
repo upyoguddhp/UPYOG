@@ -69,6 +69,11 @@ public class GarbageAccountRepository {
 			+ ", ddp_dtl.ddp_dispatched as ddp_dtl_ddp_dispatched"
 			+ ", ddp_dtl.ddp_rejection_reason as ddp_dtl_ddp_rejection_reason"
 			+ ", ddp_dtl.ddp_rejection_action, COALESCE(ddp_dtl.reprint_count, 0) as reprint_count, COALESCE(ddp_dtl.revalidate_count, 0) as revalidate_count"
+			+ ", ddp_dtl.ulb_verification_status as ddp_dtl_ulb_verification_status"
+			+ ", ddp_dtl.ulb_rejection_reason as ddp_dtl_ulb_rejection_reason"
+			+ ", ddp_dtl.ulb_rejection_action as ddp_dtl_ulb_rejection_action"
+			+ ", ddp_dtl.ready_for_printing_date as ddp_dtl_ready_for_printing_date"
+			+ ", ddp_dtl.ddp_dispatch_date as ddp_dtl_ddp_dispatch_date"
 			+ ", ddp_dtl.remarks as ddp_dtl_remarks ";
 
 	private static final String DDP_DETAIL_JOIN = " LEFT OUTER JOIN eg_grbg_account_ddp as ddp_dtl ON ddp_dtl.garbage_account_uuid = acc.uuid";
