@@ -224,8 +224,9 @@ public class DoorPlateService {
 			}
 		}
 
+		boolean isVerifier = isVerifierForTenant(request.getRequestInfo(), request.getTenantId());
 		DoorPlateQrSnapshot dbSnapshot = propertyService.buildQrSnapshot(request.getRequestInfo(),
-				request.getTenantId(), qrSnapshot.getPropertyId(), qrSnapshot.getId());
+				request.getTenantId(), qrSnapshot.getPropertyId(), qrSnapshot.getId(), isVerifier);
 
 		List<String> mismatchedFields = findMismatchedFields(qrSnapshot, dbSnapshot);
 
