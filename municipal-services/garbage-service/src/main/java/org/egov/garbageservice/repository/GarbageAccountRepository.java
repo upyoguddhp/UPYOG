@@ -927,15 +927,42 @@ public class GarbageAccountRepository {
 			+ "FROM eg_grbg_account acc "
 			+ "JOIN eg_grbg_account_ddp ddp ON ddp.garbage_account_uuid = acc.uuid "
 			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
-			+ "WHERE acc.tenant_id = ? AND acc.is_active = true "
-			+ "AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ";
+			+ "WHERE acc.tenant_id = ? AND acc.is_active = true ";
 
-	public List<RejectedPlateRecord> searchRejectedPlates(String tenantId, List<String> wardNames, long limit,
-			long offset) {
+	private static final String COUNT_REJECTED_PLATES_BASE = "SELECT COUNT(*) FROM eg_grbg_account acc "
+			+ "JOIN eg_grbg_account_ddp ddp ON ddp.garbage_account_uuid = acc.uuid "
+			+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
+			+ "WHERE acc.tenant_id = ? AND acc.is_active = true ";
+
+	/**
+	 * rejectedBy ("VENDOR"/"ULB"/"BOTH", case-insensitive, null/empty for no
+	 * filter) narrows the rejection OR-condition down to exactly one bucket,
+	 * matching RejectedPlateRecord#rejectedBy: VENDOR/ULB mean rejected at
+	 * that stage only (not the other), BOTH means both stages rejected it.
+	 */
+	private void appendRejectionFilter(StringBuilder query, String rejectedBy) {
+		if (StringUtils.isEmpty(rejectedBy)) {
+			query.append(" AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ");
+		} else if ("VENDOR".equalsIgnoreCase(rejectedBy)) {
+			query.append(" AND ddp.vendor_print_verified = 'REJECTED' "
+					+ "AND COALESCE(ddp.ulb_verification_status, '') <> 'REJECTED' ");
+		} else if ("ULB".equalsIgnoreCase(rejectedBy)) {
+			query.append(" AND ddp.ulb_verification_status = 'REJECTED' "
+					+ "AND COALESCE(ddp.vendor_print_verified, '') <> 'REJECTED' ");
+		} else if ("BOTH".equalsIgnoreCase(rejectedBy)) {
+			query.append(" AND ddp.vendor_print_verified = 'REJECTED' AND ddp.ulb_verification_status = 'REJECTED' ");
+		} else {
+			throw new CustomException("INVALID_REQUEST", "rejectedBy must be one of VENDOR, ULB, BOTH.");
+		}
+	}
+
+	public List<RejectedPlateRecord> searchRejectedPlates(String tenantId, List<String> wardNames, String rejectedBy,
+			long limit, long offset) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		preparedStatementValues.add(tenantId);
 
 		StringBuilder query = new StringBuilder(SELECT_REJECTED_PLATES_BASE);
+		appendRejectionFilter(query, rejectedBy);
 		appendWardFilter(query, wardNames, preparedStatementValues);
 
 		query.append(" ORDER BY acc.id DESC LIMIT ? OFFSET ? ");
@@ -945,16 +972,12 @@ public class GarbageAccountRepository {
 		return jdbcTemplate.query(query.toString(), preparedStatementValues.toArray(), this::mapRejectedPlateRecord);
 	}
 
-	public long countRejectedPlates(String tenantId, List<String> wardNames) {
+	public long countRejectedPlates(String tenantId, List<String> wardNames, String rejectedBy) {
 		List<Object> preparedStatementValues = new ArrayList<>();
 		preparedStatementValues.add(tenantId);
 
-		StringBuilder query = new StringBuilder(
-				"SELECT COUNT(*) FROM eg_grbg_account acc "
-						+ "JOIN eg_grbg_account_ddp ddp ON ddp.garbage_account_uuid = acc.uuid "
-						+ "LEFT JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
-						+ "WHERE acc.tenant_id = ? AND acc.is_active = true "
-						+ "AND (ddp.vendor_print_verified = 'REJECTED' OR ddp.ulb_verification_status = 'REJECTED') ");
+		StringBuilder query = new StringBuilder(COUNT_REJECTED_PLATES_BASE);
+		appendRejectionFilter(query, rejectedBy);
 		appendWardFilter(query, wardNames, preparedStatementValues);
 
 		Long count = jdbcTemplate.queryForObject(query.toString(), preparedStatementValues.toArray(), Long.class);

@@ -92,6 +92,14 @@ public class SearchCriteriaGarbageAccount {
     private Boolean ddpDispatched;
 
     private Boolean isMonthlyBilling;
+
+    /**
+     * Only used by GarbageAccountService#searchRejectedPlates: "VENDOR",
+     * "ULB", or "BOTH" (case-insensitive) to narrow its result down to one
+     * rejection bucket; null returns all rejected plates, matching the
+     * returned records' own rejectedBy key.
+     */
+    private String rejectedBy;
     
 	@Builder.Default
 	private Boolean isPayNow = false;
