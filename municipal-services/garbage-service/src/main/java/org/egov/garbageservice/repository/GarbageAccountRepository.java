@@ -266,7 +266,7 @@ public class GarbageAccountRepository {
 	        + "ddp_longitude = COALESCE(:ddpLongitude, eg_grbg_account_ddp.ddp_longitude), "
 	        + "ddp_printing_done = CASE WHEN CAST(:ddpRejectionAction AS VARCHAR) IS NOT NULL THEN false ELSE COALESCE(:ddpPrintingDone, eg_grbg_account_ddp.ddp_printing_done) END, "
 	        + "ddp_dispatched = COALESCE(:ddpDispatched, eg_grbg_account_ddp.ddp_dispatched), "
-	        + "ddp_rejection_reason = COALESCE(:ddpRejectionReason, eg_grbg_account_ddp.ddp_rejection_reason), "
+	        + "ddp_rejection_reason = CASE WHEN :vendorPrintVerified = 'VERIFIED' THEN NULL ELSE COALESCE(:ddpRejectionReason, eg_grbg_account_ddp.ddp_rejection_reason) END, "
 	        + "remarks = COALESCE(:remarks, eg_grbg_account_ddp.remarks), "
             + "is_ready_for_printing = CASE WHEN COALESCE(:ddpRejectionAction, :ulbRejectionAction) = 'REVALIDATE' THEN false "
             + "WHEN COALESCE(:ddpRejectionAction, :ulbRejectionAction) = 'REPRINT' THEN true ELSE eg_grbg_account_ddp.is_ready_for_printing END, "
@@ -278,7 +278,7 @@ public class GarbageAccountRepository {
             + "+ CASE WHEN :ulbRejectionAction = 'REVALIDATE' AND (eg_grbg_account_ddp.ulb_verification_status IS DISTINCT FROM 'REJECTED' OR eg_grbg_account_ddp.ulb_rejection_action IS DISTINCT FROM :ulbRejectionAction) THEN 1 ELSE 0 END, "
             + "ddp_rejection_action = CASE WHEN :vendorPrintVerified = 'VERIFIED' THEN NULL ELSE COALESCE(:ddpRejectionAction, eg_grbg_account_ddp.ddp_rejection_action) END, "
             + "ulb_verification_status = COALESCE(:ulbVerificationStatus, eg_grbg_account_ddp.ulb_verification_status), "
-            + "ulb_rejection_reason = COALESCE(:ulbRejectionReason, eg_grbg_account_ddp.ulb_rejection_reason), "
+            + "ulb_rejection_reason = CASE WHEN :ulbVerificationStatus = 'VERIFIED' THEN NULL ELSE COALESCE(:ulbRejectionReason, eg_grbg_account_ddp.ulb_rejection_reason) END, "
             + "ulb_rejection_action = CASE WHEN :ulbVerificationStatus = 'VERIFIED' THEN NULL ELSE COALESCE(:ulbRejectionAction, eg_grbg_account_ddp.ulb_rejection_action) END";
 
 	private static final String INSERT_DDP_ACTION_HISTORY = "INSERT INTO eg_grbg_ddp_action_history "
