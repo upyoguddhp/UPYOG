@@ -79,9 +79,14 @@ public class SearchCriteriaGarbageAccount {
     private Boolean isReadyForPrinting;
 
     /**
-     * Filters on eg_grbg_account_ddp: "VERIFIED"/"REJECTED".
+     * Filters on eg_grbg_account_ddp.vendor_print_verified: "VERIFIED"/"REJECTED".
      */
     private List<String> vendorPrintVerified;
+
+    /**
+     * Filters on eg_grbg_account_ddp.ulb_verification_status: "VERIFIED"/"REJECTED".
+     */
+    private List<String> ulbVerificationStatus;
 
     private Boolean ulbVerified;
 
@@ -92,14 +97,6 @@ public class SearchCriteriaGarbageAccount {
     private Boolean ddpDispatched;
 
     private Boolean isMonthlyBilling;
-
-    /**
-     * Only used by GarbageAccountService#searchRejectedPlates: "VENDOR",
-     * "ULB", or "BOTH" (case-insensitive) to narrow its result down to one
-     * rejection bucket; null returns all rejected plates, matching the
-     * returned records' own rejectedBy key.
-     */
-    private String rejectedBy;
     
 	@Builder.Default
 	private Boolean isPayNow = false;
@@ -130,6 +127,7 @@ public class SearchCriteriaGarbageAccount {
 				.ddpPrintVerified(this.ddpPrintVerified)
 				.isReadyForPrinting(this.isReadyForPrinting)
 				.vendorPrintVerified(copyList(this.vendorPrintVerified))
+				.ulbVerificationStatus(copyList(this.ulbVerificationStatus))
 				.ulbVerified(this.ulbVerified)
 				.installationDone(this.installationDone)
 				.ddpPrintingDone(this.ddpPrintingDone)

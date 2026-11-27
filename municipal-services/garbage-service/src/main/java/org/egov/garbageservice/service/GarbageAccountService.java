@@ -3292,9 +3292,9 @@ public GarbageAccountActionResponse openSearchPayPreview(
 		long offset = null == criteria.getOffset() ? 0L : criteria.getOffset();
 
 		List<RejectedPlateRecord> rejectedPlates = garbageAccountRepository.searchRejectedPlates(
-				criteria.getTenantId(), criteria.getWardNames(), criteria.getRejectedBy(), limit, offset);
+				criteria.getTenantId(), criteria.getWardNames(), limit, offset);
 		long totalCount = garbageAccountRepository.countRejectedPlates(criteria.getTenantId(),
-				criteria.getWardNames(), criteria.getRejectedBy());
+				criteria.getWardNames());
 
 		return RejectedPlatesSearchResponse.builder()
 				.responseInfo(
