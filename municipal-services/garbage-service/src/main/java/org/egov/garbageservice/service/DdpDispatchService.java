@@ -333,7 +333,6 @@ public class DdpDispatchService {
 	private DdpDispatchDetail toDispatchDetail(DdpDispatch batch, RequestInfo requestInfo) {
 		List<ScannedPlateInfo> scannedPlates = buildScannedPlateInfos(batch.getBatchNo(), requestInfo);
 		return DdpDispatchDetail.builder().batchNo(batch.getBatchNo()).ulb(batch.getUlb()).ward(batch.getWard())
-				.district(ddpDispatchRepository.findDistrictForBatch(batch.getBatchNo()))
 				.dispatchDate(batch.getDispatchDate()).receivedBy(batch.getReceivedBy())
 				.ulbReceivingDate(batch.getUlbReceivingDate()).status(batch.getStatus())
 				.totalScanCount(scannedPlates.size()).scannedPlates(scannedPlates)

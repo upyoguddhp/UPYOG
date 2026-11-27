@@ -27,13 +27,6 @@ public class DdpDispatchDetail {
 
 	private String ward;
 
-	/**
-	 * Not stored on eg_grbg_ddp_dispatch; read fresh at search time from one of
-	 * the batch's plates (see DdpDispatchRepository#findDistrictForBatch), so
-	 * batch creation/storage is untouched.
-	 */
-	private String district;
-
 	private Long dispatchDate;
 
 	private String receivedBy;

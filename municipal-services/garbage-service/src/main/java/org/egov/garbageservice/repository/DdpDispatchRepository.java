@@ -66,17 +66,6 @@ public class DdpDispatchRepository {
 			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
 			+ "WHERE ddp.batch_no = ?";
 
-	/**
-	 * district is not stored on eg_grbg_ddp_dispatch; read-only, best-effort
-	 * lookup off any one plate assigned to the batch, purely to enrich the
-	 * search response (see DdpDispatchService#toDispatchDetail).
-	 */
-	private static final String SELECT_DISTRICT_BY_BATCH_NO = "SELECT addr.additional_detail->>'district' as district "
-			+ "FROM eg_grbg_account_ddp ddp "
-			+ "JOIN eg_grbg_account acc ON acc.uuid = ddp.garbage_account_uuid "
-			+ "JOIN eg_grbg_address addr ON addr.garbage_id = acc.garbage_id "
-			+ "WHERE ddp.batch_no = ? AND addr.additional_detail->>'district' IS NOT NULL LIMIT 1";
-
 	private static final String SUBMIT_BATCH = "UPDATE eg_grbg_ddp_dispatch SET status = :status, "
 			+ "dispatch_date = :dispatchDate, modifiedby = :modifiedBy, modifiedtime = :modifiedTime "
 			+ "WHERE batch_no = :batchNo AND status = :currentStatus";
@@ -143,16 +132,6 @@ public class DdpDispatchRepository {
 
 	public void assignPlateToBatch(String garbageAccountUuid, String batchNo) {
 		jdbcTemplate.update(ASSIGN_PLATE_TO_BATCH, batchNo, garbageAccountUuid);
-	}
-
-	/**
-	 * Best-effort district for the batch, read off any one assigned plate's
-	 * address; null if the batch has no plates yet or none of them have a
-	 * district set.
-	 */
-	public String findDistrictForBatch(String batchNo) {
-		List<String> results = jdbcTemplate.queryForList(SELECT_DISTRICT_BY_BATCH_NO, String.class, batchNo);
-		return results.isEmpty() ? null : results.get(0);
 	}
 
 	public List<ScannedPlateRaw> findScannedPlateRawByBatchNo(String batchNo) {
